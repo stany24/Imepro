@@ -10,8 +10,8 @@ namespace LibraryData
     {
         public String UserName = "";
         public String ComputerName = "";
-        public List<String> Urls = new List<String>();
-        public Dictionary<int, String> Processes = new Dictionary<int, String>();
+        public List<String> Urls = new();
+        public Dictionary<int, String> Processes = new();
         public Bitmap? ScreenShot;
 
         public ClientData(string userName, string computerName, List<string> urls, Dictionary<int, string> processes, Bitmap screenShot)
@@ -38,8 +38,8 @@ namespace LibraryData
 
     public class ClientDataForClient: ClientData
     {
-        public Socket SocketSocketToTeacher;
-        readonly public List<string> browsersList = new List<string>{"chrome","firefox","iexplore","safari","opera","msedge"};
+        public Socket? SocketSocketToTeacher;
+        readonly public List<string> browsersList = new() { "chrome","firefox","iexplore","safari","opera","msedge"};
 
         public void GetNames()
         {
@@ -55,21 +55,17 @@ namespace LibraryData
             [DllImport("user32.dll")]
             static extern int GetWindowText(IntPtr hWnd, StringBuilder lpString, int nMaxCount);
 
-            /// <summary>
-            /// Fonction permetant de récupérer le nom des onglets actifs dans sa list de navigateur.
-            /// </summary>
-
             foreach (string singleBrowser in browsersList)
             {
                 Process[] process = Process.GetProcessesByName(singleBrowser);
                 if (process.Length > 0)
                 {
-                    foreach (Process singleProcess in process)
+                    foreach (Process instance in process)
                     {
-                        IntPtr hWnd = singleProcess.MainWindowHandle;
+                        IntPtr hWnd = instance.MainWindowHandle;
 
-                        StringBuilder text = new StringBuilder(GetWindowTextLength(hWnd) + 1);
-                        GetWindowText(hWnd, text, text.Capacity);
+                        StringBuilder text = new(GetWindowTextLength(hWnd) + 1);
+                        _ = GetWindowText(hWnd, text, text.Capacity);
                         if (text.ToString() != "") { Urls.Add(singleBrowser + " : " + text.ToString()); }
                     }
                 }
