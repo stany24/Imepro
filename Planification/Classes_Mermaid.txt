@@ -1,0 +1,20 @@
+classDiagram
+    ClientData <|-- ClientDataForMaster
+    ClientData <|-- ClientDataForClient
+    ClientData : +String UserName
+    ClientData : +String ComputerName
+    ClientData : +List~String~ Urls
+    ClientData : +Dictionary<int,String> DicProcess
+    ClientData : +Bitmap ScreenShot
+
+    class ClientDataForMaster{
+        +Socket ClientSocket
+        +Affichage Affichage
+    }
+
+    class ClientDataForClient{
+        +Socket MasterSocket
+        +GetUrls()
+        +GetProcesses()
+        +GetNames()
+    }
