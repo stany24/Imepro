@@ -133,7 +133,7 @@ namespace ApplicationTeacher
                 socket.ReceiveTimeout = DefaultTimeout;
                 int nbData = socket.Receive(dataBuffer);
                 Array.Resize(ref dataBuffer, nbData);
-                student = new DataForTeacher(JsonSerializer.Deserialize<Data>(Encoding.Default.GetString(dataBuffer)));
+                student = new(JsonSerializer.Deserialize<Data>(Encoding.Default.GetString(dataBuffer)));
                 student.SocketToStudent = socket;
                 //student.affichage = affichage;
                 /*lbxClients.Invoke(new MethodInvoker(delegate {
@@ -172,56 +172,70 @@ namespace ApplicationTeacher
         public void RecordScreen()
         {
             foreach (DataForTeacher student in AllStudents) { student.SocketToStudent.Send(Encoding.ASCII.GetBytes("receive")); }
-            using (var udpClient = new UdpClient(AddressFamily.InterNetwork))
+            using var udpClient = new UdpClient(AddressFamily.InterNetwork);
+            var address = IPAddress.Parse("224.0.0.1");
+            var ipEndPoint = new IPEndPoint(address, 11112);
+            udpClient.JoinMulticastGroup(address);
+            while (true)
             {
-                var address = IPAddress.Parse("224.0.0.1");
-                var ipEndPoint = new IPEndPoint(address, 11112);
-                udpClient.JoinMulticastGroup(address);
-                int headerSize = 5;
-                while (true)
+                Screen screen = Screen.AllScreens[1];
+                Bitmap bitmap = new(screen.Bounds.Width, screen.Bounds.Height, PixelFormat.Format32bppArgb);
+                Rectangle ScreenSize = screen.Bounds;
+                Graphics.FromImage(bitmap).CopyFromScreen(ScreenSize.Left, ScreenSize.Top, 0, 0, ScreenSize.Size);
+                ImageConverter converter = new();
+                byte[] imageArray = (byte[])converter.ConvertTo(bitmap, typeof(byte[]));
+                pbxScreenShot.Invoke(new MethodInvoker(delegate { pbxScreenShot.Image = bitmap; }));
+                int messageLength = 65000;
+                lbxConnexion.Invoke(new MethodInvoker(delegate { lbxConnexion.Items.Add(imageArray.Length); }));
+                for (int i = 0; i < imageArray.Length / messageLength + 1; i++)
                 {
-                    Screen screen = Screen.AllScreens[1];
-                    Bitmap bitmap = new Bitmap(screen.Bounds.Width, screen.Bounds.Height, PixelFormat.Format32bppArgb);
-                    Rectangle ScreenSize = screen.Bounds;
-                    Graphics.FromImage(bitmap).CopyFromScreen(ScreenSize.Left, ScreenSize.Top, 0, 0, ScreenSize.Size);
-                    ImageConverter converter = new ImageConverter();
-                    byte[] imageArray = (byte[])converter.ConvertTo(bitmap, typeof(byte[]));
-                    pbxScreenShot.Invoke(new MethodInvoker(delegate { pbxScreenShot.Image = bitmap; }));
-                    int messageLength = 65000;
-                    lbxConnexion.Invoke(new MethodInvoker(delegate { lbxConnexion.Items.Add(imageArray.Length); }));
-                    for (int i = 0; i < imageArray.Length / (messageLength - headerSize) + 1; i++)
+                    byte[] message = new byte[messageLength];
+                    int size = messageLength;
+                    if (i >= imageArray.Length / messageLength)
                     {
-                        byte[] message = new byte[messageLength];
-                        string strHeader = "datas";
-                        int size = messageLength;
-                        if (i == 0) { strHeader = "start"; }
-                        if (i >= imageArray.Length / messageLength) { strHeader = "ended"; }
-                        for (int j = 0; j < headerSize; j++) { message[j] = Encoding.ASCII.GetBytes(strHeader)[j]; }
-                        if (strHeader == "ended")
+                        for (int j = 0; j < imageArray.Length % (messageLength); j++)
                         {
-                            for (int j = 0; j < imageArray.Length % (messageLength - headerSize); j++)
-                            {
-                                message[j + headerSize] = imageArray[i * (messageLength - headerSize) + j];
-                            }
-                            Array.Resize(ref message, imageArray.Length % messageLength - headerSize);
-                            size = message.Length;
+                            message[j] = imageArray[i * (messageLength) + j];
                         }
-                        else
-                        {
-                            for (int j = 0; j < messageLength - headerSize; j++) { message[j + headerSize] = imageArray[i * (messageLength - headerSize) + j]; }
-                        }
-                        udpClient.Send(message, size, ipEndPoint);
+                        Array.Resize(ref message, imageArray.Length % messageLength);
+                        size = message.Length;
                     }
+                    else
+                    {
+                        for (int j = 0; j < messageLength; j++) { message[j] = imageArray[i * messageLength + j]; }
+                    }
+                    udpClient.Send(message, size, ipEndPoint);
                 }
             }
         }
 
-        private void bthShare_Click(object sender, EventArgs e)
+        private void ShareScreen(object sender, EventArgs e)
         {
             if (AllStudents.Count != 0)
             {
                 ScreenSharer = Task.Run(RecordScreen);
             }
+        }
+
+        public void TeacherAppResized(object sender, EventArgs e)
+        {
+            if (FormWindowState.Minimized == this.WindowState)
+            {
+                TrayIconTeacher.Visible = true;
+                this.Hide();
+            }
+            else if (FormWindowState.Normal == this.WindowState) { TrayIconTeacher.Visible = false; }
+        }
+
+        /// <summary>
+        /// Lorsque le TrayIcon est pressé on affiche la fenêtre qui était cachée
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        public void TrayIconTeacherClick(object sender, EventArgs e)
+        {
+            this.Show();
+            this.WindowState = FormWindowState.Normal;
         }
     }
 }

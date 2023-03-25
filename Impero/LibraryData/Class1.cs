@@ -100,6 +100,7 @@ namespace LibraryData
             [DllImport("user32.dll")]
             static extern int GetWindowText(IntPtr hWnd, StringBuilder lpString, int nMaxCount);
 
+            Urls.Clear();
             foreach (string singleBrowser in browsersList)
             {
                 Process[] process = Process.GetProcessesByName(singleBrowser);

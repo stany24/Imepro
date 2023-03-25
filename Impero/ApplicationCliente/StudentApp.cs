@@ -109,11 +109,11 @@ namespace ApplicationCliente
 
         public void ScreenReceiver()
         {
-            UdpClient udpClient = new UdpClient(11112);
+            UdpClient udpClient = new(11112);
             udpClient.Client.ReceiveBufferSize = 99999999;
             udpClient.JoinMulticastGroup(IPAddress.Parse("224.0.0.1"));
-            var ipEndPoint = new IPEndPoint(IPAddress.Any, 0);
-            int headerSize = 5;
+            var ipEndPoint = new IPEndPoint(IPAddress.Parse("192.168.1.38"), 11112);
+            lbxConnexion.Invoke(new MethodInvoker(delegate { lbxConnexion.Items.Add("Udp Client Ok"); }));
             // Receive messages
             while (true)
             {
@@ -121,15 +121,15 @@ namespace ApplicationCliente
                 {
                     byte[] imageBuffer = new byte[1048576];
                     int lastId = 0;
-                    string header;
                     do
                     {
+                        lbxConnexion.Invoke(new MethodInvoker(delegate { lbxConnexion.Items.Add("Waiting for reception"); }));
                         byte[] message = udpClient.Receive(ref ipEndPoint);
-                        header = Encoding.Default.GetString(message).Substring(0, headerSize);
-                        for (int i = 0; i < message.Length - headerSize; i++) { imageBuffer[i + lastId] = message[i + headerSize]; }
-                        lastId += message.Length - headerSize;
-                        lbxConnexion.Invoke(new MethodInvoker(delegate { lbxConnexion.Items.Add(header + ": " + message.Length); }));
-                    } while (header != "ended");
+                        lbxConnexion.Invoke(new MethodInvoker(delegate { lbxConnexion.Items.Add("Reception ok"); }));
+                        for (int i = 0; i < message.Length; i++) { imageBuffer[i + lastId] = message[i]; }
+                        lastId += message.Length;
+                        lbxConnexion.Invoke(new MethodInvoker(delegate { lbxConnexion.Items.Add(" Received: " + message.Length + " bytes"); }));
+                    } while (lastId % 65000 == 0);
                     lbxConnexion.Invoke(new MethodInvoker(delegate { lbxConnexion.Items.Add(lastId); }));
                     Bitmap bitmap = new Bitmap(new MemoryStream(imageBuffer));
                     pbxScreeShot.Invoke(new MethodInvoker(delegate { pbxScreeShot.Image = bitmap; }));

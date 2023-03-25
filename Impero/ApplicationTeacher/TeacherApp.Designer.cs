@@ -28,11 +28,13 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.lbxConnexion = new System.Windows.Forms.ListBox();
             this.lbxRequetes = new System.Windows.Forms.ListBox();
             this.lbxClients = new System.Windows.Forms.ListBox();
             this.pbxScreenShot = new System.Windows.Forms.PictureBox();
             this.bthShare = new System.Windows.Forms.Button();
+            this.TrayIconTeacher = new System.Windows.Forms.NotifyIcon(this.components);
             ((System.ComponentModel.ISupportInitialize)(this.pbxScreenShot)).BeginInit();
             this.SuspendLayout();
             // 
@@ -77,7 +79,14 @@
             this.bthShare.TabIndex = 8;
             this.bthShare.Text = "Share Screen";
             this.bthShare.UseVisualStyleBackColor = true;
-            this.bthShare.Click += new System.EventHandler(this.bthShare_Click);
+            this.bthShare.Click += new System.EventHandler(this.ShareScreen);
+            // 
+            // TrayIconTeacher
+            // 
+            this.TrayIconTeacher.Text = "TrayIconTeacher";
+            this.TrayIconTeacher.Visible = true;
+            this.TrayIconTeacher.MouseClick += new System.Windows.Forms.MouseEventHandler(this.TrayIconTeacherClick);
+            this.TrayIconTeacher.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.TrayIconTeacherClick);
             // 
             // TeacherApp
             // 
@@ -91,6 +100,7 @@
             this.Controls.Add(this.lbxConnexion);
             this.Name = "TeacherApp";
             this.Text = "Teacher";
+            this.SizeChanged += new System.EventHandler(this.TeacherAppResized);
             ((System.ComponentModel.ISupportInitialize)(this.pbxScreenShot)).EndInit();
             this.ResumeLayout(false);
 
@@ -103,6 +113,7 @@
         private System.Windows.Forms.ListBox lbxClients;
         private System.Windows.Forms.PictureBox pbxScreenShot;
         private System.Windows.Forms.Button bthShare;
+        private System.Windows.Forms.NotifyIcon TrayIconTeacher;
     }
 }
 
