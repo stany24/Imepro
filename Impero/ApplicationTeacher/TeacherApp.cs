@@ -173,7 +173,8 @@ namespace ApplicationTeacher
         {
             foreach (DataForTeacher student in AllStudents) { student.SocketToStudent.Send(Encoding.ASCII.GetBytes("receive")); }
             using var udpClient = new UdpClient(AddressFamily.InterNetwork);
-            var address = IPAddress.Parse("224.0.0.1");
+            udpClient.Client.SetSocketOption(SocketOptionLevel.IP, SocketOptionName.IpTimeToLive, 3);
+            var address = IPAddress.Parse("224.100.0.1");
             var ipEndPoint = new IPEndPoint(address, 11112);
             udpClient.JoinMulticastGroup(address);
             while (true)
