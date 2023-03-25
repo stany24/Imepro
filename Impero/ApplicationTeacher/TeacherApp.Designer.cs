@@ -32,6 +32,7 @@
             this.lbxRequetes = new System.Windows.Forms.ListBox();
             this.lbxClients = new System.Windows.Forms.ListBox();
             this.pbxScreenShot = new System.Windows.Forms.PictureBox();
+            this.bthShare = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.pbxScreenShot)).BeginInit();
             this.SuspendLayout();
             // 
@@ -56,7 +57,7 @@
             this.lbxClients.FormattingEnabled = true;
             this.lbxClients.Location = new System.Drawing.Point(12, 12);
             this.lbxClients.Name = "lbxClients";
-            this.lbxClients.Size = new System.Drawing.Size(1072, 134);
+            this.lbxClients.Size = new System.Drawing.Size(972, 134);
             this.lbxClients.TabIndex = 6;
             // 
             // pbxScreenShot
@@ -68,11 +69,22 @@
             this.pbxScreenShot.TabIndex = 7;
             this.pbxScreenShot.TabStop = false;
             // 
+            // bthShare
+            // 
+            this.bthShare.Location = new System.Drawing.Point(990, 12);
+            this.bthShare.Name = "bthShare";
+            this.bthShare.Size = new System.Drawing.Size(94, 21);
+            this.bthShare.TabIndex = 8;
+            this.bthShare.Text = "Share Screen";
+            this.bthShare.UseVisualStyleBackColor = true;
+            this.bthShare.Click += new System.EventHandler(this.bthShare_Click);
+            // 
             // TeacherApp
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1413, 642);
+            this.Controls.Add(this.bthShare);
             this.Controls.Add(this.pbxScreenShot);
             this.Controls.Add(this.lbxClients);
             this.Controls.Add(this.lbxRequetes);
@@ -90,6 +102,7 @@
         private System.Windows.Forms.ListBox lbxRequetes;
         private System.Windows.Forms.ListBox lbxClients;
         private System.Windows.Forms.PictureBox pbxScreenShot;
+        private System.Windows.Forms.Button bthShare;
     }
 }
 

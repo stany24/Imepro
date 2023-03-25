@@ -8,6 +8,7 @@ using LibraryData;
 using System.Text;
 using System.Drawing;
 using System.Text.Json;
+using System.IO;
 
 namespace ApplicationCliente
 {
@@ -81,7 +82,7 @@ namespace ApplicationCliente
                     case "data": SendData(); break;
                     case "image": SendImage(); break;
                     //case "kill": KillSelectedProcess(Convert.ToInt32(text.Split(' ')[1])); break;
-                    //case "receive": Task.Run(() => ScreenReceiver()); break;
+                    case "receive": Task.Run(() => ScreenReceiver()); break;
                     case "stop": Client.SocketToTeacher = null; Task.Run(() => ConnectToMaster()); return;
                 }
             }
@@ -104,6 +105,40 @@ namespace ApplicationCliente
             ImageConverter converter = new ImageConverter();
             image = (byte[])converter.ConvertTo(Client.ScreenShot, typeof(byte[]));
             Client.SocketToTeacher.Send(image, 0, image.Length, SocketFlags.None);
+        }
+
+        public void ScreenReceiver()
+        {
+            UdpClient udpClient = new UdpClient(11112);
+            udpClient.Client.ReceiveBufferSize = 99999999;
+            udpClient.JoinMulticastGroup(IPAddress.Parse("224.0.0.1"));
+            var ipEndPoint = new IPEndPoint(IPAddress.Any, 0);
+            int headerSize = 5;
+            // Receive messages
+            while (true)
+            {
+                try
+                {
+                    byte[] imageBuffer = new byte[1048576];
+                    int lastId = 0;
+                    string header;
+                    do
+                    {
+                        byte[] message = udpClient.Receive(ref ipEndPoint);
+                        header = Encoding.Default.GetString(message).Substring(0, headerSize);
+                        for (int i = 0; i < message.Length - headerSize; i++) { imageBuffer[i + lastId] = message[i + headerSize]; }
+                        lastId += message.Length - headerSize;
+                        lbxConnexion.Invoke(new MethodInvoker(delegate { lbxConnexion.Items.Add(header + ": " + message.Length); }));
+                    } while (header != "ended");
+                    lbxConnexion.Invoke(new MethodInvoker(delegate { lbxConnexion.Items.Add(lastId); }));
+                    Bitmap bitmap = new Bitmap(new MemoryStream(imageBuffer));
+                    pbxScreeShot.Invoke(new MethodInvoker(delegate { pbxScreeShot.Image = bitmap; }));
+                }
+                catch
+                {
+                    lbxConnexion.Invoke(new MethodInvoker(delegate { lbxConnexion.Items.Add("l'image n'a pas étée recue"); }));
+                }
+            }
         }
     }
 }
