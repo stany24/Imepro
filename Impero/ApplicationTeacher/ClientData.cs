@@ -1,10 +1,12 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Net.Sockets;
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace LibraryData
+namespace ApplicationCliente
 {
     public class ClientData
     {
@@ -12,7 +14,7 @@ namespace LibraryData
         public String ComputerName = "";
         public List<String> Urls = new();
         public Dictionary<int, String> Processes = new();
-        public Bitmap? ScreenShot;
+        public Bitmap ScreenShot;
 
         public ClientData(string userName, string computerName, List<string> urls, Dictionary<int, string> processes, Bitmap screenShot)
         {
@@ -26,7 +28,7 @@ namespace LibraryData
         public ClientData() { }
     }
 
-    public class ClientDataForTeacher: ClientData
+    public class ClientDataForTeacher : ClientData
     {
         public Socket SocketToClient;
 
@@ -36,10 +38,10 @@ namespace LibraryData
         }
     }
 
-    public class ClientDataForClient: ClientData
+    public class ClientDataForClient : ClientData
     {
-        public Socket? SocketSocketToTeacher;
-        readonly public List<string> browsersList = new() { "chrome","firefox","iexplore","safari","opera","msedge"};
+        public Socket SocketSocketToTeacher;
+        readonly public List<string> browsersList = new() { "chrome", "firefox", "iexplore", "safari", "opera", "msedge" };
 
         public void GetNames()
         {
@@ -50,7 +52,7 @@ namespace LibraryData
         public void GetUrl()
         {
             [DllImport("user32.dll")]
-            static extern int GetWindowTextLength(IntPtr hWnd);
+             static extern int GetWindowTextLength(IntPtr hWnd);
 
             [DllImport("user32.dll")]
             static extern int GetWindowText(IntPtr hWnd, StringBuilder lpString, int nMaxCount);
