@@ -6,6 +6,8 @@ using System.Drawing.Imaging;
 using System.Linq;
 using System.Net.Sockets;
 using System.Runtime.InteropServices;
+using System.Runtime.Serialization;
+using System.ServiceModel;
 using System.Text;
 using System.Text.Json.Serialization;
 using System.Windows.Forms;
@@ -161,6 +163,25 @@ namespace LibraryData
             //FullImage = (new Bitmap(FullImage, new Size(200,200)));
             ScreenShot = FullImage;
             FullGraphics.Dispose();
+        }
+    }
+
+    [ServiceContract]
+    public interface IScreenShotInterface
+    {
+        [OperationContract(IsOneWay = true)]
+        void SendScreenShot(ScreenShotPart part);
+    }
+
+    [DataContract]
+    public class ScreenShotPart
+    {
+        [DataMember]
+        public byte[] Part;
+
+        public ScreenShotPart(byte[] part)
+        {
+            Part = part;
         }
     }
 }
