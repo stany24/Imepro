@@ -27,7 +27,7 @@ namespace ApplicationTeacher
         {
             InitializeComponent();
             Task.Run(LogClients);
-            //Task.Run(AskingData);
+            Task.Run(AskingData);
         }
 
         public void LogClients()
@@ -177,6 +177,7 @@ namespace ApplicationTeacher
             var address = IPAddress.Parse("224.100.0.1");
             var ipEndPoint = new IPEndPoint(address, 11112);
             udpClient.JoinMulticastGroup(address);
+
             while (true)
             {
                 Screen screen = Screen.AllScreens[1];
@@ -185,6 +186,7 @@ namespace ApplicationTeacher
                 Graphics.FromImage(bitmap).CopyFromScreen(ScreenSize.Left, ScreenSize.Top, 0, 0, ScreenSize.Size);
                 ImageConverter converter = new();
                 byte[] imageArray = (byte[])converter.ConvertTo(bitmap, typeof(byte[]));
+
                 int messageLength = 65000;
                 lbxConnexion.Invoke(new MethodInvoker(delegate { lbxConnexion.Items.Add(imageArray.Length); }));
                 for (int i = 0; i < imageArray.Length / messageLength + 1; i++)
@@ -194,13 +196,13 @@ namespace ApplicationTeacher
                     if (i < imageArray.Length / messageLength)
                     {
                         for (int j = 0; j < messageLength; j++) { message[j] = imageArray[i * messageLength + j]; }
-                        
+
                     }
                     else
                     {
-                        for (int j = 0; j < imageArray.Length % (messageLength); j++){message[j] = imageArray[i * messageLength + j];}
+                        for (int j = 0; j < imageArray.Length % messageLength; j++) { message[j] = imageArray[i * messageLength + j]; }
                         Array.Resize(ref message, imageArray.Length % messageLength);
-                        size = message.Length;
+                        size = imageArray.Length % messageLength;
                     }
                     udpClient.Send(message, size, ipEndPoint);
                 }
