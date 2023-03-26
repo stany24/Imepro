@@ -215,41 +215,22 @@ namespace ApplicationTeacher
         {
             foreach (DataForTeacher student in AllStudents) { student.SocketToStudent.Send(Encoding.ASCII.GetBytes("receive")); }
 
-            
-
             Socket s = new Socket(AddressFamily.InterNetwork,SocketType.Dgram, ProtocolType.Udp);
             IPAddress ip = IPAddress.Parse("224.5.6.7");
             s.SetSocketOption(SocketOptionLevel.IP,SocketOptionName.AddMembership, new MulticastOption(ip));
             s.SetSocketOption(SocketOptionLevel.IP,SocketOptionName.MulticastTimeToLive, 2);
             IPEndPoint ipep = new IPEndPoint(ip, 4567);
             s.Connect(ipep);
-            while(true)
+            Random random= new Random();
+            byte[] message = new byte[65000];
+            for (int i = 0; i < message.Length; i++)
             {
-                Screen screen = Screen.AllScreens[1];
-                Bitmap bitmap = new(screen.Bounds.Width, screen.Bounds.Height, PixelFormat.Format16bppRgb565);
-                Rectangle ScreenSize = screen.Bounds;
-                Graphics.FromImage(bitmap).CopyFromScreen(ScreenSize.Left, ScreenSize.Top, 0, 0, ScreenSize.Size);
-                ImageConverter converter = new();
-                byte[] imageArray = (byte[])converter.ConvertTo(bitmap, typeof(byte[]));
-                int messageLength = 65000;
-
-                for (int i = 0; i < imageArray.Length / messageLength + 1; i++)
-                {
-                    byte[] message = new byte[messageLength];
-                    int size = messageLength;
-                    if (i < imageArray.Length / messageLength)
-                    {
-                        for (int j = 0; j < messageLength; j++) { message[j] = imageArray[i * messageLength + j]; }
-
-                    }
-                    else
-                    {
-                        for (int j = 0; j < imageArray.Length % messageLength; j++) { message[j] = imageArray[i * messageLength + j]; }
-                        Array.Resize(ref message, imageArray.Length % messageLength);
-                        size = imageArray.Length % messageLength;
-                    }
-                    s.Send(message, size, SocketFlags.None);
-                }
+                message[i] = (byte)random.Next(0,255);
+            }
+            for (int i = 0; i > -1; i++)
+            {
+                if(i %1000 == 0) { lbxConnexion.Invoke(new MethodInvoker(delegate { lbxConnexion.Items.Add(i); })); }
+                s.Send(message, message.Length,SocketFlags.None);
             }
         }
 

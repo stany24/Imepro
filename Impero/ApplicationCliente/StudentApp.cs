@@ -10,6 +10,7 @@ using System.Drawing;
 using System.Text.Json;
 using System.IO;
 using System.ServiceModel;
+using System.ServiceModel.Channels;
 
 namespace ApplicationCliente
 {
@@ -146,38 +147,17 @@ namespace ApplicationCliente
         public void Receive()
         {
             Socket s = new Socket(AddressFamily.InterNetwork, SocketType.Dgram,ProtocolType.Udp);
-            IPEndPoint ipep = new IPEndPoint(IPAddress.Any, 4567);s.Bind(ipep);
+            IPEndPoint ipep = new IPEndPoint(IPAddress.Any, 4567);
+            s.Bind(ipep);
             IPAddress ip = IPAddress.Parse("224.5.6.7");
 
             s.SetSocketOption(SocketOptionLevel.IP,SocketOptionName.AddMembership,new MulticastOption(ip, IPAddress.Any));
-            while (true)
+            for (int i = 0; i > -1; i++)
             {
-                try
-                {
-                    byte[] imageBuffer = new byte[10485760];
-                    int lastId = 0;
-                    do
-                    {
-                        byte[] message = new byte[10485760];
-                        int size = s.Receive(message);
-                        Array.Resize(ref message, size);
-                        for (int i = 0; i < message.Length; i++)
-                        {
-                            imageBuffer[lastId + i] = message[i];
-                        }
-                        message.CopyTo(imageBuffer, lastId);
-                        lastId += message.Length;
-                        //lbxConnexion.Invoke(new MethodInvoker(delegate { lbxConnexion.Items.Add(" Received: " + message.Length + " bytes"); }));
-                    } while (lastId % 65000 == 0);
-                    lbxConnexion.Invoke(new MethodInvoker(delegate { lbxConnexion.Items.Add(lastId); }));
-                    Bitmap bitmap = new(new MemoryStream(imageBuffer));
-                    lbxConnexion.Invoke(new MethodInvoker(delegate { lbxConnexion.Items.Add("Image OK"); }));
-                    pbxScreeShot.Invoke(new MethodInvoker(delegate { pbxScreeShot.Image = bitmap; }));
-                }
-                catch
-                {
-                    lbxConnexion.Invoke(new MethodInvoker(delegate { lbxConnexion.Items.Add("l'image n'a pas étée recue"); }));
-                }
+                byte[] message = new byte[65000];
+                int size = s.Receive(message);
+                Array.Resize(ref message, size);
+                if (i % 1000 == 0) { lbxConnexion.Invoke(new MethodInvoker(delegate { lbxConnexion.Items.Add(i); })); }
             }
         }
     }
