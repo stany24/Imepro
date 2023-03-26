@@ -117,11 +117,15 @@ namespace ApplicationCliente
             {
                 try
                 {
-                    byte[] imageBuffer = new byte[104857600];
+                    byte[] imageBuffer = new byte[10485760];
                     int lastId = 0;
                     do
                     {
                         byte[] message = udpClient.Receive(ref ipEndPoint);
+                        for (int i = 0; i < message.Length; i++)
+                        {
+                            imageBuffer[lastId + i] = message[i];
+                        }
                         message.CopyTo(imageBuffer, lastId);
                         lastId += message.Length;
                         //lbxConnexion.Invoke(new MethodInvoker(delegate { lbxConnexion.Items.Add(" Received: " + message.Length + " bytes"); }));
