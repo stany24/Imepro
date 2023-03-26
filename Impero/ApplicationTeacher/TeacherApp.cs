@@ -27,7 +27,7 @@ namespace ApplicationTeacher
         {
             InitializeComponent();
             Task.Run(LogClients);
-            Task.Run(AskingData);
+            //Task.Run(AskingData);
         }
 
         public void LogClients()
@@ -173,40 +173,57 @@ namespace ApplicationTeacher
         {
             foreach (DataForTeacher student in AllStudents) { student.SocketToStudent.Send(Encoding.ASCII.GetBytes("receive")); }
             using var udpClient = new UdpClient(AddressFamily.InterNetwork);
-            udpClient.Client.SetSocketOption(SocketOptionLevel.IP, SocketOptionName.IpTimeToLive, 3);
+            //udpClient.Client.SetSocketOption(SocketOptionLevel.IP, SocketOptionName.IpTimeToLive, 3);
             var address = IPAddress.Parse("224.100.0.1");
             var ipEndPoint = new IPEndPoint(address, 11112);
             udpClient.JoinMulticastGroup(address);
             while (true)
             {
                 Screen screen = Screen.AllScreens[1];
-                Bitmap bitmap = new(screen.Bounds.Width, screen.Bounds.Height, PixelFormat.Format32bppArgb);
+                Bitmap bitmap = new(screen.Bounds.Width, screen.Bounds.Height, PixelFormat.Format16bppRgb565);
                 Rectangle ScreenSize = screen.Bounds;
                 Graphics.FromImage(bitmap).CopyFromScreen(ScreenSize.Left, ScreenSize.Top, 0, 0, ScreenSize.Size);
                 ImageConverter converter = new();
                 byte[] imageArray = (byte[])converter.ConvertTo(bitmap, typeof(byte[]));
-                pbxScreenShot.Invoke(new MethodInvoker(delegate { pbxScreenShot.Image = bitmap; }));
                 int messageLength = 65000;
                 lbxConnexion.Invoke(new MethodInvoker(delegate { lbxConnexion.Items.Add(imageArray.Length); }));
                 for (int i = 0; i < imageArray.Length / messageLength + 1; i++)
                 {
                     byte[] message = new byte[messageLength];
                     int size = messageLength;
-                    if (i >= imageArray.Length / messageLength)
+                    if (i < imageArray.Length / messageLength)
                     {
-                        for (int j = 0; j < imageArray.Length % (messageLength); j++)
-                        {
-                            message[j] = imageArray[i * (messageLength) + j];
-                        }
-                        Array.Resize(ref message, imageArray.Length % messageLength);
-                        size = message.Length;
+                        for (int j = 0; j < messageLength; j++) { message[j] = imageArray[i * messageLength + j]; }
+                        
                     }
                     else
                     {
-                        for (int j = 0; j < messageLength; j++) { message[j] = imageArray[i * messageLength + j]; }
+                        for (int j = 0; j < imageArray.Length % (messageLength); j++){message[j] = imageArray[i * messageLength + j];}
+                        Array.Resize(ref message, imageArray.Length % messageLength);
+                        size = message.Length;
                     }
                     udpClient.Send(message, size, ipEndPoint);
                 }
+                pbxScreenShot.Invoke(new MethodInvoker(delegate { pbxScreenShot.Image = bitmap; }));
+            }
+        }
+
+        public static Bitmap ResizeImage(Bitmap imgToResize, Size size)
+        {
+            try
+            {
+                Bitmap resizedImage = new Bitmap(size.Width, size.Height);
+                using (Graphics graphics = Graphics.FromImage((Image)resizedImage))
+                {
+                    graphics.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
+                    graphics.DrawImage(imgToResize, 0, 0, size.Width, size.Height);
+                }
+                return resizedImage;
+            }
+            catch
+            {
+                Console.WriteLine("Bitmap could not be resized");
+                return imgToResize;
             }
         }
 
