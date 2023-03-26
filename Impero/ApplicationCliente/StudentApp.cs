@@ -102,7 +102,7 @@ namespace ApplicationCliente
         {
             Client.TakeScreenShot();
             byte[] image;
-            ImageConverter converter = new ImageConverter();
+            ImageConverter converter = new();
             image = (byte[])converter.ConvertTo(Client.ScreenShot, typeof(byte[]));
             Client.SocketToTeacher.Send(image, 0, image.Length, SocketFlags.None);
         }
@@ -110,7 +110,6 @@ namespace ApplicationCliente
         public void ScreenReceiver()
         {
             UdpClient udpClient = new(11112);
-            udpClient.Client.ReceiveBufferSize = 99999999;
             udpClient.JoinMulticastGroup(IPAddress.Parse("224.100.0.1"));
             var ipEndPoint = new IPEndPoint(IPAddress.Any, 0);
             // Receive messages
@@ -125,10 +124,11 @@ namespace ApplicationCliente
                         byte[] message = udpClient.Receive(ref ipEndPoint);
                         message.CopyTo(imageBuffer, lastId);
                         lastId += message.Length;
-                        lbxConnexion.Invoke(new MethodInvoker(delegate { lbxConnexion.Items.Add(" Received: " + message.Length + " bytes"); }));
+                        //lbxConnexion.Invoke(new MethodInvoker(delegate { lbxConnexion.Items.Add(" Received: " + message.Length + " bytes"); }));
                     } while (lastId % 65000 == 0);
                     lbxConnexion.Invoke(new MethodInvoker(delegate { lbxConnexion.Items.Add(lastId); }));
-                    Bitmap bitmap = new Bitmap(new MemoryStream(imageBuffer));
+                    Bitmap bitmap = new(new MemoryStream(imageBuffer));
+                    lbxConnexion.Invoke(new MethodInvoker(delegate { lbxConnexion.Items.Add("Image OK"); }));
                     pbxScreeShot.Invoke(new MethodInvoker(delegate { pbxScreeShot.Image = bitmap; }));
                 }
                 catch
