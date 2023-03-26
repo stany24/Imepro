@@ -150,14 +150,21 @@ namespace ApplicationCliente
             IPEndPoint ipep = new IPEndPoint(IPAddress.Any, 4567);
             s.Bind(ipep);
             IPAddress ip = IPAddress.Parse("224.5.6.7");
-
+            byte[] message = new byte[65000];
             s.SetSocketOption(SocketOptionLevel.IP,SocketOptionName.AddMembership,new MulticastOption(ip, IPAddress.Any));
             for (int i = 0; i > -1; i++)
             {
-                byte[] message = new byte[65000];
-                int size = s.Receive(message);
-                Array.Resize(ref message, size);
-                if (i % 1000 == 0) { lbxConnexion.Invoke(new MethodInvoker(delegate { lbxConnexion.Items.Add(i); })); }
+                try
+                {
+                    int size = s.Receive(message);
+                    Array.Resize(ref message, size);
+                    Bitmap bitmap = new(new MemoryStream(message));
+                    pbxScreeShot.Invoke(new MethodInvoker(delegate { pbxScreeShot.Image = bitmap; }));
+                    if (i % 10 == 0){lbxConnexion.Invoke(new MethodInvoker(delegate { lbxConnexion.Items.Add(i); }));}
+                }
+                catch {
+                    lbxConnexion.Invoke(new MethodInvoker(delegate { lbxConnexion.Items.Add("Error: "+i); }));
+                }
             }
         }
     }
