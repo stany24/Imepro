@@ -66,8 +66,8 @@ namespace LibraryData
         {
             UserName = data.UserName;
             ComputerName = data.ComputerName;
-            Urls= data.Urls;
-            Processes= data.Processes;
+            Urls = data.Urls;
+            Processes = data.Processes;
         }
     }
 

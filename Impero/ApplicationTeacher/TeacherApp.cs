@@ -14,21 +14,29 @@ using System.Threading;
 using System.IO;
 using System.Text.Json;
 using System.Drawing.Imaging;
-using System.ServiceModel;
 
 namespace ApplicationTeacher
 {
     public partial class TeacherApp : Form
     {
-        readonly List<DataForTeacher> AllStudents = new();
+        List<DataForTeacher> AllStudents = new();
+        Dictionary<DataForTeacher,DisplayStudent> AllStudentAffichages = new();
         Task ScreenSharer;
         readonly int DurationBetweenDemand = 15;
         readonly int DefaultTimeout = 2000;
         public TeacherApp()
         {
             InitializeComponent();
+            lblStudents.DataSource = AllStudents;
             Task.Run(LogClients);
             Task.Run(AskingData);
+        }
+
+        public void UpdateDataSource(object sender, EventArgs e)
+        {
+            lblStudents.DisplayMember = "UserName";
+            lblStudents.DataSource = null;
+            lblStudents.DataSource = AllStudents;
         }
 
         public void LogClients()
@@ -58,10 +66,11 @@ namespace ApplicationTeacher
                     Socket clientSocket = listener.Accept();
                     lbxConnexion.Invoke(new MethodInvoker(delegate { lbxConnexion.Items.Add("New connexion to " + clientSocket.RemoteEndPoint); }));
                     AllStudents.Add(new DataForTeacher(clientSocket));
-                    /*lbxClients.Invoke(new MethodInvoker(delegate {
-                        lbxClients.DataSource = null;
-                        lbxClients.DataSource = AllClients;
-                    }));*/
+                    lbxClients.Invoke(new MethodInvoker(delegate {
+                        lblStudents.DisplayMember = "UserName";
+                        lblStudents.DataSource = null;
+                        lblStudents.DataSource = AllStudents;
+                    }));
                 }
                 catch (Exception e) { lbxConnexion.Invoke(new MethodInvoker(delegate { lbxConnexion.Items.Add(e.ToString()); })); }
             }
@@ -104,12 +113,19 @@ namespace ApplicationTeacher
                     foreach (DataForTeacher client in ClientToRemove)
                     {
                         AllStudents.Remove(client);
-                        /*lbxClients.Invoke(new MethodInvoker(delegate {
-                            lbxClients.DataSource = null;
-                            lbxClients.DataSource = AllClients;
-                        }));*/
+                        AllStudentAffichages.Remove(client);
+                        lbxClients.Invoke(new MethodInvoker(delegate {
+                            lblStudents.DisplayMember = "UserName";
+                            lblStudents.DataSource = null;
+                            lblStudents.DataSource = AllStudents;
+                        }));
                         lbxRequetes.Invoke(new MethodInvoker(delegate { lbxRequetes.Items.Add("Le client " + client.UserName + "à été retiré"); }));
                     }
+                    foreach (KeyValuePair<DataForTeacher, DisplayStudent> current in AllStudentAffichages)
+                    {
+                        current.Value.UpdateAffichage();
+                    }
+
                     //foreach (DataForTeacher client in AllClients) { client.UpdateAffichage(); }
                     DateTime FinishedUpdate = DateTime.Now;
                     TimeSpan UpdateDuration = FinishedUpdate - StartUpdate;
@@ -137,10 +153,11 @@ namespace ApplicationTeacher
                 student = new(JsonSerializer.Deserialize<Data>(Encoding.Default.GetString(dataBuffer)));
                 student.SocketToStudent = socket;
                 //student.affichage = affichage;
-                /*lbxClients.Invoke(new MethodInvoker(delegate {
-                    lbxClients.DataSource = null;
-                    lbxClients.DataSource = AllClients;
-                }));*/
+                lbxClients.Invoke(new MethodInvoker(delegate {
+                    lblStudents.DisplayMember = "UserName";
+                    lblStudents.DataSource = null;
+                    lblStudents.DataSource = AllStudents;
+                }));
                 lbxRequetes.Invoke(new MethodInvoker(delegate { lbxRequetes.Items.Add("data recue de " + student.UserName); }));
                 return student;
             }
@@ -161,10 +178,11 @@ namespace ApplicationTeacher
                 int nbData = socket.Receive(imageBuffer, 0, imageBuffer.Length, SocketFlags.None);
                 Array.Resize(ref imageBuffer, nbData);
                 student.ScreenShot = new Bitmap(new MemoryStream(imageBuffer));
-                /*lbxClients.Invoke(new MethodInvoker(delegate {
-                    lbxClients.DataSource = null;
-                    lbxClients.DataSource = AllClients;
-                }));*/
+                lbxClients.Invoke(new MethodInvoker(delegate {
+                    lblStudents.DisplayMember = "UserName";
+                    lblStudents.DataSource = null;
+                    lblStudents.DataSource = AllStudents;
+                }));
                 lbxRequetes.Invoke(new MethodInvoker(delegate { lbxRequetes.Items.Add("image recue de " + student.UserName); }));
             }
             catch { lbxRequetes.Invoke(new MethodInvoker(delegate { lbxRequetes.Items.Add(student.UserName + "n'a pas envoyé d'image"); })); }
@@ -222,10 +240,10 @@ namespace ApplicationTeacher
             IPEndPoint ipep = new IPEndPoint(ip, 4567);
             s.Connect(ipep);
             Random random= new Random();
-            byte[] message = new byte[65000];
 
             for (int i = 0; i > -1; i++)
             {
+                byte[] message = new byte[65000];
                 Screen screen = Screen.AllScreens[1];
                 Bitmap bitmap = new(screen.Bounds.Width, screen.Bounds.Height, PixelFormat.Format16bppRgb565);
                 Rectangle ScreenSize = screen.Bounds;
@@ -234,9 +252,8 @@ namespace ApplicationTeacher
                 byte[] imageArray = (byte[])converter.ConvertTo(ResizeImage(bitmap, new Size(256,144)), typeof(byte[]));
                 imageArray.CopyTo(message, 0);
                 Array.Resize(ref message, imageArray.Length);
-                if (i % 10 == 0) { lbxConnexion.Invoke(new MethodInvoker(delegate { lbxConnexion.Items.Add(i); })); }
+                if (i % 100 == 0) { lbxConnexion.Invoke(new MethodInvoker(delegate { lbxConnexion.Items.Add(i); })); }
                 s.Send(message, message.Length,SocketFlags.None);
-                Thread.Sleep(100);
             }
         }
 
@@ -259,6 +276,19 @@ namespace ApplicationTeacher
             }
         }
 
+        private void SelectedStudentChanged(object sender, EventArgs e)
+        {
+            ListBox listbox = (ListBox)sender;
+            DataForTeacher Student = listbox.SelectedItem as DataForTeacher;
+            if (Student == null) { return; }
+            if (AllStudentAffichages.Keys.Contains(Student)) { return; }
+            DisplayStudent affichage = new DisplayStudent(ref Student);
+            affichage.UpdateAffichage();
+            if (affichage.InvokeRequired){affichage.Invoke(new MethodInvoker(delegate { affichage.Show(); })); }
+            else {affichage.Show(); }
+            AllStudentAffichages[Student] = affichage;
+        }
+
         private void ShareScreen(object sender, EventArgs e)
         {
             if (AllStudents.Count != 0)
@@ -277,11 +307,6 @@ namespace ApplicationTeacher
             else if (FormWindowState.Normal == this.WindowState) { TrayIconTeacher.Visible = false; }
         }
 
-        /// <summary>
-        /// Lorsque le TrayIcon est pressé on affiche la fenêtre qui était cachée
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
         public void TrayIconTeacherClick(object sender, EventArgs e)
         {
             this.Show();
