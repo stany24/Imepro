@@ -56,10 +56,12 @@ namespace LibraryData
     public class DataForTeacher : Data
     {
         public Socket SocketToStudent;
+        public int ID;
 
-        public DataForTeacher(Socket socket)
+        public DataForTeacher(Socket socket,int id)
         {
             SocketToStudent = socket;
+            ID = id;
         }
 
         public DataForTeacher(Data data)

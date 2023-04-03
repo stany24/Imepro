@@ -9,8 +9,6 @@ using System.Text;
 using System.Drawing;
 using System.Text.Json;
 using System.IO;
-using System.ServiceModel;
-using System.ServiceModel.Channels;
 
 namespace ApplicationCliente
 {
@@ -29,7 +27,7 @@ namespace ApplicationCliente
             {
                 // Establish the remote endpoint for the socket. This example uses port 11111 on the local computer.
                 IPHostEntry ipHost = Dns.GetHostEntry(Dns.GetHostName());
-                IPEndPoint localEndPoint = new(IPAddress.Parse("192.168.1.38"), 11111);
+                IPEndPoint localEndPoint = new(IPAddress.Parse("157.26.227.198"), 11111);
 
                 // Creation TCP/IP Socket using Socket Class Constructor
                 Socket sender = new(localEndPoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
@@ -146,8 +144,8 @@ namespace ApplicationCliente
 
         public void Receive()
         {
-            Socket s = new Socket(AddressFamily.InterNetwork, SocketType.Dgram,ProtocolType.Udp);
-            IPEndPoint ipep = new IPEndPoint(IPAddress.Any, 4567);
+            Socket s = new(AddressFamily.InterNetwork, SocketType.Dgram,ProtocolType.Udp);
+            IPEndPoint ipep = new(IPAddress.Any, 4567);
             s.Bind(ipep);
             IPAddress ip = IPAddress.Parse("224.5.6.7");
             s.SetSocketOption(SocketOptionLevel.IP,SocketOptionName.AddMembership,new MulticastOption(ip, IPAddress.Any));

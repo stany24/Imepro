@@ -33,7 +33,7 @@
             this.lbxRequetes = new System.Windows.Forms.ListBox();
             this.lbxClients = new System.Windows.Forms.ListBox();
             this.pbxScreenShot = new System.Windows.Forms.PictureBox();
-            this.bthShare = new System.Windows.Forms.Button();
+            this.btnShare = new System.Windows.Forms.Button();
             this.TrayIconTeacher = new System.Windows.Forms.NotifyIcon(this.components);
             this.lblStudents = new System.Windows.Forms.ListBox();
             ((System.ComponentModel.ISupportInitialize)(this.pbxScreenShot)).BeginInit();
@@ -72,15 +72,15 @@
             this.pbxScreenShot.TabIndex = 7;
             this.pbxScreenShot.TabStop = false;
             // 
-            // bthShare
+            // btnShare
             // 
-            this.bthShare.Location = new System.Drawing.Point(990, 12);
-            this.bthShare.Name = "bthShare";
-            this.bthShare.Size = new System.Drawing.Size(94, 21);
-            this.bthShare.TabIndex = 8;
-            this.bthShare.Text = "Share Screen";
-            this.bthShare.UseVisualStyleBackColor = true;
-            this.bthShare.Click += new System.EventHandler(this.ShareScreen);
+            this.btnShare.Location = new System.Drawing.Point(990, 12);
+            this.btnShare.Name = "btnShare";
+            this.btnShare.Size = new System.Drawing.Size(94, 21);
+            this.btnShare.TabIndex = 8;
+            this.btnShare.Text = "Share Screen";
+            this.btnShare.UseVisualStyleBackColor = true;
+            this.btnShare.Click += new System.EventHandler(this.ShareScreen);
             // 
             // TrayIconTeacher
             // 
@@ -104,7 +104,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1413, 642);
             this.Controls.Add(this.lblStudents);
-            this.Controls.Add(this.bthShare);
+            this.Controls.Add(this.btnShare);
             this.Controls.Add(this.pbxScreenShot);
             this.Controls.Add(this.lbxClients);
             this.Controls.Add(this.lbxRequetes);
@@ -123,7 +123,7 @@
         private System.Windows.Forms.ListBox lbxRequetes;
         private System.Windows.Forms.ListBox lbxClients;
         private System.Windows.Forms.PictureBox pbxScreenShot;
-        private System.Windows.Forms.Button bthShare;
+        private System.Windows.Forms.Button btnShare;
         private System.Windows.Forms.NotifyIcon TrayIconTeacher;
         private System.Windows.Forms.ListBox lblStudents;
     }

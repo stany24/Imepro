@@ -47,14 +47,14 @@
             this.lbxConnexion.FormattingEnabled = true;
             this.lbxConnexion.Location = new System.Drawing.Point(12, 12);
             this.lbxConnexion.Name = "lbxConnexion";
-            this.lbxConnexion.Size = new System.Drawing.Size(2036, 134);
+            this.lbxConnexion.Size = new System.Drawing.Size(1531, 134);
             this.lbxConnexion.TabIndex = 3;
             // 
             // StudentApp
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(2115, 711);
+            this.ClientSize = new System.Drawing.Size(1578, 711);
             this.Controls.Add(this.pbxScreeShot);
             this.Controls.Add(this.lbxConnexion);
             this.Name = "StudentApp";

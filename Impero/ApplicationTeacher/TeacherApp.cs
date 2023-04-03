@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Linq;
 using System.Net.Sockets;
 using System.Net;
 using System.Text;
@@ -19,11 +16,12 @@ namespace ApplicationTeacher
 {
     public partial class TeacherApp : Form
     {
-        List<DataForTeacher> AllStudents = new();
-        Dictionary<DataForTeacher,DisplayStudent> AllStudentAffichages = new();
+        readonly List<DataForTeacher> AllStudents = new();
+        readonly List<DisplayStudent> AllStudentsDisplay = new();
         Task ScreenSharer;
         readonly int DurationBetweenDemand = 15;
         readonly int DefaultTimeout = 2000;
+        int NextId = 0;
         public TeacherApp()
         {
             InitializeComponent();
@@ -65,7 +63,8 @@ namespace ApplicationTeacher
                     // Suspend while waiting for incoming connection Using Accept() method the server will accept connection of client
                     Socket clientSocket = listener.Accept();
                     lbxConnexion.Invoke(new MethodInvoker(delegate { lbxConnexion.Items.Add("New connexion to " + clientSocket.RemoteEndPoint); }));
-                    AllStudents.Add(new DataForTeacher(clientSocket));
+                    AllStudents.Add(new DataForTeacher(clientSocket,NextId));
+                    NextId++;
                     lbxClients.Invoke(new MethodInvoker(delegate {
                         lblStudents.DisplayMember = "UserName";
                         lblStudents.DataSource = null;
@@ -113,7 +112,6 @@ namespace ApplicationTeacher
                     foreach (DataForTeacher client in ClientToRemove)
                     {
                         AllStudents.Remove(client);
-                        AllStudentAffichages.Remove(client);
                         lbxClients.Invoke(new MethodInvoker(delegate {
                             lblStudents.DisplayMember = "UserName";
                             lblStudents.DataSource = null;
@@ -121,9 +119,15 @@ namespace ApplicationTeacher
                         }));
                         lbxRequetes.Invoke(new MethodInvoker(delegate { lbxRequetes.Items.Add("Le client " + client.UserName + "à été retiré"); }));
                     }
-                    foreach (KeyValuePair<DataForTeacher, DisplayStudent> current in AllStudentAffichages)
+                    foreach(DisplayStudent display in AllStudentsDisplay)
                     {
-                        current.Value.UpdateAffichage();
+                        foreach(DataForTeacher student in AllStudents)
+                        {
+                            if(display.StudentId == student.ID)
+                            {
+                                display.UpdateAffichage(student);
+                            }
+                        }
                     }
 
                     //foreach (DataForTeacher client in AllClients) { client.UpdateAffichage(); }
@@ -150,8 +154,10 @@ namespace ApplicationTeacher
                 socket.ReceiveTimeout = DefaultTimeout;
                 int nbData = socket.Receive(dataBuffer);
                 Array.Resize(ref dataBuffer, nbData);
-                student = new(JsonSerializer.Deserialize<Data>(Encoding.Default.GetString(dataBuffer)));
-                student.SocketToStudent = socket;
+                student = new(JsonSerializer.Deserialize<Data>(Encoding.Default.GetString(dataBuffer)))
+                {
+                    SocketToStudent = socket
+                };
                 //student.affichage = affichage;
                 lbxClients.Invoke(new MethodInvoker(delegate {
                     lblStudents.DisplayMember = "UserName";
@@ -233,13 +239,13 @@ namespace ApplicationTeacher
         {
             foreach (DataForTeacher student in AllStudents) { student.SocketToStudent.Send(Encoding.ASCII.GetBytes("receive")); }
 
-            Socket s = new Socket(AddressFamily.InterNetwork,SocketType.Dgram, ProtocolType.Udp);
+            Socket s = new(AddressFamily.InterNetwork,SocketType.Dgram, ProtocolType.Udp);
             IPAddress ip = IPAddress.Parse("224.5.6.7");
             s.SetSocketOption(SocketOptionLevel.IP,SocketOptionName.AddMembership, new MulticastOption(ip));
             s.SetSocketOption(SocketOptionLevel.IP,SocketOptionName.MulticastTimeToLive, 3);
-            IPEndPoint ipep = new IPEndPoint(ip, 4567);
+            IPEndPoint ipep = new(ip, 4567);
             s.Connect(ipep);
-            Random random= new Random();
+            Random random= new();
 
             for (int i = 0; i > -1; i++)
             {
@@ -261,7 +267,7 @@ namespace ApplicationTeacher
         {
             try
             {
-                Bitmap resizedImage = new Bitmap(size.Width, size.Height);
+                Bitmap resizedImage = new(size.Width, size.Height);
                 using (Graphics graphics = Graphics.FromImage((Image)resizedImage))
                 {
                     graphics.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
@@ -279,21 +285,31 @@ namespace ApplicationTeacher
         private void SelectedStudentChanged(object sender, EventArgs e)
         {
             ListBox listbox = (ListBox)sender;
-            DataForTeacher Student = listbox.SelectedItem as DataForTeacher;
-            if (Student == null) { return; }
-            if (AllStudentAffichages.Keys.Contains(Student)) { return; }
-            DisplayStudent affichage = new DisplayStudent(ref Student);
-            affichage.UpdateAffichage();
-            if (affichage.InvokeRequired){affichage.Invoke(new MethodInvoker(delegate { affichage.Show(); })); }
-            else {affichage.Show(); }
-            AllStudentAffichages[Student] = affichage;
+            if (listbox.SelectedItem is not DataForTeacher Student) { return; }
+            foreach (DisplayStudent display in AllStudentsDisplay)
+            {
+                if (display.StudentId == Student.ID) { return; }
+            }
+            DisplayStudent newDisplay = new();
+            AllStudentsDisplay.Add(newDisplay);
+            newDisplay.StudentId = Student.ID;
+            newDisplay.Show();
         }
 
         private void ShareScreen(object sender, EventArgs e)
         {
-            if (AllStudents.Count != 0)
+            if(ScreenSharer == null)
             {
-                ScreenSharer = Task.Run(Record);
+                if (AllStudents.Count != 0)
+                {
+                    ScreenSharer = Task.Run(Record);
+                    btnShare.Text = "Stop Sharing";
+                }
+            }
+            else
+            {
+                ScreenSharer.Dispose();
+                btnShare.Text = "Share screen";
             }
         }
 
