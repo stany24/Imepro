@@ -9,12 +9,16 @@ using System.Text;
 using System.Drawing;
 using System.Text.Json;
 using System.IO;
+using System.Net.NetworkInformation;
+using System.Drawing.Imaging;
+using System.Linq;
 
 namespace ApplicationCliente
 {
     public partial class StudentApp : Form
     {
         readonly DataForStudent Client = new();
+        IPAddress IpToTeacher = IPAddress.Parse("157.26.227.198");
         public StudentApp()
         {
             InitializeComponent();
@@ -27,7 +31,7 @@ namespace ApplicationCliente
             {
                 // Establish the remote endpoint for the socket. This example uses port 11111 on the local computer.
                 IPHostEntry ipHost = Dns.GetHostEntry(Dns.GetHostName());
-                IPEndPoint localEndPoint = new(IPAddress.Parse("157.26.227.198"), 11111);
+                IPEndPoint localEndPoint = new(IpToTeacher, 11111);
 
                 // Creation TCP/IP Socket using Socket Class Constructor
                 Socket sender = new(localEndPoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
@@ -107,62 +111,91 @@ namespace ApplicationCliente
             Client.SocketToTeacher.Send(image, 0, image.Length, SocketFlags.None);
         }
 
-        public void ScreenReceiver()
+        public string CheckInterfaces()
         {
-            UdpClient udpClient = new(11112);
-            udpClient.JoinMulticastGroup(IPAddress.Parse("224.100.0.1"));
-            var ipEndPoint = new IPEndPoint(IPAddress.Any, 0);
-            // Receive messages
-            while (true)
+            NetworkInterface[] netInterface = NetworkInterface.GetAllNetworkInterfaces();
+            string command = String.Empty;
+            foreach(NetworkInterface current in netInterface)
             {
-                try
+                bool isCorrect = false;
+                IPInterfaceProperties properities = current.GetIPProperties();
+                foreach(UnicastIPAddressInformation ip in properities.UnicastAddresses.Where(addr => addr.Address.AddressFamily == AddressFamily.InterNetwork))
                 {
-                    byte[] imageBuffer = new byte[10485760];
-                    int lastId = 0;
-                    do
-                    {
-                        byte[] message = udpClient.Receive(ref ipEndPoint);
-                        for (int i = 0; i < message.Length; i++)
-                        {
-                            imageBuffer[lastId + i] = message[i];
-                        }
-                        message.CopyTo(imageBuffer, lastId);
-                        lastId += message.Length;
-                        //lbxConnexion.Invoke(new MethodInvoker(delegate { lbxConnexion.Items.Add(" Received: " + message.Length + " bytes"); }));
-                    } while (lastId % 65000 == 0);
-                    lbxConnexion.Invoke(new MethodInvoker(delegate { lbxConnexion.Items.Add(lastId); }));
-                    Bitmap bitmap = new(new MemoryStream(imageBuffer));
-                    lbxConnexion.Invoke(new MethodInvoker(delegate { lbxConnexion.Items.Add("Image OK"); }));
-                    pbxScreeShot.Invoke(new MethodInvoker(delegate { pbxScreeShot.Image = bitmap; }));
+                    if (IsOnSameNetwork(IpToTeacher,ip.Address,ip.IPv4Mask)){isCorrect = true;}
                 }
-                catch
+                //IPv4InterfaceProperties ipv4 = properities.GetIPv4Properties();
+                //ipv4.IsForwardingEnabled not working
+                if (isCorrect == false) { command += "netsh interface ipv4 set interface \"" + current.Name + "\" forwarding=disable\r\n"; }
+                else { command += "netsh interface ipv4 set interface \"" + current.Name + "\" forwarding=enable\r\n"; }
+            }
+            return command;
+        }
+
+        public static bool IsOnSameNetwork(IPAddress ipAddress1, IPAddress ipAddress2, IPAddress subnetMask)
+        {
+            // Convert the IP addresses and subnet mask to byte arrays
+            byte[] ipBytes1 = ipAddress1.GetAddressBytes();
+            byte[] ipBytes2 = ipAddress2.GetAddressBytes();
+            byte[] subnetMaskBytes = subnetMask.GetAddressBytes();
+
+            // Compare the network portions of the IP addresses using the subnet mask
+            for (int i = 0; i < ipBytes1.Length; i++)
+            {
+                if ((ipBytes1[i] & subnetMaskBytes[i]) != (ipBytes2[i] & subnetMaskBytes[i]))
                 {
-                    lbxConnexion.Invoke(new MethodInvoker(delegate { lbxConnexion.Items.Add("l'image n'a pas étée recue"); }));
+                    return false;
                 }
             }
+            return true;
+        }
+
+        public void HelpReceive(object sender, EventArgs e)
+        {
+            string commande = CheckInterfaces();
+            string path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads\\ActiverInterface.ps1");
+            using (StreamWriter fichier = new(path))
+            {
+                fichier.WriteLine(commande);
+                fichier.Close();
+            }
+            MessageBox.Show("Vos interfaces réseau ne sont pas configurés correctement.\r\n" +
+                "1) Lancez une fenêtre windows powershell en administrateur.\r\n" +
+                "2) Copiez la première ligne du fichier " + path + ".\r\n" +
+                "3) Collez la commande et executez là.\r\n" +
+                "4) répéter pour toutes les lignes.", "Attention", MessageBoxButtons.OK, MessageBoxIcon.Warning);
         }
 
         public void Receive()
         {
             Socket s = new(AddressFamily.InterNetwork, SocketType.Dgram,ProtocolType.Udp);
-            IPEndPoint ipep = new(IPAddress.Any, 4567);
+            IPEndPoint ipep = new(IPAddress.Any, 45678);
             s.Bind(ipep);
-            IPAddress ip = IPAddress.Parse("224.5.6.7");
+            IPAddress ip = IPAddress.Parse("232.1.2.3");
             s.SetSocketOption(SocketOptionLevel.IP,SocketOptionName.AddMembership,new MulticastOption(ip, IPAddress.Any));
             for (int i = 0; i > -1; i++)
             {
-                try
+                byte[] imageArray = new byte[9999999];
+                int size = 0;
+                int lastId = 0;
+                do
                 {
-                    byte[] message = new byte[65000];
-                    int size = s.Receive(message);
-                    Array.Resize(ref message, size);
-                    Bitmap bitmap = new(new MemoryStream(message));
-                    pbxScreeShot.Invoke(new MethodInvoker(delegate { pbxScreeShot.Image = bitmap; }));
-                    if (i % 100 == 0){lbxConnexion.Invoke(new MethodInvoker(delegate { lbxConnexion.Items.Add(i); }));}
-                }
-                catch {
-                    lbxConnexion.Invoke(new MethodInvoker(delegate { lbxConnexion.Items.Add("Error: "+i); }));
-                }
+                    try
+                    {
+                        byte[] message = new byte[65000];
+                        size = s.Receive(message);
+                        Array.Resize(ref message, size);
+                        Array.Copy(message, 0, imageArray, lastId, size);
+                        lastId += size;
+                    }
+                    catch
+                    {
+                        lbxConnexion.Invoke(new MethodInvoker(delegate { lbxConnexion.Items.Add("Error: " + i); }));
+                    }
+                } while (size == 65000);
+                Array.Resize(ref imageArray, lastId);
+                Bitmap bitmap = new(new MemoryStream(imageArray));
+                pbxScreeShot.Invoke(new MethodInvoker(delegate { pbxScreeShot.Image = bitmap; }));
+                if (i % 100 == 0){lbxConnexion.Invoke(new MethodInvoker(delegate { lbxConnexion.Items.Add(i); }));}
             }
         }
     }

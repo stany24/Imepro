@@ -1,0 +1,2 @@
+netsh interface ipv4 set interface "Ethernet 3" forwarding=enable
+netsh interface ip show joins

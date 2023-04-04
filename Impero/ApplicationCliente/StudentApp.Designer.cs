@@ -30,6 +30,7 @@
         {
             this.pbxScreeShot = new System.Windows.Forms.PictureBox();
             this.lbxConnexion = new System.Windows.Forms.ListBox();
+            this.btnHelp = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.pbxScreeShot)).BeginInit();
             this.SuspendLayout();
             // 
@@ -50,11 +51,22 @@
             this.lbxConnexion.Size = new System.Drawing.Size(1531, 134);
             this.lbxConnexion.TabIndex = 3;
             // 
+            // btnHelp
+            // 
+            this.btnHelp.Location = new System.Drawing.Point(1213, 158);
+            this.btnHelp.Name = "btnHelp";
+            this.btnHelp.Size = new System.Drawing.Size(75, 23);
+            this.btnHelp.TabIndex = 5;
+            this.btnHelp.Text = "Help";
+            this.btnHelp.UseVisualStyleBackColor = true;
+            this.btnHelp.Click += new System.EventHandler(this.HelpReceive);
+            // 
             // StudentApp
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1578, 711);
+            this.Controls.Add(this.btnHelp);
             this.Controls.Add(this.pbxScreeShot);
             this.Controls.Add(this.lbxConnexion);
             this.Name = "StudentApp";
@@ -67,6 +79,7 @@
         #endregion
         private System.Windows.Forms.PictureBox pbxScreeShot;
         private System.Windows.Forms.ListBox lbxConnexion;
+        private System.Windows.Forms.Button btnHelp;
     }
 }
 
