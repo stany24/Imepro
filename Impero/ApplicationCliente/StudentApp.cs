@@ -160,9 +160,8 @@ namespace ApplicationCliente
             }
             MessageBox.Show("Vos interfaces réseau ne sont pas configurés correctement.\r\n" +
                 "1) Lancez une fenêtre windows powershell en administrateur.\r\n" +
-                "2) Copiez la première ligne du fichier " + path + ".\r\n" +
-                "3) Collez la commande et executez là.\r\n" +
-                "4) répéter pour toutes les lignes.", "Attention", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                "2) Copiez tout le contenu du fichier " + path + ".\r\n" +
+                "3) Collez le tout dans le terminal et executez.\r\n", "Attention", MessageBoxButtons.OK, MessageBoxIcon.Warning);
         }
 
         public void Receive()
