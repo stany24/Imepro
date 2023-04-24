@@ -10,7 +10,6 @@ using System.Drawing;
 using System.Text.Json;
 using System.IO;
 using System.Net.NetworkInformation;
-using System.Drawing.Imaging;
 using System.Linq;
 
 namespace ApplicationCliente
@@ -18,11 +17,86 @@ namespace ApplicationCliente
     public partial class StudentApp : Form
     {
         readonly DataForStudent Client = new();
-        IPAddress IpToTeacher = IPAddress.Parse("157.26.227.198");
+        IPAddress IpToTeacher;
+        readonly string pathToConfFolder = "C:\\Users\\gouvernonst\\Downloads\\";
+        readonly string FileNameConfIp = "iPToTeacher.txt";
         public StudentApp()
         {
             InitializeComponent();
+            LoadTeacherIP();
             Task.Run(ConnectToMaster);
+        }
+
+        public void NewTeacherIP()
+        {
+            AskIp prompt = new();
+            if (prompt.ShowDialog(this) == DialogResult.OK) {
+                try {
+                IpToTeacher = IPAddress.Parse(prompt.LastVerifiedIp);
+                    DayOfWeek day = DateTime.Now.DayOfWeek;
+                int MatinOuAprèsMidi = 0;
+                if (DateTime.Now.TimeOfDay > new TimeSpan(12, 35, 0)) { MatinOuAprèsMidi = 1; }
+                IpForTheWeek allIP = new();
+                switch (day)
+                {
+                    case DayOfWeek.Monday:allIP.lundi[MatinOuAprèsMidi] = prompt.LastVerifiedIp; break;
+                    case DayOfWeek.Tuesday:allIP.mardi[MatinOuAprèsMidi] = prompt.LastVerifiedIp; break;
+                    case DayOfWeek.Wednesday:allIP.mercredi[MatinOuAprèsMidi] = prompt.LastVerifiedIp; break;
+                    case DayOfWeek.Thursday:allIP.jeudi[MatinOuAprèsMidi] = prompt.LastVerifiedIp;break;
+                    case DayOfWeek.Friday:allIP.vendredi[MatinOuAprèsMidi] = prompt.LastVerifiedIp;break;
+                    case DayOfWeek.Saturday:allIP.samedi[MatinOuAprèsMidi] = prompt.LastVerifiedIp;break;
+                    case DayOfWeek.Sunday:allIP.dimanche[MatinOuAprèsMidi] = prompt.LastVerifiedIp;break;
+                }
+                using StreamWriter writeFichier = new(pathToConfFolder + FileNameConfIp);
+                writeFichier.WriteLine(JsonSerializer.Serialize(allIP, new JsonSerializerOptions { IncludeFields = true, }));
+                prompt.Close();
+                prompt.Dispose();
+                }
+                catch { }
+            }
+        }
+
+        public IpForTheWeek LoadConfIp()
+        {
+            try { 
+                using StreamReader fichier = new(pathToConfFolder + FileNameConfIp);
+                IpForTheWeek allIP = new(JsonSerializer.Deserialize<IpForTheWeek>(fichier.ReadToEnd()));
+                fichier.Close();
+                return allIP;
+            } 
+            catch {
+                using StreamWriter writer = new(pathToConfFolder + FileNameConfIp);
+                return null;
+            }
+        }
+
+        public void LoadTeacherIP()
+        {
+            try
+            {
+                DayOfWeek day = DateTime.Now.DayOfWeek;
+                int MatinOuAprèsMidi = 0;
+                if(DateTime.Now.TimeOfDay > new TimeSpan(12,35,0)){MatinOuAprèsMidi = 1;}
+                IpForTheWeek allIP = LoadConfIp();
+                if (allIP == null) { NewTeacherIP(); return; }
+                string PotentialIP = "";
+                switch(day)
+                {
+                    case DayOfWeek.Monday:PotentialIP = allIP.lundi[MatinOuAprèsMidi];break;
+                    case DayOfWeek.Tuesday:PotentialIP = allIP.mardi[MatinOuAprèsMidi];break;
+                    case DayOfWeek.Wednesday:PotentialIP = allIP.mercredi[MatinOuAprèsMidi];break;
+                    case DayOfWeek.Thursday:PotentialIP = allIP.jeudi[MatinOuAprèsMidi];break;
+                    case DayOfWeek.Friday:PotentialIP = allIP.vendredi[MatinOuAprèsMidi];break;
+                    case DayOfWeek.Saturday:PotentialIP = allIP.samedi[MatinOuAprèsMidi];break;
+                    case DayOfWeek.Sunday:PotentialIP = allIP.dimanche[MatinOuAprèsMidi];break;
+                }
+                IpToTeacher = IPAddress.Parse(PotentialIP);
+
+            }
+            catch (Exception)
+            {
+                NewTeacherIP();
+            }
         }
 
         public void ConnectToMaster()
@@ -196,6 +270,11 @@ namespace ApplicationCliente
                 pbxScreeShot.Invoke(new MethodInvoker(delegate { pbxScreeShot.Image = bitmap; }));
                 if (i % 100 == 0){lbxConnexion.Invoke(new MethodInvoker(delegate { lbxConnexion.Items.Add(i); }));}
             }
+        }
+
+        private void BtnChangeIp(object sender, EventArgs e)
+        {
+            NewTeacherIP();
         }
     }
 }

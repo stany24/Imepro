@@ -36,15 +36,16 @@
             this.btnShare = new System.Windows.Forms.Button();
             this.TrayIconTeacher = new System.Windows.Forms.NotifyIcon(this.components);
             this.lblStudents = new System.Windows.Forms.ListBox();
+            this.lblIP = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.pbxScreenShot)).BeginInit();
             this.SuspendLayout();
             // 
             // lbxConnexion
             // 
             this.lbxConnexion.FormattingEnabled = true;
-            this.lbxConnexion.Location = new System.Drawing.Point(12, 496);
+            this.lbxConnexion.Location = new System.Drawing.Point(7, 456);
             this.lbxConnexion.Name = "lbxConnexion";
-            this.lbxConnexion.Size = new System.Drawing.Size(1072, 134);
+            this.lbxConnexion.Size = new System.Drawing.Size(1077, 160);
             this.lbxConnexion.TabIndex = 4;
             // 
             // lbxRequetes
@@ -67,7 +68,7 @@
             // 
             this.pbxScreenShot.Location = new System.Drawing.Point(7, 152);
             this.pbxScreenShot.Name = "pbxScreenShot";
-            this.pbxScreenShot.Size = new System.Drawing.Size(1077, 338);
+            this.pbxScreenShot.Size = new System.Drawing.Size(1077, 298);
             this.pbxScreenShot.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.pbxScreenShot.TabIndex = 7;
             this.pbxScreenShot.TabStop = false;
@@ -98,11 +99,21 @@
             this.lblStudents.TabIndex = 9;
             this.lblStudents.SelectedIndexChanged += new System.EventHandler(this.SelectedStudentChanged);
             // 
+            // lblIP
+            // 
+            this.lblIP.AutoSize = true;
+            this.lblIP.Location = new System.Drawing.Point(4, 620);
+            this.lblIP.Name = "lblIP";
+            this.lblIP.Size = new System.Drawing.Size(20, 13);
+            this.lblIP.TabIndex = 10;
+            this.lblIP.Text = "IP:";
+            // 
             // TeacherApp
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1413, 642);
+            this.Controls.Add(this.lblIP);
             this.Controls.Add(this.lblStudents);
             this.Controls.Add(this.btnShare);
             this.Controls.Add(this.pbxScreenShot);
@@ -114,6 +125,7 @@
             this.SizeChanged += new System.EventHandler(this.TeacherAppResized);
             ((System.ComponentModel.ISupportInitialize)(this.pbxScreenShot)).EndInit();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -126,6 +138,7 @@
         private System.Windows.Forms.Button btnShare;
         private System.Windows.Forms.NotifyIcon TrayIconTeacher;
         private System.Windows.Forms.ListBox lblStudents;
+        private System.Windows.Forms.Label lblIP;
     }
 }
 

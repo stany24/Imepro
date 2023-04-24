@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Linq;
+using System.Net;
 using System.Net.Sockets;
 using System.Runtime.InteropServices;
 using System.Runtime.Serialization;
@@ -58,7 +59,7 @@ namespace LibraryData
         public Socket SocketToStudent;
         public int ID;
 
-        public DataForTeacher(Socket socket,int id)
+        public DataForTeacher(Socket socket, int id)
         {
             SocketToStudent = socket;
             ID = id;
@@ -184,6 +185,53 @@ namespace LibraryData
         public ScreenShotPart(byte[] part)
         {
             Part = part;
+        }
+    }
+    [Serializable]
+    public class IpForTheWeek
+    {
+        [JsonInclude]
+        public string[] lundi = new string[2];
+        [JsonInclude]
+        public string[] mardi = new string[2];
+        [JsonInclude]
+        public string[] mercredi = new string[2];
+        [JsonInclude]
+        public string[] jeudi = new string[2];
+        [JsonInclude]
+        public string[] vendredi = new string[2];
+        [JsonInclude]
+        public string[] samedi = new string[2];
+        [JsonInclude]
+        public string[] dimanche = new string[2];
+
+        public IpForTheWeek(IpForTheWeek copy)
+        {
+            lundi= copy.lundi;
+            mardi= copy.mardi;
+            mercredi= copy.mercredi;
+            jeudi= copy.jeudi;
+            vendredi= copy.vendredi;
+            samedi= copy.samedi;
+            dimanche= copy.dimanche;
+        }
+
+        public IpForTheWeek()
+        {
+            lundi[0] = "157.26.227.198";
+            lundi[1] = "157.26.227.198";
+            mardi[0] = "157.26.227.198";
+            mardi[1] = "157.26.227.198";
+            mercredi[0] = "157.26.227.198";
+            mercredi[1] = "157.26.227.198";
+            jeudi[0] = "157.26.227.198";
+            jeudi[1] = "157.26.227.198";
+            vendredi[0] = "157.26.227.198";
+            vendredi[1] = "157.26.227.198";
+            samedi[0] = "157.26.227.198";
+            samedi[1] = "157.26.227.198";
+            dimanche[0] = "157.26.227.198";
+            dimanche[1] = "157.26.227.198";
         }
     }
 }

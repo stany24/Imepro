@@ -22,24 +22,25 @@ namespace ApplicationTeacher
         readonly int DurationBetweenDemand = 15;
         readonly int DefaultTimeout = 2000;
         int NextId = 0;
+        IPAddress ipAddr = null;
         public TeacherApp()
         {
             InitializeComponent();
             lblStudents.DataSource = AllStudents;
+            // Establish the local endpointfor the socket.
+            // Dns.GetHostName returns the name of the host running the application.
+            IPHostEntry ipHost = Dns.GetHostEntry(Dns.GetHostName());
+            foreach (IPAddress address in ipHost.AddressList)
+            {
+                if (address.AddressFamily == AddressFamily.InterNetwork) { ipAddr = address; break; }
+            }
+            lblIP.Text = "IP: "+ipAddr.ToString();
             Task.Run(LogClients);
             Task.Run(AskingData);
         }
 
         public void LogClients()
         {
-            // Establish the local endpointfor the socket.
-            // Dns.GetHostName returns the name of the host running the application.
-            IPHostEntry ipHost = Dns.GetHostEntry(Dns.GetHostName());
-            IPAddress ipAddr = null;
-            foreach (IPAddress address in ipHost.AddressList)
-            {
-                if (address.AddressFamily == AddressFamily.InterNetwork) { ipAddr = address; break; }
-            }
             IPEndPoint localEndPoint = new(ipAddr, 11111);
             // Creation TCP/IP Socket using Socket Class Constructor
             Socket listener = new(ipAddr.AddressFamily, SocketType.Stream, ProtocolType.Tcp);

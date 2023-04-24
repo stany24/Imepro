@@ -31,6 +31,7 @@
             this.pbxScreeShot = new System.Windows.Forms.PictureBox();
             this.lbxConnexion = new System.Windows.Forms.ListBox();
             this.btnHelp = new System.Windows.Forms.Button();
+            this.button1 = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.pbxScreeShot)).BeginInit();
             this.SuspendLayout();
             // 
@@ -61,11 +62,22 @@
             this.btnHelp.UseVisualStyleBackColor = true;
             this.btnHelp.Click += new System.EventHandler(this.HelpReceive);
             // 
+            // button1
+            // 
+            this.button1.Location = new System.Drawing.Point(1294, 158);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(75, 23);
+            this.button1.TabIndex = 6;
+            this.button1.Text = "btnChangeIp";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.BtnChangeIp);
+            // 
             // StudentApp
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1578, 711);
+            this.Controls.Add(this.button1);
             this.Controls.Add(this.btnHelp);
             this.Controls.Add(this.pbxScreeShot);
             this.Controls.Add(this.lbxConnexion);
@@ -80,6 +92,7 @@
         private System.Windows.Forms.PictureBox pbxScreeShot;
         private System.Windows.Forms.ListBox lbxConnexion;
         private System.Windows.Forms.Button btnHelp;
+        private System.Windows.Forms.Button button1;
     }
 }
 
