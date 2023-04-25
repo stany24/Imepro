@@ -100,7 +100,7 @@ namespace ApplicationCliente
                     // Si l'addresse du professeur a changé on adapte le socket
                     if(localEndPoint.Address != IpToTeacher)
                     {
-                        localEndPoint = new(IpToTeacher, 11111);
+                        localEndPoint.Address = IpToTeacher;
                         sender = new(localEndPoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
                     }
                     try

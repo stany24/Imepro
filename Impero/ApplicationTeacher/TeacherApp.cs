@@ -11,7 +11,7 @@ using System.Threading;
 using System.IO;
 using System.Text.Json;
 using System.Drawing.Imaging;
-using System.Linq.Expressions;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace ApplicationTeacher
 {
@@ -27,7 +27,6 @@ namespace ApplicationTeacher
         public TeacherApp()
         {
             InitializeComponent();
-            lblStudents.DataSource = AllStudents;
             // Establish the local endpointfor the socket.
             // Dns.GetHostName returns the name of the host running the application.
             IPHostEntry ipHost = Dns.GetHostEntry(Dns.GetHostName());
@@ -64,11 +63,6 @@ namespace ApplicationTeacher
                     lbxConnexion.Invoke(new MethodInvoker(delegate { lbxConnexion.Items.Add("New connexion to " + clientSocket.RemoteEndPoint); }));
                     AllStudents.Add(new DataForTeacher(clientSocket,NextId));
                     NextId++;
-                    lbxClients.Invoke(new MethodInvoker(delegate {
-                        lblStudents.DisplayMember = "UserName";
-                        lblStudents.DataSource = null;
-                        lblStudents.DataSource = AllStudents;
-                    }));
                 }
                 catch (Exception e) { lbxConnexion.Invoke(new MethodInvoker(delegate { lbxConnexion.Items.Add(e.ToString()); })); }
             }
@@ -101,7 +95,6 @@ namespace ApplicationTeacher
                             socket.Send(Encoding.ASCII.GetBytes("image"));
                             lbxRequetes.Invoke(new MethodInvoker(delegate { lbxRequetes.Items.Add("asked image to client " + AllStudents[i].UserName); }));
                             Task.Run(() => ReceiveImage(AllStudents[i])).Wait();
-                            lbxClients.Invoke(new MethodInvoker(delegate { lbxClients.Items.Add(AllStudents[i].ToString()); }));
                             pbxScreenShot.Invoke(new MethodInvoker(delegate { pbxScreenShot.Image = AllStudents[i].ScreenShot; }));
                         }
                         catch ( SocketException)
@@ -114,11 +107,6 @@ namespace ApplicationTeacher
                     foreach (DataForTeacher client in ClientToRemove)
                     {
                         AllStudents.Remove(client);
-                        lbxClients.Invoke(new MethodInvoker(delegate {
-                            lblStudents.DisplayMember = "UserName";
-                            lblStudents.DataSource = null;
-                            lblStudents.DataSource = AllStudents;
-                        }));
                         lbxRequetes.Invoke(new MethodInvoker(delegate { lbxRequetes.Items.Add("Le client " + client.UserName + "à été retiré"); }));
                     }
                     foreach(DisplayStudent display in AllStudentsDisplay)
@@ -155,6 +143,7 @@ namespace ApplicationTeacher
         {
             try
             {
+                
                 Socket socket = student.SocketToStudent;
                 //AffichageEleve affichage = student.affichage;
                 byte[] dataBuffer = new byte[1024];
@@ -166,12 +155,63 @@ namespace ApplicationTeacher
                     SocketToStudent = socket
                 };
                 //student.affichage = affichage;
-                lbxClients.Invoke(new MethodInvoker(delegate {
-                    lblStudents.DisplayMember = "UserName";
-                    lblStudents.DataSource = null;
-                    lblStudents.DataSource = AllStudents;
-                }));
                 lbxRequetes.Invoke(new MethodInvoker(delegate { lbxRequetes.Items.Add("data recue de " + student.UserName); }));
+                TreeViewStudents.Invoke(new MethodInvoker(delegate {
+                    TreeNode[] nodeStudent = TreeViewStudents.Nodes.Find(Convert.ToString(student.ID), false);
+                    // Créer nouvelle élève
+                    if (nodeStudent.Length == 0)
+                    { 
+                        TreeNode nodeNewStudent = TreeViewStudents.Nodes.Add(Convert.ToString(student.ID), student.UserName);
+                        TreeNode nodePoste = nodeNewStudent.Nodes.Add(student.ComputerName,student.ComputerName);
+                        TreeNode nodeProcesses = nodePoste.Nodes.Add("Processus:");
+                        foreach(KeyValuePair<int,string> process in student.Processes)
+                        {
+                            nodeProcesses.Nodes.Add(Convert.ToString(process.Key), process.Value);
+                        }
+                        TreeNode nodeUrls = nodePoste.Nodes.Add("Urls:");
+                        foreach(string url in student.Urls)
+                        {
+                            nodeUrls.Nodes.Add(url);
+                        }
+                    }
+                    else
+                    {
+                        //nouvelle ordinateur pour un élève
+                        TreeNode[] nodeComputer = nodeStudent[0].Nodes.Find(student.ComputerName, false);
+                        if ( nodeComputer.Length == 0)
+                        {
+                            TreeNode nodePoste = nodeStudent[0].Nodes.Add(student.ComputerName, student.ComputerName);
+                            TreeNode nodeProcesses = nodePoste.Nodes.Add("Processus:");
+                            foreach (KeyValuePair<int, string> process in student.Processes)
+                            {
+                                nodeProcesses.Nodes.Add(Convert.ToString(process.Key), process.Value);
+                            }
+                            TreeNode nodeUrls = nodePoste.Nodes.Add("Urls:");
+                            foreach (string url in student.Urls)
+                            {
+                                nodeUrls.Nodes.Add(url);
+                            }
+                        }
+                        else
+                        {
+                            //mise à jour d'un ordinateur
+                            TreeNode proc = nodeComputer[0].Nodes[0];
+                            proc.Nodes.Clear();
+                            foreach (KeyValuePair<int, string> process in student.Processes)
+                            {
+                                proc.Nodes.Add(Convert.ToString(process.Key), process.Value);
+                            }
+                            TreeNode urls = nodeComputer[0].Nodes[1];
+                            urls.Nodes.Clear();
+                            foreach (string url in student.Urls)
+                            {
+                                urls.Nodes.Add(url);
+                            }
+                        }
+                        
+                    }
+                    
+                }));
                 student.NumberOfFailure= 0;
                 return student;
             }
@@ -197,11 +237,6 @@ namespace ApplicationTeacher
                 int nbData = socket.Receive(imageBuffer, 0, imageBuffer.Length, SocketFlags.None);
                 Array.Resize(ref imageBuffer, nbData);
                 student.ScreenShot = new Bitmap(new MemoryStream(imageBuffer));
-                lbxClients.Invoke(new MethodInvoker(delegate {
-                    lblStudents.DisplayMember = "UserName";
-                    lblStudents.DataSource = null;
-                    lblStudents.DataSource = AllStudents;
-                }));
                 lbxRequetes.Invoke(new MethodInvoker(delegate { lbxRequetes.Items.Add("image recue de " + student.UserName); }));
                 student.NumberOfFailure = 0;
             }
@@ -331,9 +366,50 @@ namespace ApplicationTeacher
         /// <param name="student"></param>
         public void StopClient(object sender, EventArgs e)
         {
-            if (lbxClients.SelectedItem is not DataForTeacher student) { return; }
-            student.SocketToStudent.Send(Encoding.ASCII.GetBytes("stop"));
-            student.SocketToStudent.Disconnect(false);
+            //if (lbxClients.SelectedItem is not DataForTeacher student) { return; }
+            //student.SocketToStudent.Send(Encoding.ASCII.GetBytes("stop"));
+            //student.SocketToStudent.Disconnect(false);
+        }
+
+
+        /// <summary>
+        /// Fonction qui permet de "zoomer" dans le TreeView en modifiant la taille de la police
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ZoomTreeView(object sender, MouseEventArgs e)
+        {
+            // Only zoom when the mouse is over the control
+            if (!TreeViewStudents.ClientRectangle.Contains(e.Location))
+            {return;}
+
+            // Increase or decrease the font size based on the mouse wheel delta
+            int fontSizeDelta = e.Delta > 0 ? 1 : -1;
+            Font oldFont = TreeViewStudents.Font;
+            float newFontSize = oldFont.Size + fontSizeDelta;
+            if(newFontSize< 5) { return; }
+            if (newFontSize > 60) { return; }
+            Font newFont = new(oldFont.FontFamily,newFontSize, oldFont.Style);
+
+            // Apply the new font size and redraw the control
+            TreeViewStudents.Font = newFont;
+            TreeViewStudents.Invalidate();
+        }
+
+        private void splitContainer1_SplitterMoved(object sender, SplitterEventArgs e)
+        {
+            if(splitContainer1.Panel1.Width > 600)
+            {
+                splitContainer1.SplitterDistance = 600;
+            }
+        }
+
+        private void splitContainer2_SplitterMoved(object sender, SplitterEventArgs e)
+        {
+            if(splitContainer2.Panel1.Width > 150)
+            {
+                splitContainer2.SplitterDistance = 150;
+            }
         }
     }
 }
