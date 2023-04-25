@@ -98,7 +98,10 @@ namespace LibraryData
             return new Data(UserName, ComputerName, Urls, Processes);
         }
 
-        public void GetUrls()
+        /// <summary>
+        /// Fonction qui permet de récuperer le nom de l'onglet actif dans tous les navigateurs ouverts
+        /// </summary>
+        public void GetCurrentWebTabsName()
         {
             [DllImport("user32.dll")]
             static extern int GetWindowTextLength(IntPtr hWnd);
@@ -123,11 +126,18 @@ namespace LibraryData
                 }
             }
         }
+
+        /// <summary>
+        /// Fonction qui crée une list de processus lancé par l'ordinateur au démarrage de l'application
+        /// </summary>
         public void GetDefaultProcesses()
         {
             foreach (Process process in Process.GetProcesses().OrderBy(x => x.ProcessName)) { DefaultProcess.Add(process.ProcessName); }
         }
 
+        /// <summary>
+        /// Fonction qui met à jour la list des processus lancé par l'utilisateur
+        /// </summary>
         public void GetUserProcesses()
         {
             Processes.Clear();
@@ -138,6 +148,9 @@ namespace LibraryData
             }
         }
 
+        /// <summary>
+        /// Fonction qui permet de prendre une capture d'écran de tous les écran puis de les recomposer en une seul image
+        /// </summary>
         public void TakeScreenShot()
         {
             int TotalWidth = 0;
@@ -188,6 +201,7 @@ namespace LibraryData
             Part = part;
         }
     }
+
     [Serializable]
     public class IpForTheWeek
     {
@@ -217,6 +231,10 @@ namespace LibraryData
             dimanche= copy.dimanche;
         }
 
+        /// <summary>
+        /// Fonction qui enregistre l'ip donnée au bonne endroit, qui dépand du jour et de l'heure de l'action
+        /// </summary>
+        /// <param name="ip"></param>
         public void SetIp(string ip)
         {
             try{IPAddress.Parse(ip);}
@@ -237,6 +255,10 @@ namespace LibraryData
             }
         }
 
+        /// <summary>
+        /// Fonction qui retourne la bonne ip en fonction du jour et de l'heure de l'appel
+        /// </summary>
+        /// <returns></returns>
         public string GetIp()
         {
             DayOfWeek day = DateTime.Now.DayOfWeek;

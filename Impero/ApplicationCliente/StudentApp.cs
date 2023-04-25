@@ -166,7 +166,7 @@ namespace ApplicationCliente
         /// </summary>
         private void SendData()
         {
-            Client.GetUrls();
+            Client.GetCurrentWebTabsName();
             Client.GetUserProcesses();
             //serialization
             string jsonString = JsonSerializer.Serialize(Client.ToData(), new JsonSerializerOptions { IncludeFields = true, });
