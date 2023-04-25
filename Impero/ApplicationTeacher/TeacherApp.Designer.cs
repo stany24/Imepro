@@ -37,6 +37,7 @@
             this.TrayIconTeacher = new System.Windows.Forms.NotifyIcon(this.components);
             this.lblStudents = new System.Windows.Forms.ListBox();
             this.lblIP = new System.Windows.Forms.Label();
+            this.btnDisconnect = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.pbxScreenShot)).BeginInit();
             this.SuspendLayout();
             // 
@@ -59,7 +60,7 @@
             // lbxClients
             // 
             this.lbxClients.FormattingEnabled = true;
-            this.lbxClients.Location = new System.Drawing.Point(176, 12);
+            this.lbxClients.Location = new System.Drawing.Point(276, 12);
             this.lbxClients.Name = "lbxClients";
             this.lbxClients.Size = new System.Drawing.Size(808, 134);
             this.lbxClients.TabIndex = 6;
@@ -75,7 +76,7 @@
             // 
             // btnShare
             // 
-            this.btnShare.Location = new System.Drawing.Point(990, 12);
+            this.btnShare.Location = new System.Drawing.Point(176, 12);
             this.btnShare.Name = "btnShare";
             this.btnShare.Size = new System.Drawing.Size(94, 21);
             this.btnShare.TabIndex = 8;
@@ -108,11 +109,22 @@
             this.lblIP.TabIndex = 10;
             this.lblIP.Text = "IP:";
             // 
+            // btnDisconnect
+            // 
+            this.btnDisconnect.Location = new System.Drawing.Point(176, 39);
+            this.btnDisconnect.Name = "btnDisconnect";
+            this.btnDisconnect.Size = new System.Drawing.Size(94, 21);
+            this.btnDisconnect.TabIndex = 11;
+            this.btnDisconnect.Text = "Disconect";
+            this.btnDisconnect.UseVisualStyleBackColor = true;
+            this.btnDisconnect.Click += new System.EventHandler(this.StopClient);
+            // 
             // TeacherApp
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1413, 642);
+            this.Controls.Add(this.btnDisconnect);
             this.Controls.Add(this.lblIP);
             this.Controls.Add(this.lblStudents);
             this.Controls.Add(this.btnShare);
@@ -122,6 +134,7 @@
             this.Controls.Add(this.lbxConnexion);
             this.Name = "TeacherApp";
             this.Text = "Teacher";
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.OnClosing);
             this.SizeChanged += new System.EventHandler(this.TeacherAppResized);
             ((System.ComponentModel.ISupportInitialize)(this.pbxScreenShot)).EndInit();
             this.ResumeLayout(false);
@@ -139,6 +152,7 @@
         private System.Windows.Forms.NotifyIcon TrayIconTeacher;
         private System.Windows.Forms.ListBox lblStudents;
         private System.Windows.Forms.Label lblIP;
+        private System.Windows.Forms.Button btnDisconnect;
     }
 }
 

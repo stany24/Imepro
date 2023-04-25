@@ -11,6 +11,7 @@ using System.Threading;
 using System.IO;
 using System.Text.Json;
 using System.Drawing.Imaging;
+using System.Linq.Expressions;
 
 namespace ApplicationTeacher
 {
@@ -22,7 +23,7 @@ namespace ApplicationTeacher
         readonly int DurationBetweenDemand = 15;
         readonly int DefaultTimeout = 2000;
         int NextId = 0;
-        IPAddress ipAddr = null;
+        readonly IPAddress ipAddr = null;
         public TeacherApp()
         {
             InitializeComponent();
@@ -44,7 +45,7 @@ namespace ApplicationTeacher
         /// </summary>
         public void LogClients()
         {
-            while (IsHandleCreated == false){Thread.Sleep(1);}
+            while (IsHandleCreated == false){Thread.Sleep(100);}
             IPEndPoint localEndPoint = new(ipAddr, 11111);
             // Creation TCP/IP Socket using Socket Class Constructor
             Socket listener = new(ipAddr.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
@@ -103,7 +104,7 @@ namespace ApplicationTeacher
                             lbxClients.Invoke(new MethodInvoker(delegate { lbxClients.Items.Add(AllStudents[i].ToString()); }));
                             pbxScreenShot.Invoke(new MethodInvoker(delegate { pbxScreenShot.Image = AllStudents[i].ScreenShot; }));
                         }
-                        catch
+                        catch ( SocketException)
                         {
                             socket.Shutdown(SocketShutdown.Both);
                             socket.Close();
@@ -171,11 +172,13 @@ namespace ApplicationTeacher
                     lblStudents.DataSource = AllStudents;
                 }));
                 lbxRequetes.Invoke(new MethodInvoker(delegate { lbxRequetes.Items.Add("data recue de " + student.UserName); }));
+                student.NumberOfFailure= 0;
                 return student;
             }
             catch
             {
                 lbxRequetes.Invoke(new MethodInvoker(delegate { lbxRequetes.Items.Add(student.UserName + "n'a pas envoyé de donnée"); }));
+                student.NumberOfFailure++;
                 return student;
             }
         }
@@ -200,8 +203,12 @@ namespace ApplicationTeacher
                     lblStudents.DataSource = AllStudents;
                 }));
                 lbxRequetes.Invoke(new MethodInvoker(delegate { lbxRequetes.Items.Add("image recue de " + student.UserName); }));
+                student.NumberOfFailure = 0;
             }
-            catch { lbxRequetes.Invoke(new MethodInvoker(delegate { lbxRequetes.Items.Add(student.UserName + "n'a pas envoyé d'image"); })); }
+            catch {
+                lbxRequetes.Invoke(new MethodInvoker(delegate { lbxRequetes.Items.Add(student.UserName + "n'a pas envoyé d'image"); }));
+                student.NumberOfFailure++;
+            }
         }
 
         /// <summary>
@@ -302,6 +309,31 @@ namespace ApplicationTeacher
         {
             this.Show();
             this.WindowState = FormWindowState.Normal;
+        }
+
+        /// <summary>
+        /// Fonction qui à la fermeture de l'applcation professeur, le signale aux élèves.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        public void OnClosing(object sender, FormClosedEventArgs e)
+        {
+            foreach (DataForTeacher student in AllStudents)
+            {
+                try { student.SocketToStudent.Send(Encoding.ASCII.GetBytes("stop")); } catch { }
+                student.SocketToStudent.Disconnect(false);
+            }
+        }
+
+        /// <summary>
+        /// Fonction qui permet d'arêter la communication avec un client
+        /// </summary>
+        /// <param name="student"></param>
+        public void StopClient(object sender, EventArgs e)
+        {
+            if (lbxClients.SelectedItem is not DataForTeacher student) { return; }
+            student.SocketToStudent.Send(Encoding.ASCII.GetBytes("stop"));
+            student.SocketToStudent.Disconnect(false);
         }
     }
 }

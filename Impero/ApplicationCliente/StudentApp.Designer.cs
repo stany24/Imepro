@@ -83,6 +83,7 @@
             this.Controls.Add(this.lbxConnexion);
             this.Name = "StudentApp";
             this.Text = "Student";
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.OnClosing);
             ((System.ComponentModel.ISupportInitialize)(this.pbxScreeShot)).EndInit();
             this.ResumeLayout(false);
 

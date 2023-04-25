@@ -156,7 +156,14 @@ namespace ApplicationCliente
                     case "image": SendImage(); break;
                     //case "kill": KillSelectedProcess(Convert.ToInt32(text.Split(' ')[1])); break;
                     case "receive": Task.Run(() => ReceiveMulticastStream()); break;
-                    case "stop": Client.SocketToTeacher = null; Task.Run(() => ConnectToMaster()); return;
+                    case "stop": 
+                        Client.SocketToTeacher.Disconnect(false);
+                        Client.SocketToTeacher = null;
+                        lbxConnexion.Invoke(new MethodInvoker(delegate { lbxConnexion.Items.Add("Le professeur a coupé la connexion"); }));
+                        Thread.Sleep(1000);
+                        Task.Run(() => ConnectToMaster());
+                        
+                        return;
                 }
             }
         }
@@ -286,9 +293,24 @@ namespace ApplicationCliente
                     }
                 } while (size == 65000);
                 Array.Resize(ref imageArray, lastId);
-                Bitmap bitmap = new(new MemoryStream(imageArray));
-                pbxScreeShot.Invoke(new MethodInvoker(delegate { pbxScreeShot.Image = bitmap; }));
-                if (i % 100 == 0){lbxConnexion.Invoke(new MethodInvoker(delegate { lbxConnexion.Items.Add(i); }));}
+                try
+                {
+                    Bitmap bitmap = new(new MemoryStream(imageArray));
+                    pbxScreeShot.Invoke(new MethodInvoker(delegate { pbxScreeShot.Image = bitmap; }));
+                    if (i % 100 == 0) { lbxConnexion.Invoke(new MethodInvoker(delegate { lbxConnexion.Items.Add(i); })); }
+                }
+                catch { lbxConnexion.Invoke(new MethodInvoker(delegate { lbxConnexion.Items.Add("Erreur avec l'image "+i); })); }
+                
+            }
+        }
+
+        public void OnClosing(object sender, FormClosedEventArgs e)
+        {
+            if (Client.SocketToTeacher != null)
+            {
+                Client.SocketToTeacher.Send(Encoding.ASCII.GetBytes("stop"));
+                Client.SocketToTeacher.Disconnect(false);
+                Client.SocketToTeacher = null;
             }
         }
     }
