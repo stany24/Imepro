@@ -39,6 +39,9 @@ namespace ApplicationTeacher
             Task.Run(LogClients);
         }
 
+        /// <summary>
+        /// Fonction qui permet de connecter les élèves qui en font la demande
+        /// </summary>
         public void LogClients()
         {
             while (IsHandleCreated == false){Thread.Sleep(1);}
@@ -70,6 +73,9 @@ namespace ApplicationTeacher
             }
         }
 
+        /// <summary>
+        /// Fonction qui demande à tous les élèves connectés leurs données ainsi que leur image
+        /// </summary>
         private void AskingData()
         {
             while (true)
@@ -139,6 +145,11 @@ namespace ApplicationTeacher
             }
         }
 
+        /// <summary>
+        /// Fonction qui permet de recevoir les données envoiées par un élève
+        /// </summary>
+        /// <param name="student">L'élève qui à envoyé les donneés</param>
+        /// <returns></returns>
         private DataForTeacher ReceiveData(DataForTeacher student)
         {
             try
@@ -169,6 +180,10 @@ namespace ApplicationTeacher
             }
         }
 
+        /// <summary>
+        /// Fonction qui recoit l'image qu'un élève a envoyé
+        /// </summary>
+        /// <param name="student">L'élève qui à envoyé l'image</param>
         private void ReceiveImage(DataForTeacher student)
         {
             try
@@ -189,7 +204,10 @@ namespace ApplicationTeacher
             catch { lbxRequetes.Invoke(new MethodInvoker(delegate { lbxRequetes.Items.Add(student.UserName + "n'a pas envoyé d'image"); })); }
         }
 
-        public void Record()
+        /// <summary>
+        /// Fonction qui permet de capturer l'écran et de le partager en multicast
+        /// </summary>
+        public void RecordAndStreamScreen()
         {
             foreach (DataForTeacher student in AllStudents) { student.SocketToStudent.Send(Encoding.ASCII.GetBytes("receive")); }
 
@@ -224,25 +242,6 @@ namespace ApplicationTeacher
             }
         }
 
-        public static Bitmap ResizeImage(Bitmap imgToResize, Size size)
-        {
-            try
-            {
-                Bitmap resizedImage = new(size.Width, size.Height);
-                using (Graphics graphics = Graphics.FromImage((Image)resizedImage))
-                {
-                    graphics.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
-                    graphics.DrawImage(imgToResize, 0, 0, size.Width, size.Height);
-                }
-                return resizedImage;
-            }
-            catch
-            {
-                Console.WriteLine("Bitmap could not be resized");
-                return imgToResize;
-            }
-        }
-
         private void SelectedStudentChanged(object sender, EventArgs e)
         {
             ListBox listbox = (ListBox)sender;
@@ -257,13 +256,18 @@ namespace ApplicationTeacher
             newDisplay.Show();
         }
 
+        /// <summary>
+        /// Fonction qui démmare ou arête le streaming en multicast de l'écran
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void ShareScreen(object sender, EventArgs e)
         {
             if(ScreenSharer == null)
             {
                 if (AllStudents.Count != 0)
                 {
-                    ScreenSharer = Task.Run(Record);
+                    ScreenSharer = Task.Run(RecordAndStreamScreen);
                     btnShare.Text = "Stop Sharing";
                 }
             }
@@ -274,6 +278,11 @@ namespace ApplicationTeacher
             }
         }
 
+        /// <summary>
+        /// Fonction qui en cas de redimensionement de l'application affiche le TrayIcon si nécessaire
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         public void TeacherAppResized(object sender, EventArgs e)
         {
             if (FormWindowState.Minimized == this.WindowState)
@@ -284,6 +293,11 @@ namespace ApplicationTeacher
             else if (FormWindowState.Normal == this.WindowState) { TrayIconTeacher.Visible = false; }
         }
 
+        /// <summary>
+        /// Fonction qui en cas de click sur le TrayIcon réaffiche l'application
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         public void TrayIconTeacherClick(object sender, EventArgs e)
         {
             this.Show();
