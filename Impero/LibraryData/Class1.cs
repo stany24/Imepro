@@ -58,6 +58,7 @@ namespace LibraryData
     {
         public Socket SocketToStudent;
         public int ID;
+        public int NumberOfFailure;
 
         public DataForTeacher(Socket socket, int id)
         {
@@ -214,6 +215,44 @@ namespace LibraryData
             vendredi= copy.vendredi;
             samedi= copy.samedi;
             dimanche= copy.dimanche;
+        }
+
+        public void SetIp(string ip)
+        {
+            try{IPAddress.Parse(ip);}
+            catch { return; }
+
+            DayOfWeek day = DateTime.Now.DayOfWeek;
+            int MatinOuAprèsMidi = 0;
+            if (DateTime.Now.TimeOfDay > new TimeSpan(12, 35, 0)) { MatinOuAprèsMidi = 1; }
+            switch (day)
+            {
+                case DayOfWeek.Monday: lundi[MatinOuAprèsMidi] = ip; break;
+                case DayOfWeek.Tuesday: mardi[MatinOuAprèsMidi] = ip; break;
+                case DayOfWeek.Wednesday: mercredi[MatinOuAprèsMidi] = ip; break;
+                case DayOfWeek.Thursday: jeudi[MatinOuAprèsMidi] = ip; break;
+                case DayOfWeek.Friday: vendredi[MatinOuAprèsMidi] = ip; break;
+                case DayOfWeek.Saturday: samedi[MatinOuAprèsMidi] = ip; break;
+                case DayOfWeek.Sunday: dimanche[MatinOuAprèsMidi] = ip; break;
+            }
+        }
+
+        public string GetIp()
+        {
+            DayOfWeek day = DateTime.Now.DayOfWeek;
+            int MatinOuAprèsMidi = 0;
+            if (DateTime.Now.TimeOfDay > new TimeSpan(12, 35, 0)) { MatinOuAprèsMidi = 1; }
+            return day switch
+            {
+                DayOfWeek.Monday => lundi[MatinOuAprèsMidi],
+                DayOfWeek.Tuesday => mardi[MatinOuAprèsMidi],
+                DayOfWeek.Wednesday => mercredi[MatinOuAprèsMidi],
+                DayOfWeek.Thursday => jeudi[MatinOuAprèsMidi],
+                DayOfWeek.Friday => vendredi[MatinOuAprèsMidi],
+                DayOfWeek.Saturday => samedi[MatinOuAprèsMidi],
+                DayOfWeek.Sunday => dimanche[MatinOuAprèsMidi],
+                _ => null,
+            };
         }
 
         public IpForTheWeek()

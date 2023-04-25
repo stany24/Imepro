@@ -35,12 +35,13 @@ namespace ApplicationTeacher
                 if (address.AddressFamily == AddressFamily.InterNetwork) { ipAddr = address; break; }
             }
             lblIP.Text = "IP: "+ipAddr.ToString();
-            Task.Run(LogClients);
             Task.Run(AskingData);
+            Task.Run(LogClients);
         }
 
         public void LogClients()
         {
+            while (IsHandleCreated == false){Thread.Sleep(1);}
             IPEndPoint localEndPoint = new(ipAddr, 11111);
             // Creation TCP/IP Socket using Socket Class Constructor
             Socket listener = new(ipAddr.AddressFamily, SocketType.Stream, ProtocolType.Tcp);

@@ -27,36 +27,34 @@ namespace ApplicationCliente
             Task.Run(ConnectToMaster);
         }
 
-        public void NewTeacherIP()
+        /// <summary>
+        /// Fonction qui demande à l'élève une nouvelle adresse ip pour le maitre
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        public void NewTeacherIP(object sender, EventArgs e)
         {
             AskIp prompt = new();
             if (prompt.ShowDialog(this) == DialogResult.OK) {
-                try {
-                IpToTeacher = IPAddress.Parse(prompt.LastVerifiedIp);
-                    DayOfWeek day = DateTime.Now.DayOfWeek;
-                int MatinOuAprèsMidi = 0;
-                if (DateTime.Now.TimeOfDay > new TimeSpan(12, 35, 0)) { MatinOuAprèsMidi = 1; }
-                IpForTheWeek allIP = new();
-                switch (day)
+                try
                 {
-                    case DayOfWeek.Monday:allIP.lundi[MatinOuAprèsMidi] = prompt.LastVerifiedIp; break;
-                    case DayOfWeek.Tuesday:allIP.mardi[MatinOuAprèsMidi] = prompt.LastVerifiedIp; break;
-                    case DayOfWeek.Wednesday:allIP.mercredi[MatinOuAprèsMidi] = prompt.LastVerifiedIp; break;
-                    case DayOfWeek.Thursday:allIP.jeudi[MatinOuAprèsMidi] = prompt.LastVerifiedIp;break;
-                    case DayOfWeek.Friday:allIP.vendredi[MatinOuAprèsMidi] = prompt.LastVerifiedIp;break;
-                    case DayOfWeek.Saturday:allIP.samedi[MatinOuAprèsMidi] = prompt.LastVerifiedIp;break;
-                    case DayOfWeek.Sunday:allIP.dimanche[MatinOuAprèsMidi] = prompt.LastVerifiedIp;break;
-                }
-                using StreamWriter writeFichier = new(pathToConfFolder + FileNameConfIp);
-                writeFichier.WriteLine(JsonSerializer.Serialize(allIP, new JsonSerializerOptions { IncludeFields = true, }));
-                prompt.Close();
-                prompt.Dispose();
+                    IpToTeacher = IPAddress.Parse(prompt.LastVerifiedIp);
+                    IpForTheWeek allIP = new();
+                    allIP.SetIp(prompt.LastVerifiedIp);
+                    using StreamWriter writeFichier = new(pathToConfFolder + FileNameConfIp);
+                    writeFichier.WriteLine(JsonSerializer.Serialize(allIP, new JsonSerializerOptions { IncludeFields = true, }));
+                    prompt.Close();
+                    prompt.Dispose();
                 }
                 catch { }
             }
         }
 
-        public IpForTheWeek LoadConfIp()
+        /// <summary>
+        /// Fonction qui lit le fichier de configuration où les adresses ip des professeur sont stocké
+        /// </summary>
+        /// <returns></returns>
+        public IpForTheWeek ReadConfIp()
         {
             try { 
                 using StreamReader fichier = new(pathToConfFolder + FileNameConfIp);
@@ -64,41 +62,29 @@ namespace ApplicationCliente
                 fichier.Close();
                 return allIP;
             } 
-            catch {
-                using StreamWriter writer = new(pathToConfFolder + FileNameConfIp);
+            catch(Exception e) {
+                lbxConnexion.Invoke(new MethodInvoker(delegate { lbxConnexion.Items.Add("Unexpected exception : " + e.ToString()); }));
                 return null;
             }
         }
 
+        /// <summary>
+        /// Fonction qui essaye de charger l'adresse ip du professeur
+        /// </summary>
         public void LoadTeacherIP()
         {
             try
             {
-                DayOfWeek day = DateTime.Now.DayOfWeek;
-                int MatinOuAprèsMidi = 0;
-                if(DateTime.Now.TimeOfDay > new TimeSpan(12,35,0)){MatinOuAprèsMidi = 1;}
-                IpForTheWeek allIP = LoadConfIp();
-                if (allIP == null) { NewTeacherIP(); return; }
-                string PotentialIP = "";
-                switch(day)
-                {
-                    case DayOfWeek.Monday:PotentialIP = allIP.lundi[MatinOuAprèsMidi];break;
-                    case DayOfWeek.Tuesday:PotentialIP = allIP.mardi[MatinOuAprèsMidi];break;
-                    case DayOfWeek.Wednesday:PotentialIP = allIP.mercredi[MatinOuAprèsMidi];break;
-                    case DayOfWeek.Thursday:PotentialIP = allIP.jeudi[MatinOuAprèsMidi];break;
-                    case DayOfWeek.Friday:PotentialIP = allIP.vendredi[MatinOuAprèsMidi];break;
-                    case DayOfWeek.Saturday:PotentialIP = allIP.samedi[MatinOuAprèsMidi];break;
-                    case DayOfWeek.Sunday:PotentialIP = allIP.dimanche[MatinOuAprèsMidi];break;
-                }
-                IpToTeacher = IPAddress.Parse(PotentialIP);
-
+                IpForTheWeek allIP = ReadConfIp();
+                if (allIP == null) { NewTeacherIP(new object(),new EventArgs()); return; }
+                IpToTeacher = IPAddress.Parse(allIP.GetIp());
             }
-            catch (Exception)
-            {
-                NewTeacherIP();
-            }
+            catch{NewTeacherIP(new object(), new EventArgs());}
         }
 
+        /// <summary>
+        /// Fonction qui connecte cette application à l'application du professeur
+        /// </summary>
         public void ConnectToMaster()
         {
             try
@@ -111,6 +97,12 @@ namespace ApplicationCliente
                 Socket sender = new(localEndPoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
                 while (Client.SocketToTeacher == null)
                 {
+                    // Si l'addresse du professeur a changé on adapte le socket
+                    if(localEndPoint.Address != IpToTeacher)
+                    {
+                        localEndPoint = new(IpToTeacher, 11111);
+                        sender = new(localEndPoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
+                    }
                     try
                     {
                         // Connect Socket to the remote endpoint using method Connect()
@@ -144,6 +136,9 @@ namespace ApplicationCliente
             }
         }
 
+        /// <summary>
+        /// Fonction qui attend les demandes du professeur et lance la bonne fonction pour y répondre
+        /// </summary>
         public void WaitForDemand()
         {
             while (true)
@@ -160,12 +155,15 @@ namespace ApplicationCliente
                     case "data": SendData(); break;
                     case "image": SendImage(); break;
                     //case "kill": KillSelectedProcess(Convert.ToInt32(text.Split(' ')[1])); break;
-                    case "receive": Task.Run(() => Receive()); break;
+                    case "receive": Task.Run(() => ReceiveMulticastStream()); break;
                     case "stop": Client.SocketToTeacher = null; Task.Run(() => ConnectToMaster()); return;
                 }
             }
         }
 
+        /// <summary>
+        /// Fonction qui sérialize les données puis les envoient au professeur
+        /// </summary>
         private void SendData()
         {
             Client.GetUrls();
@@ -176,6 +174,9 @@ namespace ApplicationCliente
             Client.SocketToTeacher.Send(Encoding.ASCII.GetBytes(jsonString), Encoding.ASCII.GetBytes(jsonString).Length, SocketFlags.None);
         }
 
+        /// <summary>
+        /// Fonction qui envoie le screenshot au professeur
+        /// </summary>
         private void SendImage()
         {
             Client.TakeScreenShot();
@@ -185,6 +186,10 @@ namespace ApplicationCliente
             Client.SocketToTeacher.Send(image, 0, image.Length, SocketFlags.None);
         }
 
+        /// <summary>
+        /// Fonction qui vérifie sur toutes les interfaces réseau si le forwarding est activé, et génére un script pour n'activer que l'interface avec le professeur
+        /// </summary>
+        /// <returns> La commande à executer en powershell pour modifier les interfaces</returns>
         public string CheckInterfaces()
         {
             NetworkInterface[] netInterface = NetworkInterface.GetAllNetworkInterfaces();
@@ -205,6 +210,13 @@ namespace ApplicationCliente
             return command;
         }
 
+        /// <summary>
+        /// Fonction qui permet de vérifier si 2 ip sont sur le même réseau ou non
+        /// </summary>
+        /// <param name="ipAddress1">La première adresse ip</param>
+        /// <param name="ipAddress2">La deuxième adresse ip</param>
+        /// <param name="subnetMask">Le mask de sous réseau d'une des adresse</param>
+        /// <returns></returns>
         public static bool IsOnSameNetwork(IPAddress ipAddress1, IPAddress ipAddress2, IPAddress subnetMask)
         {
             // Convert the IP addresses and subnet mask to byte arrays
@@ -223,6 +235,11 @@ namespace ApplicationCliente
             return true;
         }
 
+        /// <summary>
+        /// Fonction qui aide l'utilisateur à configurer ses interfaces réseaux
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         public void HelpReceive(object sender, EventArgs e)
         {
             string commande = CheckInterfaces();
@@ -238,7 +255,10 @@ namespace ApplicationCliente
                 "3) Collez le tout dans le terminal et executez.\r\n", "Attention", MessageBoxButtons.OK, MessageBoxIcon.Warning);
         }
 
-        public void Receive()
+        /// <summary>
+        /// Fonction qui recoit la diffusion multicast envoyée par le professeur
+        /// </summary>
+        public void ReceiveMulticastStream()
         {
             Socket s = new(AddressFamily.InterNetwork, SocketType.Dgram,ProtocolType.Udp);
             IPEndPoint ipep = new(IPAddress.Any, 45678);
@@ -270,11 +290,6 @@ namespace ApplicationCliente
                 pbxScreeShot.Invoke(new MethodInvoker(delegate { pbxScreeShot.Image = bitmap; }));
                 if (i % 100 == 0){lbxConnexion.Invoke(new MethodInvoker(delegate { lbxConnexion.Items.Add(i); }));}
             }
-        }
-
-        private void BtnChangeIp(object sender, EventArgs e)
-        {
-            NewTeacherIP();
         }
     }
 }
