@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(TeacherApp));
             this.lbxConnexion = new System.Windows.Forms.ListBox();
             this.lbxRequetes = new System.Windows.Forms.ListBox();
             this.lbxClients = new System.Windows.Forms.ListBox();
@@ -86,8 +87,8 @@
             // 
             // TrayIconTeacher
             // 
+            this.TrayIconTeacher.Icon = ((System.Drawing.Icon)(resources.GetObject("TrayIconTeacher.Icon")));
             this.TrayIconTeacher.Text = "TrayIconTeacher";
-            this.TrayIconTeacher.Visible = true;
             this.TrayIconTeacher.MouseClick += new System.Windows.Forms.MouseEventHandler(this.TrayIconTeacherClick);
             this.TrayIconTeacher.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.TrayIconTeacherClick);
             // 

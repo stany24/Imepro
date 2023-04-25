@@ -28,10 +28,13 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(StudentApp));
             this.pbxScreeShot = new System.Windows.Forms.PictureBox();
             this.lbxConnexion = new System.Windows.Forms.ListBox();
             this.btnHelp = new System.Windows.Forms.Button();
             this.button1 = new System.Windows.Forms.Button();
+            this.TrayIconStudent = new System.Windows.Forms.NotifyIcon(this.components);
             ((System.ComponentModel.ISupportInitialize)(this.pbxScreeShot)).BeginInit();
             this.SuspendLayout();
             // 
@@ -72,6 +75,14 @@
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.NewTeacherIP);
             // 
+            // TrayIconStudent
+            // 
+            this.TrayIconStudent.Icon = ((System.Drawing.Icon)(resources.GetObject("TrayIconStudent.Icon")));
+            this.TrayIconStudent.Text = "TrayIconStudent";
+            this.TrayIconStudent.Visible = true;
+            this.TrayIconStudent.MouseClick += new System.Windows.Forms.MouseEventHandler(this.TrayIconStudentClick);
+            this.TrayIconStudent.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.TrayIconStudentClick);
+            // 
             // StudentApp
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -84,6 +95,7 @@
             this.Name = "StudentApp";
             this.Text = "Student";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.OnClosing);
+            this.Resize += new System.EventHandler(this.StudentAppResized);
             ((System.ComponentModel.ISupportInitialize)(this.pbxScreeShot)).EndInit();
             this.ResumeLayout(false);
 
@@ -94,6 +106,7 @@
         private System.Windows.Forms.ListBox lbxConnexion;
         private System.Windows.Forms.Button btnHelp;
         private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.NotifyIcon TrayIconStudent;
     }
 }
 

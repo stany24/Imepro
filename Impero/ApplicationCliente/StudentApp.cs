@@ -313,5 +313,31 @@ namespace ApplicationCliente
                 Client.SocketToTeacher = null;
             }
         }
+
+        /// <summary>
+        /// Fonction qui en cas de redimensionement de l'application affiche le TrayIcon si nécessaire
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        public void StudentAppResized(object sender, EventArgs e)
+        {
+            if (FormWindowState.Minimized == this.WindowState)
+            {
+                TrayIconStudent.Visible = true;
+                this.Hide();
+            }
+            else if (FormWindowState.Normal == this.WindowState) { TrayIconStudent.Visible = false; }
+        }
+
+        /// <summary>
+        /// Fonction qui en cas de click sur le TrayIcon réaffiche l'application
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        public void TrayIconStudentClick(object sender, EventArgs e)
+        {
+            this.Show();
+            this.WindowState = FormWindowState.Normal;
+        }
     }
 }
