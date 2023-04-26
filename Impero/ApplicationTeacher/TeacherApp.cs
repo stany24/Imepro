@@ -16,6 +16,7 @@ namespace ApplicationTeacher
 {
     public partial class TeacherApp : Form
     {
+        MiniatureDisplayer Displayer = new();
         readonly List<DataForTeacher> AllStudents = new();
         readonly List<DisplayStudent> AllStudentsDisplay = new();
         Task ScreenSharer;
@@ -26,8 +27,6 @@ namespace ApplicationTeacher
         public TeacherApp()
         {
             InitializeComponent();
-            // Establish the local endpointfor the socket.
-            // Dns.GetHostName returns the name of the host running the application.
             FindIp();
             Task.Run(AskingData);
             Task.Run(LogClients);
@@ -38,8 +37,10 @@ namespace ApplicationTeacher
         /// </summary>
         public void FindIp()
         {
+            // Establish the local endpointfor the socket.
+            // Dns.GetHostName returns the name of the host running the application.
             IPHostEntry ipHost = Dns.GetHostEntry(Dns.GetHostName());
-            List<IPAddress> PossiblesIp = new List<IPAddress>();
+            List<IPAddress> PossiblesIp = new();
             foreach (IPAddress address in ipHost.AddressList)
             {
                 if (address.AddressFamily == AddressFamily.InterNetwork) { PossiblesIp.Add(address);}
@@ -143,7 +144,7 @@ namespace ApplicationTeacher
                             }
                         }
                     }
-
+                    Task.Run(UpdateAllMiniatures);
                     //foreach (DataForTeacher client in AllClients) { client.UpdateAffichage(); }
                     DateTime FinishedUpdate = DateTime.Now;
                     TimeSpan UpdateDuration = FinishedUpdate - StartUpdate;
@@ -180,59 +181,8 @@ namespace ApplicationTeacher
                 };
                 //student.affichage = affichage;
                 lbxRequetes.Invoke(new MethodInvoker(delegate { lbxRequetes.Items.Add("data recue de " + student.UserName); }));
-                // Mise à jour du TreeView avec les détails.
-                TreeViewDetails.Invoke(new MethodInvoker(delegate {
-                    TreeNode[] nodeStudent = TreeViewDetails.Nodes.Find(Convert.ToString(student.ID), false);
-                    if (nodeStudent.Length == 0)
-                    { 
-                        // Créer nouvelle élève
-                        TreeNode nodeNewStudent = TreeViewDetails.Nodes.Add(Convert.ToString(student.ID), student.UserName);
-                        TreeNode nodePoste = nodeNewStudent.Nodes.Add(student.ComputerName,student.ComputerName);
-                        TreeNode nodeProcesses = nodePoste.Nodes.Add("Processus:");
-                        foreach(KeyValuePair<int,string> process in student.Processes){nodeProcesses.Nodes.Add(Convert.ToString(process.Key), process.Value);}
-                        TreeNode nodeUrls = nodePoste.Nodes.Add("Urls:");
-                        foreach(string url in student.Urls){nodeUrls.Nodes.Add(url);}
-                    }
-                    else
-                    {
-                        //nouvelle ordinateur pour un élève
-                        TreeNode[] nodeComputer = nodeStudent[0].Nodes.Find(student.ComputerName, false);
-                        if ( nodeComputer.Length == 0)
-                        {
-                            TreeNode nodePoste = nodeStudent[0].Nodes.Add(student.ComputerName, student.ComputerName);
-                            TreeNode nodeProcesses = nodePoste.Nodes.Add("Processus:");
-                            foreach (KeyValuePair<int, string> process in student.Processes){nodeProcesses.Nodes.Add(Convert.ToString(process.Key), process.Value);}
-                            TreeNode nodeUrls = nodePoste.Nodes.Add("Urls:");
-                            foreach (string url in student.Urls){nodeUrls.Nodes.Add(url);}
-                        }
-                        else
-                        {
-                            //mise à jour d'un ordinateur
-                            TreeNode proc = nodeComputer[0].Nodes[0];
-                            proc.Nodes.Clear();
-                            foreach (KeyValuePair<int, string> process in student.Processes){proc.Nodes.Add(Convert.ToString(process.Key), process.Value);}
-                            TreeNode urls = nodeComputer[0].Nodes[1];
-                            urls.Nodes.Clear();
-                            foreach (string url in student.Urls){urls.Nodes.Add(url);}
-                        }
-                    }
-                }));
-                // Mise à jour du TreeView pour la sélection
-                TreeViewSelect.Invoke(new MethodInvoker(delegate {
-                    TreeNode[] nodeStudent = TreeViewSelect.Nodes.Find(Convert.ToString(student.ID), false);
-                    if (nodeStudent.Length == 0)
-                    {
-                        // Créer nouvelle élève
-                        TreeNode nodeNewStudent = TreeViewSelect.Nodes.Add(Convert.ToString(student.ID), student.UserName);
-                        nodeNewStudent.Nodes.Add(student.ComputerName, student.ComputerName);
-                    }
-                    else
-                    {
-                        //nouvelle ordinateur pour un élève
-                        TreeNode[] nodeComputer = nodeStudent[0].Nodes.Find(student.ComputerName, false);
-                        if (nodeComputer.Length == 0){nodeStudent[0].Nodes.Add(student.ComputerName, student.ComputerName);}
-                    }
-                }));
+                
+                Task.Run(() => UpdateTreeViews(student));
                 student.NumberOfFailure = 0;
                 return student;
             }
@@ -241,6 +191,85 @@ namespace ApplicationTeacher
                 lbxRequetes.Invoke(new MethodInvoker(delegate { lbxRequetes.Items.Add(student.UserName + "n'a pas envoyé de donnée"); }));
                 student.NumberOfFailure++;
                 return student;
+            }
+        }
+
+        /// <summary>
+        /// Fonction qui met à jour les TreeViews (détails et sélection)
+        /// </summary>
+        /// <param name="student">L'élève que l'on met à jour</param>
+        public void UpdateTreeViews(DataForTeacher student)
+        {
+            // Mise à jour du TreeView avec les détails.
+            TreeViewDetails.Invoke(new MethodInvoker(delegate {
+                TreeNode[] nodeStudent = TreeViewDetails.Nodes.Find(Convert.ToString(student.ID), false);
+                if (nodeStudent.Length == 0)
+                {
+                    // Créer nouvelle élève
+                    TreeNode nodeNewStudent = TreeViewDetails.Nodes.Add(Convert.ToString(student.ID), student.UserName);
+                    TreeNode nodePoste = nodeNewStudent.Nodes.Add(student.ComputerName, student.ComputerName);
+                    TreeNode nodeProcesses = nodePoste.Nodes.Add("Processus:");
+                    foreach (KeyValuePair<int, string> process in student.Processes) { nodeProcesses.Nodes.Add(Convert.ToString(process.Key), process.Value); }
+                    TreeNode nodeUrls = nodePoste.Nodes.Add("Urls:");
+                    foreach (string url in student.Urls) { nodeUrls.Nodes.Add(url); }
+                }
+                else
+                {
+                    //nouvelle ordinateur pour un élève
+                    TreeNode[] nodeComputer = nodeStudent[0].Nodes.Find(student.ComputerName, false);
+                    if (nodeComputer.Length == 0)
+                    {
+                        TreeNode nodePoste = nodeStudent[0].Nodes.Add(student.ComputerName, student.ComputerName);
+                        TreeNode nodeProcesses = nodePoste.Nodes.Add("Processus:");
+                        foreach (KeyValuePair<int, string> process in student.Processes) { nodeProcesses.Nodes.Add(Convert.ToString(process.Key), process.Value); }
+                        TreeNode nodeUrls = nodePoste.Nodes.Add("Urls:");
+                        foreach (string url in student.Urls) { nodeUrls.Nodes.Add(url); }
+                    }
+                    else
+                    {
+                        //mise à jour d'un ordinateur
+                        TreeNode proc = nodeComputer[0].Nodes[0];
+                        proc.Nodes.Clear();
+                        foreach (KeyValuePair<int, string> process in student.Processes) { proc.Nodes.Add(Convert.ToString(process.Key), process.Value); }
+                        TreeNode urls = nodeComputer[0].Nodes[1];
+                        urls.Nodes.Clear();
+                        foreach (string url in student.Urls) { urls.Nodes.Add(url); }
+                    }
+                }
+            }));
+            // Mise à jour du TreeView pour la sélection
+            TreeViewSelect.Invoke(new MethodInvoker(delegate {
+                TreeNode[] nodeStudent = TreeViewSelect.Nodes.Find(Convert.ToString(student.ID), false);
+                if (nodeStudent.Length == 0)
+                {
+                    // Créer nouvelle élève
+                    TreeNode nodeNewStudent = TreeViewSelect.Nodes.Add(Convert.ToString(student.ID), student.UserName);
+                    nodeNewStudent.Nodes.Add(student.ComputerName, student.ComputerName);
+                }
+                else
+                {
+                    //nouvelle ordinateur pour un élève
+                    TreeNode[] nodeComputer = nodeStudent[0].Nodes.Find(student.ComputerName, false);
+                    if (nodeComputer.Length == 0) { nodeStudent[0].Nodes.Add(student.ComputerName, student.ComputerName); }
+                }
+            }));
+        }
+
+        public void UpdateAllMiniatures()
+        {
+            foreach(DataForTeacher student in AllStudents) {
+                TreeViewSelect.Invoke(new MethodInvoker(delegate {
+                    TreeNode[] studentNode = TreeViewSelect.Nodes.Find(student.UserName, false);
+                    if (studentNode.Length == 0) { return; }
+                    TreeNode[] computerNode = studentNode[0].Nodes.Find(student.ComputerName, false);
+                    if (computerNode.Length == 0) { return; }
+                    if (computerNode[0].Checked == false) { return; }
+                    Miniature StudentDisplay = null;
+                    foreach (Miniature display in Displayer.MiniatureList) { if (display.StudentID == student.ID) { StudentDisplay = display; } }
+                    StudentDisplay ??= new Miniature(student.ScreenShot, student.ComputerName, "14", student.ID);
+                    StudentDisplay.Image.Image = student.ScreenShot;
+                    Displayer.AddMiniature(StudentDisplay);
+                }));
             }
         }
 
@@ -422,14 +451,6 @@ namespace ApplicationTeacher
             if(splitContainer1.Panel1.Width > 600)
             {
                 splitContainer1.SplitterDistance = 600;
-            }
-        }
-
-        private void SplitContainer2_SplitterMoved(object sender, SplitterEventArgs e)
-        {
-            if(splitContainer2.Panel1.Width > 150)
-            {
-                splitContainer2.SplitterDistance = 150;
             }
         }
     }

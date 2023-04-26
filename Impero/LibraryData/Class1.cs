@@ -295,4 +295,59 @@ namespace LibraryData
             dimanche[1] = "157.26.227.198";
         }
     }
+    public class Miniature
+    {
+        public int StudentID;
+        public PictureBox Image = new();
+        Label Name = new();
+        Label Age = new();
+        int Marge = 10;
+        double Zoom = 0.1;
+
+        public Miniature(Bitmap image,string name, string age, int studentID)
+        {
+            Image.Image = image;
+            Image.SizeMode = PictureBoxSizeMode.StretchImage;
+            Image.Width = Convert.ToInt32(Image.Image.Width*Zoom);
+            Image.Height = Convert.ToInt32(Image.Image.Height*Zoom);
+            Name.Text = name;
+            Age.Text = age;
+            StudentID = studentID;
+            Image.SizeChanged += new EventHandler(UpdateLabelsPositions);
+            Image.LocationChanged += new EventHandler(UpdateLabelsPositions);
+            UpdateLabelsPositions(new object(), new EventArgs());
+        }
+
+        public void UpdateLabelsPositions(object sender, EventArgs e)
+        {
+            Image.Width = Convert.ToInt32(Image.Image.Width * Zoom);
+            Image.Height = Convert.ToInt32(Image.Image.Height * Zoom);
+            Name.Left = Image.Location.X + Image.Width / 2 - Name.Width/2;
+            Name.Top = Image.Location.Y + Image.Height + Marge;
+            Age.Left = Image.Location.X + Image.Width / 2 - Name.Width/2;
+            Age.Top = Image.Location.Y + Image.Height + 2*Marge + Name.Height;
+        }
+    }
+
+    public class MiniatureDisplayer
+    {
+        public List<Miniature> MiniatureList;
+        Rectangle Area = new Rectangle(770, 12,702, 937);
+
+        public void UpdateAllLocations()
+        {
+            foreach(Miniature miniature in MiniatureList)
+            {
+                miniature.Image.Top = Area.Top;
+                miniature.Image.Left= Area.Left;
+            }
+        }
+
+        public void AddMiniature(Miniature miniature)
+        {
+            MiniatureList.Add(miniature);
+            UpdateAllLocations();
+        }
+    }
+
 }

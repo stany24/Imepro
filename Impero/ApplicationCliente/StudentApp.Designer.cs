@@ -79,7 +79,6 @@
             // 
             this.TrayIconStudent.Icon = ((System.Drawing.Icon)(resources.GetObject("TrayIconStudent.Icon")));
             this.TrayIconStudent.Text = "TrayIconStudent";
-            this.TrayIconStudent.Visible = true;
             this.TrayIconStudent.MouseClick += new System.Windows.Forms.MouseEventHandler(this.TrayIconStudentClick);
             this.TrayIconStudent.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.TrayIconStudentClick);
             // 
