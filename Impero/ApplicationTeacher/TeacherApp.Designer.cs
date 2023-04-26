@@ -37,10 +37,10 @@
             this.TrayIconTeacher = new System.Windows.Forms.NotifyIcon(this.components);
             this.lblIP = new System.Windows.Forms.Label();
             this.btnDisconnect = new System.Windows.Forms.Button();
-            this.TreeViewStudents = new System.Windows.Forms.TreeView();
+            this.TreeViewDetails = new System.Windows.Forms.TreeView();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.splitContainer2 = new System.Windows.Forms.SplitContainer();
-            this.treeView1 = new System.Windows.Forms.TreeView();
+            this.TreeViewSelect = new System.Windows.Forms.TreeView();
             this.treeView2 = new System.Windows.Forms.TreeView();
             ((System.ComponentModel.ISupportInitialize)(this.pbxScreenShot)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
@@ -114,14 +114,13 @@
             this.btnDisconnect.UseVisualStyleBackColor = true;
             this.btnDisconnect.Click += new System.EventHandler(this.StopClient);
             // 
-            // TreeViewStudents
+            // TreeViewDetails
             // 
-            this.TreeViewStudents.CheckBoxes = true;
-            this.TreeViewStudents.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.TreeViewStudents.Location = new System.Drawing.Point(0, 0);
-            this.TreeViewStudents.Name = "TreeViewStudents";
-            this.TreeViewStudents.Size = new System.Drawing.Size(486, 588);
-            this.TreeViewStudents.TabIndex = 12;
+            this.TreeViewDetails.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.TreeViewDetails.Location = new System.Drawing.Point(0, 0);
+            this.TreeViewDetails.Name = "TreeViewDetails";
+            this.TreeViewDetails.Size = new System.Drawing.Size(486, 588);
+            this.TreeViewDetails.TabIndex = 12;
             // 
             // splitContainer1
             // 
@@ -130,7 +129,7 @@
             // 
             // splitContainer1.Panel1
             // 
-            this.splitContainer1.Panel1.Controls.Add(this.TreeViewStudents);
+            this.splitContainer1.Panel1.Controls.Add(this.TreeViewDetails);
             this.splitContainer1.Panel1MinSize = 125;
             // 
             // splitContainer1.Panel2
@@ -140,7 +139,7 @@
             this.splitContainer1.Size = new System.Drawing.Size(1460, 588);
             this.splitContainer1.SplitterDistance = 486;
             this.splitContainer1.TabIndex = 0;
-            this.splitContainer1.SplitterMoved += new System.Windows.Forms.SplitterEventHandler(this.splitContainer1_SplitterMoved);
+            this.splitContainer1.SplitterMoved += new System.Windows.Forms.SplitterEventHandler(this.SplitContainer1_SplitterMoved);
             // 
             // splitContainer2
             // 
@@ -150,7 +149,7 @@
             // 
             // splitContainer2.Panel1
             // 
-            this.splitContainer2.Panel1.Controls.Add(this.treeView1);
+            this.splitContainer2.Panel1.Controls.Add(this.TreeViewSelect);
             // 
             // splitContainer2.Panel2
             // 
@@ -158,15 +157,16 @@
             this.splitContainer2.Size = new System.Drawing.Size(970, 588);
             this.splitContainer2.SplitterDistance = 323;
             this.splitContainer2.TabIndex = 0;
-            this.splitContainer2.SplitterMoved += new System.Windows.Forms.SplitterEventHandler(this.splitContainer2_SplitterMoved);
+            this.splitContainer2.SplitterMoved += new System.Windows.Forms.SplitterEventHandler(this.SplitContainer2_SplitterMoved);
             // 
-            // treeView1
+            // TreeViewSelect
             // 
-            this.treeView1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.treeView1.Location = new System.Drawing.Point(0, 0);
-            this.treeView1.Name = "treeView1";
-            this.treeView1.Size = new System.Drawing.Size(323, 588);
-            this.treeView1.TabIndex = 0;
+            this.TreeViewSelect.CheckBoxes = true;
+            this.TreeViewSelect.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.TreeViewSelect.Location = new System.Drawing.Point(0, 0);
+            this.TreeViewSelect.Name = "TreeViewSelect";
+            this.TreeViewSelect.Size = new System.Drawing.Size(323, 588);
+            this.TreeViewSelect.TabIndex = 0;
             // 
             // treeView2
             // 
@@ -215,10 +215,10 @@
         private System.Windows.Forms.NotifyIcon TrayIconTeacher;
         private System.Windows.Forms.Label lblIP;
         private System.Windows.Forms.Button btnDisconnect;
-        private System.Windows.Forms.TreeView TreeViewStudents;
+        private System.Windows.Forms.TreeView TreeViewDetails;
         private System.Windows.Forms.SplitContainer splitContainer1;
         private System.Windows.Forms.SplitContainer splitContainer2;
-        private System.Windows.Forms.TreeView treeView1;
+        private System.Windows.Forms.TreeView TreeViewSelect;
         private System.Windows.Forms.TreeView treeView2;
     }
 }

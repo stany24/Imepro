@@ -107,8 +107,8 @@ namespace ApplicationCliente
                     {
                         // Connect Socket to the remote endpoint using method Connect()
                         sender.Connect(localEndPoint);
-                        Task.Run(WaitForDemand);
                         Client.SocketToTeacher = sender;
+                        Task.Run(WaitForDemand);
                         lbxConnexion.Invoke(new MethodInvoker(delegate { lbxConnexion.Items.Add("Connected"); }));
                     }
                     // Manage of Socket's Exceptions

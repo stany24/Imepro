@@ -11,7 +11,6 @@ using System.Threading;
 using System.IO;
 using System.Text.Json;
 using System.Drawing.Imaging;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace ApplicationTeacher
 {
@@ -23,20 +22,45 @@ namespace ApplicationTeacher
         readonly int DurationBetweenDemand = 15;
         readonly int DefaultTimeout = 2000;
         int NextId = 0;
-        readonly IPAddress ipAddr = null;
+        IPAddress ipAddr = null;
         public TeacherApp()
         {
             InitializeComponent();
             // Establish the local endpointfor the socket.
             // Dns.GetHostName returns the name of the host running the application.
-            IPHostEntry ipHost = Dns.GetHostEntry(Dns.GetHostName());
-            foreach (IPAddress address in ipHost.AddressList)
-            {
-                if (address.AddressFamily == AddressFamily.InterNetwork) { ipAddr = address; break; }
-            }
-            lblIP.Text = "IP: "+ipAddr.ToString();
+            FindIp();
             Task.Run(AskingData);
             Task.Run(LogClients);
+        }
+
+        /// <summary>
+        /// Fonction qui 
+        /// </summary>
+        public void FindIp()
+        {
+            IPHostEntry ipHost = Dns.GetHostEntry(Dns.GetHostName());
+            List<IPAddress> PossiblesIp = new List<IPAddress>();
+            foreach (IPAddress address in ipHost.AddressList)
+            {
+                if (address.AddressFamily == AddressFamily.InterNetwork) { PossiblesIp.Add(address);}
+            }
+            switch (PossiblesIp.Count)
+            {
+                case 0:
+                    MessageBox.Show("Aucune addresse ip conforme n'a étée trouvée.\r\n" +
+                        "Vérifiez vos connexion aux réseaux.\r\n" +
+                        "L'application va ce fermer.","Attention",MessageBoxButtons.OK,MessageBoxIcon.Warning);
+                    Application.Exit();
+                    break;
+                case 1:ipAddr = PossiblesIp[0]; break;
+                default:
+                    AskToChoseIp prompt = new(PossiblesIp);
+                    if (prompt.ShowDialog(this) == DialogResult.OK){ipAddr = prompt.ChoosenIp;}
+                    else { ipAddr = PossiblesIp[0]; }
+                    prompt.Dispose();
+                    break;
+            }
+            lblIP.Text = "IP: " + ipAddr.ToString();
         }
 
         /// <summary>
@@ -156,23 +180,18 @@ namespace ApplicationTeacher
                 };
                 //student.affichage = affichage;
                 lbxRequetes.Invoke(new MethodInvoker(delegate { lbxRequetes.Items.Add("data recue de " + student.UserName); }));
-                TreeViewStudents.Invoke(new MethodInvoker(delegate {
-                    TreeNode[] nodeStudent = TreeViewStudents.Nodes.Find(Convert.ToString(student.ID), false);
-                    // Créer nouvelle élève
+                // Mise à jour du TreeView avec les détails.
+                TreeViewDetails.Invoke(new MethodInvoker(delegate {
+                    TreeNode[] nodeStudent = TreeViewDetails.Nodes.Find(Convert.ToString(student.ID), false);
                     if (nodeStudent.Length == 0)
                     { 
-                        TreeNode nodeNewStudent = TreeViewStudents.Nodes.Add(Convert.ToString(student.ID), student.UserName);
+                        // Créer nouvelle élève
+                        TreeNode nodeNewStudent = TreeViewDetails.Nodes.Add(Convert.ToString(student.ID), student.UserName);
                         TreeNode nodePoste = nodeNewStudent.Nodes.Add(student.ComputerName,student.ComputerName);
                         TreeNode nodeProcesses = nodePoste.Nodes.Add("Processus:");
-                        foreach(KeyValuePair<int,string> process in student.Processes)
-                        {
-                            nodeProcesses.Nodes.Add(Convert.ToString(process.Key), process.Value);
-                        }
+                        foreach(KeyValuePair<int,string> process in student.Processes){nodeProcesses.Nodes.Add(Convert.ToString(process.Key), process.Value);}
                         TreeNode nodeUrls = nodePoste.Nodes.Add("Urls:");
-                        foreach(string url in student.Urls)
-                        {
-                            nodeUrls.Nodes.Add(url);
-                        }
+                        foreach(string url in student.Urls){nodeUrls.Nodes.Add(url);}
                     }
                     else
                     {
@@ -182,37 +201,39 @@ namespace ApplicationTeacher
                         {
                             TreeNode nodePoste = nodeStudent[0].Nodes.Add(student.ComputerName, student.ComputerName);
                             TreeNode nodeProcesses = nodePoste.Nodes.Add("Processus:");
-                            foreach (KeyValuePair<int, string> process in student.Processes)
-                            {
-                                nodeProcesses.Nodes.Add(Convert.ToString(process.Key), process.Value);
-                            }
+                            foreach (KeyValuePair<int, string> process in student.Processes){nodeProcesses.Nodes.Add(Convert.ToString(process.Key), process.Value);}
                             TreeNode nodeUrls = nodePoste.Nodes.Add("Urls:");
-                            foreach (string url in student.Urls)
-                            {
-                                nodeUrls.Nodes.Add(url);
-                            }
+                            foreach (string url in student.Urls){nodeUrls.Nodes.Add(url);}
                         }
                         else
                         {
                             //mise à jour d'un ordinateur
                             TreeNode proc = nodeComputer[0].Nodes[0];
                             proc.Nodes.Clear();
-                            foreach (KeyValuePair<int, string> process in student.Processes)
-                            {
-                                proc.Nodes.Add(Convert.ToString(process.Key), process.Value);
-                            }
+                            foreach (KeyValuePair<int, string> process in student.Processes){proc.Nodes.Add(Convert.ToString(process.Key), process.Value);}
                             TreeNode urls = nodeComputer[0].Nodes[1];
                             urls.Nodes.Clear();
-                            foreach (string url in student.Urls)
-                            {
-                                urls.Nodes.Add(url);
-                            }
+                            foreach (string url in student.Urls){urls.Nodes.Add(url);}
                         }
-                        
                     }
-                    
                 }));
-                student.NumberOfFailure= 0;
+                // Mise à jour du TreeView pour la sélection
+                TreeViewSelect.Invoke(new MethodInvoker(delegate {
+                    TreeNode[] nodeStudent = TreeViewSelect.Nodes.Find(Convert.ToString(student.ID), false);
+                    if (nodeStudent.Length == 0)
+                    {
+                        // Créer nouvelle élève
+                        TreeNode nodeNewStudent = TreeViewSelect.Nodes.Add(Convert.ToString(student.ID), student.UserName);
+                        nodeNewStudent.Nodes.Add(student.ComputerName, student.ComputerName);
+                    }
+                    else
+                    {
+                        //nouvelle ordinateur pour un élève
+                        TreeNode[] nodeComputer = nodeStudent[0].Nodes.Find(student.ComputerName, false);
+                        if (nodeComputer.Length == 0){nodeStudent[0].Nodes.Add(student.ComputerName, student.ComputerName);}
+                    }
+                }));
+                student.NumberOfFailure = 0;
                 return student;
             }
             catch
@@ -380,23 +401,23 @@ namespace ApplicationTeacher
         private void ZoomTreeView(object sender, MouseEventArgs e)
         {
             // Only zoom when the mouse is over the control
-            if (!TreeViewStudents.ClientRectangle.Contains(e.Location))
+            if (!TreeViewDetails.ClientRectangle.Contains(e.Location))
             {return;}
 
             // Increase or decrease the font size based on the mouse wheel delta
             int fontSizeDelta = e.Delta > 0 ? 1 : -1;
-            Font oldFont = TreeViewStudents.Font;
+            Font oldFont = TreeViewDetails.Font;
             float newFontSize = oldFont.Size + fontSizeDelta;
             if(newFontSize< 5) { return; }
             if (newFontSize > 60) { return; }
             Font newFont = new(oldFont.FontFamily,newFontSize, oldFont.Style);
 
             // Apply the new font size and redraw the control
-            TreeViewStudents.Font = newFont;
-            TreeViewStudents.Invalidate();
+            TreeViewDetails.Font = newFont;
+            TreeViewDetails.Invalidate();
         }
 
-        private void splitContainer1_SplitterMoved(object sender, SplitterEventArgs e)
+        private void SplitContainer1_SplitterMoved(object sender, SplitterEventArgs e)
         {
             if(splitContainer1.Panel1.Width > 600)
             {
@@ -404,7 +425,7 @@ namespace ApplicationTeacher
             }
         }
 
-        private void splitContainer2_SplitterMoved(object sender, SplitterEventArgs e)
+        private void SplitContainer2_SplitterMoved(object sender, SplitterEventArgs e)
         {
             if(splitContainer2.Panel1.Width > 150)
             {

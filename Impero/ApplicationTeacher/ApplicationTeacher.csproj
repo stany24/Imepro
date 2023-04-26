@@ -79,17 +79,17 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AskToChoseIp.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="AskToChoseIp.Designer.cs">
+      <DependentUpon>AskToChoseIp.cs</DependentUpon>
+    </Compile>
     <Compile Include="DisplayStudent.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="DisplayStudent.Designer.cs">
       <DependentUpon>DisplayStudent.cs</DependentUpon>
-    </Compile>
-    <Compile Include="EssaiSplit1.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="EssaiSplit1.Designer.cs">
-      <DependentUpon>EssaiSplit1.cs</DependentUpon>
     </Compile>
     <Compile Include="TeacherApp.cs">
       <SubType>Form</SubType>
@@ -99,11 +99,11 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="AskToChoseIp.resx">
+      <DependentUpon>AskToChoseIp.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="DisplayStudent.resx">
       <DependentUpon>DisplayStudent.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="EssaiSplit1.resx">
-      <DependentUpon>EssaiSplit1.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
