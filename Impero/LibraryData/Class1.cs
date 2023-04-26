@@ -298,27 +298,27 @@ namespace LibraryData
     public class Miniature:UserControl
     {
         public int StudentID;
-        public PictureBox Image = new();
+        public PictureBox PbxImage = new();
         public readonly System.Windows.Forms.Label ComputerName = new();
         readonly System.Windows.Forms.Label Age = new();
-        int MargeBetweenText = 5;
+        readonly int MargeBetweenText = 5;
 
         public Miniature(Bitmap image,string name, string age, int studentID)
         {
             //valeurs pour la fenêtre de control
-            Size = Image.Size;
+            Size = PbxImage.Size;
             StudentID = studentID;
             
 
-            Image = new PictureBox {
+            PbxImage = new PictureBox {
                 Location = new Point(0, 0),
                 Image = image,
                 SizeMode = PictureBoxSizeMode.StretchImage,
                 Size = new Size(400,100),
             };
-            Image.SizeChanged += new EventHandler(UpdateLabelsPositions);
-            Image.LocationChanged += new EventHandler(UpdateLabelsPositions);
-            Controls.Add(Image);
+            PbxImage.SizeChanged += new EventHandler(UpdateLabelsPositions);
+            PbxImage.LocationChanged += new EventHandler(UpdateLabelsPositions);
+            Controls.Add(PbxImage);
 
             ComputerName = new System.Windows.Forms.Label{
                 Location = new Point(140, 0),
@@ -338,13 +338,13 @@ namespace LibraryData
 
         public void UpdateLabelsPositions(object sender, EventArgs e)
         {
-            Image.Width = Convert.ToInt32(Image.Width);
-            Image.Height = Convert.ToInt32(Image.Height);
-            ComputerName.Left = Image.Location.X + Image.Width / 2 - ComputerName.Width/2;
-            ComputerName.Top = Image.Location.Y + Image.Height + MargeBetweenText;
-            Age.Left = Image.Location.X + Image.Width / 2 - ComputerName.Width/2;
-            Age.Top = Image.Location.Y + Image.Height + 2 * MargeBetweenText + ComputerName.Height;
-            Size = new Size(Image.Width, Image.Height + 3 * MargeBetweenText + ComputerName.Height + Age.Height);
+            PbxImage.Width = Convert.ToInt32(PbxImage.Width);
+            PbxImage.Height = Convert.ToInt32(PbxImage.Height);
+            ComputerName.Left = PbxImage.Location.X + PbxImage.Width / 2 - ComputerName.Width/2;
+            ComputerName.Top = PbxImage.Location.Y + PbxImage.Height + MargeBetweenText;
+            Age.Left = PbxImage.Location.X + PbxImage.Width / 2 - ComputerName.Width/2;
+            Age.Top = PbxImage.Location.Y + PbxImage.Height + 2 * MargeBetweenText + ComputerName.Height;
+            Size = new Size(PbxImage.Width, PbxImage.Height + 3 * MargeBetweenText + ComputerName.Height + Age.Height);
         }
     }
 
@@ -359,10 +359,10 @@ namespace LibraryData
         {
             foreach (Miniature miniature in MiniatureList)
             {
-                double NewHeight = miniature.Image.Image.Height * zoom;
-                double NewWidth = miniature.Image.Image.Width * zoom;
-                miniature.Image.Height = Convert.ToInt32(NewHeight);
-                miniature.Image.Width = Convert.ToInt32(NewWidth);
+                double NewHeight = miniature.PbxImage.Image.Height * zoom;
+                double NewWidth = miniature.PbxImage.Image.Width * zoom;
+                miniature.PbxImage.Height = Convert.ToInt32(NewHeight);
+                miniature.PbxImage.Width = Convert.ToInt32(NewWidth);
             }
             UpdateAllLocations();
         }
@@ -391,7 +391,7 @@ namespace LibraryData
         {
             foreach(Miniature miniature in MiniatureList)
             {
-                if(miniature.StudentID == id && miniature.ComputerName.Text == computername) {miniature.Image.Image = image;return; }
+                if(miniature.StudentID == id && miniature.ComputerName.Text == computername) {miniature.PbxImage.Image = image;return; }
             }
         }
 

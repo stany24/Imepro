@@ -131,8 +131,7 @@ namespace ApplicationTeacher
                     }
                     foreach (DataForTeacher client in ClientToRemove)
                     {
-                        AllStudents.Remove(client);
-                        lbxRequetes.Invoke(new MethodInvoker(delegate { lbxRequetes.Items.Add("Le client " + client.UserName + "à été retiré"); }));
+                        RemoveStudent(client);
                     }
                     foreach(DisplayStudent display in AllStudentsDisplay)
                     {
@@ -156,6 +155,24 @@ namespace ApplicationTeacher
                 }
                 else { Thread.Sleep(100); }
             }
+        }
+
+        public void RemoveStudent(DataForTeacher student)
+        {
+            AllStudents.Remove(student);
+            lbxRequetes.Invoke(new MethodInvoker(delegate { lbxRequetes.Items.Add("L'élève " + student.UserName + "à été retiré"); }));
+            TreeViewDetails.Invoke(new MethodInvoker(delegate {
+                TreeNode[] students = TreeViewDetails.Nodes.Find(Convert.ToString(student.ID), false);
+                TreeNode[] computers = students[0].Nodes.Find(student.ComputerName,false);
+                if(computers.Length > 0) { computers[0].Remove(); }
+                if (students[0].Nodes.Count == 0) { students[0].Remove(); }
+            }));
+            TreeViewSelect.Invoke(new MethodInvoker(delegate {
+                TreeNode[] students = TreeViewSelect.Nodes.Find(Convert.ToString(student.ID), false);
+                TreeNode[] computers = students[0].Nodes.Find(student.ComputerName, false);
+                if (computers.Length > 0) { computers[0].Remove(); }
+                if (students[0].Nodes.Count == 0) { students[0].Remove(); }
+            }));
         }
 
         /// <summary>
@@ -266,6 +283,7 @@ namespace ApplicationTeacher
                     if (students.ComputerName == e.Node.Name) { student = students; }
                 }
                 if (student == null) { return; }
+                foreach(Miniature mini in Displayer.MiniatureList) { if (mini.ComputerName.Text == student.ComputerName && mini.StudentID == student.ID) { return; } }
                 Miniature miniature = new(student.ScreenShot, student.ComputerName, "14", student.ID);
                 Displayer.AddMiniature(miniature);
                 Controls.Add(miniature);
