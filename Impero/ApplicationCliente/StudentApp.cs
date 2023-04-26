@@ -308,9 +308,11 @@ namespace ApplicationCliente
         {
             if (Client.SocketToTeacher != null)
             {
-                Client.SocketToTeacher.Send(Encoding.ASCII.GetBytes("stop"));
-                Client.SocketToTeacher.Disconnect(false);
-                Client.SocketToTeacher = null;
+                try {
+                    Client.SocketToTeacher.Send(Encoding.ASCII.GetBytes("stop"));
+                    Client.SocketToTeacher.Disconnect(false);
+                    Client.SocketToTeacher = null;}
+                catch { }
             }
         }
 

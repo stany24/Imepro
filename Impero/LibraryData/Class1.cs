@@ -6,14 +6,12 @@ using System.Drawing.Imaging;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
-using System.Reflection.Emit;
 using System.Runtime.InteropServices;
 using System.Runtime.Serialization;
 using System.ServiceModel;
 using System.Text;
 using System.Text.Json.Serialization;
 using System.Windows.Forms;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace LibraryData
 {
@@ -301,7 +299,7 @@ namespace LibraryData
     {
         public int StudentID;
         public PictureBox Image = new();
-        readonly System.Windows.Forms.Label ComputerName = new();
+        public readonly System.Windows.Forms.Label ComputerName = new();
         readonly System.Windows.Forms.Label Age = new();
         int MargeBetweenText = 5;
 
@@ -353,23 +351,20 @@ namespace LibraryData
     public class MiniatureDisplayer
     {
         public List<Miniature> MiniatureList = new();
-        readonly System.Windows.Forms.Label hidden = new();
         Rectangle Area = new(770, 12,1002, 937);
         readonly int Marge = 10;
-        double Zoom = 0.1;
-        public MiniatureDisplayer() {
-            hidden.MouseWheel += ChangeZoom;
-        }
+        public double zoom = 0.1;
 
-        public void ChangeZoom(object sender, MouseEventArgs e)
+        public void ChangeZoom()
         {
-            if (!Area.Contains(e.Location)) { return; }
-            Zoom = e.Delta > 0 ? 1 : -1;
             foreach (Miniature miniature in MiniatureList)
             {
-                miniature.Image.Height = (int)(miniature.Image.Image.Height * Zoom);
-                miniature.Image.Width = (int)(miniature.Image.Image.Width * Zoom);
+                double NewHeight = miniature.Image.Image.Height * zoom;
+                double NewWidth = miniature.Image.Image.Width * zoom;
+                miniature.Image.Height = Convert.ToInt32(NewHeight);
+                miniature.Image.Width = Convert.ToInt32(NewWidth);
             }
+            UpdateAllLocations();
         }
 
         public void UpdateAllLocations()
@@ -392,25 +387,25 @@ namespace LibraryData
             }
         }
 
-        public void UpdateMiniature(int id,Bitmap image)
+        public void UpdateMiniature(int id,string computername,Bitmap image)
         {
             foreach(Miniature miniature in MiniatureList)
             {
-                if(miniature.StudentID == id) {miniature.Image.Image = image;}
+                if(miniature.StudentID == id && miniature.ComputerName.Text == computername) {miniature.Image.Image = image;return; }
             }
         }
 
         public void AddMiniature(Miniature miniature)
         {
             MiniatureList.Add(miniature);
-            UpdateAllLocations();
+            ChangeZoom();
         }
 
-        public void RemoveMiniature(int id)
+        public void RemoveMiniature(int id, string computername)
         {
             foreach(Miniature miniature in MiniatureList)
             {
-                if(miniature.StudentID == id) {
+                if(miniature.StudentID == id && miniature.ComputerName.Text == computername) {
                     MiniatureList.Remove(miniature);
                     miniature.Dispose();
                     UpdateAllLocations();

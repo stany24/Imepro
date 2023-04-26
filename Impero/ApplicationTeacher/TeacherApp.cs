@@ -261,11 +261,11 @@ namespace ApplicationTeacher
             if (e.Node.Checked)
             {
                 DataForTeacher student = null;
-                foreach(DataForTeacher students in AllStudents)
+                foreach (DataForTeacher students in AllStudents)
                 {
-                    if(students.ComputerName == e.Node.Name) { student = students; }
+                    if (students.ComputerName == e.Node.Name) { student = students; }
                 }
-                if(student== null) { return; }
+                if (student == null) { return; }
                 Miniature miniature = new(student.ScreenShot, student.ComputerName, "14", student.ID);
                 Displayer.AddMiniature(miniature);
                 Controls.Add(miniature);
@@ -273,7 +273,7 @@ namespace ApplicationTeacher
             }
             else
             {
-                Displayer.RemoveMiniature(Convert.ToInt32(e.Node.Parent.Name));
+                Displayer.RemoveMiniature(Convert.ToInt32(e.Node.Parent.Name),e.Node.Name);
             }
         }
 
@@ -293,7 +293,7 @@ namespace ApplicationTeacher
                 student.ScreenShot = new Bitmap(new MemoryStream(imageBuffer));
                 lbxRequetes.Invoke(new MethodInvoker(delegate { lbxRequetes.Items.Add("image recue de " + student.UserName); }));
                 student.NumberOfFailure = 0;
-                Displayer.UpdateMiniature(student.ID, student.ScreenShot);
+                Displayer.UpdateMiniature(student.ID,student.ComputerName ,student.ScreenShot);
             }
             catch {
                 lbxRequetes.Invoke(new MethodInvoker(delegate { lbxRequetes.Items.Add(student.UserName + "n'a pas envoyé d'image"); }));
@@ -458,6 +458,12 @@ namespace ApplicationTeacher
             {
                 splitContainer1.SplitterDistance = 600;
             }
+        }
+
+        private void Slider_Scroll(object sender, EventArgs e)
+        {
+            Displayer.zoom = Slider.Value / 100.0;
+            Displayer.ChangeZoom();
         }
     }
 }

@@ -40,11 +40,13 @@
             this.TreeViewDetails = new System.Windows.Forms.TreeView();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.TreeViewSelect = new System.Windows.Forms.TreeView();
+            this.Slider = new System.Windows.Forms.TrackBar();
             ((System.ComponentModel.ISupportInitialize)(this.pbxScreenShot)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
             this.splitContainer1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.Slider)).BeginInit();
             this.SuspendLayout();
             // 
             // lbxConnexion
@@ -145,11 +147,23 @@
             this.TreeViewSelect.TabIndex = 0;
             this.TreeViewSelect.AfterCheck += new System.Windows.Forms.TreeViewEventHandler(this.TreeNodeChecked);
             // 
+            // Slider
+            // 
+            this.Slider.Location = new System.Drawing.Point(564, 606);
+            this.Slider.Maximum = 100;
+            this.Slider.Minimum = 1;
+            this.Slider.Name = "Slider";
+            this.Slider.Size = new System.Drawing.Size(200, 45);
+            this.Slider.TabIndex = 12;
+            this.Slider.Value = 10;
+            this.Slider.Scroll += new System.EventHandler(this.Slider_Scroll);
+            // 
             // TeacherApp
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1784, 961);
+            this.Controls.Add(this.Slider);
             this.Controls.Add(this.splitContainer1);
             this.Controls.Add(this.btnDisconnect);
             this.Controls.Add(this.lblIP);
@@ -166,6 +180,7 @@
             this.splitContainer1.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
             this.splitContainer1.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.Slider)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -183,6 +198,7 @@
         private System.Windows.Forms.TreeView TreeViewDetails;
         private System.Windows.Forms.SplitContainer splitContainer1;
         private System.Windows.Forms.TreeView TreeViewSelect;
+        private System.Windows.Forms.TrackBar Slider;
     }
 }
 
