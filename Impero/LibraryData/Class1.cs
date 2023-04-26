@@ -6,12 +6,14 @@ using System.Drawing.Imaging;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
+using System.Reflection.Emit;
 using System.Runtime.InteropServices;
 using System.Runtime.Serialization;
 using System.ServiceModel;
 using System.Text;
 using System.Text.Json.Serialization;
 using System.Windows.Forms;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace LibraryData
 {
@@ -295,51 +297,106 @@ namespace LibraryData
             dimanche[1] = "157.26.227.198";
         }
     }
-    public class Miniature
+    public class Miniature:UserControl
     {
         public int StudentID;
         public PictureBox Image = new();
-        Label Name = new();
-        Label Age = new();
-        int Marge = 10;
-        double Zoom = 0.1;
+        readonly System.Windows.Forms.Label ComputerName = new();
+        readonly System.Windows.Forms.Label Age = new();
+        int MargeBetweenText = 5;
 
         public Miniature(Bitmap image,string name, string age, int studentID)
         {
-            Image.Image = image;
-            Image.SizeMode = PictureBoxSizeMode.StretchImage;
-            Image.Width = Convert.ToInt32(Image.Image.Width*Zoom);
-            Image.Height = Convert.ToInt32(Image.Image.Height*Zoom);
-            Name.Text = name;
-            Age.Text = age;
+            //valeurs pour la fenêtre de control
+            Size = Image.Size;
             StudentID = studentID;
+            
+
+            Image = new PictureBox {
+                Location = new Point(0, 0),
+                Image = image,
+                SizeMode = PictureBoxSizeMode.StretchImage,
+                Size = new Size(400,100),
+            };
             Image.SizeChanged += new EventHandler(UpdateLabelsPositions);
             Image.LocationChanged += new EventHandler(UpdateLabelsPositions);
+            Controls.Add(Image);
+
+            ComputerName = new System.Windows.Forms.Label{
+                Location = new Point(140, 0),
+                Size = new Size(100, 20),
+                Text = name,
+            };
+            Controls.Add(ComputerName);
+
+            Age = new System.Windows.Forms.Label{
+                Location = new Point(0, 0),
+                Size = new Size(100, 20),
+                Text = age
+            };
+            Controls.Add(Age);
             UpdateLabelsPositions(new object(), new EventArgs());
         }
 
         public void UpdateLabelsPositions(object sender, EventArgs e)
         {
-            Image.Width = Convert.ToInt32(Image.Image.Width * Zoom);
-            Image.Height = Convert.ToInt32(Image.Image.Height * Zoom);
-            Name.Left = Image.Location.X + Image.Width / 2 - Name.Width/2;
-            Name.Top = Image.Location.Y + Image.Height + Marge;
-            Age.Left = Image.Location.X + Image.Width / 2 - Name.Width/2;
-            Age.Top = Image.Location.Y + Image.Height + 2*Marge + Name.Height;
+            Image.Width = Convert.ToInt32(Image.Width);
+            Image.Height = Convert.ToInt32(Image.Height);
+            ComputerName.Left = Image.Location.X + Image.Width / 2 - ComputerName.Width/2;
+            ComputerName.Top = Image.Location.Y + Image.Height + MargeBetweenText;
+            Age.Left = Image.Location.X + Image.Width / 2 - ComputerName.Width/2;
+            Age.Top = Image.Location.Y + Image.Height + 2 * MargeBetweenText + ComputerName.Height;
+            Size = new Size(Image.Width, Image.Height + 3 * MargeBetweenText + ComputerName.Height + Age.Height);
         }
     }
 
     public class MiniatureDisplayer
     {
-        public List<Miniature> MiniatureList;
-        Rectangle Area = new Rectangle(770, 12,702, 937);
+        public List<Miniature> MiniatureList = new();
+        readonly System.Windows.Forms.Label hidden = new();
+        Rectangle Area = new(770, 12,1002, 937);
+        readonly int Marge = 10;
+        double Zoom = 0.1;
+        public MiniatureDisplayer() {
+            hidden.MouseWheel += ChangeZoom;
+        }
+
+        public void ChangeZoom(object sender, MouseEventArgs e)
+        {
+            if (!Area.Contains(e.Location)) { return; }
+            Zoom = e.Delta > 0 ? 1 : -1;
+            foreach (Miniature miniature in MiniatureList)
+            {
+                miniature.Image.Height = (int)(miniature.Image.Image.Height * Zoom);
+                miniature.Image.Width = (int)(miniature.Image.Image.Width * Zoom);
+            }
+        }
 
         public void UpdateAllLocations()
         {
+            int OffsetTop = 0;
+            int OffsetRight = 0;
+            int MaxHeightInRow = 0;
+            for (int i = 0; i < MiniatureList.Count; i++)
+            {
+                if(OffsetRight + MiniatureList[i].Width> Area.Width)
+                {
+                    OffsetTop += MaxHeightInRow;
+                    MaxHeightInRow = 0;
+                    OffsetRight = 0;
+                }
+                MiniatureList[i].Top = Area.Top + OffsetTop;
+                MiniatureList[i].Left = Area.Left + OffsetRight;
+                OffsetRight += MiniatureList[i].Width;
+                if (MiniatureList[i].Height > MaxHeightInRow) { MaxHeightInRow = MiniatureList[i].Height; }
+            }
+        }
+
+        public void UpdateMiniature(int id,Bitmap image)
+        {
             foreach(Miniature miniature in MiniatureList)
             {
-                miniature.Image.Top = Area.Top;
-                miniature.Image.Left= Area.Left;
+                if(miniature.StudentID == id) {miniature.Image.Image = image;}
             }
         }
 
@@ -348,6 +405,18 @@ namespace LibraryData
             MiniatureList.Add(miniature);
             UpdateAllLocations();
         }
-    }
 
+        public void RemoveMiniature(int id)
+        {
+            foreach(Miniature miniature in MiniatureList)
+            {
+                if(miniature.StudentID == id) {
+                    MiniatureList.Remove(miniature);
+                    miniature.Dispose();
+                    UpdateAllLocations();
+                    break;
+                }
+            }
+        }
+    }
 }

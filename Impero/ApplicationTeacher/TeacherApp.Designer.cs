@@ -143,12 +143,13 @@
             this.TreeViewSelect.Name = "TreeViewSelect";
             this.TreeViewSelect.Size = new System.Drawing.Size(498, 588);
             this.TreeViewSelect.TabIndex = 0;
+            this.TreeViewSelect.AfterCheck += new System.Windows.Forms.TreeViewEventHandler(this.TreeNodeChecked);
             // 
             // TeacherApp
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1484, 961);
+            this.ClientSize = new System.Drawing.Size(1784, 961);
             this.Controls.Add(this.splitContainer1);
             this.Controls.Add(this.btnDisconnect);
             this.Controls.Add(this.lblIP);

@@ -16,7 +16,7 @@ namespace ApplicationTeacher
 {
     public partial class TeacherApp : Form
     {
-        MiniatureDisplayer Displayer = new();
+        readonly MiniatureDisplayer Displayer = new();
         readonly List<DataForTeacher> AllStudents = new();
         readonly List<DisplayStudent> AllStudentsDisplay = new();
         Task ScreenSharer;
@@ -144,7 +144,6 @@ namespace ApplicationTeacher
                             }
                         }
                     }
-                    Task.Run(UpdateAllMiniatures);
                     //foreach (DataForTeacher client in AllClients) { client.UpdateAffichage(); }
                     DateTime FinishedUpdate = DateTime.Now;
                     TimeSpan UpdateDuration = FinishedUpdate - StartUpdate;
@@ -181,7 +180,6 @@ namespace ApplicationTeacher
                 };
                 //student.affichage = affichage;
                 lbxRequetes.Invoke(new MethodInvoker(delegate { lbxRequetes.Items.Add("data recue de " + student.UserName); }));
-                
                 Task.Run(() => UpdateTreeViews(student));
                 student.NumberOfFailure = 0;
                 return student;
@@ -255,21 +253,27 @@ namespace ApplicationTeacher
             }));
         }
 
-        public void UpdateAllMiniatures()
+        private void TreeNodeChecked(object sender, TreeViewEventArgs e)
         {
-            foreach(DataForTeacher student in AllStudents) {
-                TreeViewSelect.Invoke(new MethodInvoker(delegate {
-                    TreeNode[] studentNode = TreeViewSelect.Nodes.Find(student.UserName, false);
-                    if (studentNode.Length == 0) { return; }
-                    TreeNode[] computerNode = studentNode[0].Nodes.Find(student.ComputerName, false);
-                    if (computerNode.Length == 0) { return; }
-                    if (computerNode[0].Checked == false) { return; }
-                    Miniature StudentDisplay = null;
-                    foreach (Miniature display in Displayer.MiniatureList) { if (display.StudentID == student.ID) { StudentDisplay = display; } }
-                    StudentDisplay ??= new Miniature(student.ScreenShot, student.ComputerName, "14", student.ID);
-                    StudentDisplay.Image.Image = student.ScreenShot;
-                    Displayer.AddMiniature(StudentDisplay);
-                }));
+            if (e.Node == null) { return; } // no node selected
+            if (e.Node.Parent == null) { return; } //vérification du niveau de la node
+            if (e.Node.Parent.Parent != null) { return; }
+            if (e.Node.Checked)
+            {
+                DataForTeacher student = null;
+                foreach(DataForTeacher students in AllStudents)
+                {
+                    if(students.ComputerName == e.Node.Name) { student = students; }
+                }
+                if(student== null) { return; }
+                Miniature miniature = new(student.ScreenShot, student.ComputerName, "14", student.ID);
+                Displayer.AddMiniature(miniature);
+                Controls.Add(miniature);
+                Controls.SetChildIndex(miniature, 0);
+            }
+            else
+            {
+                Displayer.RemoveMiniature(Convert.ToInt32(e.Node.Parent.Name));
             }
         }
 
@@ -289,6 +293,7 @@ namespace ApplicationTeacher
                 student.ScreenShot = new Bitmap(new MemoryStream(imageBuffer));
                 lbxRequetes.Invoke(new MethodInvoker(delegate { lbxRequetes.Items.Add("image recue de " + student.UserName); }));
                 student.NumberOfFailure = 0;
+                Displayer.UpdateMiniature(student.ID, student.ScreenShot);
             }
             catch {
                 lbxRequetes.Invoke(new MethodInvoker(delegate { lbxRequetes.Items.Add(student.UserName + "n'a pas envoyé d'image"); }));
@@ -406,7 +411,8 @@ namespace ApplicationTeacher
             foreach (DataForTeacher student in AllStudents)
             {
                 try { student.SocketToStudent.Send(Encoding.ASCII.GetBytes("stop")); } catch { }
-                student.SocketToStudent.Disconnect(false);
+                student.SocketToStudent.Dispose();
+                //student.SocketToStudent.Disconnect(false);
             }
         }
 
