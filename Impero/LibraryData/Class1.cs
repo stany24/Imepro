@@ -353,7 +353,7 @@ namespace LibraryData
     public class MiniatureDisplayer
     {
         public List<Miniature> MiniatureList = new();
-        Rectangle Area = new(770, 12,1002, 937);
+        int MaxWidth;
         readonly int Marge = 10;
         public double zoom = 0.1;
 
@@ -369,8 +369,9 @@ namespace LibraryData
             UpdateAllLocations();
         }
 
-        public MiniatureDisplayer()
+        public MiniatureDisplayer(int maxwidth)
         {
+            MaxWidth= maxwidth;
             Task.Run(LaunchTimeUpdate);
         }
 
@@ -399,15 +400,15 @@ namespace LibraryData
             int MaxHeightInRow = 0;
             for (int i = 0; i < MiniatureList.Count; i++)
             {
-                if(OffsetRight + MiniatureList[i].Width> Area.Width)
+                if(OffsetRight + MiniatureList[i].Width> MaxWidth)
                 {
                     OffsetTop += MaxHeightInRow;
                     MaxHeightInRow = 0;
                     OffsetRight = 0;
                 }
-                MiniatureList[i].Top = Area.Top + OffsetTop;
-                MiniatureList[i].Left = Area.Left + OffsetRight;
-                OffsetRight += MiniatureList[i].Width;
+                MiniatureList[i].Top = OffsetTop;
+                MiniatureList[i].Left = OffsetRight +Marge;
+                OffsetRight += MiniatureList[i].Width + Marge;
                 if (MiniatureList[i].Height > MaxHeightInRow) { MaxHeightInRow = MiniatureList[i].Height; }
             }
         }

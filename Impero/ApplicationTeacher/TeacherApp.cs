@@ -16,7 +16,7 @@ namespace ApplicationTeacher
 {
     public partial class TeacherApp : Form
     {
-        readonly MiniatureDisplayer Displayer = new();
+        readonly MiniatureDisplayer Displayer;
         readonly List<DataForTeacher> AllStudents = new();
         readonly List<DisplayStudent> AllStudentsDisplay = new();
         Task ScreenSharer;
@@ -27,6 +27,7 @@ namespace ApplicationTeacher
         public TeacherApp()
         {
             InitializeComponent();
+            Displayer = new(panelMiniatures.Width);
             FindIp();
             Task.Run(AskingData);
             Task.Run(LogClients);
@@ -120,7 +121,6 @@ namespace ApplicationTeacher
                             socket.Send(Encoding.ASCII.GetBytes("image"));
                             lbxRequetes.Invoke(new MethodInvoker(delegate { lbxRequetes.Items.Add("asked image to client " + AllStudents[i].UserName); }));
                             Task.Run(() => ReceiveImage(AllStudents[i])).Wait();
-                            pbxScreenShot.Invoke(new MethodInvoker(delegate { pbxScreenShot.Image = AllStudents[i].ScreenShot; }));
                         }
                         catch ( SocketException)
                         {
@@ -286,8 +286,8 @@ namespace ApplicationTeacher
                 foreach(Miniature mini in Displayer.MiniatureList) { if (mini.ComputerName == student.ComputerName && mini.StudentID == student.ID) { return; } }
                 Miniature miniature = new(student.ScreenShot, student.ComputerName, student.ID);
                 Displayer.AddMiniature(miniature);
-                Controls.Add(miniature);
-                Controls.SetChildIndex(miniature, 0);
+                panelMiniatures.Controls.Add(miniature);
+                panelMiniatures.Controls.SetChildIndex(miniature, 0);
             }
             else
             {
@@ -468,14 +468,6 @@ namespace ApplicationTeacher
             // Apply the new font size and redraw the control
             TreeViewDetails.Font = newFont;
             TreeViewDetails.Invalidate();
-        }
-
-        private void SplitContainer1_SplitterMoved(object sender, SplitterEventArgs e)
-        {
-            if(splitContainer1.Panel1.Width > 600)
-            {
-                splitContainer1.SplitterDistance = 600;
-            }
         }
 
         private void Slider_Scroll(object sender, EventArgs e)
