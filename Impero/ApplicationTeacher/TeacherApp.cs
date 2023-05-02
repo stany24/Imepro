@@ -81,12 +81,11 @@ namespace ApplicationTeacher
             listener.Listen(-1);
             while (true)
             {
-                lbxConnexion.Invoke(new MethodInvoker(delegate { lbxConnexion.Items.Add("Waiting connection..."); }));
                 try
                 {
                     // Suspend while waiting for incoming connection Using Accept() method the server will accept connection of client
                     Socket clientSocket = listener.Accept();
-                    lbxConnexion.Invoke(new MethodInvoker(delegate { lbxConnexion.Items.Add("New connexion to " + clientSocket.RemoteEndPoint); }));
+                    lbxRequetes.Invoke(new MethodInvoker(delegate { lbxRequetes.Items.Add(DateTime.Now.ToString("HH:mm:ss")+" Nouvelle connexion de: " + clientSocket.RemoteEndPoint); }));
                     AllStudents.Add(new DataForTeacher(clientSocket,NextId));
                     NextId++;
                 }
@@ -115,11 +114,11 @@ namespace ApplicationTeacher
                         {
                             //demande les données
                             socket.Send(Encoding.ASCII.GetBytes("data"));
-                            lbxRequetes.Invoke(new MethodInvoker(delegate { lbxRequetes.Items.Add("asked data to client " + AllStudents[i].UserName); }));
+                            lbxRequetes.Invoke(new MethodInvoker(delegate { lbxRequetes.Items.Add(DateTime.Now.ToString("HH:mm:ss") + " Demande des données à " + AllStudents[i].UserName); }));
                             Task.Run(() => AllStudents[i] = ReceiveData(AllStudents[i])).Wait();
                             //demande le screenshot
                             socket.Send(Encoding.ASCII.GetBytes("image"));
-                            lbxRequetes.Invoke(new MethodInvoker(delegate { lbxRequetes.Items.Add("asked image to client " + AllStudents[i].UserName); }));
+                            lbxRequetes.Invoke(new MethodInvoker(delegate { lbxRequetes.Items.Add(DateTime.Now.ToString("HH:mm:ss") + " Demande de l'image à " + AllStudents[i].UserName); }));
                             Task.Run(() => ReceiveImage(AllStudents[i])).Wait();
                         }
                         catch ( SocketException)
@@ -149,7 +148,7 @@ namespace ApplicationTeacher
                     TimeSpan CycleDuration = NextUpdate - StartUpdate;
                     if (CycleDuration > UpdateDuration)
                     {
-                        lbxRequetes.Invoke(new MethodInvoker(delegate { lbxRequetes.Items.Add("Attente du prochain cycle dans " + (CycleDuration - UpdateDuration) + " secondes"); }));
+                        lbxRequetes.Invoke(new MethodInvoker(delegate { lbxRequetes.Items.Add(DateTime.Now.ToString("HH:mm:ss") +  " Attente du prochain cycle dans " + (CycleDuration - UpdateDuration) + " secondes"); }));
                         Thread.Sleep(CycleDuration - UpdateDuration);
                     }
                 }
@@ -164,7 +163,7 @@ namespace ApplicationTeacher
         public void RemoveStudent(DataForTeacher student)
         {
             AllStudents.Remove(student);
-            lbxRequetes.Invoke(new MethodInvoker(delegate { lbxRequetes.Items.Add("L'élève " + student.UserName + "à été retiré"); }));
+            lbxRequetes.Invoke(new MethodInvoker(delegate { lbxRequetes.Items.Add(DateTime.Now.ToString("HH:mm:ss") + " L'élève " + student.UserName + " est déconnecté"); }));
             TreeViewDetails.Invoke(new MethodInvoker(delegate {
                 TreeNode[] students = TreeViewDetails.Nodes.Find(Convert.ToString(student.ID), false);
                 TreeNode[] computers = students[0].Nodes.Find(student.ComputerName,false);
@@ -200,16 +199,40 @@ namespace ApplicationTeacher
                     SocketToStudent = socket
                 };
                 //student.affichage = affichage;
-                lbxRequetes.Invoke(new MethodInvoker(delegate { lbxRequetes.Items.Add("data recue de " + student.UserName); }));
+                lbxRequetes.Invoke(new MethodInvoker(delegate { lbxRequetes.Items.Add(DateTime.Now.ToString("HH:mm:ss") +  " Données recue de " + student.UserName); }));
                 Task.Run(() => UpdateTreeViews(student));
                 student.NumberOfFailure = 0;
                 return student;
             }
             catch
             {
-                lbxRequetes.Invoke(new MethodInvoker(delegate { lbxRequetes.Items.Add(student.UserName + "n'a pas envoyé de donnée"); }));
+                lbxRequetes.Invoke(new MethodInvoker(delegate { lbxRequetes.Items.Add(DateTime.Now.ToString("HH:mm:ss") + " " +student.UserName + "n'a pas envoyé de donnée"); }));
                 student.NumberOfFailure++;
                 return student;
+            }
+        }
+
+        /// <summary>
+        /// Fonction qui recoit l'image qu'un élève a envoyé
+        /// </summary>
+        /// <param name="student">L'élève qui à envoyé l'image</param>
+        private void ReceiveImage(DataForTeacher student)
+        {
+            try
+            {
+                Socket socket = student.SocketToStudent;
+                byte[] imageBuffer = new byte[10485760];
+                socket.ReceiveTimeout = DefaultTimeout;
+                int nbData = socket.Receive(imageBuffer, 0, imageBuffer.Length, SocketFlags.None);
+                Array.Resize(ref imageBuffer, nbData);
+                student.ScreenShot = new Bitmap(new MemoryStream(imageBuffer));
+                lbxRequetes.Invoke(new MethodInvoker(delegate { lbxRequetes.Items.Add(DateTime.Now.ToString("HH:mm:ss") + " Image recue de " + student.UserName); }));
+                student.NumberOfFailure = 0;
+                Displayer.UpdateMiniature(student.ID,student.ComputerName ,student.ScreenShot);
+            }
+            catch {
+                lbxRequetes.Invoke(new MethodInvoker(delegate { lbxRequetes.Items.Add(DateTime.Now.ToString("HH:mm:ss") + " "+ student.UserName + "n'a pas envoyé d'image"); }));
+                student.NumberOfFailure++;
             }
         }
 
@@ -301,30 +324,6 @@ namespace ApplicationTeacher
             else
             {
                 Displayer.RemoveMiniature(Convert.ToInt32(e.Node.Parent.Name),e.Node.Name);
-            }
-        }
-
-        /// <summary>
-        /// Fonction qui recoit l'image qu'un élève a envoyé
-        /// </summary>
-        /// <param name="student">L'élève qui à envoyé l'image</param>
-        private void ReceiveImage(DataForTeacher student)
-        {
-            try
-            {
-                Socket socket = student.SocketToStudent;
-                byte[] imageBuffer = new byte[10485760];
-                socket.ReceiveTimeout = DefaultTimeout;
-                int nbData = socket.Receive(imageBuffer, 0, imageBuffer.Length, SocketFlags.None);
-                Array.Resize(ref imageBuffer, nbData);
-                student.ScreenShot = new Bitmap(new MemoryStream(imageBuffer));
-                lbxRequetes.Invoke(new MethodInvoker(delegate { lbxRequetes.Items.Add("image recue de " + student.UserName); }));
-                student.NumberOfFailure = 0;
-                Displayer.UpdateMiniature(student.ID,student.ComputerName ,student.ScreenShot);
-            }
-            catch {
-                lbxRequetes.Invoke(new MethodInvoker(delegate { lbxRequetes.Items.Add(student.UserName + "n'a pas envoyé d'image"); }));
-                student.NumberOfFailure++;
             }
         }
 

@@ -14,7 +14,6 @@ using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Xml.Linq;
 
 namespace LibraryData
 {
@@ -124,7 +123,7 @@ namespace LibraryData
 
                         StringBuilder text = new(GetWindowTextLength(hWnd) + 1);
                         _ = GetWindowText(hWnd, text, text.Capacity);
-                        if (text.ToString() != "") { Urls.Add(singleBrowser + " : " + text.ToString()); }
+                        if (text.ToString() != "") { Urls.Add(DateTime.Now.ToString("HH:mm:ss") +" "+ singleBrowser + " : " + text.ToString()); }
                     }
                 }
             }

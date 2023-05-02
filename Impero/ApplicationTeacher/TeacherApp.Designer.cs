@@ -48,13 +48,13 @@
             this.lbxConnexion.FormattingEnabled = true;
             this.lbxConnexion.Location = new System.Drawing.Point(268, 893);
             this.lbxConnexion.Name = "lbxConnexion";
-            this.lbxConnexion.Size = new System.Drawing.Size(568, 56);
+            this.lbxConnexion.Size = new System.Drawing.Size(337, 56);
             this.lbxConnexion.TabIndex = 4;
             // 
             // lbxRequetes
             // 
             this.lbxRequetes.FormattingEnabled = true;
-            this.lbxRequetes.Location = new System.Drawing.Point(842, 893);
+            this.lbxRequetes.Location = new System.Drawing.Point(611, 893);
             this.lbxRequetes.Name = "lbxRequetes";
             this.lbxRequetes.Size = new System.Drawing.Size(541, 56);
             this.lbxRequetes.TabIndex = 5;
