@@ -333,6 +333,9 @@ namespace LibraryData
             UpdateLabelsPositions(new object(), new EventArgs());
         }
 
+        /// <summary>
+        /// Fonction qui ajoute une seconde au temps depuis la mise à jour de l'image et change le texte du label.
+        /// </summary>
         public void UpdateTime()
         {
             TimeSinceUpdate++;
@@ -340,6 +343,11 @@ namespace LibraryData
             catch {};
         }
 
+        /// <summary>
+        /// Fonction qui positionne le label par rapport à la picturebox
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         public void UpdateLabelsPositions(object sender, EventArgs e)
         {
             PbxImage.Width = Convert.ToInt32(PbxImage.Width);
@@ -357,6 +365,9 @@ namespace LibraryData
         readonly int Marge = 10;
         public double zoom = 0.1;
 
+        /// <summary>
+        /// Fonction qui permet de zoomer dans les miniatures en changant leur taille
+        /// </summary>
         public void ChangeZoom()
         {
             foreach (Miniature miniature in MiniatureList)
@@ -375,6 +386,9 @@ namespace LibraryData
             Task.Run(LaunchTimeUpdate);
         }
 
+        /// <summary>
+        /// Fonction qui toutes les seconde lance une mise à jour du temps
+        /// </summary>
         public void LaunchTimeUpdate()
         {
             Thread.Sleep(3000);
@@ -385,6 +399,9 @@ namespace LibraryData
             }
         }
 
+        /// <summary>
+        /// Fonction qui lance la mise à jour du temps dans toutes les miniatures
+        /// </summary>
         public void UpdateAllTimes()
         {
             foreach (Miniature miniature in MiniatureList)
@@ -393,6 +410,9 @@ namespace LibraryData
             }
         }
 
+        /// <summary>
+        /// Fonction qui place toutes les miniatures au bon endroit
+        /// </summary>
         public void UpdateAllLocations()
         {
             int OffsetTop = 0;
@@ -413,6 +433,12 @@ namespace LibraryData
             }
         }
 
+        /// <summary>
+        /// Fonction pour mettre à jour l'image d'une miniature
+        /// </summary>
+        /// <param name="id">Id de l'élève</param>
+        /// <param name="computername"> Nom de l'ordinateur</param>
+        /// <param name="image">La nouvelle image que l'on veux mettre</param>
         public void UpdateMiniature(int id,string computername,Bitmap image)
         {
             foreach(Miniature miniature in MiniatureList)
@@ -425,12 +451,21 @@ namespace LibraryData
             }
         }
 
+        /// <summary>
+        /// Fonction pour ajouter une miniature que le miniatureDisplayer doit gérer
+        /// </summary>
+        /// <param name="miniature"></param>
         public void AddMiniature(Miniature miniature)
         {
             MiniatureList.Add(miniature);
             ChangeZoom();
         }
 
+        /// <summary>
+        /// Fonction pour enlever un miniature de la liste que le miniatureDisplayer doit gérer
+        /// </summary>
+        /// <param name="id">Id de l'éléve</param>
+        /// <param name="computername">Le nom de l'ordinateur</param>
         public void RemoveMiniature(int id, string computername)
         {
             foreach(Miniature miniature in MiniatureList)

@@ -157,6 +157,10 @@ namespace ApplicationTeacher
             }
         }
 
+        /// <summary>
+        /// Fonction qui enléve un élève en cas de déconnection
+        /// </summary>
+        /// <param name="student">L'élève à enlever</param>
         public void RemoveStudent(DataForTeacher student)
         {
             AllStudents.Remove(student);
@@ -270,6 +274,11 @@ namespace ApplicationTeacher
             }));
         }
 
+        /// <summary>
+        /// Fonction qui permet la création ou la supresion de miniatures par rapport aux checkbox. 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void TreeNodeChecked(object sender, TreeViewEventArgs e)
         {
             if (e.Node == null) { return; } // no node selected
@@ -357,6 +366,11 @@ namespace ApplicationTeacher
             }
         }
 
+        /// <summary>
+        /// Fonction qui ouvre un affichage individuel pour un éléve.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void SelectedStudentChanged(object sender, EventArgs e)
         {
             ListBox listbox = (ListBox)sender;
@@ -470,6 +484,11 @@ namespace ApplicationTeacher
             TreeViewDetails.Invalidate();
         }
 
+        /// <summary>
+        /// Fonction pour changer le zoom des miniatures avec un slider
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Slider_Scroll(object sender, EventArgs e)
         {
             Displayer.zoom = Slider.Value / 100.0;
