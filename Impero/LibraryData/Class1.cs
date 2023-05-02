@@ -11,7 +11,10 @@ using System.Runtime.Serialization;
 using System.ServiceModel;
 using System.Text;
 using System.Text.Json.Serialization;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Xml.Linq;
 
 namespace LibraryData
 {
@@ -299,16 +302,17 @@ namespace LibraryData
     {
         public int StudentID;
         public PictureBox PbxImage = new();
-        public readonly System.Windows.Forms.Label ComputerName = new();
-        readonly System.Windows.Forms.Label Age = new();
+        public readonly Label ComputerInformations = new();
         readonly int MargeBetweenText = 5;
+        public int TimeSinceUpdate = 0;
+        public string ComputerName;
 
-        public Miniature(Bitmap image,string name, string age, int studentID)
+        public Miniature(Bitmap image,string name, int studentID)
         {
             //valeurs pour la fenêtre de control
             Size = PbxImage.Size;
             StudentID = studentID;
-            
+            ComputerName= name;
 
             PbxImage = new PictureBox {
                 Location = new Point(0, 0),
@@ -320,31 +324,29 @@ namespace LibraryData
             PbxImage.LocationChanged += new EventHandler(UpdateLabelsPositions);
             Controls.Add(PbxImage);
 
-            ComputerName = new System.Windows.Forms.Label{
+            ComputerInformations = new Label {
                 Location = new Point(140, 0),
                 Size = new Size(100, 20),
-                Text = name,
+                Text = ComputerName + " " + TimeSinceUpdate,
             };
-            Controls.Add(ComputerName);
-
-            Age = new System.Windows.Forms.Label{
-                Location = new Point(0, 0),
-                Size = new Size(100, 20),
-                Text = age
-            };
-            Controls.Add(Age);
+            Controls.Add(ComputerInformations);
             UpdateLabelsPositions(new object(), new EventArgs());
+        }
+
+        public void UpdateTime()
+        {
+            TimeSinceUpdate++;
+            try { ComputerInformations.Invoke(new MethodInvoker(delegate { ComputerInformations.Text = ComputerName + " " + TimeSinceUpdate; })); }
+            catch {};
         }
 
         public void UpdateLabelsPositions(object sender, EventArgs e)
         {
             PbxImage.Width = Convert.ToInt32(PbxImage.Width);
             PbxImage.Height = Convert.ToInt32(PbxImage.Height);
-            ComputerName.Left = PbxImage.Location.X + PbxImage.Width / 2 - ComputerName.Width/2;
-            ComputerName.Top = PbxImage.Location.Y + PbxImage.Height + MargeBetweenText;
-            Age.Left = PbxImage.Location.X + PbxImage.Width / 2 - ComputerName.Width/2;
-            Age.Top = PbxImage.Location.Y + PbxImage.Height + 2 * MargeBetweenText + ComputerName.Height;
-            Size = new Size(PbxImage.Width, PbxImage.Height + 3 * MargeBetweenText + ComputerName.Height + Age.Height);
+            ComputerInformations.Left = PbxImage.Location.X + PbxImage.Width / 2 - ComputerInformations.Width/2;
+            ComputerInformations.Top = PbxImage.Location.Y + PbxImage.Height + MargeBetweenText;
+            Size = new Size(PbxImage.Width, PbxImage.Height + 3 * MargeBetweenText + ComputerInformations.Height);
         }
     }
 
@@ -365,6 +367,29 @@ namespace LibraryData
                 miniature.PbxImage.Width = Convert.ToInt32(NewWidth);
             }
             UpdateAllLocations();
+        }
+
+        public MiniatureDisplayer()
+        {
+            Task.Run(LaunchTimeUpdate);
+        }
+
+        public void LaunchTimeUpdate()
+        {
+            Thread.Sleep(3000);
+            while(true)
+            {
+                Thread.Sleep(1000);
+                Task.Run(UpdateAllTimes);
+            }
+        }
+
+        public void UpdateAllTimes()
+        {
+            foreach (Miniature miniature in MiniatureList)
+            {
+                miniature.UpdateTime();
+            }
         }
 
         public void UpdateAllLocations()
@@ -391,7 +416,11 @@ namespace LibraryData
         {
             foreach(Miniature miniature in MiniatureList)
             {
-                if(miniature.StudentID == id && miniature.ComputerName.Text == computername) {miniature.PbxImage.Image = image;return; }
+                if(miniature.StudentID == id && miniature.ComputerName == computername) {
+                    miniature.PbxImage.Image = image;
+                    miniature.TimeSinceUpdate = 0;
+                    return;
+                }
             }
         }
 
@@ -405,7 +434,7 @@ namespace LibraryData
         {
             foreach(Miniature miniature in MiniatureList)
             {
-                if(miniature.StudentID == id && miniature.ComputerName.Text == computername) {
+                if(miniature.StudentID == id && miniature.ComputerName == computername) {
                     MiniatureList.Remove(miniature);
                     miniature.Dispose();
                     UpdateAllLocations();

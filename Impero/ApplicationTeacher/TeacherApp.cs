@@ -283,8 +283,8 @@ namespace ApplicationTeacher
                     if (students.ComputerName == e.Node.Name) { student = students; }
                 }
                 if (student == null) { return; }
-                foreach(Miniature mini in Displayer.MiniatureList) { if (mini.ComputerName.Text == student.ComputerName && mini.StudentID == student.ID) { return; } }
-                Miniature miniature = new(student.ScreenShot, student.ComputerName, "14", student.ID);
+                foreach(Miniature mini in Displayer.MiniatureList) { if (mini.ComputerName == student.ComputerName && mini.StudentID == student.ID) { return; } }
+                Miniature miniature = new(student.ScreenShot, student.ComputerName, student.ID);
                 Displayer.AddMiniature(miniature);
                 Controls.Add(miniature);
                 Controls.SetChildIndex(miniature, 0);
