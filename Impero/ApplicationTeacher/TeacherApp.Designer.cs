@@ -45,6 +45,7 @@
             // 
             // lbxConnexion
             // 
+            this.lbxConnexion.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.lbxConnexion.FormattingEnabled = true;
             this.lbxConnexion.Location = new System.Drawing.Point(268, 893);
             this.lbxConnexion.Name = "lbxConnexion";
@@ -53,6 +54,7 @@
             // 
             // lbxRequetes
             // 
+            this.lbxRequetes.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.lbxRequetes.FormattingEnabled = true;
             this.lbxRequetes.Location = new System.Drawing.Point(611, 893);
             this.lbxRequetes.Name = "lbxRequetes";

@@ -11,6 +11,8 @@ using System.Threading;
 using System.IO;
 using System.Text.Json;
 using System.Drawing.Imaging;
+using System.Linq;
+using System.Diagnostics;
 
 namespace ApplicationTeacher
 {
@@ -187,14 +189,15 @@ namespace ApplicationTeacher
         {
             try
             {
-                
                 Socket socket = student.SocketToStudent;
                 //AffichageEleve affichage = student.affichage;
                 byte[] dataBuffer = new byte[1024];
                 socket.ReceiveTimeout = DefaultTimeout;
                 int nbData = socket.Receive(dataBuffer);
                 Array.Resize(ref dataBuffer, nbData);
-                student = new(JsonSerializer.Deserialize<Data>(Encoding.Default.GetString(dataBuffer)))
+                string temp = Encoding.Default.GetString(dataBuffer);
+                Data data = JsonSerializer.Deserialize<Data>(temp);
+                student = new(data)
                 {
                     SocketToStudent = socket
                 };
@@ -244,40 +247,28 @@ namespace ApplicationTeacher
         {
             // Mise à jour du TreeView avec les détails.
             TreeViewDetails.Invoke(new MethodInvoker(delegate {
-                TreeNode[] nodeStudent = TreeViewDetails.Nodes.Find(Convert.ToString(student.ID), false);
-                if (nodeStudent.Length == 0)
-                {
-                    // Créer nouvelle élève
-                    TreeNode nodeNewStudent = TreeViewDetails.Nodes.Add(Convert.ToString(student.ID), student.UserName);
-                    TreeNode nodePoste = nodeNewStudent.Nodes.Add(student.ComputerName, student.ComputerName);
-                    TreeNode nodeProcesses = nodePoste.Nodes.Add("Processus:");
-                    foreach (KeyValuePair<int, string> process in student.Processes) { nodeProcesses.Nodes.Add(Convert.ToString(process.Key), process.Value); }
-                    TreeNode nodeUrls = nodePoste.Nodes.Add("Urls:");
-                    foreach (string url in student.Urls) { nodeUrls.Nodes.Add(url); }
-                }
-                else
-                {
-                    //nouvelle ordinateur pour un élève
-                    TreeNode[] nodeComputer = nodeStudent[0].Nodes.Find(student.ComputerName, false);
-                    if (nodeComputer.Length == 0)
-                    {
-                        TreeNode nodePoste = nodeStudent[0].Nodes.Add(student.ComputerName, student.ComputerName);
-                        TreeNode nodeProcesses = nodePoste.Nodes.Add("Processus:");
-                        foreach (KeyValuePair<int, string> process in student.Processes) { nodeProcesses.Nodes.Add(Convert.ToString(process.Key), process.Value); }
-                        TreeNode nodeUrls = nodePoste.Nodes.Add("Urls:");
-                        foreach (string url in student.Urls) { nodeUrls.Nodes.Add(url); }
-                    }
-                    else
-                    {
-                        //mise à jour d'un ordinateur
-                        TreeNode proc = nodeComputer[0].Nodes[0];
-                        proc.Nodes.Clear();
-                        foreach (KeyValuePair<int, string> process in student.Processes) { proc.Nodes.Add(Convert.ToString(process.Key), process.Value); }
-                        TreeNode urls = nodeComputer[0].Nodes[1];
-                        urls.Nodes.Clear();
-                        foreach (string url in student.Urls) { urls.Nodes.Add(url); }
-                    }
-                }
+                //Trouver ou créer la node pour l'élève
+                TreeNode[] nodeSearchStudent = TreeViewDetails.Nodes.Find(Convert.ToString(student.ID), false);
+                if (nodeSearchStudent.Length == 0) { TreeViewDetails.Nodes.Add(Convert.ToString(student.ID), student.UserName); }
+                TreeNode nodeStudent = TreeViewDetails.Nodes.Find(Convert.ToString(student.ID), false)[0];
+                //Trouver ou créer la node pour les processus de l'élève
+                TreeNode nodeProcess;
+                try{ nodeProcess = nodeStudent.Nodes[0]; }
+                catch { nodeProcess = nodeStudent.Nodes.Add("Processus:"); }
+                //Trouver ou créer la node pour les urls de l'élève
+                TreeNode nodeNavigateurs;
+                try { nodeNavigateurs = nodeStudent.Nodes[1]; }
+                catch { nodeNavigateurs = nodeStudent.Nodes.Add("Navigateurs:"); }
+                //Mise à jour des processus
+                nodeProcess.Nodes.Clear();
+                foreach(KeyValuePair<int,string> process in student.Processes) { nodeProcess.Nodes.Add(process.Value); }
+                //Mise à jour des urls
+                UpdateUrlsTree(nodeNavigateurs, student.Urls.chrome, "chrome");
+                UpdateUrlsTree(nodeNavigateurs, student.Urls.firefox, "firefox");
+                UpdateUrlsTree(nodeNavigateurs, student.Urls.edge, "msedge");
+                UpdateUrlsTree(nodeNavigateurs, student.Urls.opera, "opera");
+                UpdateUrlsTree(nodeNavigateurs, student.Urls.iexplorer, "iexplorer");
+                UpdateUrlsTree(nodeNavigateurs, student.Urls.safari, "safari");
             }));
             // Mise à jour du TreeView pour la sélection
             TreeViewSelect.Invoke(new MethodInvoker(delegate {
@@ -294,6 +285,15 @@ namespace ApplicationTeacher
                     TreeNode[] nodeComputer = nodeStudent[0].Nodes.Find(student.ComputerName, false);
                     if (nodeComputer.Length == 0) { nodeStudent[0].Nodes.Add(student.ComputerName, student.ComputerName); }
                 }
+            }));
+        }
+
+        public void UpdateUrlsTree(TreeNode NodeAllNavigateur, List<Url> urls, string navigateurName) {
+            if(urls.Count == 0) { try { NodeAllNavigateur.Nodes.Find(navigateurName, false)[0].Remove(); } catch { }; return; }
+            TreeViewDetails.Invoke(new MethodInvoker(delegate {
+                TreeNode[] nodeNavigateur = NodeAllNavigateur.Nodes.Find(navigateurName, false);
+                if (nodeNavigateur.Count() == 0 ) {NodeAllNavigateur.Nodes.Add(navigateurName,navigateurName);}
+                for (int i = NodeAllNavigateur.Nodes.Find(navigateurName, false)[0].Nodes.Count; i < urls.Count; i++){ NodeAllNavigateur.Nodes.Find(navigateurName, false)[0].Nodes.Add(urls[i].ToString());}
             }));
         }
 
@@ -456,31 +456,6 @@ namespace ApplicationTeacher
             //if (lbxClients.SelectedItem is not DataForTeacher student) { return; }
             //student.SocketToStudent.Send(Encoding.ASCII.GetBytes("stop"));
             //student.SocketToStudent.Disconnect(false);
-        }
-
-
-        /// <summary>
-        /// Fonction qui permet de "zoomer" dans le TreeView en modifiant la taille de la police
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void ZoomTreeView(object sender, MouseEventArgs e)
-        {
-            // Only zoom when the mouse is over the control
-            if (!TreeViewDetails.ClientRectangle.Contains(e.Location))
-            {return;}
-
-            // Increase or decrease the font size based on the mouse wheel delta
-            int fontSizeDelta = e.Delta > 0 ? 1 : -1;
-            Font oldFont = TreeViewDetails.Font;
-            float newFontSize = oldFont.Size + fontSizeDelta;
-            if(newFontSize< 5) { return; }
-            if (newFontSize > 60) { return; }
-            Font newFont = new(oldFont.FontFamily,newFontSize, oldFont.Style);
-
-            // Apply the new font size and redraw the control
-            TreeViewDetails.Font = newFont;
-            TreeViewDetails.Invalidate();
         }
 
         /// <summary>

@@ -25,7 +25,7 @@ namespace ApplicationTeacher
                 }));
                 lbxUrls.Invoke(new MethodInvoker(delegate {
                     lbxUrls.Items.Clear();
-                    foreach (String url in student.Urls) { lbxUrls.Items.Add(url); }
+                    //foreach (String url in student.Urls) { lbxUrls.Items.Add(url); }
                 }));
                 pbxScreenShot.Invoke(new MethodInvoker(delegate { pbxScreenShot.Image = student.ScreenShot; }));
             }
@@ -37,7 +37,7 @@ namespace ApplicationTeacher
                 lbxProcesses.Items.Clear();
                 foreach (KeyValuePair<int, string> process in student.Processes) { lbxProcesses.Items.Add(process.Value); }
                 lbxUrls.Items.Clear();
-                foreach (String url in student.Urls) { lbxUrls.Items.Add(url); }
+                //foreach (String url in student.Urls) { lbxUrls.Items.Add(url); }
                 pbxScreenShot.Image = student.ScreenShot;
             }
         }

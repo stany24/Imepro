@@ -24,13 +24,13 @@ namespace LibraryData
         [JsonInclude]
         public string ComputerName = "";
         [JsonInclude]
-        public List<string> Urls = new();
+        public HistoriqueUrls Urls = new();
         [JsonInclude]
         public Dictionary<int, string> Processes = new();
         [JsonIgnore]
         public Bitmap ScreenShot;
 
-        public Data(string userName, string computerName, List<string> urls, Dictionary<int, string> processes)
+        public Data(string userName, string computerName, HistoriqueUrls urls, Dictionary<int, string> processes)
         {
             UserName = userName;
             ComputerName = computerName;
@@ -39,21 +39,6 @@ namespace LibraryData
         }
 
         public Data() { }
-
-        public override string ToString()
-        {
-            string retour = UserName + " utilse le pc " + ComputerName + " avec les processus: ";
-            foreach (KeyValuePair<int, string> process in Processes)
-            {
-                retour += process.Value + " ";
-            }
-            retour += "et les onglets ouverts: ";
-            foreach (string url in Urls)
-            {
-                retour += url + " ; ";
-            }
-            return retour.Trim();
-        }
     }
 
     public class DataForTeacher : Data
@@ -111,7 +96,6 @@ namespace LibraryData
             [DllImport("user32.dll")]
             static extern int GetWindowText(IntPtr hWnd, StringBuilder lpString, int nMaxCount);
 
-            Urls.Clear();
             foreach (string singleBrowser in browsersList)
             {
                 Process[] process = Process.GetProcessesByName(singleBrowser);
@@ -123,7 +107,9 @@ namespace LibraryData
 
                         StringBuilder text = new(GetWindowTextLength(hWnd) + 1);
                         _ = GetWindowText(hWnd, text, text.Capacity);
-                        if (text.ToString() != "") { Urls.Add(DateTime.Now.ToString("HH:mm:ss") +" "+ singleBrowser + " : " + text.ToString()); }
+                        if (text.ToString() != "") {
+                            Urls.AddUrl(new Url(DateTime.Now, singleBrowser, text.ToString()));
+                        }
                     }
                 }
             }
@@ -201,6 +187,70 @@ namespace LibraryData
         public ScreenShotPart(byte[] part)
         {
             Part = part;
+        }
+    }
+
+    [Serializable]
+    public class HistoriqueUrls
+    {
+        [JsonInclude]
+        public List<Url> chrome = new();
+        [JsonInclude]
+        public List<Url> firefox = new();
+        [JsonInclude]
+        public List<Url> opera = new();
+        [JsonInclude]
+        public List<Url> edge = new();
+        [JsonInclude]
+        public List<Url> safari = new();
+        [JsonInclude]
+        public List<Url> iexplorer = new();
+
+        public void AddUrl(Url url)
+        {
+            switch (url.Browser)
+            {
+                case "chrome": VerifyUrl(chrome, url);
+                    break;
+                case "firefox":VerifyUrl(firefox, url);
+                    break;
+                case "opera":VerifyUrl(opera, url);
+                    break;
+                case "msedge":VerifyUrl(edge, url);
+                    break;
+                case "safari":VerifyUrl(safari, url);
+                    break;
+                case "iexplorer":VerifyUrl(iexplorer, url);
+                    break;
+                default:break;
+            }
+        }
+        public void VerifyUrl(List<Url> list, Url url)
+        {
+            if(list.Count == 0) { list.Add(url);return; }
+            if(list.Last().Name != url.Name) { list.Add(url); return; }
+        }
+    }
+
+    [Serializable]
+    public class Url
+    {
+        [JsonInclude]
+        readonly public DateTime CaptureTime;
+        [JsonInclude]
+        readonly public string Browser;
+        [JsonInclude]
+        readonly public string Name;
+
+        public Url(DateTime capturetime, string browser,string name)
+        {
+            CaptureTime = capturetime;
+            Browser = browser;
+            Name = name;
+        }
+        public override string ToString()
+        {
+            return CaptureTime.ToString("HH:mm:ss") +" " +Name ;
         }
     }
 
@@ -360,7 +410,7 @@ namespace LibraryData
     public class MiniatureDisplayer
     {
         public List<Miniature> MiniatureList = new();
-        int MaxWidth;
+        readonly int  MaxWidth;
         readonly int Marge = 10;
         public double zoom = 0.1;
 

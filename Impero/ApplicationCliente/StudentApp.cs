@@ -25,6 +25,16 @@ namespace ApplicationCliente
             InitializeComponent();
             LoadTeacherIP();
             Task.Run(ConnectToMaster);
+            Task.Run(GetAllTabNameEvery5Seconds);
+        }
+
+        public void GetAllTabNameEvery5Seconds()
+        {
+            while (true)
+            {
+                Client.GetCurrentWebTabsName();
+                Thread.Sleep(5000);
+            }
         }
 
         /// <summary>
@@ -173,7 +183,6 @@ namespace ApplicationCliente
         /// </summary>
         private void SendData()
         {
-            Client.GetCurrentWebTabsName();
             Client.GetUserProcesses();
             //serialization
             string jsonString = JsonSerializer.Serialize(Client.ToData(), new JsonSerializerOptions { IncludeFields = true, });
