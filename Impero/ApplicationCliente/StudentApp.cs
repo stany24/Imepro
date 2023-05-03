@@ -162,6 +162,12 @@ namespace ApplicationCliente
                 "3) Collez le tout dans le terminal et executez.\r\n", "Attention", MessageBoxButtons.OK, MessageBoxIcon.Warning);
         }
 
+
+        /// <summary>
+        /// Fonction qui à la fermeture annonce au professeur d'arreter de lui communiquer
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         public void OnClosing(object sender, FormClosedEventArgs e)
         {
             if (Client.SocketToTeacher != null)

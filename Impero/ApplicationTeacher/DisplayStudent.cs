@@ -1,6 +1,8 @@
 ﻿using LibraryData;
 using System;
 using System.Collections.Generic;
+using System.Drawing.Imaging;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace ApplicationTeacher
@@ -8,13 +10,17 @@ namespace ApplicationTeacher
     public partial class DisplayStudent : Form
     {
         public int StudentId;
-        public DisplayStudent()
+        public string ComputerName;
+        public string SavePath;
+        public DisplayStudent(string savepath)
         {
+            SavePath = savepath;
             InitializeComponent();
         }
 
         public void UpdateAffichage(DataForTeacher student)
         {
+            ComputerName= student.ComputerName;
             if (InvokeRequired)
             {
                 lblPoste.Invoke(new MethodInvoker(delegate { lblPoste.Text = "Poste: " + student.ComputerName; }));
@@ -23,9 +29,13 @@ namespace ApplicationTeacher
                     lbxProcesses.Items.Clear();
                     foreach (KeyValuePair<int, string> process in student.Processes) { lbxProcesses.Items.Add(process.Value); }
                 }));
-                lbxUrls.Invoke(new MethodInvoker(delegate {
-                    lbxUrls.Items.Clear();
-                    //foreach (String url in student.Urls) { lbxUrls.Items.Add(url); }
+                TreeViewUrls.Invoke(new MethodInvoker(delegate {
+                    UpdateUrlsTree(TreeViewUrls, student.Urls.chrome, "chrome");
+                    UpdateUrlsTree(TreeViewUrls, student.Urls.firefox, "firefox");
+                    UpdateUrlsTree(TreeViewUrls, student.Urls.edge, "msedge");
+                    UpdateUrlsTree(TreeViewUrls, student.Urls.opera, "opera");
+                    UpdateUrlsTree(TreeViewUrls, student.Urls.iexplorer, "iexplorer");
+                    UpdateUrlsTree(TreeViewUrls, student.Urls.safari, "safari");
                 }));
                 pbxScreenShot.Invoke(new MethodInvoker(delegate { pbxScreenShot.Image = student.ScreenShot; }));
             }
@@ -36,10 +46,38 @@ namespace ApplicationTeacher
                 lblUserName.Text = "Nom: " + student.UserName;
                 lbxProcesses.Items.Clear();
                 foreach (KeyValuePair<int, string> process in student.Processes) { lbxProcesses.Items.Add(process.Value); }
-                lbxUrls.Items.Clear();
-                //foreach (Url url in student.Urls) { lbxUrls.Items.Add(url); }
+                UpdateUrlsTree(TreeViewUrls, student.Urls.chrome, "chrome");
+                UpdateUrlsTree(TreeViewUrls, student.Urls.firefox, "firefox");
+                UpdateUrlsTree(TreeViewUrls, student.Urls.edge, "msedge");
+                UpdateUrlsTree(TreeViewUrls, student.Urls.opera, "opera");
+                UpdateUrlsTree(TreeViewUrls, student.Urls.iexplorer, "iexplorer");
+                UpdateUrlsTree(TreeViewUrls, student.Urls.safari, "safari");
                 pbxScreenShot.Image = student.ScreenShot;
             }
+        }
+
+        public void UpdateUrlsTree(TreeView NodeAllNavigateur, List<Url> urls, string navigateurName)
+        {
+            if (urls.Count == 0) { try { NodeAllNavigateur.Nodes.Find(navigateurName, false)[0].Remove(); } catch { }; return; }
+            if (InvokeRequired)
+            {
+                TreeViewUrls.Invoke(new MethodInvoker(delegate {
+                    TreeNode[] nodeNavigateur = NodeAllNavigateur.Nodes.Find(navigateurName, false);
+                    if (nodeNavigateur.Count() == 0) { NodeAllNavigateur.Nodes.Add(navigateurName, navigateurName); }
+                    for (int i = NodeAllNavigateur.Nodes.Find(navigateurName, false)[0].Nodes.Count; i < urls.Count; i++) { NodeAllNavigateur.Nodes.Find(navigateurName, false)[0].Nodes.Add(urls[i].ToString()); }
+                }));
+            }
+            else
+            {
+                TreeNode[] nodeNavigateur = NodeAllNavigateur.Nodes.Find(navigateurName, false);
+                if (nodeNavigateur.Count() == 0) { NodeAllNavigateur.Nodes.Add(navigateurName, navigateurName); }
+                for (int i = NodeAllNavigateur.Nodes.Find(navigateurName, false)[0].Nodes.Count; i < urls.Count; i++) { NodeAllNavigateur.Nodes.Find(navigateurName, false)[0].Nodes.Add(urls[i].ToString()); }
+            }
+        }
+
+        public void SaveScreenShot(object sender, EventArgs e)
+        {
+            pbxScreenShot.Image.Save(SavePath +ComputerName+ DateTime.Now.ToString("_yyyy-mm-dd_hh-mm-ss") + ".jpg", ImageFormat.Jpeg);
         }
     }
 }

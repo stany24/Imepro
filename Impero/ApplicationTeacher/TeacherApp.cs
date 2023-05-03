@@ -26,6 +26,7 @@ namespace ApplicationTeacher
         readonly int DefaultTimeout = 2000;
         int NextId = 0;
         IPAddress ipAddr = null;
+        readonly string pathToSaveFolder = "C:\\Users\\gouvernonst\\Downloads\\";
         public TeacherApp()
         {
             InitializeComponent();
@@ -317,7 +318,7 @@ namespace ApplicationTeacher
                 }
                 if (student == null) { return; }
                 foreach(Miniature mini in Displayer.MiniatureList) { if (mini.ComputerName == student.ComputerName && mini.StudentID == student.ID) { return; } }
-                Miniature miniature = new(student.ScreenShot, student.ComputerName, student.ID);
+                Miniature miniature = new(student.ScreenShot, student.ComputerName, student.ID,pathToSaveFolder);
                 Displayer.AddMiniature(miniature);
                 panelMiniatures.Controls.Add(miniature);
                 panelMiniatures.Controls.SetChildIndex(miniature, 0);
@@ -451,7 +452,7 @@ namespace ApplicationTeacher
             Displayer.ChangeZoom();
         }
 
-        private void TreeViewSelectDoubleClick(object sender, TreeNodeMouseClickEventArgs e)
+        private void TreeViewDoubleClick(object sender, TreeNodeMouseClickEventArgs e)
         {
             //vérification que la node est un ordinateur
             if(e.Node== null) return;
@@ -474,7 +475,7 @@ namespace ApplicationTeacher
             {
                 if (display.StudentId == student.ID) { return; }
             }
-            DisplayStudent newDisplay = new();
+            DisplayStudent newDisplay = new(pathToSaveFolder);
             AllStudentsDisplay.Add(newDisplay);
             newDisplay.StudentId = student.ID;
             newDisplay.UpdateAffichage(student);

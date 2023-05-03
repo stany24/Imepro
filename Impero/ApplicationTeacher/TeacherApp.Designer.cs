@@ -123,7 +123,7 @@
             this.TreeViewSelect.Size = new System.Drawing.Size(250, 307);
             this.TreeViewSelect.TabIndex = 0;
             this.TreeViewSelect.AfterCheck += new System.Windows.Forms.TreeViewEventHandler(this.TreeNodeChecked);
-            this.TreeViewSelect.NodeMouseDoubleClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.TreeViewSelectDoubleClick);
+            this.TreeViewSelect.NodeMouseDoubleClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.TreeViewDoubleClick);
             // 
             // panelMiniatures
             // 

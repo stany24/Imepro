@@ -504,17 +504,20 @@ namespace LibraryData
     {
         public int StudentID;
         public PictureBox PbxImage = new();
-        public readonly Label ComputerInformations = new();
+        public readonly Label lblComputerInformations = new();
+        public readonly Button btnSaveScreenShot= new();
         readonly int MargeBetweenText = 5;
         public int TimeSinceUpdate = 0;
         public string ComputerName;
+        readonly string SavePath;
 
-        public Miniature(Bitmap image,string name, int studentID)
+        public Miniature(Bitmap image,string name, int studentID, string savepath)
         {
             //valeurs pour la fenêtre de control
             Size = PbxImage.Size;
             StudentID = studentID;
             ComputerName= name;
+            SavePath = savepath;
 
             PbxImage = new PictureBox {
                 Location = new Point(0, 0),
@@ -522,17 +525,31 @@ namespace LibraryData
                 SizeMode = PictureBoxSizeMode.StretchImage,
                 Size = new Size(400,100),
             };
-            PbxImage.SizeChanged += new EventHandler(UpdateLabelsPositions);
-            PbxImage.LocationChanged += new EventHandler(UpdateLabelsPositions);
+            PbxImage.SizeChanged += new EventHandler(UpdatePositionsRelativeToImage);
+            PbxImage.LocationChanged += new EventHandler(UpdatePositionsRelativeToImage);
             Controls.Add(PbxImage);
 
-            ComputerInformations = new Label {
+            lblComputerInformations = new Label {
                 Location = new Point(140, 0),
                 Size = new Size(100, 20),
                 Text = ComputerName + " " + TimeSinceUpdate,
             };
-            Controls.Add(ComputerInformations);
-            UpdateLabelsPositions(new object(), new EventArgs());
+            Controls.Add(lblComputerInformations);
+
+            btnSaveScreenShot = new Button
+            {
+                Location = new Point(0, 0),
+                Size = new Size(80, 21),
+                Text = "Sauvegarder"
+            };
+            btnSaveScreenShot.Click += new EventHandler(SaveScreenShot);
+            Controls.Add(btnSaveScreenShot);
+            UpdatePositionsRelativeToImage(new object(), new EventArgs());
+        }
+
+        public void SaveScreenShot(object sender,EventArgs e)
+        {
+            PbxImage.Image.Save(SavePath + ComputerName +DateTime.Now.ToString("_yyyy-mm-dd_hh-mm-ss")+".jpg", ImageFormat.Jpeg);
         }
 
         /// <summary>
@@ -541,7 +558,7 @@ namespace LibraryData
         public void UpdateTime()
         {
             TimeSinceUpdate++;
-            try { ComputerInformations.Invoke(new MethodInvoker(delegate { ComputerInformations.Text = ComputerName + " " + TimeSinceUpdate; })); }
+            try { lblComputerInformations.Invoke(new MethodInvoker(delegate { lblComputerInformations.Text = ComputerName + " " + TimeSinceUpdate+ "s"; })); }
             catch {};
         }
 
@@ -550,13 +567,16 @@ namespace LibraryData
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        public void UpdateLabelsPositions(object sender, EventArgs e)
+        public void UpdatePositionsRelativeToImage(object sender, EventArgs e)
         {
-            PbxImage.Width = Convert.ToInt32(PbxImage.Width);
-            PbxImage.Height = Convert.ToInt32(PbxImage.Height);
-            ComputerInformations.Left = PbxImage.Location.X + PbxImage.Width / 2 - ComputerInformations.Width/2;
-            ComputerInformations.Top = PbxImage.Location.Y + PbxImage.Height + MargeBetweenText;
-            Size = new Size(PbxImage.Width, PbxImage.Height + 3 * MargeBetweenText + ComputerInformations.Height);
+            //taille de la picturebox
+            Size = new Size(PbxImage.Width, PbxImage.Height + 3 * MargeBetweenText + lblComputerInformations.Height);
+            //postion du bouton
+            btnSaveScreenShot.Left = PbxImage.Location.X + PbxImage.Width / 2 + MargeBetweenText/2;
+            btnSaveScreenShot.Top = PbxImage.Location.Y + PbxImage.Height +MargeBetweenText;
+            //position du label
+            lblComputerInformations.Left = PbxImage.Location.X + PbxImage.Width / 2 - lblComputerInformations.Width - MargeBetweenText/2;
+            lblComputerInformations.Top = btnSaveScreenShot.Location.Y + (btnSaveScreenShot.Height -lblComputerInformations.Height);
         }
     }
 
