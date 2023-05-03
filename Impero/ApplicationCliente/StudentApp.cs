@@ -187,7 +187,8 @@ namespace ApplicationCliente
             //serialization
             string jsonString = JsonSerializer.Serialize(Client.ToData(), new JsonSerializerOptions { IncludeFields = true, });
             //envoi
-            Client.SocketToTeacher.Send(Encoding.ASCII.GetBytes(jsonString), Encoding.ASCII.GetBytes(jsonString).Length, SocketFlags.None);
+            int nbtest = Client.SocketToTeacher.Send(Encoding.ASCII.GetBytes(jsonString), Encoding.ASCII.GetBytes(jsonString).Length, SocketFlags.None);
+            Console.WriteLine(nbtest);
         }
 
         /// <summary>

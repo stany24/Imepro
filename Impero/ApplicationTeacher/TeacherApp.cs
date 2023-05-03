@@ -191,7 +191,7 @@ namespace ApplicationTeacher
             {
                 Socket socket = student.SocketToStudent;
                 //AffichageEleve affichage = student.affichage;
-                byte[] dataBuffer = new byte[1024];
+                byte[] dataBuffer = new byte[100000];
                 socket.ReceiveTimeout = DefaultTimeout;
                 int nbData = socket.Receive(dataBuffer);
                 Array.Resize(ref dataBuffer, nbData);
@@ -251,14 +251,18 @@ namespace ApplicationTeacher
                 TreeNode[] nodeSearchStudent = TreeViewDetails.Nodes.Find(Convert.ToString(student.ID), false);
                 if (nodeSearchStudent.Length == 0) { TreeViewDetails.Nodes.Add(Convert.ToString(student.ID), student.UserName); }
                 TreeNode nodeStudent = TreeViewDetails.Nodes.Find(Convert.ToString(student.ID), false)[0];
-                //Trouver ou créer la node pour les processus de l'élève
+                //Trouver ou créer la node pour le pc
+                TreeNode nodeComputer;
+                try { nodeComputer = nodeStudent.Nodes.Find(student.ComputerName,false)[0]; }
+                catch { nodeComputer = nodeStudent.Nodes.Add(student.ComputerName,student.ComputerName); }
+                //Trouver ou créer la node pour les processus du pc
                 TreeNode nodeProcess;
-                try{ nodeProcess = nodeStudent.Nodes[0]; }
-                catch { nodeProcess = nodeStudent.Nodes.Add("Processus:"); }
-                //Trouver ou créer la node pour les urls de l'élève
+                try{ nodeProcess = nodeComputer.Nodes[0]; }
+                catch { nodeProcess = nodeComputer.Nodes.Add("Processus:"); }
+                //Trouver ou créer la node pour les urls du pc
                 TreeNode nodeNavigateurs;
-                try { nodeNavigateurs = nodeStudent.Nodes[1]; }
-                catch { nodeNavigateurs = nodeStudent.Nodes.Add("Navigateurs:"); }
+                try { nodeNavigateurs = nodeComputer.Nodes[1]; }
+                catch { nodeNavigateurs = nodeComputer.Nodes.Add("Navigateurs:"); }
                 //Mise à jour des processus
                 nodeProcess.Nodes.Clear();
                 foreach(KeyValuePair<int,string> process in student.Processes) { nodeProcess.Nodes.Add(process.Value); }
