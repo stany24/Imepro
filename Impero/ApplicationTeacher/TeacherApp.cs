@@ -190,6 +190,7 @@ namespace ApplicationTeacher
             try
             {
                 Socket socket = student.SocketToStudent;
+                int id = student.ID;
                 //AffichageEleve affichage = student.affichage;
                 byte[] dataBuffer = new byte[100000];
                 socket.ReceiveTimeout = DefaultTimeout;
@@ -199,7 +200,8 @@ namespace ApplicationTeacher
                 Data data = JsonSerializer.Deserialize<Data>(temp);
                 student = new(data)
                 {
-                    SocketToStudent = socket
+                    SocketToStudent = socket,
+                    ID = id
                 };
                 //student.affichage = affichage;
                 lbxRequetes.Invoke(new MethodInvoker(delegate { lbxRequetes.Items.Add(DateTime.Now.ToString("HH:mm:ss") +  " Données recue de " + student.UserName); }));
@@ -248,13 +250,13 @@ namespace ApplicationTeacher
             // Mise à jour du TreeView avec les détails.
             TreeViewDetails.Invoke(new MethodInvoker(delegate {
                 //Trouver ou créer la node pour l'élève
-                TreeNode[] nodeSearchStudent = TreeViewDetails.Nodes.Find(Convert.ToString(student.ID), false);
-                if (nodeSearchStudent.Length == 0) { TreeViewDetails.Nodes.Add(Convert.ToString(student.ID), student.UserName); }
-                TreeNode nodeStudent = TreeViewDetails.Nodes.Find(Convert.ToString(student.ID), false)[0];
+                TreeNode nodeStudent;
+                try { nodeStudent = TreeViewDetails.Nodes.Find(Convert.ToString(student.UserName), false)[0]; }
+                catch { nodeStudent = TreeViewDetails.Nodes.Add(student.UserName, student.UserName); }
                 //Trouver ou créer la node pour le pc
                 TreeNode nodeComputer;
-                try { nodeComputer = nodeStudent.Nodes.Find(student.ComputerName,false)[0]; }
-                catch { nodeComputer = nodeStudent.Nodes.Add(student.ComputerName,student.ComputerName); }
+                try { nodeComputer = nodeStudent.Nodes.Find(Convert.ToString(student.ID),false)[0]; }
+                catch { nodeComputer = nodeStudent.Nodes.Add(Convert.ToString(student.ID), student.ComputerName); }
                 //Trouver ou créer la node pour les processus du pc
                 TreeNode nodeProcess;
                 try{ nodeProcess = nodeComputer.Nodes[0]; }
@@ -276,19 +278,14 @@ namespace ApplicationTeacher
             }));
             // Mise à jour du TreeView pour la sélection
             TreeViewSelect.Invoke(new MethodInvoker(delegate {
-                TreeNode[] nodeStudent = TreeViewSelect.Nodes.Find(Convert.ToString(student.ID), false);
-                if (nodeStudent.Length == 0)
-                {
-                    // Créer nouvelle élève
-                    TreeNode nodeNewStudent = TreeViewSelect.Nodes.Add(Convert.ToString(student.ID), student.UserName);
-                    nodeNewStudent.Nodes.Add(student.ComputerName, student.ComputerName);
-                }
-                else
-                {
-                    //nouvelle ordinateur pour un élève
-                    TreeNode[] nodeComputer = nodeStudent[0].Nodes.Find(student.ComputerName, false);
-                    if (nodeComputer.Length == 0) { nodeStudent[0].Nodes.Add(student.ComputerName, student.ComputerName); }
-                }
+                //Trouver ou créer la node pour l'élève
+                TreeNode nodeStudent;
+                try { nodeStudent = TreeViewSelect.Nodes.Find(Convert.ToString(student.UserName), false)[0]; }
+                catch { nodeStudent = TreeViewSelect.Nodes.Add(student.UserName, student.UserName); }
+                //Trouver ou créer la node pour le pc
+                TreeNode nodeComputer;
+                try { nodeComputer = nodeStudent.Nodes.Find(Convert.ToString(student.ID), false)[0]; }
+                catch { nodeComputer = nodeStudent.Nodes.Add(Convert.ToString(student.ID), student.ComputerName); }
             }));
         }
 
@@ -316,7 +313,7 @@ namespace ApplicationTeacher
                 DataForTeacher student = null;
                 foreach (DataForTeacher students in AllStudents)
                 {
-                    if (students.ComputerName == e.Node.Name) { student = students; }
+                    if (students.ComputerName == e.Node.Text) { student = students; }
                 }
                 if (student == null) { return; }
                 foreach(Miniature mini in Displayer.MiniatureList) { if (mini.ComputerName == student.ComputerName && mini.StudentID == student.ID) { return; } }
@@ -327,7 +324,7 @@ namespace ApplicationTeacher
             }
             else
             {
-                Displayer.RemoveMiniature(Convert.ToInt32(e.Node.Parent.Name),e.Node.Name);
+                Displayer.RemoveMiniature(Convert.ToInt32(e.Node.Name),e.Node.Text);
             }
         }
 
@@ -367,25 +364,6 @@ namespace ApplicationTeacher
                     s.Send(message, message.Length, SocketFlags.None);
                 }
             }
-        }
-
-        /// <summary>
-        /// Fonction qui ouvre un affichage individuel pour un éléve.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void SelectedStudentChanged(object sender, EventArgs e)
-        {
-            ListBox listbox = (ListBox)sender;
-            if (listbox.SelectedItem is not DataForTeacher Student) { return; }
-            foreach (DisplayStudent display in AllStudentsDisplay)
-            {
-                if (display.StudentId == Student.ID) { return; }
-            }
-            DisplayStudent newDisplay = new();
-            AllStudentsDisplay.Add(newDisplay);
-            newDisplay.StudentId = Student.ID;
-            newDisplay.Show();
         }
 
         /// <summary>
@@ -471,6 +449,48 @@ namespace ApplicationTeacher
         {
             Displayer.zoom = Slider.Value / 100.0;
             Displayer.ChangeZoom();
+        }
+
+        private void TreeViewSelectDoubleClick(object sender, TreeNodeMouseClickEventArgs e)
+        {
+            //vérification que la node est un ordinateur
+            if(e.Node== null) return;
+            if(e.Node.Parent == null) return;
+            if (e.Node.Parent.Parent != null) return;
+            foreach(DataForTeacher student in AllStudents)
+            {
+                if(student.ID == Convert.ToInt32(e.Node.Name)) { OpenPrivateDisplay(student);return; }
+            }
+        }
+
+
+        /// <summary>
+        /// Fonction qui crée un nouvelle affichage individuel pour un élève
+        /// </summary>
+        /// <param name="student"></param>
+        public void OpenPrivateDisplay(DataForTeacher student)
+        {
+            foreach (DisplayStudent display in AllStudentsDisplay)
+            {
+                if (display.StudentId == student.ID) { return; }
+            }
+            DisplayStudent newDisplay = new();
+            AllStudentsDisplay.Add(newDisplay);
+            newDisplay.StudentId = student.ID;
+            newDisplay.UpdateAffichage(student);
+            newDisplay.FormClosing += new FormClosingEventHandler(RemovePrivateDisplay);
+            newDisplay.Show();
+        }
+
+        /// <summary>
+        /// Fonction qui retire l'affichage individuel lorsque il se ferme
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        public void RemovePrivateDisplay(object sender, FormClosingEventArgs e)
+        {
+            DisplayStudent closingDisplay = (DisplayStudent)sender;
+            AllStudentsDisplay.Remove(closingDisplay);
         }
     }
 }

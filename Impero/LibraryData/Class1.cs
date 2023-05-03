@@ -67,9 +67,9 @@ namespace LibraryData
     {
         public Socket SocketToTeacher;
         public List<string> DefaultProcess = new();
-        public ListBox lbxConnexion;
-        public PictureBox pbxScreeShot;
-        IPAddress IpToTeacher;
+        private ListBox lbxConnexion;
+        private PictureBox pbxScreeShot;
+        readonly private IPAddress IpToTeacher;
         readonly public List<string> browsersList = new() { "chrome", "firefox", "iexplore", "safari", "opera", "msedge" };
 
         public DataForStudent(ListBox lbxconnexion,PictureBox pbxscreenshot ,IPAddress ipToTeacher)
