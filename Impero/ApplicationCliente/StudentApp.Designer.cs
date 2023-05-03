@@ -36,8 +36,8 @@
             this.button1 = new System.Windows.Forms.Button();
             this.TrayIconStudent = new System.Windows.Forms.NotifyIcon(this.components);
             this.notifyIcon1 = new System.Windows.Forms.NotifyIcon(this.components);
-            this.tbxMessage = new System.Windows.Forms.TextBox();
             this.lblMessage = new System.Windows.Forms.Label();
+            this.lbxMessages = new System.Windows.Forms.ListBox();
             ((System.ComponentModel.ISupportInitialize)(this.pbxScreeShot)).BeginInit();
             this.SuspendLayout();
             // 
@@ -90,14 +90,6 @@
             this.notifyIcon1.Text = "notifyIcon1";
             this.notifyIcon1.Visible = true;
             // 
-            // tbxMessage
-            // 
-            this.tbxMessage.Location = new System.Drawing.Point(1203, 224);
-            this.tbxMessage.Multiline = true;
-            this.tbxMessage.Name = "tbxMessage";
-            this.tbxMessage.Size = new System.Drawing.Size(263, 205);
-            this.tbxMessage.TabIndex = 7;
-            // 
             // lblMessage
             // 
             this.lblMessage.AutoSize = true;
@@ -107,13 +99,21 @@
             this.lblMessage.TabIndex = 8;
             this.lblMessage.Text = "Message";
             // 
+            // lbxMessages
+            // 
+            this.lbxMessages.FormattingEnabled = true;
+            this.lbxMessages.Location = new System.Drawing.Point(1206, 224);
+            this.lbxMessages.Name = "lbxMessages";
+            this.lbxMessages.Size = new System.Drawing.Size(260, 264);
+            this.lbxMessages.TabIndex = 9;
+            // 
             // StudentApp
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1474, 711);
+            this.Controls.Add(this.lbxMessages);
             this.Controls.Add(this.lblMessage);
-            this.Controls.Add(this.tbxMessage);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.btnHelp);
             this.Controls.Add(this.pbxScreeShot);
@@ -135,8 +135,8 @@
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.NotifyIcon TrayIconStudent;
         private System.Windows.Forms.NotifyIcon notifyIcon1;
-        private System.Windows.Forms.TextBox tbxMessage;
         private System.Windows.Forms.Label lblMessage;
+        private System.Windows.Forms.ListBox lbxMessages;
     }
 }
 

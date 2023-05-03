@@ -77,7 +77,7 @@ namespace ApplicationTeacher
 
         public void SaveScreenShot(object sender, EventArgs e)
         {
-            pbxScreenShot.Image.Save(SavePath +Student.ComputerName+ DateTime.Now.ToString("_yyyy-mm-dd_hh-mm-ss") + ".jpg", ImageFormat.Jpeg);
+            pbxScreenShot.Image.Save(SavePath +Student.ComputerName+ DateTime.Now.ToString("_yyyy-MM-dd_HH-mm-ss") + ".jpg", ImageFormat.Jpeg);
         }
 
         private void SendMessage(object sender, EventArgs e)

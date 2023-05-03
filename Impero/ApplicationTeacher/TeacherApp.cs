@@ -12,7 +12,6 @@ using System.IO;
 using System.Text.Json;
 using System.Drawing.Imaging;
 using System.Linq;
-using System.Diagnostics;
 
 namespace ApplicationTeacher
 {
@@ -21,19 +20,58 @@ namespace ApplicationTeacher
         readonly MiniatureDisplayer Displayer;
         readonly List<DataForTeacher> AllStudents = new();
         readonly List<DisplayStudent> AllStudentsDisplay = new();
+        List<string> IgnoredProcesses= new();
+        List<string> AlertedProcesses= new();
         Task ScreenSharer;
         readonly int DurationBetweenDemand = 15;
         readonly int DefaultTimeout = 2000;
         int NextId = 0;
         IPAddress ipAddr = null;
         readonly string pathToSaveFolder = "C:\\Users\\gouvernonst\\Downloads\\";
+        readonly string FileNameIgnoredProcesses = "ProcessusIgnore.txt";
+        readonly string FileNameAlertedProcesses = "ProcessusAlerté.txt";
         public TeacherApp()
         {
             InitializeComponent();
             Displayer = new(panelMiniatures.Width);
             FindIp();
+            LoadProcessesLists();
             Task.Run(AskingData);
             Task.Run(LogClients);
+        }
+
+        public void LoadProcessesLists()
+        {
+            try
+            {
+                using StreamReader fichier = new(pathToSaveFolder + FileNameIgnoredProcesses);
+                IgnoredProcesses = new(JsonSerializer.Deserialize<List<string>>(fichier.ReadToEnd()));
+                fichier.Close();
+            }
+            catch (Exception e)
+            {
+                lbxConnexion.Invoke(new MethodInvoker(delegate { lbxConnexion.Items.Add("Unexpected exception : " + e.ToString()); }));
+            }
+            try
+            {
+                using StreamReader fichier = new(pathToSaveFolder + FileNameAlertedProcesses);
+                AlertedProcesses = new(JsonSerializer.Deserialize<List<string>>(fichier.ReadToEnd()));
+                fichier.Close();
+            }
+            catch (Exception e)
+            {
+                lbxConnexion.Invoke(new MethodInvoker(delegate { lbxConnexion.Items.Add("Unexpected exception : " + e.ToString()); }));
+            }
+        }
+
+        public void SaveProcessesLists()
+        {
+            using StreamWriter writeFichierignore = new(pathToSaveFolder + FileNameIgnoredProcesses);
+            writeFichierignore.WriteLine(JsonSerializer.Serialize(IgnoredProcesses));
+            writeFichierignore.Close();
+            using StreamWriter writeFichieralerte = new(pathToSaveFolder + FileNameAlertedProcesses);
+            writeFichieralerte.WriteLine(JsonSerializer.Serialize(AlertedProcesses));
+            writeFichieralerte.Close();
         }
 
         /// <summary>
@@ -168,13 +206,13 @@ namespace ApplicationTeacher
             AllStudents.Remove(student);
             lbxRequetes.Invoke(new MethodInvoker(delegate { lbxRequetes.Items.Add(DateTime.Now.ToString("HH:mm:ss") + " L'élève " + student.UserName + " est déconnecté"); }));
             TreeViewDetails.Invoke(new MethodInvoker(delegate {
-                TreeNode[] students = TreeViewDetails.Nodes.Find(Convert.ToString(student.ID), false);
+                TreeNode[] students = TreeViewDetails.Nodes.Find(Convert.ToString(student.UserName), false);
                 TreeNode[] computers = students[0].Nodes.Find(student.ComputerName,false);
                 if(computers.Length > 0) { computers[0].Remove(); }
                 if (students[0].Nodes.Count == 0) { students[0].Remove(); }
             }));
             TreeViewSelect.Invoke(new MethodInvoker(delegate {
-                TreeNode[] students = TreeViewSelect.Nodes.Find(Convert.ToString(student.ID), false);
+                TreeNode[] students = TreeViewSelect.Nodes.Find(Convert.ToString(student.UserName), false);
                 TreeNode[] computers = students[0].Nodes.Find(student.ComputerName, false);
                 if (computers.Length > 0) { computers[0].Remove(); }
                 if (students[0].Nodes.Count == 0) { students[0].Remove(); }
@@ -267,7 +305,19 @@ namespace ApplicationTeacher
                 catch { nodeNavigateurs = nodeComputer.Nodes.Add("Navigateurs:"); }
                 //Mise à jour des processus
                 nodeProcess.Nodes.Clear();
-                foreach(KeyValuePair<int,string> process in student.Processes) { nodeProcess.Nodes.Add(process.Value); }
+                foreach(KeyValuePair<int,string> process in student.Processes) {
+                    TreeNode current = nodeProcess.Nodes.Add(process.Value);
+                    if(AlertedProcesses.Find(x => x == process.Value) != null)
+                    {
+                        current.BackColor = Color.Red;
+                        while(current.Parent != null)
+                        {
+                            current = current.Parent;
+                            current.BackColor = Color.Red;
+                        }
+                    }
+                    else{if(IgnoredProcesses.Find(x => x == process.Value) != null){current.BackColor = Color.Yellow;/*current.Remove();*/ }}
+                }
                 //Mise à jour des urls
                 UpdateUrlsTree(nodeNavigateurs, student.Urls.chrome, "chrome");
                 UpdateUrlsTree(nodeNavigateurs, student.Urls.firefox, "firefox");
@@ -427,6 +477,7 @@ namespace ApplicationTeacher
                 student.SocketToStudent.Dispose();
                 //student.SocketToStudent.Disconnect(false);
             }
+            SaveProcessesLists();
         }
 
         /// <summary>

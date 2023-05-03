@@ -71,18 +71,19 @@ namespace LibraryData
         readonly private ListBox lbxConnexion;
         readonly private PictureBox pbxScreeShot;
         readonly private IPAddress IpToTeacher;
-        private TextBox tbxMessage;
+        readonly private ListBox tbxMessage;
         public List<Message> Messages = new();
         readonly public List<string> browsersList = new() { "chrome", "firefox", "iexplore", "safari", "opera", "msedge" };
 
-        public DataForStudent(ListBox lbxconnexion,PictureBox pbxscreenshot,TextBox tbxmessage ,IPAddress ipToTeacher)
+        public DataForStudent(ListBox lbxconnexion,PictureBox pbxscreenshot,ListBox tbxmessage ,IPAddress ipToTeacher)
         {
             lbxConnexion = lbxconnexion;
             pbxScreeShot = pbxscreenshot;
-            tbxMessage= tbxmessage;
+            tbxMessage = tbxmessage;
             IpToTeacher = ipToTeacher;
             GetDefaultProcesses();
             GetNames();
+            Task.Run(GetAllTabNameEvery5Seconds);
         }
 
         public void GetNames()
@@ -94,6 +95,15 @@ namespace LibraryData
         public Data ToData()
         {
             return new Data(UserName, ComputerName, Urls, Processes);
+        }
+
+        public void GetAllTabNameEvery5Seconds()
+        {
+            while (true)
+            {
+                GetCurrentWebTabsName();
+                Thread.Sleep(5000);
+            }
         }
 
         /// <summary>
@@ -297,7 +307,7 @@ namespace LibraryData
             byte[] bytemessage = new byte[1024];
             int nbData = SocketToTeacher.Receive(bytemessage);
             Array.Resize(ref bytemessage, nbData);
-            tbxMessage.Invoke(new MethodInvoker(delegate { tbxMessage.Text = Encoding.Default.GetString(bytemessage); }));
+            tbxMessage.Invoke(new MethodInvoker(delegate { tbxMessage.Items.Add(DateTime.Now.ToString("hh:mm ")+Encoding.Default.GetString(bytemessage)); }));
         }
 
         /// <summary>

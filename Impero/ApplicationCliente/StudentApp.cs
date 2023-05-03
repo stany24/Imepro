@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Net.Sockets;
 using System.Net;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using LibraryData;
@@ -23,18 +22,8 @@ namespace ApplicationCliente
         {
             InitializeComponent();
             LoadTeacherIP();
-            Client = new(lbxConnexion,pbxScreeShot,tbxMessage, IpToTeacher);
+            Client = new(lbxConnexion,pbxScreeShot,lbxMessages, IpToTeacher);
             Task.Run(Client.ConnectToMaster);
-            Task.Run(GetAllTabNameEvery5Seconds);
-        }
-
-        public void GetAllTabNameEvery5Seconds()
-        {
-            while (true)
-            {
-                Client.GetCurrentWebTabsName();
-                Thread.Sleep(5000);
-            }
         }
 
         /// <summary>
