@@ -3,14 +3,14 @@ using System;
 using System.Collections.Generic;
 using System.Drawing.Imaging;
 using System.Linq;
+using System.Text;
 using System.Windows.Forms;
 
 namespace ApplicationTeacher
 {
     public partial class DisplayStudent : Form
     {
-        public int StudentId;
-        public string ComputerName;
+        public DataForTeacher Student;
         public string SavePath;
         public DisplayStudent(string savepath)
         {
@@ -20,7 +20,7 @@ namespace ApplicationTeacher
 
         public void UpdateAffichage(DataForTeacher student)
         {
-            ComputerName= student.ComputerName;
+            Student= student;
             if (InvokeRequired)
             {
                 lblPoste.Invoke(new MethodInvoker(delegate { lblPoste.Text = "Poste: " + student.ComputerName; }));
@@ -77,7 +77,13 @@ namespace ApplicationTeacher
 
         public void SaveScreenShot(object sender, EventArgs e)
         {
-            pbxScreenShot.Image.Save(SavePath +ComputerName+ DateTime.Now.ToString("_yyyy-mm-dd_hh-mm-ss") + ".jpg", ImageFormat.Jpeg);
+            pbxScreenShot.Image.Save(SavePath +Student.ComputerName+ DateTime.Now.ToString("_yyyy-mm-dd_hh-mm-ss") + ".jpg", ImageFormat.Jpeg);
+        }
+
+        private void SendMessage(object sender, EventArgs e)
+        {
+            Student.SocketToStudent.Send(Encoding.ASCII.GetBytes("message"));
+            Student.SocketToStudent.Send(Encoding.ASCII.GetBytes(tbxMessage.Text));
         }
     }
 }

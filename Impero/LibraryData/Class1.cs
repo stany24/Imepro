@@ -47,6 +47,7 @@ namespace LibraryData
         public Socket SocketToStudent;
         public int ID;
         public int NumberOfFailure;
+        public List<Message> Messages = new();
 
         public DataForTeacher(Socket socket, int id)
         {
@@ -67,15 +68,18 @@ namespace LibraryData
     {
         public Socket SocketToTeacher;
         public List<string> DefaultProcess = new();
-        private ListBox lbxConnexion;
-        private PictureBox pbxScreeShot;
+        readonly private ListBox lbxConnexion;
+        readonly private PictureBox pbxScreeShot;
         readonly private IPAddress IpToTeacher;
+        private TextBox tbxMessage;
+        public List<Message> Messages = new();
         readonly public List<string> browsersList = new() { "chrome", "firefox", "iexplore", "safari", "opera", "msedge" };
 
-        public DataForStudent(ListBox lbxconnexion,PictureBox pbxscreenshot ,IPAddress ipToTeacher)
+        public DataForStudent(ListBox lbxconnexion,PictureBox pbxscreenshot,TextBox tbxmessage ,IPAddress ipToTeacher)
         {
             lbxConnexion = lbxconnexion;
             pbxScreeShot = pbxscreenshot;
+            tbxMessage= tbxmessage;
             IpToTeacher = ipToTeacher;
             GetDefaultProcesses();
             GetNames();
@@ -276,16 +280,24 @@ namespace LibraryData
                     case "image": SendImage(); break;
                     //case "kill": KillSelectedProcess(Convert.ToInt32(text.Split(' ')[1])); break;
                     case "receive": Task.Run(ReceiveMulticastStream); break;
+                    case "message":ReceiveMessage(); break;
                     case "stop":
                         SocketToTeacher.Disconnect(false);
                         SocketToTeacher = null;
                         lbxConnexion.Invoke(new MethodInvoker(delegate { lbxConnexion.Items.Add("Le professeur a coupé la connexion"); }));
                         Thread.Sleep(1000);
                         Task.Run(() => ConnectToMaster());
-
                         return;
                 }
             }
+        }
+
+        public void ReceiveMessage()
+        {
+            byte[] bytemessage = new byte[1024];
+            int nbData = SocketToTeacher.Receive(bytemessage);
+            Array.Resize(ref bytemessage, nbData);
+            tbxMessage.Invoke(new MethodInvoker(delegate { tbxMessage.Text = Encoding.Default.GetString(bytemessage); }));
         }
 
         /// <summary>

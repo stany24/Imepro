@@ -36,12 +36,14 @@
             this.pbxScreenShot = new System.Windows.Forms.PictureBox();
             this.TreeViewUrls = new System.Windows.Forms.TreeView();
             this.btnSaveImage = new System.Windows.Forms.Button();
+            this.tbxMessage = new System.Windows.Forms.TextBox();
+            this.btnSend = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.pbxScreenShot)).BeginInit();
             this.SuspendLayout();
             // 
             // btnKillProcess
             // 
-            this.btnKillProcess.Location = new System.Drawing.Point(142, 75);
+            this.btnKillProcess.Location = new System.Drawing.Point(142, 71);
             this.btnKillProcess.Name = "btnKillProcess";
             this.btnKillProcess.Size = new System.Drawing.Size(107, 23);
             this.btnKillProcess.TabIndex = 29;
@@ -69,7 +71,7 @@
             // lbxProcesses
             // 
             this.lbxProcesses.FormattingEnabled = true;
-            this.lbxProcesses.Location = new System.Drawing.Point(255, 16);
+            this.lbxProcesses.Location = new System.Drawing.Point(255, 12);
             this.lbxProcesses.Name = "lbxProcesses";
             this.lbxProcesses.Size = new System.Drawing.Size(348, 82);
             this.lbxProcesses.TabIndex = 25;
@@ -93,7 +95,7 @@
             // 
             // btnSaveImage
             // 
-            this.btnSaveImage.Location = new System.Drawing.Point(17, 75);
+            this.btnSaveImage.Location = new System.Drawing.Point(17, 71);
             this.btnSaveImage.Name = "btnSaveImage";
             this.btnSaveImage.Size = new System.Drawing.Size(119, 23);
             this.btnSaveImage.TabIndex = 31;
@@ -101,11 +103,30 @@
             this.btnSaveImage.UseVisualStyleBackColor = true;
             this.btnSaveImage.Click += new System.EventHandler(this.SaveScreenShot);
             // 
+            // tbxMessage
+            // 
+            this.tbxMessage.Location = new System.Drawing.Point(17, 386);
+            this.tbxMessage.Name = "tbxMessage";
+            this.tbxMessage.Size = new System.Drawing.Size(768, 20);
+            this.tbxMessage.TabIndex = 32;
+            // 
+            // btnSend
+            // 
+            this.btnSend.Location = new System.Drawing.Point(791, 385);
+            this.btnSend.Name = "btnSend";
+            this.btnSend.Size = new System.Drawing.Size(75, 23);
+            this.btnSend.TabIndex = 33;
+            this.btnSend.Text = "Envoyer";
+            this.btnSend.UseVisualStyleBackColor = true;
+            this.btnSend.Click += new System.EventHandler(this.SendMessage);
+            // 
             // DisplayStudent
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(878, 393);
+            this.ClientSize = new System.Drawing.Size(878, 415);
+            this.Controls.Add(this.btnSend);
+            this.Controls.Add(this.tbxMessage);
             this.Controls.Add(this.btnSaveImage);
             this.Controls.Add(this.TreeViewUrls);
             this.Controls.Add(this.btnKillProcess);
@@ -130,5 +151,7 @@
         private System.Windows.Forms.PictureBox pbxScreenShot;
         private System.Windows.Forms.TreeView TreeViewUrls;
         private System.Windows.Forms.Button btnSaveImage;
+        private System.Windows.Forms.TextBox tbxMessage;
+        private System.Windows.Forms.Button btnSend;
     }
 }

@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using LibraryData;
 using System.Text;
-using System.Drawing;
 using System.Text.Json;
 using System.IO;
 using System.Net.NetworkInformation;
@@ -24,7 +23,7 @@ namespace ApplicationCliente
         {
             InitializeComponent();
             LoadTeacherIP();
-            Client = new(lbxConnexion,pbxScreeShot, IpToTeacher);
+            Client = new(lbxConnexion,pbxScreeShot,tbxMessage, IpToTeacher);
             Task.Run(Client.ConnectToMaster);
             Task.Run(GetAllTabNameEvery5Seconds);
         }

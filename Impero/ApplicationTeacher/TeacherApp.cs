@@ -139,7 +139,7 @@ namespace ApplicationTeacher
                     {
                         foreach(DataForTeacher student in AllStudents)
                         {
-                            if(display.StudentId == student.ID)
+                            if(display.Student.ID == student.ID)
                             {
                                 display.UpdateAffichage(student);
                             }
@@ -197,8 +197,7 @@ namespace ApplicationTeacher
                 socket.ReceiveTimeout = DefaultTimeout;
                 int nbData = socket.Receive(dataBuffer);
                 Array.Resize(ref dataBuffer, nbData);
-                string temp = Encoding.Default.GetString(dataBuffer);
-                Data data = JsonSerializer.Deserialize<Data>(temp);
+                Data data = JsonSerializer.Deserialize<Data>(Encoding.Default.GetString(dataBuffer));
                 student = new(data)
                 {
                     SocketToStudent = socket,
@@ -473,11 +472,10 @@ namespace ApplicationTeacher
         {
             foreach (DisplayStudent display in AllStudentsDisplay)
             {
-                if (display.StudentId == student.ID) { return; }
+                if (display.Student.ID == student.ID) { return; }
             }
             DisplayStudent newDisplay = new(pathToSaveFolder);
             AllStudentsDisplay.Add(newDisplay);
-            newDisplay.StudentId = student.ID;
             newDisplay.UpdateAffichage(student);
             newDisplay.FormClosing += new FormClosingEventHandler(RemovePrivateDisplay);
             newDisplay.Show();
