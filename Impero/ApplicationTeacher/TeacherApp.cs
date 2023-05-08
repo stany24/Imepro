@@ -577,5 +577,10 @@ namespace ApplicationTeacher
             DisplayStudent closingDisplay = (DisplayStudent)sender;
             AllStudentsDisplay.Remove(closingDisplay);
         }
+
+        private void panelMiniatures_Resize(object sender, EventArgs e)
+        {
+            Displayer.UpdateAllLocations(panelMiniatures.Width);
+        }
     }
 }

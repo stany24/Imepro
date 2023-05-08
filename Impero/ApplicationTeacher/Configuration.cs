@@ -106,7 +106,7 @@ namespace ApplicationTeacher
     public class MiniatureDisplayer
     {
         public List<Miniature> MiniatureList = new();
-        readonly int MaxWidth;
+        int MaxWidth;
         readonly int Marge = 10;
         public double zoom = 0.1;
 
@@ -122,7 +122,7 @@ namespace ApplicationTeacher
                 miniature.PbxImage.Height = Convert.ToInt32(NewHeight);
                 miniature.PbxImage.Width = Convert.ToInt32(NewWidth);
             }
-            UpdateAllLocations();
+            UpdateAllLocations(MaxWidth);
         }
 
         public MiniatureDisplayer(int maxwidth)
@@ -158,8 +158,9 @@ namespace ApplicationTeacher
         /// <summary>
         /// Fonction qui place toutes les miniatures au bon endroit
         /// </summary>
-        public void UpdateAllLocations()
+        public void UpdateAllLocations(int maxwidth)
         {
+            MaxWidth = maxwidth;
             int OffsetTop = 0;
             int OffsetRight = 0;
             int MaxHeightInRow = 0;
@@ -220,7 +221,7 @@ namespace ApplicationTeacher
                 {
                     MiniatureList.Remove(miniature);
                     miniature.Dispose();
-                    UpdateAllLocations();
+                    UpdateAllLocations(MaxWidth);
                     break;
                 }
             }

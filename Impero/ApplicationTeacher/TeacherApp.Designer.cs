@@ -40,30 +40,55 @@
             this.TreeViewDetails = new System.Windows.Forms.TreeView();
             this.TreeViewSelect = new System.Windows.Forms.TreeView();
             this.panelMiniatures = new System.Windows.Forms.Panel();
+            this.SplitterPrincipal = new System.Windows.Forms.SplitContainer();
+            this.SplitterInfoTree = new System.Windows.Forms.SplitContainer();
+            this.SplitterTree = new System.Windows.Forms.SplitContainer();
+            this.SplitterImageLog = new System.Windows.Forms.SplitContainer();
+            this.SplitterConnexionRequetes = new System.Windows.Forms.SplitContainer();
             ((System.ComponentModel.ISupportInitialize)(this.Slider)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.SplitterPrincipal)).BeginInit();
+            this.SplitterPrincipal.Panel1.SuspendLayout();
+            this.SplitterPrincipal.Panel2.SuspendLayout();
+            this.SplitterPrincipal.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.SplitterInfoTree)).BeginInit();
+            this.SplitterInfoTree.Panel1.SuspendLayout();
+            this.SplitterInfoTree.Panel2.SuspendLayout();
+            this.SplitterInfoTree.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.SplitterTree)).BeginInit();
+            this.SplitterTree.Panel1.SuspendLayout();
+            this.SplitterTree.Panel2.SuspendLayout();
+            this.SplitterTree.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.SplitterImageLog)).BeginInit();
+            this.SplitterImageLog.Panel1.SuspendLayout();
+            this.SplitterImageLog.Panel2.SuspendLayout();
+            this.SplitterImageLog.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.SplitterConnexionRequetes)).BeginInit();
+            this.SplitterConnexionRequetes.Panel1.SuspendLayout();
+            this.SplitterConnexionRequetes.Panel2.SuspendLayout();
+            this.SplitterConnexionRequetes.SuspendLayout();
             this.SuspendLayout();
             // 
             // lbxConnexion
             // 
-            this.lbxConnexion.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.lbxConnexion.Dock = System.Windows.Forms.DockStyle.Fill;
             this.lbxConnexion.FormattingEnabled = true;
-            this.lbxConnexion.Location = new System.Drawing.Point(268, 893);
+            this.lbxConnexion.Location = new System.Drawing.Point(0, 0);
             this.lbxConnexion.Name = "lbxConnexion";
-            this.lbxConnexion.Size = new System.Drawing.Size(337, 56);
+            this.lbxConnexion.Size = new System.Drawing.Size(500, 57);
             this.lbxConnexion.TabIndex = 4;
             // 
             // lbxRequetes
             // 
-            this.lbxRequetes.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.lbxRequetes.Dock = System.Windows.Forms.DockStyle.Fill;
             this.lbxRequetes.FormattingEnabled = true;
-            this.lbxRequetes.Location = new System.Drawing.Point(611, 893);
+            this.lbxRequetes.Location = new System.Drawing.Point(0, 0);
             this.lbxRequetes.Name = "lbxRequetes";
-            this.lbxRequetes.Size = new System.Drawing.Size(541, 56);
+            this.lbxRequetes.Size = new System.Drawing.Size(996, 57);
             this.lbxRequetes.TabIndex = 5;
             // 
             // btnShare
             // 
-            this.btnShare.Location = new System.Drawing.Point(12, 567);
+            this.btnShare.Location = new System.Drawing.Point(3, 3);
             this.btnShare.Name = "btnShare";
             this.btnShare.Size = new System.Drawing.Size(83, 21);
             this.btnShare.TabIndex = 8;
@@ -81,7 +106,7 @@
             // lblIP
             // 
             this.lblIP.AutoSize = true;
-            this.lblIP.Location = new System.Drawing.Point(171, 571);
+            this.lblIP.Location = new System.Drawing.Point(162, 7);
             this.lblIP.Name = "lblIP";
             this.lblIP.Size = new System.Drawing.Size(20, 13);
             this.lblIP.TabIndex = 10;
@@ -89,7 +114,7 @@
             // 
             // btnDisconnect
             // 
-            this.btnDisconnect.Location = new System.Drawing.Point(101, 567);
+            this.btnDisconnect.Location = new System.Drawing.Point(92, 3);
             this.btnDisconnect.Name = "btnDisconnect";
             this.btnDisconnect.Size = new System.Drawing.Size(64, 21);
             this.btnDisconnect.TabIndex = 11;
@@ -99,7 +124,7 @@
             // 
             // Slider
             // 
-            this.Slider.Location = new System.Drawing.Point(12, 594);
+            this.Slider.Location = new System.Drawing.Point(3, 30);
             this.Slider.Maximum = 100;
             this.Slider.Minimum = 5;
             this.Slider.Name = "Slider";
@@ -110,50 +135,156 @@
             // 
             // TreeViewDetails
             // 
-            this.TreeViewDetails.Location = new System.Drawing.Point(12, 12);
+            this.TreeViewDetails.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.TreeViewDetails.Location = new System.Drawing.Point(0, 0);
             this.TreeViewDetails.Name = "TreeViewDetails";
-            this.TreeViewDetails.Size = new System.Drawing.Size(250, 549);
+            this.TreeViewDetails.Size = new System.Drawing.Size(280, 442);
             this.TreeViewDetails.TabIndex = 12;
             // 
             // TreeViewSelect
             // 
             this.TreeViewSelect.CheckBoxes = true;
-            this.TreeViewSelect.Location = new System.Drawing.Point(12, 642);
+            this.TreeViewSelect.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.TreeViewSelect.Location = new System.Drawing.Point(0, 0);
             this.TreeViewSelect.Name = "TreeViewSelect";
-            this.TreeViewSelect.Size = new System.Drawing.Size(250, 307);
+            this.TreeViewSelect.Size = new System.Drawing.Size(280, 441);
             this.TreeViewSelect.TabIndex = 0;
             this.TreeViewSelect.AfterCheck += new System.Windows.Forms.TreeViewEventHandler(this.TreeNodeChecked);
             this.TreeViewSelect.NodeMouseDoubleClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.TreeViewDoubleClick);
             // 
             // panelMiniatures
             // 
-            this.panelMiniatures.AutoScroll = true;
-            this.panelMiniatures.Location = new System.Drawing.Point(268, 12);
+            this.panelMiniatures.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.panelMiniatures.Location = new System.Drawing.Point(0, 0);
             this.panelMiniatures.Name = "panelMiniatures";
-            this.panelMiniatures.Size = new System.Drawing.Size(1504, 875);
+            this.panelMiniatures.Size = new System.Drawing.Size(1500, 900);
             this.panelMiniatures.TabIndex = 13;
+            this.panelMiniatures.Resize += new System.EventHandler(this.panelMiniatures_Resize);
+            // 
+            // SplitterPrincipal
+            // 
+            this.SplitterPrincipal.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.SplitterPrincipal.Location = new System.Drawing.Point(0, 0);
+            this.SplitterPrincipal.Name = "SplitterPrincipal";
+            // 
+            // SplitterPrincipal.Panel1
+            // 
+            this.SplitterPrincipal.Panel1.Controls.Add(this.SplitterInfoTree);
+            // 
+            // SplitterPrincipal.Panel2
+            // 
+            this.SplitterPrincipal.Panel2.Controls.Add(this.SplitterImageLog);
+            this.SplitterPrincipal.Size = new System.Drawing.Size(1784, 961);
+            this.SplitterPrincipal.SplitterDistance = 280;
+            this.SplitterPrincipal.TabIndex = 14;
+            // 
+            // SplitterInfoTree
+            // 
+            this.SplitterInfoTree.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.SplitterInfoTree.Location = new System.Drawing.Point(0, 0);
+            this.SplitterInfoTree.Name = "SplitterInfoTree";
+            this.SplitterInfoTree.Orientation = System.Windows.Forms.Orientation.Horizontal;
+            // 
+            // SplitterInfoTree.Panel1
+            // 
+            this.SplitterInfoTree.Panel1.Controls.Add(this.btnShare);
+            this.SplitterInfoTree.Panel1.Controls.Add(this.btnDisconnect);
+            this.SplitterInfoTree.Panel1.Controls.Add(this.lblIP);
+            this.SplitterInfoTree.Panel1.Controls.Add(this.Slider);
+            // 
+            // SplitterInfoTree.Panel2
+            // 
+            this.SplitterInfoTree.Panel2.Controls.Add(this.SplitterTree);
+            this.SplitterInfoTree.Size = new System.Drawing.Size(280, 961);
+            this.SplitterInfoTree.SplitterDistance = 70;
+            this.SplitterInfoTree.TabIndex = 14;
+            // 
+            // SplitterTree
+            // 
+            this.SplitterTree.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.SplitterTree.Location = new System.Drawing.Point(0, 0);
+            this.SplitterTree.Name = "SplitterTree";
+            this.SplitterTree.Orientation = System.Windows.Forms.Orientation.Horizontal;
+            // 
+            // SplitterTree.Panel1
+            // 
+            this.SplitterTree.Panel1.Controls.Add(this.TreeViewDetails);
+            // 
+            // SplitterTree.Panel2
+            // 
+            this.SplitterTree.Panel2.Controls.Add(this.TreeViewSelect);
+            this.SplitterTree.Size = new System.Drawing.Size(280, 887);
+            this.SplitterTree.SplitterDistance = 442;
+            this.SplitterTree.TabIndex = 13;
+            // 
+            // SplitterImageLog
+            // 
+            this.SplitterImageLog.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.SplitterImageLog.Location = new System.Drawing.Point(0, 0);
+            this.SplitterImageLog.Name = "SplitterImageLog";
+            this.SplitterImageLog.Orientation = System.Windows.Forms.Orientation.Horizontal;
+            // 
+            // SplitterImageLog.Panel1
+            // 
+            this.SplitterImageLog.Panel1.Controls.Add(this.panelMiniatures);
+            // 
+            // SplitterImageLog.Panel2
+            // 
+            this.SplitterImageLog.Panel2.Controls.Add(this.SplitterConnexionRequetes);
+            this.SplitterImageLog.Size = new System.Drawing.Size(1500, 961);
+            this.SplitterImageLog.SplitterDistance = 900;
+            this.SplitterImageLog.TabIndex = 14;
+            // 
+            // SplitterConnexionRequetes
+            // 
+            this.SplitterConnexionRequetes.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.SplitterConnexionRequetes.Location = new System.Drawing.Point(0, 0);
+            this.SplitterConnexionRequetes.Name = "SplitterConnexionRequetes";
+            // 
+            // SplitterConnexionRequetes.Panel1
+            // 
+            this.SplitterConnexionRequetes.Panel1.Controls.Add(this.lbxConnexion);
+            // 
+            // SplitterConnexionRequetes.Panel2
+            // 
+            this.SplitterConnexionRequetes.Panel2.Controls.Add(this.lbxRequetes);
+            this.SplitterConnexionRequetes.Size = new System.Drawing.Size(1500, 57);
+            this.SplitterConnexionRequetes.SplitterDistance = 500;
+            this.SplitterConnexionRequetes.TabIndex = 6;
             // 
             // TeacherApp
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1784, 961);
-            this.Controls.Add(this.panelMiniatures);
-            this.Controls.Add(this.TreeViewDetails);
-            this.Controls.Add(this.TreeViewSelect);
-            this.Controls.Add(this.Slider);
-            this.Controls.Add(this.btnDisconnect);
-            this.Controls.Add(this.lblIP);
-            this.Controls.Add(this.btnShare);
-            this.Controls.Add(this.lbxRequetes);
-            this.Controls.Add(this.lbxConnexion);
+            this.Controls.Add(this.SplitterPrincipal);
             this.Name = "TeacherApp";
             this.Text = "Teacher";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.OnClosing);
             this.SizeChanged += new System.EventHandler(this.TeacherAppResized);
             ((System.ComponentModel.ISupportInitialize)(this.Slider)).EndInit();
+            this.SplitterPrincipal.Panel1.ResumeLayout(false);
+            this.SplitterPrincipal.Panel2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.SplitterPrincipal)).EndInit();
+            this.SplitterPrincipal.ResumeLayout(false);
+            this.SplitterInfoTree.Panel1.ResumeLayout(false);
+            this.SplitterInfoTree.Panel1.PerformLayout();
+            this.SplitterInfoTree.Panel2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.SplitterInfoTree)).EndInit();
+            this.SplitterInfoTree.ResumeLayout(false);
+            this.SplitterTree.Panel1.ResumeLayout(false);
+            this.SplitterTree.Panel2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.SplitterTree)).EndInit();
+            this.SplitterTree.ResumeLayout(false);
+            this.SplitterImageLog.Panel1.ResumeLayout(false);
+            this.SplitterImageLog.Panel2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.SplitterImageLog)).EndInit();
+            this.SplitterImageLog.ResumeLayout(false);
+            this.SplitterConnexionRequetes.Panel1.ResumeLayout(false);
+            this.SplitterConnexionRequetes.Panel2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.SplitterConnexionRequetes)).EndInit();
+            this.SplitterConnexionRequetes.ResumeLayout(false);
             this.ResumeLayout(false);
-            this.PerformLayout();
 
         }
 
@@ -169,6 +300,11 @@
         private System.Windows.Forms.TreeView TreeViewDetails;
         private System.Windows.Forms.TreeView TreeViewSelect;
         private System.Windows.Forms.Panel panelMiniatures;
+        private System.Windows.Forms.SplitContainer SplitterPrincipal;
+        private System.Windows.Forms.SplitContainer SplitterImageLog;
+        private System.Windows.Forms.SplitContainer SplitterConnexionRequetes;
+        private System.Windows.Forms.SplitContainer SplitterTree;
+        private System.Windows.Forms.SplitContainer SplitterInfoTree;
     }
 }
 
