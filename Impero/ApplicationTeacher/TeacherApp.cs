@@ -22,6 +22,7 @@ namespace ApplicationTeacher
         readonly List<DisplayStudent> AllStudentsDisplay = new();
         List<string> IgnoredProcesses= new();
         List<string> AlertedProcesses= new();
+        List<string> AlertedUrls = new();
         Task ScreenSharer;
         readonly int DurationBetweenDemand = 15;
         readonly int DefaultTimeout = 2000;
@@ -30,17 +31,18 @@ namespace ApplicationTeacher
         readonly string pathToSaveFolder = "C:\\Users\\gouvernonst\\Downloads\\";
         readonly string FileNameIgnoredProcesses = "ProcessusIgnore.txt";
         readonly string FileNameAlertedProcesses = "ProcessusAlerté.txt";
+        readonly string FileNameAlertedUrl = "UrlsAlerté.txt";
         public TeacherApp()
         {
             InitializeComponent();
             Displayer = new(panelMiniatures.Width);
             FindIp();
-            LoadProcessesLists();
+            LoadConfigurationLists();
             Task.Run(AskingData);
             Task.Run(LogClients);
         }
 
-        public void LoadProcessesLists()
+        public void LoadConfigurationLists()
         {
             try
             {
@@ -50,7 +52,7 @@ namespace ApplicationTeacher
             }
             catch (Exception e)
             {
-                lbxConnexion.Invoke(new MethodInvoker(delegate { lbxConnexion.Items.Add("Unexpected exception : " + e.ToString()); }));
+                lbxConnexion.Invoke(new MethodInvoker(delegate { lbxConnexion.Items.Add("Problème au chargement de la list des processus ignorées : " + e.ToString()); }));
             }
             try
             {
@@ -60,18 +62,31 @@ namespace ApplicationTeacher
             }
             catch (Exception e)
             {
-                lbxConnexion.Invoke(new MethodInvoker(delegate { lbxConnexion.Items.Add("Unexpected exception : " + e.ToString()); }));
+                lbxConnexion.Invoke(new MethodInvoker(delegate { lbxConnexion.Items.Add("Problème au chargement de la list des processus alerté : " + e.ToString()); }));
+            }
+            try
+            {
+                using StreamReader fichier = new(pathToSaveFolder + FileNameAlertedUrl);
+                AlertedUrls = new(JsonSerializer.Deserialize<List<string>>(fichier.ReadToEnd()));
+                fichier.Close();
+            }
+            catch (Exception e)
+            {
+                lbxConnexion.Invoke(new MethodInvoker(delegate { lbxConnexion.Items.Add("Problème au chargement de la list des urls alerté  : " + e.ToString()); }));
             }
         }
 
-        public void SaveProcessesLists()
+        public void SaveConfigurationLists()
         {
-            using StreamWriter writeFichierignore = new(pathToSaveFolder + FileNameIgnoredProcesses);
-            writeFichierignore.WriteLine(JsonSerializer.Serialize(IgnoredProcesses));
-            writeFichierignore.Close();
-            using StreamWriter writeFichieralerte = new(pathToSaveFolder + FileNameAlertedProcesses);
-            writeFichieralerte.WriteLine(JsonSerializer.Serialize(AlertedProcesses));
-            writeFichieralerte.Close();
+            using StreamWriter writeFichierProcesusIgnore = new(pathToSaveFolder + FileNameIgnoredProcesses);
+            writeFichierProcesusIgnore.WriteLine(JsonSerializer.Serialize(IgnoredProcesses));
+            writeFichierProcesusIgnore.Close();
+            using StreamWriter writeFichierProcesusAlerte = new(pathToSaveFolder + FileNameAlertedProcesses);
+            writeFichierProcesusAlerte.WriteLine(JsonSerializer.Serialize(AlertedProcesses));
+            writeFichierProcesusAlerte.Close();
+            using StreamWriter writeFichierUrlsAlerte = new(pathToSaveFolder + FileNameAlertedUrl);
+            writeFichierUrlsAlerte.WriteLine(JsonSerializer.Serialize(AlertedUrls));
+            writeFichierUrlsAlerte.Close();
         }
 
         /// <summary>
@@ -230,7 +245,6 @@ namespace ApplicationTeacher
             {
                 Socket socket = student.SocketToStudent;
                 int id = student.ID;
-                //AffichageEleve affichage = student.affichage;
                 byte[] dataBuffer = new byte[100000];
                 socket.ReceiveTimeout = DefaultTimeout;
                 int nbData = socket.Receive(dataBuffer);
@@ -241,7 +255,6 @@ namespace ApplicationTeacher
                     SocketToStudent = socket,
                     ID = id
                 };
-                //student.affichage = affichage;
                 lbxRequetes.Invoke(new MethodInvoker(delegate { lbxRequetes.Items.Add(DateTime.Now.ToString("HH:mm:ss") +  " Données recue de " + student.UserName); }));
                 Task.Run(() => UpdateTreeViews(student));
                 student.NumberOfFailure = 0;
@@ -319,12 +332,15 @@ namespace ApplicationTeacher
                     else{if(IgnoredProcesses.Find(x => x == process.Value) != null){current.BackColor = Color.Yellow;/*current.Remove();*/ }}
                 }
                 //Mise à jour des urls
-                UpdateUrlsTree(nodeNavigateurs, student.Urls.chrome, "chrome");
-                UpdateUrlsTree(nodeNavigateurs, student.Urls.firefox, "firefox");
-                UpdateUrlsTree(nodeNavigateurs, student.Urls.edge, "msedge");
-                UpdateUrlsTree(nodeNavigateurs, student.Urls.opera, "opera");
-                UpdateUrlsTree(nodeNavigateurs, student.Urls.iexplorer, "iexplorer");
-                UpdateUrlsTree(nodeNavigateurs, student.Urls.safari, "safari");
+                bool isAnyAlerted = false;
+                isAnyAlerted |= UpdateUrlsTree(nodeNavigateurs, student.Urls.chrome, "chrome","Chrome");
+                isAnyAlerted |= UpdateUrlsTree(nodeNavigateurs, student.Urls.firefox, "firefox","Firefox");
+                /*isAnyAlerted |= UpdateUrlsTree(nodeNavigateurs, student.Urls.edge, "msedge", "Edge");
+                isAnyAlerted |= UpdateUrlsTree(nodeNavigateurs, student.Urls.opera, "opera", "Opera");
+                isAnyAlerted |= UpdateUrlsTree(nodeNavigateurs, student.Urls.iexplorer, "iexplorer", "Internet Explorer");
+                isAnyAlerted |= UpdateUrlsTree(nodeNavigateurs, student.Urls.safari, "safari", "Safari");*/
+                if (isAnyAlerted) { nodeNavigateurs.BackColor = Color.Red; }
+                else { nodeNavigateurs.BackColor = Color.White; }
             }));
             // Mise à jour du TreeView pour la sélection
             TreeViewSelect.Invoke(new MethodInvoker(delegate {
@@ -339,13 +355,40 @@ namespace ApplicationTeacher
             }));
         }
 
-        public void UpdateUrlsTree(TreeNode NodeAllNavigateur, List<Url> urls, string navigateurName) {
-            if(urls.Count == 0) { try { NodeAllNavigateur.Nodes.Find(navigateurName, false)[0].Remove(); } catch { }; return; }
+        /// <summary>
+        /// Fonction qui met à jour les urls montré dans le TreeView
+        /// </summary>
+        /// <param name="NodeAllNavigateur">TreeNode qui contient tout les navigateurs</param>
+        /// <param name="urls">List des urls pour ce navigateur</param>
+        /// <param name="ProcessName">Nom du processus pour ce navigateur</param>
+        /// <param name="DisplayName">Nom d'affichage pour ce navigateur</param>
+        /// <returns></returns>
+        public bool UpdateUrlsTree(TreeNode NodeAllNavigateur, List<Url> urls, string ProcessName, string DisplayName) {
+            if(urls.Count == 0) { try { NodeAllNavigateur.Nodes.Find(ProcessName, false)[0].Remove(); } catch { }; return false; }
+            bool isAlerted = false;
             TreeViewDetails.Invoke(new MethodInvoker(delegate {
-                TreeNode[] nodeNavigateur = NodeAllNavigateur.Nodes.Find(navigateurName, false);
-                if (nodeNavigateur.Count() == 0 ) {NodeAllNavigateur.Nodes.Add(navigateurName,navigateurName);}
-                for (int i = NodeAllNavigateur.Nodes.Find(navigateurName, false)[0].Nodes.Count; i < urls.Count; i++){ NodeAllNavigateur.Nodes.Find(navigateurName, false)[0].Nodes.Add(urls[i].ToString());}
+                TreeNode[] nodeNavigateur = NodeAllNavigateur.Nodes.Find(ProcessName, false);
+                if (nodeNavigateur.Count() == 0 ) {NodeAllNavigateur.Nodes.Add(DisplayName,ProcessName);}
+                for (int i = NodeAllNavigateur.Nodes.Find(ProcessName, false)[0].Nodes.Count; i < urls.Count; i++)
+                {
+                    TreeNode NodeBrowser = NodeAllNavigateur.Nodes.Find(ProcessName, false)[0];
+                    TreeNode NodeUrl = NodeBrowser.Nodes.Add(urls[i].ToString());
+                    for (int j = 0; j < AlertedUrls.Count; j++)
+                    {
+                        if (urls[i].Name.ToLower().Contains(AlertedUrls[j])){
+                            NodeUrl.BackColor = Color.Red;
+                            NodeBrowser.BackColor = Color.Red;
+                            isAlerted = true;
+                        }
+                    }
+                    if (isAlerted == false)
+                    {
+                        NodeUrl.BackColor = Color.White;
+                        NodeBrowser.BackColor = Color.White;
+                    }
+                }
             }));
+            return isAlerted;
         }
 
         /// <summary>
@@ -477,7 +520,7 @@ namespace ApplicationTeacher
                 student.SocketToStudent.Dispose();
                 //student.SocketToStudent.Disconnect(false);
             }
-            SaveProcessesLists();
+            SaveConfigurationLists();
         }
 
         /// <summary>
@@ -525,7 +568,7 @@ namespace ApplicationTeacher
             {
                 if (display.Student.ID == student.ID) { return; }
             }
-            DisplayStudent newDisplay = new(pathToSaveFolder);
+            DisplayStudent newDisplay = new(pathToSaveFolder,AlertedUrls,AlertedProcesses,IgnoredProcesses);
             AllStudentsDisplay.Add(newDisplay);
             newDisplay.UpdateAffichage(student);
             newDisplay.FormClosing += new FormClosingEventHandler(RemovePrivateDisplay);

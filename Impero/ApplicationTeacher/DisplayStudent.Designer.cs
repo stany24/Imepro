@@ -32,12 +32,12 @@
             this.btnKillProcess = new System.Windows.Forms.Button();
             this.lblPoste = new System.Windows.Forms.Label();
             this.lblUserName = new System.Windows.Forms.Label();
-            this.lbxProcesses = new System.Windows.Forms.ListBox();
             this.pbxScreenShot = new System.Windows.Forms.PictureBox();
             this.TreeViewUrls = new System.Windows.Forms.TreeView();
             this.btnSaveImage = new System.Windows.Forms.Button();
             this.tbxMessage = new System.Windows.Forms.TextBox();
             this.btnSend = new System.Windows.Forms.Button();
+            this.TreeViewProcesses = new System.Windows.Forms.TreeView();
             ((System.ComponentModel.ISupportInitialize)(this.pbxScreenShot)).BeginInit();
             this.SuspendLayout();
             // 
@@ -67,14 +67,6 @@
             this.lblUserName.Size = new System.Drawing.Size(29, 13);
             this.lblUserName.TabIndex = 27;
             this.lblUserName.Text = "Nom";
-            // 
-            // lbxProcesses
-            // 
-            this.lbxProcesses.FormattingEnabled = true;
-            this.lbxProcesses.Location = new System.Drawing.Point(255, 12);
-            this.lbxProcesses.Name = "lbxProcesses";
-            this.lbxProcesses.Size = new System.Drawing.Size(348, 82);
-            this.lbxProcesses.TabIndex = 25;
             // 
             // pbxScreenShot
             // 
@@ -120,11 +112,19 @@
             this.btnSend.UseVisualStyleBackColor = true;
             this.btnSend.Click += new System.EventHandler(this.SendMessage);
             // 
+            // TreeViewProcesses
+            // 
+            this.TreeViewProcesses.Location = new System.Drawing.Point(255, 12);
+            this.TreeViewProcesses.Name = "TreeViewProcesses";
+            this.TreeViewProcesses.Size = new System.Drawing.Size(348, 86);
+            this.TreeViewProcesses.TabIndex = 34;
+            // 
             // DisplayStudent
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(878, 415);
+            this.Controls.Add(this.TreeViewProcesses);
             this.Controls.Add(this.btnSend);
             this.Controls.Add(this.tbxMessage);
             this.Controls.Add(this.btnSaveImage);
@@ -132,7 +132,6 @@
             this.Controls.Add(this.btnKillProcess);
             this.Controls.Add(this.lblPoste);
             this.Controls.Add(this.lblUserName);
-            this.Controls.Add(this.lbxProcesses);
             this.Controls.Add(this.pbxScreenShot);
             this.Name = "DisplayStudent";
             this.Text = "DisplayStudent";
@@ -147,11 +146,11 @@
         private System.Windows.Forms.Button btnKillProcess;
         private System.Windows.Forms.Label lblPoste;
         private System.Windows.Forms.Label lblUserName;
-        private System.Windows.Forms.ListBox lbxProcesses;
         private System.Windows.Forms.PictureBox pbxScreenShot;
         private System.Windows.Forms.TreeView TreeViewUrls;
         private System.Windows.Forms.Button btnSaveImage;
         private System.Windows.Forms.TextBox tbxMessage;
         private System.Windows.Forms.Button btnSend;
+        private System.Windows.Forms.TreeView TreeViewProcesses;
     }
 }
