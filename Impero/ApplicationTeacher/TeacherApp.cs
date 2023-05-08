@@ -20,18 +20,10 @@ namespace ApplicationTeacher
         readonly MiniatureDisplayer Displayer;
         readonly List<DataForTeacher> AllStudents = new();
         readonly List<DisplayStudent> AllStudentsDisplay = new();
-        List<string> IgnoredProcesses= new();
-        List<string> AlertedProcesses= new();
-        List<string> AlertedUrls = new();
         Task ScreenSharer;
-        readonly int DurationBetweenDemand = 15;
-        readonly int DefaultTimeout = 2000;
         int NextId = 0;
         IPAddress ipAddr = null;
-        readonly string pathToSaveFolder = "C:\\Users\\gouvernonst\\Downloads\\";
-        readonly string FileNameIgnoredProcesses = "ProcessusIgnore.txt";
-        readonly string FileNameAlertedProcesses = "ProcessusAlerté.txt";
-        readonly string FileNameAlertedUrl = "UrlsAlerté.txt";
+
         public TeacherApp()
         {
             InitializeComponent();
@@ -46,8 +38,8 @@ namespace ApplicationTeacher
         {
             try
             {
-                using StreamReader fichier = new(pathToSaveFolder + FileNameIgnoredProcesses);
-                IgnoredProcesses = new(JsonSerializer.Deserialize<List<string>>(fichier.ReadToEnd()));
+                using StreamReader fichier = new(Configuration.pathToSaveFolder + Configuration.FileNameIgnoredProcesses);
+                Configuration.IgnoredProcesses = new(JsonSerializer.Deserialize<List<string>>(fichier.ReadToEnd()));
                 fichier.Close();
             }
             catch (Exception e)
@@ -56,8 +48,8 @@ namespace ApplicationTeacher
             }
             try
             {
-                using StreamReader fichier = new(pathToSaveFolder + FileNameAlertedProcesses);
-                AlertedProcesses = new(JsonSerializer.Deserialize<List<string>>(fichier.ReadToEnd()));
+                using StreamReader fichier = new(Configuration.pathToSaveFolder + Configuration.FileNameAlertedProcesses);
+                Configuration.AlertedProcesses = new(JsonSerializer.Deserialize<List<string>>(fichier.ReadToEnd()));
                 fichier.Close();
             }
             catch (Exception e)
@@ -66,8 +58,8 @@ namespace ApplicationTeacher
             }
             try
             {
-                using StreamReader fichier = new(pathToSaveFolder + FileNameAlertedUrl);
-                AlertedUrls = new(JsonSerializer.Deserialize<List<string>>(fichier.ReadToEnd()));
+                using StreamReader fichier = new(Configuration.pathToSaveFolder + Configuration.FileNameAlertedUrl);
+                Configuration.AlertedUrls = new(JsonSerializer.Deserialize<List<string>>(fichier.ReadToEnd()));
                 fichier.Close();
             }
             catch (Exception e)
@@ -78,14 +70,14 @@ namespace ApplicationTeacher
 
         public void SaveConfigurationLists()
         {
-            using StreamWriter writeFichierProcesusIgnore = new(pathToSaveFolder + FileNameIgnoredProcesses);
-            writeFichierProcesusIgnore.WriteLine(JsonSerializer.Serialize(IgnoredProcesses));
+            using StreamWriter writeFichierProcesusIgnore = new(Configuration.pathToSaveFolder + Configuration.FileNameIgnoredProcesses);
+            writeFichierProcesusIgnore.WriteLine(JsonSerializer.Serialize(Configuration.IgnoredProcesses));
             writeFichierProcesusIgnore.Close();
-            using StreamWriter writeFichierProcesusAlerte = new(pathToSaveFolder + FileNameAlertedProcesses);
-            writeFichierProcesusAlerte.WriteLine(JsonSerializer.Serialize(AlertedProcesses));
+            using StreamWriter writeFichierProcesusAlerte = new(Configuration.pathToSaveFolder + Configuration.FileNameAlertedProcesses);
+            writeFichierProcesusAlerte.WriteLine(JsonSerializer.Serialize(Configuration.AlertedProcesses));
             writeFichierProcesusAlerte.Close();
-            using StreamWriter writeFichierUrlsAlerte = new(pathToSaveFolder + FileNameAlertedUrl);
-            writeFichierUrlsAlerte.WriteLine(JsonSerializer.Serialize(AlertedUrls));
+            using StreamWriter writeFichierUrlsAlerte = new(Configuration.pathToSaveFolder + Configuration.FileNameAlertedUrl);
+            writeFichierUrlsAlerte.WriteLine(JsonSerializer.Serialize(Configuration.AlertedUrls));
             writeFichierUrlsAlerte.Close();
         }
 
@@ -159,13 +151,13 @@ namespace ApplicationTeacher
                 if (AllStudents.Count != 0)
                 {
                     DateTime StartUpdate = DateTime.Now;
-                    DateTime NextUpdate = DateTime.Now.AddSeconds(DurationBetweenDemand);
+                    DateTime NextUpdate = DateTime.Now.AddSeconds(Configuration.DurationBetweenDemand);
                     List<DataForTeacher> ClientToRemove = new();
                     for (int i = 0; i < AllStudents.Count; i++)
                     {
                         Socket socket = AllStudents[i].SocketToStudent;
-                        socket.ReceiveTimeout = DefaultTimeout;
-                        socket.SendTimeout = DefaultTimeout;
+                        socket.ReceiveTimeout = Configuration.DefaultTimeout;
+                        socket.SendTimeout = Configuration.DefaultTimeout;
                         try
                         {
                             //demande les données
@@ -246,7 +238,7 @@ namespace ApplicationTeacher
                 Socket socket = student.SocketToStudent;
                 int id = student.ID;
                 byte[] dataBuffer = new byte[100000];
-                socket.ReceiveTimeout = DefaultTimeout;
+                socket.ReceiveTimeout = Configuration.DefaultTimeout;
                 int nbData = socket.Receive(dataBuffer);
                 Array.Resize(ref dataBuffer, nbData);
                 Data data = JsonSerializer.Deserialize<Data>(Encoding.Default.GetString(dataBuffer));
@@ -278,7 +270,7 @@ namespace ApplicationTeacher
             {
                 Socket socket = student.SocketToStudent;
                 byte[] imageBuffer = new byte[10485760];
-                socket.ReceiveTimeout = DefaultTimeout;
+                socket.ReceiveTimeout = Configuration.DefaultTimeout;
                 int nbData = socket.Receive(imageBuffer, 0, imageBuffer.Length, SocketFlags.None);
                 Array.Resize(ref imageBuffer, nbData);
                 student.ScreenShot = new Bitmap(new MemoryStream(imageBuffer));
@@ -320,7 +312,7 @@ namespace ApplicationTeacher
                 nodeProcess.Nodes.Clear();
                 foreach(KeyValuePair<int,string> process in student.Processes) {
                     TreeNode current = nodeProcess.Nodes.Add(process.Value);
-                    if(AlertedProcesses.Find(x => x == process.Value) != null)
+                    if(Configuration.AlertedProcesses.Find(x => x == process.Value) != null)
                     {
                         current.BackColor = Color.Red;
                         while(current.Parent != null)
@@ -329,7 +321,7 @@ namespace ApplicationTeacher
                             current.BackColor = Color.Red;
                         }
                     }
-                    else{if(IgnoredProcesses.Find(x => x == process.Value) != null){current.BackColor = Color.Yellow;/*current.Remove();*/ }}
+                    else{if(Configuration.IgnoredProcesses.Find(x => x == process.Value) != null){current.BackColor = Color.Yellow;/*current.Remove();*/ }}
                 }
                 //Mise à jour des urls
                 bool isAnyAlerted = false;
@@ -373,9 +365,9 @@ namespace ApplicationTeacher
                 {
                     TreeNode NodeBrowser = NodeAllNavigateur.Nodes.Find(ProcessName, false)[0];
                     TreeNode NodeUrl = NodeBrowser.Nodes.Add(urls[i].ToString());
-                    for (int j = 0; j < AlertedUrls.Count; j++)
+                    for (int j = 0; j < Configuration.AlertedUrls.Count; j++)
                     {
-                        if (urls[i].Name.ToLower().Contains(AlertedUrls[j])){
+                        if (urls[i].Name.ToLower().Contains(Configuration.AlertedUrls[j])){
                             NodeUrl.BackColor = Color.Red;
                             NodeBrowser.BackColor = Color.Red;
                             isAlerted = true;
@@ -410,7 +402,7 @@ namespace ApplicationTeacher
                 }
                 if (student == null) { return; }
                 foreach(Miniature mini in Displayer.MiniatureList) { if (mini.ComputerName == student.ComputerName && mini.StudentID == student.ID) { return; } }
-                Miniature miniature = new(student.ScreenShot, student.ComputerName, student.ID,pathToSaveFolder);
+                Miniature miniature = new(student.ScreenShot, student.ComputerName, student.ID, Configuration.pathToSaveFolder);
                 Displayer.AddMiniature(miniature);
                 panelMiniatures.Controls.Add(miniature);
                 panelMiniatures.Controls.SetChildIndex(miniature, 0);
@@ -568,7 +560,7 @@ namespace ApplicationTeacher
             {
                 if (display.Student.ID == student.ID) { return; }
             }
-            DisplayStudent newDisplay = new(pathToSaveFolder,AlertedUrls,AlertedProcesses,IgnoredProcesses);
+            DisplayStudent newDisplay = new();
             AllStudentsDisplay.Add(newDisplay);
             newDisplay.UpdateAffichage(student);
             newDisplay.FormClosing += new FormClosingEventHandler(RemovePrivateDisplay);

@@ -11,17 +11,9 @@ namespace ApplicationTeacher
     public partial class DisplayStudent : Form
     {
         public DataForTeacher Student;
-        public string SavePath;
-        public List<string> AlertedUrls;
-        public List<string> AlertedProcess;
-        public List<string> IgnoredProcess;
-        public DisplayStudent(string savepath,List<string> alertedurls, List<string> alertedProcess, List<string> ignoredProcess)
+        public DisplayStudent()
         {
-            AlertedUrls = alertedurls;
-            SavePath = savepath;
             InitializeComponent();
-            AlertedProcess = alertedProcess;
-            IgnoredProcess = ignoredProcess;
         }
 
         public void UpdateAffichage(DataForTeacher student)
@@ -34,7 +26,7 @@ namespace ApplicationTeacher
                 TreeViewProcesses.Invoke(new MethodInvoker(delegate {
                     foreach (KeyValuePair<int, string> process in student.Processes) {
                         TreeNode current = TreeViewProcesses.Nodes.Add(process.Value);
-                        if (AlertedProcess.Find(x => x == process.Value) != null)
+                        if (Configuration.AlertedProcesses.Find(x => x == process.Value) != null)
                         {
                             current.BackColor = Color.Red;
                             while (current.Parent != null)
@@ -64,7 +56,7 @@ namespace ApplicationTeacher
                 foreach (KeyValuePair<int, string> process in student.Processes)
                 {
                     TreeNode current = TreeViewProcesses.Nodes.Add(process.Value);
-                    if (AlertedProcess.Find(x => x == process.Value) != null)
+                    if (Configuration.AlertedProcesses.Find(x => x == process.Value) != null)
                     {
                         current.BackColor = Color.Red;
                         while (current.Parent != null)
@@ -99,9 +91,9 @@ namespace ApplicationTeacher
                         for (int i = NodeNavigateur.Nodes.Count; i < urls.Count; i++)
                         {
                             TreeNode NodeUrl = NodeNavigateur.Nodes.Add(urls[i].ToString());
-                            for (int j = 0; j < AlertedUrls.Count; j++)
+                            for (int j = 0; j < Configuration.AlertedUrls.Count; j++)
                             {
-                                if (urls[i].Name.ToLower().Contains(AlertedUrls[j]))
+                                if (urls[i].Name.ToLower().Contains(Configuration.AlertedUrls[j]))
                                 {
                                     NodeUrl.BackColor = Color.Red;
                                     NodeNavigateur.BackColor = Color.Red;
@@ -129,9 +121,9 @@ namespace ApplicationTeacher
                 for (int i = NodeNavigateur.Nodes.Count; i < urls.Count; i++)
                 {
                     TreeNode NodeUrl = NodeNavigateur.Nodes.Add(urls[i].ToString());
-                    for (int j = 0; j < AlertedUrls.Count; j++)
+                    for (int j = 0; j < Configuration.AlertedUrls.Count; j++)
                     {
-                        if (urls[i].Name.ToLower().Contains(AlertedUrls[j]))
+                        if (urls[i].Name.ToLower().Contains(Configuration.AlertedUrls[j]))
                         {
                             NodeUrl.BackColor = Color.Red;
                             NodeNavigateur.BackColor = Color.Red;
@@ -150,7 +142,7 @@ namespace ApplicationTeacher
 
         public void SaveScreenShot(object sender, EventArgs e)
         {
-            pbxScreenShot.Image.Save(SavePath +Student.ComputerName+ DateTime.Now.ToString("_yyyy-MM-dd_HH-mm-ss") + ".jpg", ImageFormat.Jpeg);
+            pbxScreenShot.Image.Save(Configuration.pathToSaveFolder +Student.ComputerName+ DateTime.Now.ToString("_yyyy-MM-dd_HH-mm-ss") + ".jpg", ImageFormat.Jpeg);
         }
 
         private void SendMessage(object sender, EventArgs e)

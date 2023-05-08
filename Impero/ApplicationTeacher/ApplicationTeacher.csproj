@@ -85,6 +85,7 @@
     <Compile Include="AskToChoseIp.Designer.cs">
       <DependentUpon>AskToChoseIp.cs</DependentUpon>
     </Compile>
+    <Compile Include="Configuration.cs" />
     <Compile Include="DisplayStudent.cs">
       <SubType>Form</SubType>
     </Compile>
