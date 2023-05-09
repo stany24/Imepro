@@ -466,7 +466,7 @@ namespace ApplicationTeacher
         /// </summary>
         public void RecordAndStreamScreen()
         {
-            foreach (DataForTeacher student in AllStudents) { student.SocketToStudent.Send(Encoding.ASCII.GetBytes("receive")); }
+            foreach (DataForTeacher student in Configuration.StudentToShareScreen) { student.SocketToStudent.Send(Encoding.ASCII.GetBytes("receive")); }
 
             Socket s = new(AddressFamily.InterNetwork,SocketType.Dgram, ProtocolType.Udp);
             IPAddress ip = IPAddress.Parse("232.1.2.3");
@@ -508,10 +508,14 @@ namespace ApplicationTeacher
         {
             if(ScreenSharer == null)
             {
-                if (AllStudents.Count != 0)
+                ChooseStudentToShareScreen prompt = new(AllStudents);
+                if (prompt.ShowDialog(this) == DialogResult.OK)
                 {
-                    ScreenSharer = Task.Run(RecordAndStreamScreen);
-                    btnShare.Text = "Stop Sharing";
+                    if (Configuration.StudentToShareScreen.Count != 0)
+                    {
+                        ScreenSharer = Task.Run(RecordAndStreamScreen);
+                        btnShare.Text = "Stop Sharing";
+                    }
                 }
             }
             else

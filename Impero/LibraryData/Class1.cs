@@ -63,6 +63,11 @@ namespace LibraryData
             Urls = data.Urls;
             Processes = data.Processes;
         }
+
+        public override string ToString()
+        {
+            return UserName +" "+ ComputerName;
+        }
     }
 
     public class DataForStudent : Data
