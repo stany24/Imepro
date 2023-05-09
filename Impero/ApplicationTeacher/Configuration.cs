@@ -13,10 +13,12 @@ namespace ApplicationTeacher
         public static List<string> IgnoredProcesses = new();
         public static List<string> AlertedProcesses = new();
         public static List<string> AlertedUrls = new();
+        public static List<string> AutorisedWebsite = new();
         public static string pathToSaveFolder = "C:\\Users\\gouvernonst\\Downloads\\";
         public static string FileNameIgnoredProcesses = "ProcessusIgnore.txt";
         public static string FileNameAlertedProcesses = "ProcessusAlerté.txt";
         public static string FileNameAlertedUrl = "UrlsAlerté.txt";
+        public static string FileNameAutorisedWebsite = "SitesAutorise.txt";
         public static int DurationBetweenDemand = 15;
         public static int DefaultTimeout = 2000;
     }

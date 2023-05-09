@@ -21,6 +21,7 @@ namespace ApplicationTeacher
         readonly List<DataForTeacher> AllStudents = new();
         readonly List<DisplayStudent> AllStudentsDisplay = new();
         Task ScreenSharer;
+        bool isAsking = false;
         int NextId = 0;
         IPAddress ipAddr = null;
 
@@ -66,6 +67,16 @@ namespace ApplicationTeacher
             {
                 lbxConnexion.Invoke(new MethodInvoker(delegate { lbxConnexion.Items.Add("Problème au chargement de la list des urls alerté  : " + e.ToString()); }));
             }
+            try
+            {
+                using StreamReader fichier = new(Configuration.pathToSaveFolder + Configuration.FileNameAutorisedWebsite);
+                Configuration.AutorisedWebsite = new(JsonSerializer.Deserialize<List<string>>(fichier.ReadToEnd()));
+                fichier.Close();
+            }
+            catch (Exception e)
+            {
+                lbxConnexion.Invoke(new MethodInvoker(delegate { lbxConnexion.Items.Add("Problème au chargement de la list des urls autorisé  : " + e.ToString()); }));
+            }
         }
 
         public void SaveConfigurationLists()
@@ -79,6 +90,9 @@ namespace ApplicationTeacher
             using StreamWriter writeFichierUrlsAlerte = new(Configuration.pathToSaveFolder + Configuration.FileNameAlertedUrl);
             writeFichierUrlsAlerte.WriteLine(JsonSerializer.Serialize(Configuration.AlertedUrls));
             writeFichierUrlsAlerte.Close();
+            using StreamWriter writeFichierAutorisedUrl = new(Configuration.pathToSaveFolder + Configuration.FileNameAutorisedWebsite);
+            writeFichierAutorisedUrl.WriteLine(JsonSerializer.Serialize(Configuration.AutorisedWebsite));
+            writeFichierAutorisedUrl.Close();
         }
 
         /// <summary>
@@ -135,10 +149,24 @@ namespace ApplicationTeacher
                     Socket clientSocket = listener.Accept();
                     lbxRequetes.Invoke(new MethodInvoker(delegate { lbxRequetes.Items.Add(DateTime.Now.ToString("HH:mm:ss")+" Nouvelle connexion de: " + clientSocket.RemoteEndPoint); }));
                     AllStudents.Add(new DataForTeacher(clientSocket,NextId));
+                    Task.Run(() => SendAutorisedUrl(clientSocket));
                     NextId++;
                 }
                 catch (Exception e) { lbxConnexion.Invoke(new MethodInvoker(delegate { lbxConnexion.Items.Add(e.ToString()); })); }
             }
+        }
+
+        public void SendAutorisedUrl(Socket socket)
+        {
+            while (isAsking) {Thread.Sleep(100);}
+            isAsking = true;
+            socket.Send(Encoding.Default.GetBytes("url"));
+            //serialization
+            string jsonString = JsonSerializer.Serialize(Configuration.AutorisedWebsite);
+            //envoi
+            Thread.Sleep(100);
+            socket.Send(Encoding.ASCII.GetBytes(jsonString), Encoding.ASCII.GetBytes(jsonString).Length, SocketFlags.None);
+            isAsking = false;
         }
 
         /// <summary>
@@ -150,6 +178,8 @@ namespace ApplicationTeacher
             {
                 if (AllStudents.Count != 0)
                 {
+                    while (isAsking) { Thread.Sleep(10); }
+                    isAsking = true;
                     DateTime StartUpdate = DateTime.Now;
                     DateTime NextUpdate = DateTime.Now.AddSeconds(Configuration.DurationBetweenDemand);
                     List<DataForTeacher> ClientToRemove = new();
@@ -196,6 +226,7 @@ namespace ApplicationTeacher
                     TimeSpan CycleDuration = NextUpdate - StartUpdate;
                     if (CycleDuration > UpdateDuration)
                     {
+                        isAsking = false;
                         lbxRequetes.Invoke(new MethodInvoker(delegate { lbxRequetes.Items.Add(DateTime.Now.ToString("HH:mm:ss") +  " Attente du prochain cycle dans " + (CycleDuration - UpdateDuration) + " secondes"); }));
                         Thread.Sleep(CycleDuration - UpdateDuration);
                     }
@@ -327,10 +358,11 @@ namespace ApplicationTeacher
                 bool isAnyAlerted = false;
                 isAnyAlerted |= UpdateUrlsTree(nodeNavigateurs, student.Urls.chrome, "chrome","Chrome");
                 isAnyAlerted |= UpdateUrlsTree(nodeNavigateurs, student.Urls.firefox, "firefox","Firefox");
-                /*isAnyAlerted |= UpdateUrlsTree(nodeNavigateurs, student.Urls.edge, "msedge", "Edge");
+                isAnyAlerted |= UpdateUrlsTree(nodeNavigateurs, student.Urls.edge, "msedge", "Edge");
                 isAnyAlerted |= UpdateUrlsTree(nodeNavigateurs, student.Urls.opera, "opera", "Opera");
                 isAnyAlerted |= UpdateUrlsTree(nodeNavigateurs, student.Urls.iexplorer, "iexplorer", "Internet Explorer");
-                isAnyAlerted |= UpdateUrlsTree(nodeNavigateurs, student.Urls.safari, "safari", "Safari");*/
+                isAnyAlerted |= UpdateUrlsTree(nodeNavigateurs, student.Urls.safari, "safari", "Safari");
+                isAnyAlerted |= UpdateUrlsTree(nodeNavigateurs, student.Urls.custom, "custom", "Custom");
                 if (isAnyAlerted) { nodeNavigateurs.BackColor = Color.Red; }
                 else { nodeNavigateurs.BackColor = Color.White; }
             }));
@@ -548,7 +580,6 @@ namespace ApplicationTeacher
                 if(student.ID == Convert.ToInt32(e.Node.Name)) { OpenPrivateDisplay(student);return; }
             }
         }
-
 
         /// <summary>
         /// Fonction qui crée un nouvelle affichage individuel pour un élève

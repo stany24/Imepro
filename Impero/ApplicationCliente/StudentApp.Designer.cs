@@ -38,14 +38,17 @@
             this.notifyIcon1 = new System.Windows.Forms.NotifyIcon(this.components);
             this.lblMessage = new System.Windows.Forms.Label();
             this.lbxMessages = new System.Windows.Forms.ListBox();
+            this.webView = new Microsoft.Web.WebView2.WinForms.WebView2();
+            this.lbxAutorisedWebSite = new System.Windows.Forms.ListBox();
             ((System.ComponentModel.ISupportInitialize)(this.pbxScreeShot)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.webView)).BeginInit();
             this.SuspendLayout();
             // 
             // pbxScreeShot
             // 
-            this.pbxScreeShot.Location = new System.Drawing.Point(12, 163);
+            this.pbxScreeShot.Location = new System.Drawing.Point(12, 152);
             this.pbxScreeShot.Name = "pbxScreeShot";
-            this.pbxScreeShot.Size = new System.Drawing.Size(1185, 536);
+            this.pbxScreeShot.Size = new System.Drawing.Size(420, 306);
             this.pbxScreeShot.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.pbxScreeShot.TabIndex = 4;
             this.pbxScreeShot.TabStop = false;
@@ -107,11 +110,36 @@
             this.lbxMessages.Size = new System.Drawing.Size(260, 264);
             this.lbxMessages.TabIndex = 9;
             // 
+            // webView
+            // 
+            this.webView.AllowExternalDrop = true;
+            this.webView.CreationProperties = null;
+            this.webView.DefaultBackgroundColor = System.Drawing.Color.White;
+            this.webView.Location = new System.Drawing.Point(437, 152);
+            this.webView.Name = "webView";
+            this.webView.Size = new System.Drawing.Size(759, 547);
+            this.webView.Source = new System.Uri("https://www.microsoft.com", System.UriKind.Absolute);
+            this.webView.TabIndex = 10;
+            this.webView.ZoomFactor = 1D;
+            this.webView.NavigationStarting += new System.EventHandler<Microsoft.Web.WebView2.Core.CoreWebView2NavigationStartingEventArgs>(this.ChangingUrl);
+            this.webView.SourceChanged += new System.EventHandler<Microsoft.Web.WebView2.Core.CoreWebView2SourceChangedEventArgs>(this.webView_SourceChanged);
+            // 
+            // lbxAutorisedWebSite
+            // 
+            this.lbxAutorisedWebSite.FormattingEnabled = true;
+            this.lbxAutorisedWebSite.Location = new System.Drawing.Point(12, 464);
+            this.lbxAutorisedWebSite.Name = "lbxAutorisedWebSite";
+            this.lbxAutorisedWebSite.Size = new System.Drawing.Size(419, 238);
+            this.lbxAutorisedWebSite.TabIndex = 11;
+            this.lbxAutorisedWebSite.SelectedIndexChanged += new System.EventHandler(this.ChangeWebSite);
+            // 
             // StudentApp
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1474, 711);
+            this.Controls.Add(this.lbxAutorisedWebSite);
+            this.Controls.Add(this.webView);
             this.Controls.Add(this.lbxMessages);
             this.Controls.Add(this.lblMessage);
             this.Controls.Add(this.button1);
@@ -123,6 +151,7 @@
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.OnClosing);
             this.Resize += new System.EventHandler(this.StudentAppResized);
             ((System.ComponentModel.ISupportInitialize)(this.pbxScreeShot)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.webView)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -137,6 +166,8 @@
         private System.Windows.Forms.NotifyIcon notifyIcon1;
         private System.Windows.Forms.Label lblMessage;
         private System.Windows.Forms.ListBox lbxMessages;
+        private Microsoft.Web.WebView2.WinForms.WebView2 webView;
+        private System.Windows.Forms.ListBox lbxAutorisedWebSite;
     }
 }
 

@@ -9,6 +9,8 @@ using System.Text.Json;
 using System.IO;
 using System.Net.NetworkInformation;
 using System.Linq;
+using Microsoft.Web.WebView2.WinForms;
+using Microsoft.Web.WebView2.Core;
 
 namespace ApplicationCliente
 {
@@ -22,7 +24,7 @@ namespace ApplicationCliente
         {
             InitializeComponent();
             LoadTeacherIP();
-            Client = new(lbxConnexion,pbxScreeShot,lbxMessages, IpToTeacher);
+            Client = new(lbxConnexion,pbxScreeShot,lbxMessages, IpToTeacher,lbxAutorisedWebSite);
             Task.Run(Client.ConnectToMaster);
         }
 
@@ -192,6 +194,28 @@ namespace ApplicationCliente
         {
             this.Show();
             this.WindowState = FormWindowState.Normal;
+        }
+
+        private void webView_SourceChanged(object sender, CoreWebView2SourceChangedEventArgs e)
+        {
+            WebView2 web = (WebView2)sender;
+            Client.Urls.AddUrl(new Url(DateTime.Now,"custom",web.Source.AbsoluteUri));
+        }
+
+        private void ChangingUrl(object sender, CoreWebView2NavigationStartingEventArgs e)
+        {
+            bool notOk = true;
+            foreach(string url in Client.AutorisedUrls)
+            {
+                if (e.Uri.StartsWith("https://" + url)) { notOk = false; }
+            }
+            e.Cancel = notOk;
+        }
+
+        private void ChangeWebSite(object sender, EventArgs e)
+        {
+            ListBox listbox = (ListBox)sender;
+            webView.Source = new Uri("https://"+ listbox.SelectedItem.ToString());
         }
     }
 }
