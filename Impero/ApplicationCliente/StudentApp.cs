@@ -11,6 +11,10 @@ using System.Net.NetworkInformation;
 using System.Linq;
 using Microsoft.Web.WebView2.WinForms;
 using Microsoft.Web.WebView2.Core;
+using OpenQA.Selenium;
+using OpenQA.Selenium.Chrome;
+using OpenQA.Selenium.Firefox;
+using System.Threading;
 
 namespace ApplicationCliente
 {
@@ -20,12 +24,85 @@ namespace ApplicationCliente
         IPAddress IpToTeacher;
         readonly string pathToConfFolder = "C:\\Users\\gouvernonst\\Downloads\\";
         readonly string FileNameConfIp = "iPToTeacher.txt";
+        IWebDriver firefoxdriver;
+        IWebDriver chromedriver;
         public StudentApp()
         {
             InitializeComponent();
             LoadTeacherIP();
-            Client = new(lbxConnexion,pbxScreeShot,lbxMessages, IpToTeacher,lbxAutorisedWebSite);
+            Client = new(lbxConnexion,pbxScreeShot,lbxMessages, IpToTeacher,lbxAutorisedWebSite,this);
             Task.Run(Client.ConnectToMaster);
+            Task.Run(AutomaticChecker);
+        }
+
+        public void NewChrome(object sender, EventArgs e)
+        {
+            Task.Run(StartChrome);
+        }
+
+        public void StartChrome()
+        {
+            chromedriver = new ChromeDriver();
+        }
+
+        public void NewFirefox(object sender, EventArgs e)
+        {
+            Task.Run(StartFirefox);
+        }
+
+        public void StartFirefox()
+        {
+            firefoxdriver = new FirefoxDriver();
+        }
+
+        public void AutomaticChecker()
+        {
+            while(true)
+            {
+                GetUrls();
+                Thread.Sleep(2000);
+            }
+        }
+
+        /// <summary>
+        /// Fonction qui récupére les urls dans les navigateurs sélénium
+        /// </summary>
+        public void GetUrls()
+        {
+            try
+            {
+                if (chromedriver != null)
+                {
+                    Client.Urls.AddUrl(new Url(DateTime.Now, "seleniumchrome", chromedriver.Url));
+                    bool navigateback = true;
+                    foreach (string url in Client.AutorisedUrls)
+                    {
+                        if (chromedriver.Url.Contains(url)) { navigateback = false; }
+
+                    }
+                    if (navigateback) { chromedriver.Navigate().Back(); }
+                }
+            }
+            catch { chromedriver.Dispose(); }
+            try
+            {
+                if (firefoxdriver != null)
+                {
+                
+                    Client.Urls.AddUrl(new Url(DateTime.Now, "seleniumfirefox", firefoxdriver.Url));
+                    bool navigateback = true;
+                    foreach (string url in Client.AutorisedUrls)
+                    {
+                        if (firefoxdriver.Url.Contains(url)) { navigateback = false; }
+
+                    }
+                    if (navigateback) {
+                        string url = firefoxdriver.Url;
+                        firefoxdriver.Navigate().Back();
+                    }
+                }
+            }
+            catch { firefoxdriver.Dispose(); }
         }
 
         /// <summary>
@@ -165,7 +242,10 @@ namespace ApplicationCliente
                 try {
                     Client.SocketToTeacher.Send(Encoding.ASCII.GetBytes("stop"));
                     Client.SocketToTeacher.Disconnect(false);
-                    Client.SocketToTeacher = null;}
+                    Client.SocketToTeacher = null;
+                    firefoxdriver.Dispose();
+                    chromedriver.Dispose();
+                }
                 catch { }
             }
         }

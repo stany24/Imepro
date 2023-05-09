@@ -371,6 +371,8 @@ namespace ApplicationTeacher
                 //Mise à jour des urls
                 UpdateUrlsTree(nodeNavigateurs, student.Urls.chrome, "chrome","Chrome");
                 UpdateUrlsTree(nodeNavigateurs, student.Urls.firefox, "firefox","Firefox");
+                UpdateUrlsTree(nodeNavigateurs, student.Urls.seleniumchrome, "seleniumchrome", "Selenium Chrome");
+                UpdateUrlsTree(nodeNavigateurs, student.Urls.seleniumfirefox, "seleniumfirefox", "Selenium Firefox");
                 UpdateUrlsTree(nodeNavigateurs, student.Urls.edge, "msedge", "Edge");
                 UpdateUrlsTree(nodeNavigateurs, student.Urls.opera, "opera", "Opera");
                 UpdateUrlsTree(nodeNavigateurs, student.Urls.iexplorer, "iexplorer", "Internet Explorer");
@@ -402,7 +404,7 @@ namespace ApplicationTeacher
             if(urls.Count == 0) { try { NodeAllNavigateur.Nodes.Find(ProcessName, false)[0].Remove(); } catch { }; return; }
             TreeViewDetails.Invoke(new MethodInvoker(delegate {
                 TreeNode[] nodeNavigateur = NodeAllNavigateur.Nodes.Find(ProcessName, false);
-                if (nodeNavigateur.Count() == 0 ) {NodeAllNavigateur.Nodes.Add(DisplayName,ProcessName);}
+                if (nodeNavigateur.Count() == 0 ) {NodeAllNavigateur.Nodes.Add(ProcessName,DisplayName);}
                 TreeNode NodeBrowser = NodeAllNavigateur.Nodes.Find(ProcessName, false)[0]; ;
                 for (int i = NodeAllNavigateur.Nodes.Find(ProcessName, false)[0].Nodes.Count; i < urls.Count; i++)
                 {

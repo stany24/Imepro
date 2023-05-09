@@ -43,6 +43,35 @@ namespace LibraryData
         public Data() { }
     }
 
+    public class StreamOptions
+    {
+        public Priority priority;
+        public Focus focus;
+        public StreamOptions(Priority priority, Focus focus)
+        {
+            this.priority = priority;
+            this.focus = focus;
+        }
+    }
+
+    public enum Priority
+    {
+        Widowed,
+        Fullscreen,
+        Topmost,
+        Blocking
+    }
+
+    public enum Focus
+    {
+        Everything,
+        Nothing,
+        OneNote,
+        VisualStudio,
+        VSCode,
+        Word,
+    }
+
     public class DataForTeacher : Data
     {
         public Socket SocketToStudent;
@@ -72,6 +101,7 @@ namespace LibraryData
 
     public class DataForStudent : Data
     {
+        StreamOptions options;
         public Socket SocketToTeacher;
         public List<string> DefaultProcess = new();
         readonly private ListBox lbxConnexion;
@@ -79,11 +109,12 @@ namespace LibraryData
         readonly private PictureBox pbxScreeShot;
         readonly private IPAddress IpToTeacher;
         readonly private ListBox tbxMessage;
+        readonly private Form form;
         public List<Message> Messages = new();
         public List<string> AutorisedUrls = new();
         readonly public List<string> browsersList = new() { "chrome", "firefox", "iexplore", "safari", "opera", "msedge" };
 
-        public DataForStudent(ListBox lbxconnexion,PictureBox pbxscreenshot, ListBox tbxmessage ,IPAddress ipToTeacher,ListBox lbxwebsite)
+        public DataForStudent(ListBox lbxconnexion,PictureBox pbxscreenshot, ListBox tbxmessage ,IPAddress ipToTeacher,ListBox lbxwebsite, Form form)
         {
             lbxAutorisedWebSite = lbxwebsite;
             lbxConnexion = lbxconnexion;
@@ -319,6 +350,31 @@ namespace LibraryData
             }
         }
 
+        public void ApplyMulticastSettings()
+        {
+            byte[] message = new byte[128];
+            int size = SocketToTeacher.Receive(message);
+            Array.Resize(ref message, size);
+            options = JsonSerializer.Deserialize<StreamOptions>(Encoding.Default.GetString(message));
+            pbxScreeShot.Dock = DockStyle.Fill;
+            form.Controls.SetChildIndex(pbxScreeShot, 0);
+            switch (options.priority)
+            {
+                case Priority.Fullscreen:
+                    form.WindowState = FormWindowState.Maximized;
+                    break;
+                case Priority.Blocking:
+                    form.WindowState = FormWindowState.Maximized;
+                    break;
+                case Priority.Topmost:
+                    form.WindowState = FormWindowState.Maximized;
+                    break;
+                case Priority.Widowed:
+                    form.Controls.SetChildIndex(pbxScreeShot, 0);
+                    break;
+            }
+        }
+
         /// <summary>
         /// Fonction qui recoit la liste des urls autorisés
         /// </summary>
@@ -408,6 +464,10 @@ namespace LibraryData
         [JsonInclude]
         public List<Url> firefox = new();
         [JsonInclude]
+        public List<Url> seleniumchrome = new();
+        [JsonInclude]
+        public List<Url> seleniumfirefox = new();
+        [JsonInclude]
         public List<Url> opera = new();
         [JsonInclude]
         public List<Url> edge = new();
@@ -425,6 +485,12 @@ namespace LibraryData
                 case "chrome": VerifyUrl(chrome, url);
                     break;
                 case "firefox":VerifyUrl(firefox, url);
+                    break;
+                case "seleniumchrome":
+                    VerifyUrl(seleniumchrome, url);
+                    break;
+                case "seleniumfirefox":
+                    VerifyUrl(seleniumfirefox, url);
                     break;
                 case "opera":VerifyUrl(opera, url);
                     break;

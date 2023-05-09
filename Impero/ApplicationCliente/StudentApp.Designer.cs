@@ -40,6 +40,8 @@
             this.lbxMessages = new System.Windows.Forms.ListBox();
             this.webView = new Microsoft.Web.WebView2.WinForms.WebView2();
             this.lbxAutorisedWebSite = new System.Windows.Forms.ListBox();
+            this.btnFirefox = new System.Windows.Forms.Button();
+            this.btnChrome = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.pbxScreeShot)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.webView)).BeginInit();
             this.SuspendLayout();
@@ -49,7 +51,7 @@
             this.pbxScreeShot.Location = new System.Drawing.Point(12, 152);
             this.pbxScreeShot.Name = "pbxScreeShot";
             this.pbxScreeShot.Size = new System.Drawing.Size(420, 306);
-            this.pbxScreeShot.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.pbxScreeShot.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.pbxScreeShot.TabIndex = 4;
             this.pbxScreeShot.TabStop = false;
             // 
@@ -133,11 +135,33 @@
             this.lbxAutorisedWebSite.TabIndex = 11;
             this.lbxAutorisedWebSite.SelectedIndexChanged += new System.EventHandler(this.ChangeWebSite);
             // 
+            // btnFirefox
+            // 
+            this.btnFirefox.Location = new System.Drawing.Point(1206, 494);
+            this.btnFirefox.Name = "btnFirefox";
+            this.btnFirefox.Size = new System.Drawing.Size(75, 23);
+            this.btnFirefox.TabIndex = 12;
+            this.btnFirefox.Text = "Firefox";
+            this.btnFirefox.UseVisualStyleBackColor = true;
+            this.btnFirefox.Click += new System.EventHandler(this.NewFirefox);
+            // 
+            // btnChrome
+            // 
+            this.btnChrome.Location = new System.Drawing.Point(1287, 494);
+            this.btnChrome.Name = "btnChrome";
+            this.btnChrome.Size = new System.Drawing.Size(75, 23);
+            this.btnChrome.TabIndex = 13;
+            this.btnChrome.Text = "Chrome";
+            this.btnChrome.UseVisualStyleBackColor = true;
+            this.btnChrome.Click += new System.EventHandler(this.NewChrome);
+            // 
             // StudentApp
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1474, 711);
+            this.Controls.Add(this.btnChrome);
+            this.Controls.Add(this.btnFirefox);
             this.Controls.Add(this.lbxAutorisedWebSite);
             this.Controls.Add(this.webView);
             this.Controls.Add(this.lbxMessages);
@@ -168,6 +192,8 @@
         private System.Windows.Forms.ListBox lbxMessages;
         private Microsoft.Web.WebView2.WinForms.WebView2 webView;
         private System.Windows.Forms.ListBox lbxAutorisedWebSite;
+        private System.Windows.Forms.Button btnFirefox;
+        private System.Windows.Forms.Button btnChrome;
     }
 }
 
