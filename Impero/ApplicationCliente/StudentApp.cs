@@ -196,12 +196,22 @@ namespace ApplicationCliente
             this.WindowState = FormWindowState.Normal;
         }
 
+        /// <summary>
+        /// Fonction qui ajoute le nouvelle url à la liste des urls visités
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void webView_SourceChanged(object sender, CoreWebView2SourceChangedEventArgs e)
         {
             WebView2 web = (WebView2)sender;
             Client.Urls.AddUrl(new Url(DateTime.Now,"custom",web.Source.AbsoluteUri));
         }
 
+        /// <summary>
+        /// Fonction qui vérife qui le nouvelle url est dans la liste des urls autorisé
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void ChangingUrl(object sender, CoreWebView2NavigationStartingEventArgs e)
         {
             bool notOk = true;
@@ -212,6 +222,11 @@ namespace ApplicationCliente
             e.Cancel = notOk;
         }
 
+        /// <summary>
+        /// Fonction qui change l'url à l'objet cliqué dans la listbox
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void ChangeWebSite(object sender, EventArgs e)
         {
             ListBox listbox = (ListBox)sender;

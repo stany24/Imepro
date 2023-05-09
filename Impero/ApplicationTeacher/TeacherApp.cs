@@ -36,6 +36,9 @@ namespace ApplicationTeacher
             Task.Run(LogClients);
         }
 
+        /// <summary>
+        /// Fonction qui charge toutes les fichier de configuration
+        /// </summary>
         public void LoadConfigurationLists()
         {
             try
@@ -80,6 +83,9 @@ namespace ApplicationTeacher
             }
         }
 
+        /// <summary>
+        /// Fonction qui sauvegarde toutes les configuration dans des fichiers
+        /// </summary>
         public void SaveConfigurationLists()
         {
             using StreamWriter writeFichierProcesusIgnore = new(Configuration.pathToSaveFolder + Configuration.FileNameIgnoredProcesses);
@@ -157,6 +163,10 @@ namespace ApplicationTeacher
             }
         }
 
+        /// <summary>
+        /// Fonction qui envoye les url autorisé a un client.
+        /// </summary>
+        /// <param name="socket"></param>
         public void SendAutorisedUrl(Socket socket)
         {
             while (isAsking) {Thread.Sleep(100);}
@@ -575,6 +585,11 @@ namespace ApplicationTeacher
             Displayer.ChangeZoom();
         }
 
+        /// <summary>
+        /// Fonction qui vérifie que la node cliquée est bien un ordinateur puis crée un affichage individuel
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void TreeViewDoubleClick(object sender, TreeNodeMouseClickEventArgs e)
         {
             //vérification que la node est un ordinateur
@@ -615,12 +630,22 @@ namespace ApplicationTeacher
             AllStudentsDisplay.Remove(closingDisplay);
         }
 
-        private void panelMiniatures_Resize(object sender, EventArgs e)
+        /// <summary>
+        /// Fonction qui met à jour les miniatures lorsque le panel est redimensionné
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void PanelMiniatures_Resize(object sender, EventArgs e)
         {
             Displayer.UpdateAllLocations(panelMiniatures.Width);
         }
 
-        private void btnFilter_Click(object sender, EventArgs e)
+        /// <summary>
+        /// Fonction qui active ou désactive les filtres
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ButtonFilter_Click(object sender, EventArgs e)
         {
             FilterEnabled = !FilterEnabled;
             if(FilterEnabled)
@@ -638,9 +663,12 @@ namespace ApplicationTeacher
                     RemoveFilter(node);
                 }
             }
-            
         }
 
+        /// <summary>
+        /// Fonction qui retire la couleur de fond de toutes les TreeNode
+        /// </summary>
+        /// <param name="node"></param>
         void RemoveFilter(TreeNode node)
         {
             node.BackColor= Color.White;

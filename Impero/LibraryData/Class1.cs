@@ -90,12 +90,19 @@ namespace LibraryData
             Task.Run(GetAllTabNameEvery5Seconds);
         }
 
+        /// <summary>
+        /// Fonction qui permet de trouver le nom d'utilisateur et le nom de la machine
+        /// </summary>
         public void GetNames()
         {
             ComputerName = Environment.MachineName;
             UserName = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
         }
 
+        /// <summary>
+        /// Fonction qui retourne un instance de la classe parente
+        /// </summary>
+        /// <returns></returns>
         public Data ToData()
         {
             return new Data(UserName, ComputerName, Urls, Processes);
@@ -307,6 +314,9 @@ namespace LibraryData
             }
         }
 
+        /// <summary>
+        /// Fonction qui recoit la liste des urls autorisés
+        /// </summary>
         public void ReceiveAuthorisedUrls()
         {
             byte[] bytemessage = new byte[102400];
@@ -319,6 +329,9 @@ namespace LibraryData
             }));
         }
 
+        /// <summary>
+        /// Fonction qui recoit un message du professeur
+        /// </summary>
         public void ReceiveMessage()
         {
             byte[] bytemessage = new byte[1024];

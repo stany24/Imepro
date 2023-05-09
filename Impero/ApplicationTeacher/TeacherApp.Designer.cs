@@ -160,7 +160,7 @@
             this.panelMiniatures.Name = "panelMiniatures";
             this.panelMiniatures.Size = new System.Drawing.Size(1500, 900);
             this.panelMiniatures.TabIndex = 13;
-            this.panelMiniatures.Resize += new System.EventHandler(this.panelMiniatures_Resize);
+            this.panelMiniatures.Resize += new System.EventHandler(this.PanelMiniatures_Resize);
             // 
             // SplitterPrincipal
             // 
@@ -262,7 +262,7 @@
             this.btnFilter.TabIndex = 13;
             this.btnFilter.Text = "Désactiver";
             this.btnFilter.UseVisualStyleBackColor = true;
-            this.btnFilter.Click += new System.EventHandler(this.btnFilter_Click);
+            this.btnFilter.Click += new System.EventHandler(this.ButtonFilter_Click);
             // 
             // TeacherApp
             // 
