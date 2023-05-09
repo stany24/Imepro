@@ -17,6 +17,7 @@ namespace ApplicationTeacher
 {
     public partial class TeacherApp : Form
     {
+        bool FilterEnabled = true;
         readonly MiniatureDisplayer Displayer;
         readonly List<DataForTeacher> AllStudents = new();
         readonly List<DisplayStudent> AllStudentsDisplay = new();
@@ -343,28 +344,28 @@ namespace ApplicationTeacher
                 nodeProcess.Nodes.Clear();
                 foreach(KeyValuePair<int,string> process in student.Processes) {
                     TreeNode current = nodeProcess.Nodes.Add(process.Value);
-                    if(Configuration.AlertedProcesses.Find(x => x == process.Value) != null)
+                    if (FilterEnabled)
                     {
-                        current.BackColor = Color.Red;
-                        while(current.Parent != null)
+                        if (Configuration.AlertedProcesses.Find(x => x == process.Value) != null)
                         {
-                            current = current.Parent;
                             current.BackColor = Color.Red;
+                            while (current.Parent != null)
+                            {
+                                current = current.Parent;
+                                current.BackColor = Color.Red;
+                            }
                         }
                     }
                     else{if(Configuration.IgnoredProcesses.Find(x => x == process.Value) != null){current.BackColor = Color.Yellow;/*current.Remove();*/ }}
                 }
                 //Mise à jour des urls
-                bool isAnyAlerted = false;
-                isAnyAlerted |= UpdateUrlsTree(nodeNavigateurs, student.Urls.chrome, "chrome","Chrome");
-                isAnyAlerted |= UpdateUrlsTree(nodeNavigateurs, student.Urls.firefox, "firefox","Firefox");
-                isAnyAlerted |= UpdateUrlsTree(nodeNavigateurs, student.Urls.edge, "msedge", "Edge");
-                isAnyAlerted |= UpdateUrlsTree(nodeNavigateurs, student.Urls.opera, "opera", "Opera");
-                isAnyAlerted |= UpdateUrlsTree(nodeNavigateurs, student.Urls.iexplorer, "iexplorer", "Internet Explorer");
-                isAnyAlerted |= UpdateUrlsTree(nodeNavigateurs, student.Urls.safari, "safari", "Safari");
-                isAnyAlerted |= UpdateUrlsTree(nodeNavigateurs, student.Urls.custom, "custom", "Custom");
-                if (isAnyAlerted) { nodeNavigateurs.BackColor = Color.Red; }
-                else { nodeNavigateurs.BackColor = Color.White; }
+                UpdateUrlsTree(nodeNavigateurs, student.Urls.chrome, "chrome","Chrome");
+                UpdateUrlsTree(nodeNavigateurs, student.Urls.firefox, "firefox","Firefox");
+                UpdateUrlsTree(nodeNavigateurs, student.Urls.edge, "msedge", "Edge");
+                UpdateUrlsTree(nodeNavigateurs, student.Urls.opera, "opera", "Opera");
+                UpdateUrlsTree(nodeNavigateurs, student.Urls.iexplorer, "iexplorer", "Internet Explorer");
+                UpdateUrlsTree(nodeNavigateurs, student.Urls.safari, "safari", "Safari");
+                UpdateUrlsTree(nodeNavigateurs, student.Urls.custom, "custom", "Custom");
             }));
             // Mise à jour du TreeView pour la sélection
             TreeViewSelect.Invoke(new MethodInvoker(delegate {
@@ -387,32 +388,37 @@ namespace ApplicationTeacher
         /// <param name="ProcessName">Nom du processus pour ce navigateur</param>
         /// <param name="DisplayName">Nom d'affichage pour ce navigateur</param>
         /// <returns></returns>
-        public bool UpdateUrlsTree(TreeNode NodeAllNavigateur, List<Url> urls, string ProcessName, string DisplayName) {
-            if(urls.Count == 0) { try { NodeAllNavigateur.Nodes.Find(ProcessName, false)[0].Remove(); } catch { }; return false; }
-            bool isAlerted = false;
+        public void UpdateUrlsTree(TreeNode NodeAllNavigateur, List<Url> urls, string ProcessName, string DisplayName) {
+            if(urls.Count == 0) { try { NodeAllNavigateur.Nodes.Find(ProcessName, false)[0].Remove(); } catch { }; return; }
             TreeViewDetails.Invoke(new MethodInvoker(delegate {
                 TreeNode[] nodeNavigateur = NodeAllNavigateur.Nodes.Find(ProcessName, false);
                 if (nodeNavigateur.Count() == 0 ) {NodeAllNavigateur.Nodes.Add(DisplayName,ProcessName);}
+                TreeNode NodeBrowser = NodeAllNavigateur.Nodes.Find(ProcessName, false)[0]; ;
                 for (int i = NodeAllNavigateur.Nodes.Find(ProcessName, false)[0].Nodes.Count; i < urls.Count; i++)
                 {
-                    TreeNode NodeBrowser = NodeAllNavigateur.Nodes.Find(ProcessName, false)[0];
                     TreeNode NodeUrl = NodeBrowser.Nodes.Add(urls[i].ToString());
-                    for (int j = 0; j < Configuration.AlertedUrls.Count; j++)
+                }
+                if (FilterEnabled)
+                {
+                    for (int i = 0; i < NodeBrowser.Nodes.Count; i++)
                     {
-                        if (urls[i].Name.ToLower().Contains(Configuration.AlertedUrls[j])){
-                            NodeUrl.BackColor = Color.Red;
-                            NodeBrowser.BackColor = Color.Red;
-                            isAlerted = true;
+                        for (int j = 0; j < Configuration.AlertedUrls.Count; j++)
+                        {
+                            if (NodeBrowser.Nodes[i].Text.ToLower().Contains(Configuration.AlertedUrls[j]))
+                            {
+                                TreeNode NodeUrl = NodeBrowser.Nodes[i];
+                                NodeUrl.BackColor = Color.Red;
+                                while (NodeUrl.Parent != null)
+                                {
+                                    NodeUrl = NodeUrl.Parent;
+                                    NodeUrl.BackColor = Color.Red;
+                                }
+                            }
                         }
                     }
-                    if (isAlerted == false)
-                    {
-                        NodeUrl.BackColor = Color.White;
-                        NodeBrowser.BackColor = Color.White;
-                    }
+
                 }
             }));
-            return isAlerted;
         }
 
         /// <summary>
@@ -612,6 +618,36 @@ namespace ApplicationTeacher
         private void panelMiniatures_Resize(object sender, EventArgs e)
         {
             Displayer.UpdateAllLocations(panelMiniatures.Width);
+        }
+
+        private void btnFilter_Click(object sender, EventArgs e)
+        {
+            FilterEnabled = !FilterEnabled;
+            if(FilterEnabled)
+            {
+                btnFilter.Text = "Désactiver";
+                foreach(DataForTeacher student in AllStudents)
+                {
+                    UpdateTreeViews(student);
+                }
+            }
+            else {
+                btnFilter.Text = "Activer";
+                foreach (TreeNode node in TreeViewDetails.Nodes)
+                {
+                    RemoveFilter(node);
+                }
+            }
+            
+        }
+
+        void RemoveFilter(TreeNode node)
+        {
+            node.BackColor= Color.White;
+            foreach (TreeNode subnode in node.Nodes)
+            {
+                RemoveFilter(subnode);
+            }
         }
     }
 }

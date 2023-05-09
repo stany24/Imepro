@@ -45,6 +45,7 @@
             this.SplitterTree = new System.Windows.Forms.SplitContainer();
             this.SplitterImageLog = new System.Windows.Forms.SplitContainer();
             this.SplitterConnexionRequetes = new System.Windows.Forms.SplitContainer();
+            this.btnFilter = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.Slider)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.SplitterPrincipal)).BeginInit();
             this.SplitterPrincipal.Panel1.SuspendLayout();
@@ -106,7 +107,7 @@
             // lblIP
             // 
             this.lblIP.AutoSize = true;
-            this.lblIP.Location = new System.Drawing.Point(162, 7);
+            this.lblIP.Location = new System.Drawing.Point(12, 62);
             this.lblIP.Name = "lblIP";
             this.lblIP.Size = new System.Drawing.Size(20, 13);
             this.lblIP.TabIndex = 10;
@@ -138,7 +139,7 @@
             this.TreeViewDetails.Dock = System.Windows.Forms.DockStyle.Fill;
             this.TreeViewDetails.Location = new System.Drawing.Point(0, 0);
             this.TreeViewDetails.Name = "TreeViewDetails";
-            this.TreeViewDetails.Size = new System.Drawing.Size(280, 442);
+            this.TreeViewDetails.Size = new System.Drawing.Size(280, 427);
             this.TreeViewDetails.TabIndex = 12;
             // 
             // TreeViewSelect
@@ -147,7 +148,7 @@
             this.TreeViewSelect.Dock = System.Windows.Forms.DockStyle.Fill;
             this.TreeViewSelect.Location = new System.Drawing.Point(0, 0);
             this.TreeViewSelect.Name = "TreeViewSelect";
-            this.TreeViewSelect.Size = new System.Drawing.Size(280, 441);
+            this.TreeViewSelect.Size = new System.Drawing.Size(280, 426);
             this.TreeViewSelect.TabIndex = 0;
             this.TreeViewSelect.AfterCheck += new System.Windows.Forms.TreeViewEventHandler(this.TreeNodeChecked);
             this.TreeViewSelect.NodeMouseDoubleClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.TreeViewDoubleClick);
@@ -187,6 +188,7 @@
             // 
             // SplitterInfoTree.Panel1
             // 
+            this.SplitterInfoTree.Panel1.Controls.Add(this.btnFilter);
             this.SplitterInfoTree.Panel1.Controls.Add(this.btnShare);
             this.SplitterInfoTree.Panel1.Controls.Add(this.btnDisconnect);
             this.SplitterInfoTree.Panel1.Controls.Add(this.lblIP);
@@ -196,7 +198,7 @@
             // 
             this.SplitterInfoTree.Panel2.Controls.Add(this.SplitterTree);
             this.SplitterInfoTree.Size = new System.Drawing.Size(280, 961);
-            this.SplitterInfoTree.SplitterDistance = 70;
+            this.SplitterInfoTree.SplitterDistance = 100;
             this.SplitterInfoTree.TabIndex = 14;
             // 
             // SplitterTree
@@ -213,8 +215,8 @@
             // SplitterTree.Panel2
             // 
             this.SplitterTree.Panel2.Controls.Add(this.TreeViewSelect);
-            this.SplitterTree.Size = new System.Drawing.Size(280, 887);
-            this.SplitterTree.SplitterDistance = 442;
+            this.SplitterTree.Size = new System.Drawing.Size(280, 857);
+            this.SplitterTree.SplitterDistance = 427;
             this.SplitterTree.TabIndex = 13;
             // 
             // SplitterImageLog
@@ -251,6 +253,16 @@
             this.SplitterConnexionRequetes.Size = new System.Drawing.Size(1500, 57);
             this.SplitterConnexionRequetes.SplitterDistance = 500;
             this.SplitterConnexionRequetes.TabIndex = 6;
+            // 
+            // btnFilter
+            // 
+            this.btnFilter.Location = new System.Drawing.Point(162, 3);
+            this.btnFilter.Name = "btnFilter";
+            this.btnFilter.Size = new System.Drawing.Size(68, 21);
+            this.btnFilter.TabIndex = 13;
+            this.btnFilter.Text = "Désactiver";
+            this.btnFilter.UseVisualStyleBackColor = true;
+            this.btnFilter.Click += new System.EventHandler(this.btnFilter_Click);
             // 
             // TeacherApp
             // 
@@ -305,6 +317,7 @@
         private System.Windows.Forms.SplitContainer SplitterConnexionRequetes;
         private System.Windows.Forms.SplitContainer SplitterTree;
         private System.Windows.Forms.SplitContainer SplitterInfoTree;
+        private System.Windows.Forms.Button btnFilter;
     }
 }
 
