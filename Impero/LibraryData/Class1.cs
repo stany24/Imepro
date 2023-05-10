@@ -98,11 +98,11 @@ namespace LibraryData
 
         public override string ToString()
         {
-            return UserName +" "+ ComputerName;
+            return UserName + " " + ComputerName;
         }
     }
 
-    public class DataForStudent : Data,IMessageFilter
+    public class DataForStudent : Data, IMessageFilter
     {
         Rectangle OldRect = Rectangle.Empty;
         StreamOptions options;
@@ -110,7 +110,6 @@ namespace LibraryData
         public Socket SocketToTeacher;
         public List<string> DefaultProcess = new();
         readonly private ListBox lbxConnexion;
-        readonly private ListBox lbxAutorisedWebSite;
         readonly private PictureBox pbxScreeShot;
         readonly private IPAddress IpToTeacher;
         readonly private ListBox tbxMessage;
@@ -119,7 +118,7 @@ namespace LibraryData
         public List<string> AutorisedUrls = new();
         readonly public List<string> browsersList = new() { "chrome", "firefox", "iexplore", "safari", "opera", "msedge" };
 
-        public DataForStudent(ListBox lbxconnexion,PictureBox pbxscreenshot, ListBox tbxmessage ,IPAddress ipToTeacher, Form form)
+        public DataForStudent(ListBox lbxconnexion, PictureBox pbxscreenshot, ListBox tbxmessage, IPAddress ipToTeacher, Form form)
         {
             lbxConnexion = lbxconnexion;
             pbxScreeShot = pbxscreenshot;
@@ -180,7 +179,8 @@ namespace LibraryData
 
                         StringBuilder text = new(GetWindowTextLength(hWnd) + 1);
                         _ = GetWindowText(hWnd, text, text.Capacity);
-                        if (text.ToString() != "") {
+                        if (text.ToString() != "")
+                        {
                             Urls.AddUrl(new Url(DateTime.Now, singleBrowser, text.ToString()));
                         }
                     }
@@ -342,9 +342,9 @@ namespace LibraryData
                     case "image": SendImage(); break;
                     //case "kill": KillSelectedProcess(Convert.ToInt32(text.Split(' ')[1])); break;
                     case "receive": Task.Run(ReceiveMulticastStream); break;
-                    case "message":ReceiveMessage(); break;
-                    case "url":ReceiveAuthorisedUrls(); break;
-                    case "apply":ApplyMulticastSettings(); break;
+                    case "message": ReceiveMessage(); break;
+                    case "url": ReceiveAuthorisedUrls(); break;
+                    case "apply": ApplyMulticastSettings(); break;
                     case "stop":
                         mouseDisabled = false;
                         pbxScreeShot.Visible = false;
@@ -367,7 +367,8 @@ namespace LibraryData
             Array.Resize(ref message, size);
             options = JsonSerializer.Deserialize<StreamOptions>(Encoding.Default.GetString(message));
             pbxScreeShot.Invoke(new MethodInvoker(delegate { pbxScreeShot.Dock = DockStyle.Fill; }));
-            form.Invoke(new MethodInvoker(delegate {
+            form.Invoke(new MethodInvoker(delegate
+            {
                 form.Controls.SetChildIndex(pbxScreeShot, 0);
                 switch (options.priority)
                 {
@@ -439,7 +440,7 @@ namespace LibraryData
             byte[] bytemessage = new byte[1024];
             int nbData = SocketToTeacher.Receive(bytemessage);
             Array.Resize(ref bytemessage, nbData);
-            tbxMessage.Invoke(new MethodInvoker(delegate { tbxMessage.Items.Add(DateTime.Now.ToString("hh:mm ")+Encoding.Default.GetString(bytemessage)); }));
+            tbxMessage.Invoke(new MethodInvoker(delegate { tbxMessage.Items.Add(DateTime.Now.ToString("hh:mm ") + Encoding.Default.GetString(bytemessage)); }));
         }
 
         /// <summary>
@@ -523,9 +524,11 @@ namespace LibraryData
         {
             switch (url.Browser)
             {
-                case "chrome": VerifyUrl(chrome, url);
+                case "chrome":
+                    VerifyUrl(chrome, url);
                     break;
-                case "firefox":VerifyUrl(firefox, url);
+                case "firefox":
+                    VerifyUrl(firefox, url);
                     break;
                 case "seleniumchrome":
                     VerifyUrl(seleniumchrome, url);
@@ -533,23 +536,28 @@ namespace LibraryData
                 case "seleniumfirefox":
                     VerifyUrl(seleniumfirefox, url);
                     break;
-                case "opera":VerifyUrl(opera, url);
+                case "opera":
+                    VerifyUrl(opera, url);
                     break;
-                case "msedge":VerifyUrl(edge, url);
+                case "msedge":
+                    VerifyUrl(edge, url);
                     break;
-                case "safari":VerifyUrl(safari, url);
+                case "safari":
+                    VerifyUrl(safari, url);
                     break;
-                case "iexplorer":VerifyUrl(iexplorer, url);
+                case "iexplorer":
+                    VerifyUrl(iexplorer, url);
                     break;
-                case "custom":VerifyUrl(custom, url);
+                case "custom":
+                    VerifyUrl(custom, url);
                     break;
-                default:break;
+                default: break;
             }
         }
         public void VerifyUrl(List<Url> list, Url url)
         {
-            if(list.Count == 0) { list.Add(url);return; }
-            if(list.Last().Name != url.Name) { list.Add(url); return; }
+            if (list.Count == 0) { list.Add(url); return; }
+            if (list.Last().Name != url.Name) { list.Add(url); return; }
         }
     }
 
@@ -563,7 +571,7 @@ namespace LibraryData
         [JsonInclude]
         readonly public string Name;
 
-        public Url(DateTime capturetime, string browser,string name)
+        public Url(DateTime capturetime, string browser, string name)
         {
             CaptureTime = capturetime;
             Browser = browser;
@@ -571,7 +579,7 @@ namespace LibraryData
         }
         public override string ToString()
         {
-            return CaptureTime.ToString("HH:mm:ss") +" " +Name ;
+            return CaptureTime.ToString("HH:mm:ss") + " " + Name;
         }
     }
 
@@ -595,13 +603,13 @@ namespace LibraryData
 
         public IpForTheWeek(IpForTheWeek copy)
         {
-            lundi= copy.lundi;
-            mardi= copy.mardi;
-            mercredi= copy.mercredi;
-            jeudi= copy.jeudi;
-            vendredi= copy.vendredi;
-            samedi= copy.samedi;
-            dimanche= copy.dimanche;
+            lundi = copy.lundi;
+            mardi = copy.mardi;
+            mercredi = copy.mercredi;
+            jeudi = copy.jeudi;
+            vendredi = copy.vendredi;
+            samedi = copy.samedi;
+            dimanche = copy.dimanche;
         }
 
         /// <summary>
@@ -610,7 +618,7 @@ namespace LibraryData
         /// <param name="ip"></param>
         public void SetIp(string ip)
         {
-            try{IPAddress.Parse(ip);}
+            try { IPAddress.Parse(ip); }
             catch { return; }
 
             DayOfWeek day = DateTime.Now.DayOfWeek;
