@@ -12,6 +12,7 @@ using System.IO;
 using System.Text.Json;
 using System.Drawing.Imaging;
 using System.Linq;
+using System.Text.Json.Serialization;
 
 namespace ApplicationTeacher
 {
@@ -22,6 +23,7 @@ namespace ApplicationTeacher
         readonly List<DataForTeacher> AllStudents = new();
         readonly List<DisplayStudent> AllStudentsDisplay = new();
         Task ScreenSharer;
+        bool isSharing = false;
         bool isAsking = false;
         int NextId = 0;
         IPAddress ipAddr = null;
@@ -479,7 +481,7 @@ namespace ApplicationTeacher
             s.Connect(ipep);
             Random random= new();
 
-            for (int i = 0; i > -1; i++)
+            while (isSharing)
             {
                 byte[] message = new byte[65000];
                 Screen screen = Screen.AllScreens[1];
@@ -495,7 +497,6 @@ namespace ApplicationTeacher
                         Array.Copy(imageArray, j *65000 , message, 0, imageArray.Length % 65000);
                         Array.Resize(ref message, imageArray.Length % 65000);
                     }
-                    if (i % 100 == 0) { lbxConnexion.Invoke(new MethodInvoker(delegate { lbxConnexion.Items.Add(i); })); }
                     s.Send(message, message.Length, SocketFlags.None);
                 }
             }
@@ -515,6 +516,8 @@ namespace ApplicationTeacher
                 {
                     if (Configuration.StudentToShareScreen.Count != 0)
                     {
+                        isSharing= true;
+                        SendStreamConfiguration();
                         ScreenSharer = Task.Run(RecordAndStreamScreen);
                         btnShare.Text = "Stop Sharing";
                     }
@@ -522,8 +525,28 @@ namespace ApplicationTeacher
             }
             else
             {
-                ScreenSharer.Dispose();
+                isSharing = false;
+                foreach(DataForTeacher student in Configuration.StudentToShareScreen)
+                {
+                    student.SocketToStudent.Send(Encoding.Default.GetBytes("stop"));
+                }
                 btnShare.Text = "Share screen";
+                ScreenSharer.Wait();
+                ScreenSharer.Dispose();
+            }
+        }
+
+        private void SendStreamConfiguration()
+        {
+            byte[] bytes = Encoding.Default.GetBytes(JsonSerializer.Serialize(Configuration.streamoptions));
+            foreach(DataForTeacher student in Configuration.StudentToShareScreen)
+            {
+                student.SocketToStudent.Send(Encoding.Default.GetBytes("apply"));
+            }
+            Thread.Sleep(100);
+            foreach (DataForTeacher student in Configuration.StudentToShareScreen)
+            {
+                student.SocketToStudent.Send(bytes);
             }
         }
 
@@ -562,7 +585,7 @@ namespace ApplicationTeacher
         {
             foreach (DataForTeacher student in AllStudents)
             {
-                try { student.SocketToStudent.Send(Encoding.ASCII.GetBytes("stop")); } catch { }
+                try { student.SocketToStudent.Send(Encoding.ASCII.GetBytes("shutdown")); } catch { }
                 student.SocketToStudent.Dispose();
                 //student.SocketToStudent.Disconnect(false);
             }

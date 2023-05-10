@@ -16,6 +16,7 @@ namespace ApplicationTeacher
         public static List<string> AlertedUrls = new();
         public static List<string> AutorisedWebsite = new();
         public static List<DataForTeacher> StudentToShareScreen = new();
+        public static StreamOptions streamoptions;
         public static string pathToSaveFolder = "C:\\Users\\gouvernonst\\Downloads\\";
         public static string FileNameIgnoredProcesses = "ProcessusIgnore.txt";
         public static string FileNameAlertedProcesses = "ProcessusAlerté.txt";

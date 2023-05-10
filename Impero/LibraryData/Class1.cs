@@ -43,9 +43,12 @@ namespace LibraryData
         public Data() { }
     }
 
+    [Serializable]
     public class StreamOptions
     {
+        [JsonInclude]
         public Priority priority;
+        [JsonInclude]
         public Focus focus;
         public StreamOptions(Priority priority, Focus focus)
         {
@@ -99,9 +102,11 @@ namespace LibraryData
         }
     }
 
-    public class DataForStudent : Data
+    public class DataForStudent : Data,IMessageFilter
     {
+        Rectangle OldRect = Rectangle.Empty;
         StreamOptions options;
+        bool mouseDisabled = false;
         public Socket SocketToTeacher;
         public List<string> DefaultProcess = new();
         readonly private ListBox lbxConnexion;
@@ -114,13 +119,13 @@ namespace LibraryData
         public List<string> AutorisedUrls = new();
         readonly public List<string> browsersList = new() { "chrome", "firefox", "iexplore", "safari", "opera", "msedge" };
 
-        public DataForStudent(ListBox lbxconnexion,PictureBox pbxscreenshot, ListBox tbxmessage ,IPAddress ipToTeacher,ListBox lbxwebsite, Form form)
+        public DataForStudent(ListBox lbxconnexion,PictureBox pbxscreenshot, ListBox tbxmessage ,IPAddress ipToTeacher, Form form)
         {
-            lbxAutorisedWebSite = lbxwebsite;
             lbxConnexion = lbxconnexion;
             pbxScreeShot = pbxscreenshot;
             tbxMessage = tbxmessage;
             IpToTeacher = ipToTeacher;
+            this.form = form;
             GetDefaultProcesses();
             GetNames();
             Task.Run(GetAllTabNameEvery5Seconds);
@@ -339,7 +344,12 @@ namespace LibraryData
                     case "receive": Task.Run(ReceiveMulticastStream); break;
                     case "message":ReceiveMessage(); break;
                     case "url":ReceiveAuthorisedUrls(); break;
+                    case "apply":ApplyMulticastSettings(); break;
                     case "stop":
+                        mouseDisabled = false;
+                        pbxScreeShot.Visible = false;
+                        break;
+                    case "shutdown":
                         SocketToTeacher.Disconnect(false);
                         SocketToTeacher = null;
                         lbxConnexion.Invoke(new MethodInvoker(delegate { lbxConnexion.Items.Add("Le professeur a coupé la connexion"); }));
@@ -356,23 +366,58 @@ namespace LibraryData
             int size = SocketToTeacher.Receive(message);
             Array.Resize(ref message, size);
             options = JsonSerializer.Deserialize<StreamOptions>(Encoding.Default.GetString(message));
-            pbxScreeShot.Dock = DockStyle.Fill;
-            form.Controls.SetChildIndex(pbxScreeShot, 0);
-            switch (options.priority)
+            pbxScreeShot.Invoke(new MethodInvoker(delegate { pbxScreeShot.Dock = DockStyle.Fill; }));
+            form.Invoke(new MethodInvoker(delegate {
+                form.Controls.SetChildIndex(pbxScreeShot, 0);
+                switch (options.priority)
+                {
+                    case Priority.Fullscreen:
+                        form.WindowState = FormWindowState.Maximized;
+                        break;
+                    case Priority.Blocking:
+                        form.WindowState = FormWindowState.Maximized;
+                        mouseDisabled = true;
+                        Task.Run(DisableMouseEverySecond);
+                        break;
+                    case Priority.Topmost:
+                        form.WindowState = FormWindowState.Maximized;
+                        break;
+                    case Priority.Widowed:
+                        form.Controls.SetChildIndex(pbxScreeShot, 0);
+                        break;
+                }
+            }));
+        }
+
+        private void DisableMouseEverySecond()
+        {
+            OldRect = Cursor.Clip;
+            while (mouseDisabled)
             {
-                case Priority.Fullscreen:
-                    form.WindowState = FormWindowState.Maximized;
-                    break;
-                case Priority.Blocking:
-                    form.WindowState = FormWindowState.Maximized;
-                    break;
-                case Priority.Topmost:
-                    form.WindowState = FormWindowState.Maximized;
-                    break;
-                case Priority.Widowed:
-                    form.Controls.SetChildIndex(pbxScreeShot, 0);
-                    break;
+                DisableMouse();
+                Thread.Sleep(1000);
             }
+            EnableMouse();
+        }
+
+        private void EnableMouse()
+        {
+            Cursor.Clip = OldRect;
+            Cursor.Show();
+            Application.RemoveMessageFilter(this);
+        }
+        public bool PreFilterMessage(ref Message m)
+        {
+            if (m.Msg == 0x201 || m.Msg == 0x202 || m.Msg == 0x203) return true;
+            if (m.Msg == 0x204 || m.Msg == 0x205 || m.Msg == 0x206) return true;
+            return false;
+        }
+        private void DisableMouse()
+        {
+            // Arbitrary location.
+            Cursor.Clip = new Rectangle(0, 0, 1, 1);
+            Cursor.Hide();
+            Application.AddMessageFilter(this);
         }
 
         /// <summary>
@@ -384,10 +429,6 @@ namespace LibraryData
             int nbData = SocketToTeacher.Receive(bytemessage);
             Array.Resize(ref bytemessage, nbData);
             AutorisedUrls = JsonSerializer.Deserialize<List<string>>(Encoding.Default.GetString(bytemessage));
-            lbxAutorisedWebSite.Invoke(new MethodInvoker(delegate {
-                lbxAutorisedWebSite.Items.Clear();
-                foreach(string url in AutorisedUrls){lbxAutorisedWebSite.Items.Add(url);}
-            }));
         }
 
         /// <summary>

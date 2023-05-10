@@ -9,8 +9,6 @@ using System.Text.Json;
 using System.IO;
 using System.Net.NetworkInformation;
 using System.Linq;
-using Microsoft.Web.WebView2.WinForms;
-using Microsoft.Web.WebView2.Core;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Firefox;
@@ -30,7 +28,7 @@ namespace ApplicationCliente
         {
             InitializeComponent();
             LoadTeacherIP();
-            Client = new(lbxConnexion,pbxScreeShot,lbxMessages, IpToTeacher,lbxAutorisedWebSite,this);
+            Client = new(lbxConnexion,pbxScreeShot,lbxMessages, IpToTeacher,this);
             Task.Run(Client.ConnectToMaster);
             Task.Run(AutomaticChecker);
         }
@@ -243,8 +241,8 @@ namespace ApplicationCliente
                     Client.SocketToTeacher.Send(Encoding.ASCII.GetBytes("stop"));
                     Client.SocketToTeacher.Disconnect(false);
                     Client.SocketToTeacher = null;
-                    firefoxdriver.Dispose();
-                    chromedriver.Dispose();
+                    if(firefoxdriver!= null) { firefoxdriver.Dispose(); }
+                    if(chromedriver!= null) { chromedriver.Dispose(); }
                 }
                 catch { }
             }
@@ -274,43 +272,6 @@ namespace ApplicationCliente
         {
             this.Show();
             this.WindowState = FormWindowState.Normal;
-        }
-
-        /// <summary>
-        /// Fonction qui ajoute le nouvelle url à la liste des urls visités
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void webView_SourceChanged(object sender, CoreWebView2SourceChangedEventArgs e)
-        {
-            WebView2 web = (WebView2)sender;
-            Client.Urls.AddUrl(new Url(DateTime.Now,"custom",web.Source.AbsoluteUri));
-        }
-
-        /// <summary>
-        /// Fonction qui vérife qui le nouvelle url est dans la liste des urls autorisé
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void ChangingUrl(object sender, CoreWebView2NavigationStartingEventArgs e)
-        {
-            bool notOk = true;
-            foreach(string url in Client.AutorisedUrls)
-            {
-                if (e.Uri.StartsWith("https://" + url)) { notOk = false; }
-            }
-            e.Cancel = notOk;
-        }
-
-        /// <summary>
-        /// Fonction qui change l'url à l'objet cliqué dans la listbox
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void ChangeWebSite(object sender, EventArgs e)
-        {
-            ListBox listbox = (ListBox)sender;
-            webView.Source = new Uri("https://"+ listbox.SelectedItem.ToString());
         }
     }
 }
