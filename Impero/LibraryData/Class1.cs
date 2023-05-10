@@ -68,7 +68,6 @@ namespace LibraryData
     public enum Focus
     {
         Everything,
-        Nothing,
         OneNote,
         VisualStudio,
         VSCode,
@@ -104,6 +103,7 @@ namespace LibraryData
 
     public class DataForStudent : Data, IMessageFilter
     {
+        GlobalKeyboardHook gkh = new GlobalKeyboardHook();
         Rectangle OldRect = Rectangle.Empty;
         StreamOptions options;
         bool mouseDisabled = false;
@@ -222,25 +222,31 @@ namespace LibraryData
             {
                 Bitmap Bitmap = new(screen.Bounds.Width, screen.Bounds.Height, PixelFormat.Format32bppArgb);
                 Rectangle ScreenSize = screen.Bounds;
-                Graphics.FromImage(Bitmap).CopyFromScreen(ScreenSize.Left, ScreenSize.Top, 0, 0, ScreenSize.Size);
-                images.Add(Bitmap);
-                TotalWidth += ScreenSize.Width;
-                if (ScreenSize.Height > MaxHeight) { MaxHeight = ScreenSize.Height; }
+                try
+                {
+                    Graphics.FromImage(Bitmap).CopyFromScreen(ScreenSize.Left, ScreenSize.Top, 0, 0, ScreenSize.Size);
+                    images.Add(Bitmap);
+                    TotalWidth += ScreenSize.Width;
+                    if (ScreenSize.Height > MaxHeight) { MaxHeight = ScreenSize.Height; }
+                }
+                catch (Exception ex) { }
             }
-
-            Bitmap FullImage = new(TotalWidth, MaxHeight, PixelFormat.Format32bppArgb);
-            Graphics FullGraphics = Graphics.FromImage(FullImage);
-
-            int offsetLeft = 0;
-            //Crée une seul image de toutes les captures d'écran
-            foreach (Bitmap image in images)
+            if(MaxHeight > 0)
             {
-                FullGraphics.DrawImage(image, new Point(offsetLeft, 0));
-                offsetLeft += image.Width;
+                Bitmap FullImage = new(TotalWidth, MaxHeight, PixelFormat.Format32bppArgb);
+                Graphics FullGraphics = Graphics.FromImage(FullImage);
+
+                int offsetLeft = 0;
+                //Crée une seul image de toutes les captures d'écran
+                foreach (Bitmap image in images)
+                {
+                    FullGraphics.DrawImage(image, new Point(offsetLeft, 0));
+                    offsetLeft += image.Width;
+                }
+                //FullImage = (new Bitmap(FullImage, new Size(200,200)));
+                ScreenShot = FullImage;
+                FullGraphics.Dispose();
             }
-            //FullImage = (new Bitmap(FullImage, new Size(200,200)));
-            ScreenShot = FullImage;
-            FullGraphics.Dispose();
         }
 
         /// <summary>
@@ -347,7 +353,9 @@ namespace LibraryData
                     case "apply": ApplyMulticastSettings(); break;
                     case "stop":
                         mouseDisabled = false;
-                        pbxScreeShot.Visible = false;
+                        form.FormBorderStyle = FormBorderStyle.Sizable;
+                        pbxScreeShot.Invoke(new MethodInvoker(delegate {pbxScreeShot.Visible = false;}));
+                        gkh.unhook();
                         break;
                     case "shutdown":
                         SocketToTeacher.Disconnect(false);
@@ -373,14 +381,20 @@ namespace LibraryData
                 switch (options.priority)
                 {
                     case Priority.Fullscreen:
+                        form.FormBorderStyle = FormBorderStyle.None;
                         form.WindowState = FormWindowState.Maximized;
                         break;
                     case Priority.Blocking:
+                        form.FormBorderStyle = FormBorderStyle.None;
                         form.WindowState = FormWindowState.Maximized;
+                        form.TopMost = true;
                         mouseDisabled = true;
                         Task.Run(DisableMouseEverySecond);
+                        DisableKeyboard();
                         break;
                     case Priority.Topmost:
+                        form.TopMost = true;
+                        form.FormBorderStyle = FormBorderStyle.None;
                         form.WindowState = FormWindowState.Maximized;
                         break;
                     case Priority.Widowed:
@@ -388,6 +402,74 @@ namespace LibraryData
                         break;
                 }
             }));
+        }
+
+        private void DisableKeyboard()
+        {
+            foreach (Keys key in Enum.GetValues(typeof(Keys)))
+            {
+                gkh.HookedKeys.Add(key);
+            }
+            gkh.KeyDown += new KeyEventHandler(gkh_KeyDown);
+            gkh.KeyUp += new KeyEventHandler(gkh_KeyUp);
+        }
+
+
+        [DllImport("user32.dll")]
+        private static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
+
+        [DllImport("user32.dll")]
+        private static extern bool IsIconic(IntPtr hWnd);
+
+        public void ApplyAuthorisedFocus()
+        {
+            List<Process> ProcessToMinimize = Process.GetProcesses().ToList();
+            const int SW_MINIMIZE = 6;
+            foreach (Process process in ProcessToMinimize)
+            {
+                if(process.ProcessName == "client") { ProcessToMinimize.Remove(process); }
+            }
+            List<string> processToRemove = new();
+            switch (options.focus)
+            {
+                case Focus.VSCode:processToRemove = new List<string>() {"code"};
+                    break;
+                case Focus.OneNote:processToRemove = new List<string>() { "ONENOTE" };
+                    break;
+                case Focus.VisualStudio:processToRemove = new List<string>() { "devenv" };
+                    break;
+                case Focus.Word:processToRemove = new List<string>() { "WINWORD" };
+                    break;
+                case Focus.Everything:return;
+            }
+
+            foreach (Process process in ProcessToMinimize)
+            {
+                foreach(string key in processToRemove)
+                    if(process.ProcessName == key) { ProcessToMinimize.Remove(process); }
+            }
+
+            while (true)
+            {
+                foreach(Process process in ProcessToMinimize)
+                {
+                    if (!IsIconic(process.MainWindowHandle))
+                    {
+                        // Minimize the window
+                        ShowWindow(process.MainWindowHandle, SW_MINIMIZE);
+                    }
+                }
+            }
+        }
+
+        void gkh_KeyUp(object sender, KeyEventArgs e)
+        {
+            e.Handled = true;
+        }
+
+        void gkh_KeyDown(object sender, KeyEventArgs e)
+        {
+            e.Handled = true;
         }
 
         private void DisableMouseEverySecond()
@@ -416,9 +498,13 @@ namespace LibraryData
         private void DisableMouse()
         {
             // Arbitrary location.
-            Cursor.Clip = new Rectangle(0, 0, 1, 1);
+            Cursor.Clip = new Rectangle(0, 60, 1, 1);
             Cursor.Hide();
             Application.AddMessageFilter(this);
+            foreach (var process in Process.GetProcessesByName("Taskmgr"))
+            {
+                process.Kill();
+            }
         }
 
         /// <summary>
@@ -675,5 +761,114 @@ namespace LibraryData
             dimanche[0] = "157.26.227.198";
             dimanche[1] = "157.26.227.198";
         }
+    }
+
+
+    public class GlobalKeyboardHook
+    {
+        #region Constant, Structure, and Delegate Definitions
+
+        public delegate int KeyboardHookProc(int code, int wParam, ref KeyboardHookStruct lParam);
+
+        public struct KeyboardHookStruct
+        {
+            public int vkCode;
+            public int scanCode;
+            public int flags;
+            public int time;
+            public int dwExtraInfo;
+        }
+
+        private const int WH_KEYBOARD_LL = 13;
+        private const int WM_KEYDOWN = 0x100;
+        private const int WM_KEYUP = 0x101;
+        private const int WM_SYSKEYDOWN = 0x104;
+        private const int WM_SYSKEYUP = 0x105;
+
+        #endregion
+
+        #region Instance Variables
+
+        public List<Keys> HookedKeys = new List<Keys>();
+        private IntPtr hHook = IntPtr.Zero;
+        private static KeyboardHookProc hookProc;
+
+        #endregion
+
+        #region Events
+
+        public event KeyEventHandler KeyDown;
+        public event KeyEventHandler KeyUp;
+
+        #endregion
+
+        #region Constructors and Destructors
+
+        public GlobalKeyboardHook()
+        {
+            hookProc = HookCallback;
+            hook();
+        }
+
+        ~GlobalKeyboardHook()
+        {
+            unhook();
+        }
+
+        #endregion
+
+        #region Public Methods
+
+        public void hook()
+        {
+            IntPtr hInstance = LoadLibrary("User32");
+            hHook = SetWindowsHookEx(WH_KEYBOARD_LL, hookProc, hInstance, 0);
+        }
+
+        public void unhook()
+        {
+            UnhookWindowsHookEx(hHook);
+        }
+
+        #endregion
+
+        #region Private Methods
+
+        private int HookCallback(int code, int wParam, ref KeyboardHookStruct lParam)
+        {
+            if (code >= 0)
+            {
+                Keys key = (Keys)lParam.vkCode;
+                if (HookedKeys.Contains(key))
+                {
+                    KeyEventArgs kea = new KeyEventArgs(key);
+                    if ((wParam == WM_KEYDOWN || wParam == WM_SYSKEYDOWN) && (KeyDown != null))
+                    {
+                        KeyDown(this, kea);
+                    }
+                    else if ((wParam == WM_KEYUP || wParam == WM_SYSKEYUP) && (KeyUp != null))
+                    {
+                        KeyUp(this, kea);
+                    }
+                    if (kea.Handled)
+                        return 1;
+                }
+            }
+            return CallNextHookEx(hHook, code, wParam, ref lParam);
+        }
+
+        #endregion
+
+        #region DLL Imports
+
+        [DllImport("user32.dll")]
+        static extern IntPtr SetWindowsHookEx(int idHook, KeyboardHookProc callback, IntPtr hInstance, uint threadId);
+        [DllImport("user32.dll")]
+        static extern bool UnhookWindowsHookEx(IntPtr hInstance);
+        [DllImport("user32.dll")]
+        static extern int CallNextHookEx(IntPtr idHook, int nCode, int wParam, ref KeyboardHookStruct lParam);
+        [DllImport("kernel32.dll")]
+        static extern IntPtr LoadLibrary(string lpFileName);
+        #endregion
     }
 }

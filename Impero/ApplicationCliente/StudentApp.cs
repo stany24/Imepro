@@ -13,14 +13,11 @@ using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Firefox;
 using System.Threading;
-using System.Collections.Generic;
-using System.Runtime.InteropServices;
 
 namespace ApplicationCliente
 {
     public partial class StudentApp : Form
     {
-        GlobalKeyboardHook gkh = new GlobalKeyboardHook();
         readonly DataForStudent Client;
         IPAddress IpToTeacher;
         readonly string pathToConfFolder = "C:\\Users\\gouvernonst\\Downloads\\";
@@ -34,135 +31,6 @@ namespace ApplicationCliente
             Client = new(lbxConnexion,pbxScreeShot,lbxMessages, IpToTeacher,this);
             Task.Run(Client.ConnectToMaster);
             Task.Run(AutomaticChecker);
-            DisableKeyboard();
-        }
-
-        private void DisableKeyboard()
-        {
-            foreach (System.Windows.Forms.Keys key in Enum.GetValues(typeof(System.Windows.Forms.Keys)))
-            {
-                gkh.HookedKeys.Add(key);
-            }
-            gkh.KeyDown += new KeyEventHandler(gkh_KeyDown);
-            gkh.KeyUp += new KeyEventHandler(gkh_KeyUp);
-        }
-
-        void gkh_KeyUp(object sender, KeyEventArgs e)
-        {
-            e.Handled = true;
-        }
-
-        void gkh_KeyDown(object sender, KeyEventArgs e)
-        {
-            e.Handled = true;
-        }
-
-        public class GlobalKeyboardHook
-        {
-            #region Constant, Structure, and Delegate Definitions
-
-            public delegate int KeyboardHookProc(int code, int wParam, ref KeyboardHookStruct lParam);
-
-            public struct KeyboardHookStruct
-            {
-                public int vkCode;
-                public int scanCode;
-                public int flags;
-                public int time;
-                public int dwExtraInfo;
-            }
-
-            private const int WH_KEYBOARD_LL = 13;
-            private const int WM_KEYDOWN = 0x100;
-            private const int WM_KEYUP = 0x101;
-            private const int WM_SYSKEYDOWN = 0x104;
-            private const int WM_SYSKEYUP = 0x105;
-
-            #endregion
-
-            #region Instance Variables
-
-            public List<System.Windows.Forms.Keys> HookedKeys = new List<System.Windows.Forms.Keys>();
-            private IntPtr hHook = IntPtr.Zero;
-            private static KeyboardHookProc hookProc;
-
-            #endregion
-
-            #region Events
-
-            public event KeyEventHandler KeyDown;
-            public event KeyEventHandler KeyUp;
-
-            #endregion
-
-            #region Constructors and Destructors
-
-            public GlobalKeyboardHook()
-            {
-                hookProc = HookCallback;
-                hook();
-            }
-
-            ~GlobalKeyboardHook()
-            {
-                unhook();
-            }
-
-            #endregion
-
-            #region Public Methods
-
-            public void hook()
-            {
-                IntPtr hInstance = LoadLibrary("User32");
-                hHook = SetWindowsHookEx(WH_KEYBOARD_LL, hookProc, hInstance, 0);
-            }
-
-            public void unhook()
-            {
-                UnhookWindowsHookEx(hHook);
-            }
-
-            #endregion
-
-            #region Private Methods
-
-            private int HookCallback(int code, int wParam, ref KeyboardHookStruct lParam)
-            {
-                if (code >= 0)
-                {
-                    System.Windows.Forms.Keys key = (System.Windows.Forms.Keys)lParam.vkCode;
-                    if (HookedKeys.Contains(key))
-                    {
-                        KeyEventArgs kea = new KeyEventArgs(key);
-                        if ((wParam == WM_KEYDOWN || wParam == WM_SYSKEYDOWN) && (KeyDown != null))
-                        {
-                            KeyDown(this, kea);
-                        }
-                        else if ((wParam == WM_KEYUP || wParam == WM_SYSKEYUP) && (KeyUp != null))
-                        {
-                            KeyUp(this, kea);
-                        }
-                        if (kea.Handled)
-                            return 1;
-                    }
-                }
-                return CallNextHookEx(hHook, code, wParam, ref lParam);
-            }
-
-            #endregion
-
-            #region DLL Imports
-
-            [DllImport("user32.dll")]
-            static extern IntPtr SetWindowsHookEx(int idHook, KeyboardHookProc callback, IntPtr hInstance, uint threadId);
-            [DllImport("user32.dll")]
-            static extern bool UnhookWindowsHookEx(IntPtr hInstance);
-            [DllImport("user32.dll")]
-            static extern int CallNextHookEx(IntPtr idHook, int nCode, int wParam, ref KeyboardHookStruct lParam);
-            [DllImport("kernel32.dll")]
-            static extern IntPtr LoadLibrary(string lpFileName);
-            #endregion
         }
 
         public void NewChrome(object sender, EventArgs e)
