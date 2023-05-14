@@ -502,7 +502,7 @@ namespace ApplicationTeacher
         {
             if(ScreenSharer == null)
             {
-                ChooseStudentToShareScreen prompt = new(AllStudents);
+                ChooseStreamOptions prompt = new(AllStudents);
                 if (prompt.ShowDialog(this) != DialogResult.OK){return;}
                 if (Configuration.StudentToShareScreen.Count == 0){return;}
                 isSharing = true;
