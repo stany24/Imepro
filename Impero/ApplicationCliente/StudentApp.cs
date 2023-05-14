@@ -20,10 +20,10 @@ namespace ApplicationCliente
     {
         readonly DataForStudent Client;
         IPAddress IpToTeacher;
-        readonly string pathToConfFolder = "C:\\Users\\gouvernonst\\Downloads\\";
-        readonly string FileNameConfIp = "iPToTeacher.txt";
-        IWebDriver firefoxdriver;
-        IWebDriver chromedriver;
+        readonly string pathToConfigurationFolder = "C:\\Users\\gouvernonst\\Downloads\\";
+        readonly string FileNameConfigurationIp = "iPToTeacher.txt";
+        IWebDriver FirefoxDriver;
+        IWebDriver ChromeDriver;
         public StudentApp()
         {
             InitializeComponent();
@@ -40,7 +40,7 @@ namespace ApplicationCliente
 
         public void StartChrome()
         {
-            chromedriver = new ChromeDriver();
+            ChromeDriver = new ChromeDriver();
         }
 
         public void NewFirefox(object sender, EventArgs e)
@@ -50,57 +50,37 @@ namespace ApplicationCliente
 
         public void StartFirefox()
         {
-            firefoxdriver = new FirefoxDriver();
+            FirefoxDriver = new FirefoxDriver();
         }
 
         public void AutomaticChecker()
         {
             while(true)
             {
-                GetUrls();
+                VerifyUrlOfWebDriver((WebDriver)FirefoxDriver,"seleniumfirefox");
+                VerifyUrlOfWebDriver((WebDriver)ChromeDriver,"seleniumchorme");
                 Thread.Sleep(2000);
             }
         }
 
-        /// <summary>
-        /// Fonction qui récupére les urls dans les navigateurs sélénium
-        /// </summary>
-        public void GetUrls()
+        public void VerifyUrlOfWebDriver(WebDriver navigateur,string navigateurName)
         {
             try
             {
-                if (chromedriver != null)
+                if (navigateur == null){return;}
+                Client.Urls.AddUrl(new Url(DateTime.Now, navigateurName, navigateur.Url));
+                bool navigateback = true;
+                foreach (string url in Client.AutorisedUrls)
                 {
-                    Client.Urls.AddUrl(new Url(DateTime.Now, "seleniumchrome", chromedriver.Url));
-                    bool navigateback = true;
-                    foreach (string url in Client.AutorisedUrls)
-                    {
-                        if (chromedriver.Url.Contains(url)) { navigateback = false; }
-
-                    }
-                    if (navigateback) { chromedriver.Navigate().Back(); }
+                    if (navigateur.Url.Contains(url)) { navigateback = false; }
+                }
+                if (navigateback)
+                {
+                    string url = navigateur.Url;
+                    navigateur.Navigate().Back();
                 }
             }
-            catch { chromedriver.Dispose(); }
-            try
-            {
-                if (firefoxdriver != null)
-                {
-                
-                    Client.Urls.AddUrl(new Url(DateTime.Now, "seleniumfirefox", firefoxdriver.Url));
-                    bool navigateback = true;
-                    foreach (string url in Client.AutorisedUrls)
-                    {
-                        if (firefoxdriver.Url.Contains(url)) { navigateback = false; }
-
-                    }
-                    if (navigateback) {
-                        string url = firefoxdriver.Url;
-                        firefoxdriver.Navigate().Back();
-                    }
-                }
-            }
-            catch { firefoxdriver.Dispose(); }
+            catch { navigateur.Dispose(); }
         }
 
         /// <summary>
@@ -111,19 +91,18 @@ namespace ApplicationCliente
         public void NewTeacherIP(object sender, EventArgs e)
         {
             AskIp prompt = new();
-            if (prompt.ShowDialog(this) == DialogResult.OK) {
-                try
-                {
-                    IpToTeacher = IPAddress.Parse(prompt.LastVerifiedIp);
-                    IpForTheWeek allIP = new();
-                    allIP.SetIp(prompt.LastVerifiedIp);
-                    using StreamWriter writeFichier = new(pathToConfFolder + FileNameConfIp);
-                    writeFichier.WriteLine(JsonSerializer.Serialize(allIP, new JsonSerializerOptions { IncludeFields = true, }));
-                    prompt.Close();
-                    prompt.Dispose();
-                }
-                catch { }
+            if (prompt.ShowDialog(this) != DialogResult.OK) { return; }
+            try
+            {
+                IpToTeacher = IPAddress.Parse(prompt.LastVerifiedIp);
+                IpForTheWeek allIP = new();
+                allIP.SetIp(prompt.LastVerifiedIp);
+                using StreamWriter writeFichier = new(pathToConfigurationFolder + FileNameConfigurationIp);
+                writeFichier.WriteLine(JsonSerializer.Serialize(allIP, new JsonSerializerOptions { IncludeFields = true, }));
+                prompt.Close();
+                prompt.Dispose();
             }
+            catch { }
         }
 
         /// <summary>
@@ -133,7 +112,7 @@ namespace ApplicationCliente
         public IpForTheWeek ReadConfIp()
         {
             try { 
-                using StreamReader fichier = new(pathToConfFolder + FileNameConfIp);
+                using StreamReader fichier = new(pathToConfigurationFolder + FileNameConfigurationIp);
                 IpForTheWeek allIP = new(JsonSerializer.Deserialize<IpForTheWeek>(fichier.ReadToEnd()));
                 fichier.Close();
                 return allIP;
@@ -235,17 +214,16 @@ namespace ApplicationCliente
         /// <param name="e"></param>
         public void OnClosing(object sender, FormClosedEventArgs e)
         {
-            if (Client.SocketToTeacher != null)
+            if (Client.SocketToTeacher == null){return;}
+            try
             {
-                try {
-                    Client.SocketToTeacher.Send(Encoding.ASCII.GetBytes("stop"));
-                    Client.SocketToTeacher.Disconnect(false);
-                    Client.SocketToTeacher = null;
-                    if(firefoxdriver!= null) { firefoxdriver.Dispose(); }
-                    if(chromedriver!= null) { chromedriver.Dispose(); }
-                }
-                catch { }
+                Client.SocketToTeacher.Send(Encoding.ASCII.GetBytes("stop"));
+                Client.SocketToTeacher.Disconnect(false);
+                Client.SocketToTeacher = null;
+                FirefoxDriver?.Dispose();
+                ChromeDriver?.Dispose();
             }
+            catch { }
         }
 
         /// <summary>
@@ -255,12 +233,15 @@ namespace ApplicationCliente
         /// <param name="e"></param>
         public void StudentAppResized(object sender, EventArgs e)
         {
-            if (FormWindowState.Minimized == this.WindowState)
+            switch(WindowState)
             {
-                TrayIconStudent.Visible = true;
-                this.Hide();
+                case FormWindowState.Minimized:TrayIconStudent.Visible = true;Hide();
+                    break;
+                case FormWindowState.Normal: TrayIconStudent.Visible = false;
+                    break;
+                case FormWindowState.Maximized: TrayIconStudent.Visible = false;
+                    break;
             }
-            else if (FormWindowState.Normal == this.WindowState) { TrayIconStudent.Visible = false; }
         }
 
         /// <summary>
@@ -270,8 +251,8 @@ namespace ApplicationCliente
         /// <param name="e"></param>
         public void TrayIconStudentClick(object sender, EventArgs e)
         {
-            this.Show();
-            this.WindowState = FormWindowState.Normal;
+            Show();
+            WindowState = FormWindowState.Normal;
         }
     }
 }

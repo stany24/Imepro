@@ -103,7 +103,7 @@ namespace LibraryData
 
     public class DataForStudent : Data, IMessageFilter
     {
-        GlobalKeyboardHook gkh = new GlobalKeyboardHook();
+        readonly GlobalKeyboardHook gkh = new();
         Rectangle OldRect = Rectangle.Empty;
         StreamOptions options;
         bool mouseDisabled = false;
@@ -229,7 +229,7 @@ namespace LibraryData
                     TotalWidth += ScreenSize.Width;
                     if (ScreenSize.Height > MaxHeight) { MaxHeight = ScreenSize.Height; }
                 }
-                catch (Exception ex) { }
+                catch (Exception) { }
             }
             if(MaxHeight > 0)
             {
@@ -355,7 +355,7 @@ namespace LibraryData
                         mouseDisabled = false;
                         form.FormBorderStyle = FormBorderStyle.Sizable;
                         pbxScreeShot.Invoke(new MethodInvoker(delegate {pbxScreeShot.Visible = false;}));
-                        gkh.unhook();
+                        gkh.Unhook();
                         break;
                     case "shutdown":
                         SocketToTeacher.Disconnect(false);
@@ -410,8 +410,8 @@ namespace LibraryData
             {
                 gkh.HookedKeys.Add(key);
             }
-            gkh.KeyDown += new KeyEventHandler(gkh_KeyDown);
-            gkh.KeyUp += new KeyEventHandler(gkh_KeyUp);
+            gkh.KeyDown += new KeyEventHandler(GKH_KeyDown);
+            gkh.KeyUp += new KeyEventHandler(GKH_KeyUp);
         }
 
 
@@ -462,12 +462,12 @@ namespace LibraryData
             }
         }
 
-        void gkh_KeyUp(object sender, KeyEventArgs e)
+        void GKH_KeyUp(object sender, KeyEventArgs e)
         {
             e.Handled = true;
         }
 
-        void gkh_KeyDown(object sender, KeyEventArgs e)
+        void GKH_KeyDown(object sender, KeyEventArgs e)
         {
             e.Handled = true;
         }
@@ -789,7 +789,7 @@ namespace LibraryData
 
         #region Instance Variables
 
-        public List<Keys> HookedKeys = new List<Keys>();
+        public List<Keys> HookedKeys = new();
         private IntPtr hHook = IntPtr.Zero;
         private static KeyboardHookProc hookProc;
 
@@ -807,25 +807,25 @@ namespace LibraryData
         public GlobalKeyboardHook()
         {
             hookProc = HookCallback;
-            hook();
+            Hook();
         }
 
         ~GlobalKeyboardHook()
         {
-            unhook();
+            Unhook();
         }
 
         #endregion
 
         #region Public Methods
 
-        public void hook()
+        public void Hook()
         {
             IntPtr hInstance = LoadLibrary("User32");
             hHook = SetWindowsHookEx(WH_KEYBOARD_LL, hookProc, hInstance, 0);
         }
 
-        public void unhook()
+        public void Unhook()
         {
             UnhookWindowsHookEx(hHook);
         }
@@ -841,7 +841,7 @@ namespace LibraryData
                 Keys key = (Keys)lParam.vkCode;
                 if (HookedKeys.Contains(key))
                 {
-                    KeyEventArgs kea = new KeyEventArgs(key);
+                    KeyEventArgs kea = new(key);
                     if ((wParam == WM_KEYDOWN || wParam == WM_SYSKEYDOWN) && (KeyDown != null))
                     {
                         KeyDown(this, kea);
