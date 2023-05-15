@@ -12,7 +12,6 @@ using System.IO;
 using System.Text.Json;
 using System.Drawing.Imaging;
 using System.Linq;
-using System.Text.Json.Serialization;
 
 namespace ApplicationTeacher
 {
@@ -509,26 +508,27 @@ namespace ApplicationTeacher
         /// <param name="e"></param>
         private void ShareScreen(object sender, EventArgs e)
         {
-            if(ScreenSharer == null)
+            if(isSharing == false)
             {
                 ChooseStudentToShareScreen prompt = new(AllStudents);
-                if (prompt.ShowDialog(this) == DialogResult.OK)
-                {
-                    if (Configuration.StudentToShareScreen.Count != 0)
-                    {
-                        isSharing= true;
-                        SendStreamConfiguration();
-                        ScreenSharer = Task.Run(RecordAndStreamScreen);
-                        btnShare.Text = "Stop Sharing";
-                    }
-                }
+                if (prompt.ShowDialog(this) != DialogResult.OK){return;}
+                if (Configuration.StudentToShareScreen.Count == 0){return;}
+                isSharing= true;
+                SendStreamConfiguration();
+                ScreenSharer = Task.Run(RecordAndStreamScreen);
+                btnShare.Text = "Stop Sharing";
             }
             else
             {
                 isSharing = false;
-                foreach(DataForTeacher student in Configuration.StudentToShareScreen)
+                for (int i = 0; i < Configuration.StudentToShareScreen.Count; i++)
                 {
-                    student.SocketToStudent.Send(Encoding.Default.GetBytes("stop"));
+                    try
+                    {
+                        Configuration.StudentToShareScreen[i].SocketToStudent.Send(Encoding.Default.GetBytes("stop"));
+                    }
+                    catch { }
+                    Configuration.StudentToShareScreen.Remove(Configuration.StudentToShareScreen[i]);
                 }
                 btnShare.Text = "Share screen";
                 ScreenSharer.Wait();

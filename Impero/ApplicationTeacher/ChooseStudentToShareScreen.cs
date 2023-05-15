@@ -41,7 +41,19 @@ namespace ApplicationTeacher
             }
             Focus focus = (Focus)Enum.Parse(typeof(Focus), lbxFocus.SelectedItem.ToString());
             Priority priorite = (Priority)Enum.Parse(typeof(Priority), lbxPriorite.SelectedItem.ToString());
-            Configuration.streamoptions = new StreamOptions(priorite, focus);
+            List<string> list = new();
+            switch(focus)
+            {
+                case LibraryData.Focus.VSCode:list = new() { "Code" };
+                    break;
+                case LibraryData.Focus.Word:list = new() { "WINWORD","sppsvc" };
+                    break;
+                case LibraryData.Focus.VisualStudio:list = new() { "devenv" };
+                    break;
+                case LibraryData.Focus.OneNote:list = new() { "onenoteim" };
+                    break;
+            }
+            Configuration.streamoptions = new StreamOptions(priorite, focus,list);
         }
     }
 }

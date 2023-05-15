@@ -50,10 +50,13 @@ namespace LibraryData
         public Priority priority;
         [JsonInclude]
         public Focus focus;
-        public StreamOptions(Priority priority, Focus focus)
+        [JsonInclude]
+        public List<string> AutorisedOpenedProcess;
+        public StreamOptions(Priority priority, Focus focus, List<string> autorisedOpenedProcess)
         {
             this.priority = priority;
             this.focus = focus;
+            AutorisedOpenedProcess = autorisedOpenedProcess;
         }
     }
 
@@ -103,7 +106,10 @@ namespace LibraryData
 
     public class DataForStudent : Data, IMessageFilter
     {
-        GlobalKeyboardHook gkh = new GlobalKeyboardHook();
+        #region Variables/Constructeur
+
+        public bool isReceiving = false;
+        readonly GlobalKeyboardHook gkh = new();
         Rectangle OldRect = Rectangle.Empty;
         StreamOptions options;
         bool mouseDisabled = false;
@@ -117,7 +123,6 @@ namespace LibraryData
         public List<Message> Messages = new();
         public List<string> AutorisedUrls = new();
         readonly public List<string> browsersList = new() { "chrome", "firefox", "iexplore", "safari", "opera", "msedge" };
-
         public DataForStudent(ListBox lbxconnexion, PictureBox pbxscreenshot, ListBox tbxmessage, IPAddress ipToTeacher, Form form)
         {
             lbxConnexion = lbxconnexion;
@@ -147,6 +152,10 @@ namespace LibraryData
         {
             return new Data(UserName, ComputerName, Urls, Processes);
         }
+
+        #endregion
+
+        #region Récupération Url/Processus/Image
 
         public void GetAllTabNameEvery5Seconds()
         {
@@ -229,9 +238,9 @@ namespace LibraryData
                     TotalWidth += ScreenSize.Width;
                     if (ScreenSize.Height > MaxHeight) { MaxHeight = ScreenSize.Height; }
                 }
-                catch (Exception ex) { }
+                catch (Exception) { }
             }
-            if(MaxHeight > 0)
+            if (MaxHeight > 0)
             {
                 Bitmap FullImage = new(TotalWidth, MaxHeight, PixelFormat.Format32bppArgb);
                 Graphics FullGraphics = Graphics.FromImage(FullImage);
@@ -248,6 +257,10 @@ namespace LibraryData
                 FullGraphics.Dispose();
             }
         }
+
+        #endregion
+
+        #region Envoi de données
 
         /// <summary>
         /// Fonction qui sérialize les données puis les envoient au professeur
@@ -273,6 +286,10 @@ namespace LibraryData
             image = (byte[])converter.ConvertTo(ScreenShot, typeof(byte[]));
             SocketToTeacher.Send(image, 0, image.Length, SocketFlags.None);
         }
+
+        #endregion
+
+        #region Connexion/Reception
 
         /// <summary>
         /// Fonction qui connecte cette application à l'application du professeur
@@ -347,15 +364,18 @@ namespace LibraryData
                     case "data": SendData(); break;
                     case "image": SendImage(); break;
                     //case "kill": KillSelectedProcess(Convert.ToInt32(text.Split(' ')[1])); break;
-                    case "receive": Task.Run(ReceiveMulticastStream); break;
+                    case "receive":
+                        isReceiving = true;
+                        Task.Run(ReceiveMulticastStream); break;
                     case "message": ReceiveMessage(); break;
                     case "url": ReceiveAuthorisedUrls(); break;
                     case "apply": ApplyMulticastSettings(); break;
                     case "stop":
+                        isReceiving = false;
                         mouseDisabled = false;
-                        form.FormBorderStyle = FormBorderStyle.Sizable;
-                        pbxScreeShot.Invoke(new MethodInvoker(delegate {pbxScreeShot.Visible = false;}));
-                        gkh.unhook();
+                        form.Invoke(new MethodInvoker(delegate { form.FormBorderStyle = FormBorderStyle.Sizable; }));
+                        pbxScreeShot.Invoke(new MethodInvoker(delegate { pbxScreeShot.Visible = false; }));
+                        gkh.Unhook();
                         break;
                     case "shutdown":
                         SocketToTeacher.Disconnect(false);
@@ -368,15 +388,80 @@ namespace LibraryData
             }
         }
 
+        /// <summary>
+        /// Fonction qui recoit la liste des urls autorisés
+        /// </summary>
+        public void ReceiveAuthorisedUrls()
+        {
+            byte[] bytemessage = new byte[102400];
+            int nbData = SocketToTeacher.Receive(bytemessage);
+            Array.Resize(ref bytemessage, nbData);
+            AutorisedUrls = JsonSerializer.Deserialize<List<string>>(Encoding.Default.GetString(bytemessage));
+        }
+
+        /// <summary>
+        /// Fonction qui recoit un message du professeur
+        /// </summary>
+        public void ReceiveMessage()
+        {
+            byte[] bytemessage = new byte[1024];
+            int nbData = SocketToTeacher.Receive(bytemessage);
+            Array.Resize(ref bytemessage, nbData);
+            tbxMessage.Invoke(new MethodInvoker(delegate { tbxMessage.Items.Add(DateTime.Now.ToString("hh:mm ") + Encoding.Default.GetString(bytemessage)); }));
+        }
+
+        #endregion
+
+        #region Stream
+
+        /// <summary>
+        /// Fonction qui recoit la diffusion multicast envoyée par le professeur
+        /// </summary>
+        public void ReceiveMulticastStream()
+        {
+            Socket s = new(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+            IPEndPoint ipep = new(IPAddress.Any, 45678);
+            s.Bind(ipep);
+            IPAddress ip = IPAddress.Parse("232.1.2.3");
+            s.SetSocketOption(SocketOptionLevel.IP, SocketOptionName.AddMembership, new MulticastOption(ip, IPAddress.Any));
+            while (isReceiving)
+            {
+                byte[] imageArray = new byte[9999999];
+                int size = 0;
+                int lastId = 0;
+                do
+                {
+                    try
+                    {
+                        byte[] message = new byte[65000];
+                        size = s.Receive(message);
+                        Array.Resize(ref message, size);
+                        Array.Copy(message, 0, imageArray, lastId, size);
+                        lastId += size;
+                    }
+                    catch { }
+                } while (size == 65000);
+                Array.Resize(ref imageArray, lastId);
+                try
+                {
+                    Bitmap bitmap = new(new MemoryStream(imageArray));
+                    pbxScreeShot.Invoke(new MethodInvoker(delegate { pbxScreeShot.Image = bitmap; }));
+                }
+                catch { }
+            }
+        }
+
         public void ApplyMulticastSettings()
         {
             byte[] message = new byte[128];
             int size = SocketToTeacher.Receive(message);
             Array.Resize(ref message, size);
             options = JsonSerializer.Deserialize<StreamOptions>(Encoding.Default.GetString(message));
+            pbxScreeShot.Invoke(new MethodInvoker(delegate { pbxScreeShot.Visible = true; }));
             pbxScreeShot.Invoke(new MethodInvoker(delegate { pbxScreeShot.Dock = DockStyle.Fill; }));
             form.Invoke(new MethodInvoker(delegate
             {
+                form.Show();
                 form.Controls.SetChildIndex(pbxScreeShot, 0);
                 switch (options.priority)
                 {
@@ -402,7 +487,19 @@ namespace LibraryData
                         break;
                 }
             }));
+            switch (options.focus)
+            {
+                case Focus.Everything:
+                    break;
+                default:
+                    Task.Run(MinimizeUnAutorisedEverySecond);
+                    break;
+            }
         }
+
+        #endregion
+
+        #region Blocage
 
         private void DisableKeyboard()
         {
@@ -410,8 +507,8 @@ namespace LibraryData
             {
                 gkh.HookedKeys.Add(key);
             }
-            gkh.KeyDown += new KeyEventHandler(gkh_KeyDown);
-            gkh.KeyUp += new KeyEventHandler(gkh_KeyUp);
+            gkh.KeyDown += new KeyEventHandler(GKH_KeyDown);
+            gkh.KeyUp += new KeyEventHandler(GKH_KeyUp);
         }
 
 
@@ -427,31 +524,35 @@ namespace LibraryData
             const int SW_MINIMIZE = 6;
             foreach (Process process in ProcessToMinimize)
             {
-                if(process.ProcessName == "client") { ProcessToMinimize.Remove(process); }
+                if (process.ProcessName == "client") { ProcessToMinimize.Remove(process); }
             }
             List<string> processToRemove = new();
             switch (options.focus)
             {
-                case Focus.VSCode:processToRemove = new List<string>() {"code"};
+                case Focus.VSCode:
+                    processToRemove = new List<string>() { "code" };
                     break;
-                case Focus.OneNote:processToRemove = new List<string>() { "ONENOTE" };
+                case Focus.OneNote:
+                    processToRemove = new List<string>() { "ONENOTE" };
                     break;
-                case Focus.VisualStudio:processToRemove = new List<string>() { "devenv" };
+                case Focus.VisualStudio:
+                    processToRemove = new List<string>() { "devenv" };
                     break;
-                case Focus.Word:processToRemove = new List<string>() { "WINWORD" };
+                case Focus.Word:
+                    processToRemove = new List<string>() { "WINWORD" };
                     break;
-                case Focus.Everything:return;
+                case Focus.Everything: return;
             }
 
             foreach (Process process in ProcessToMinimize)
             {
-                foreach(string key in processToRemove)
-                    if(process.ProcessName == key) { ProcessToMinimize.Remove(process); }
+                foreach (string key in processToRemove)
+                    if (process.ProcessName == key) { ProcessToMinimize.Remove(process); }
             }
 
             while (true)
             {
-                foreach(Process process in ProcessToMinimize)
+                foreach (Process process in ProcessToMinimize)
                 {
                     if (!IsIconic(process.MainWindowHandle))
                     {
@@ -462,14 +563,23 @@ namespace LibraryData
             }
         }
 
-        void gkh_KeyUp(object sender, KeyEventArgs e)
+        void GKH_KeyUp(object sender, KeyEventArgs e)
         {
             e.Handled = true;
         }
 
-        void gkh_KeyDown(object sender, KeyEventArgs e)
+        void GKH_KeyDown(object sender, KeyEventArgs e)
         {
             e.Handled = true;
+        }
+
+        private void MinimizeUnAutorisedEverySecond()
+        {
+            while (isReceiving)
+            {
+                WindowMinimize.MinimizeUnAuthorised(options.AutorisedOpenedProcess);
+                Thread.Sleep(1000);
+            }
         }
 
         private void DisableMouseEverySecond()
@@ -507,69 +617,7 @@ namespace LibraryData
             }
         }
 
-        /// <summary>
-        /// Fonction qui recoit la liste des urls autorisés
-        /// </summary>
-        public void ReceiveAuthorisedUrls()
-        {
-            byte[] bytemessage = new byte[102400];
-            int nbData = SocketToTeacher.Receive(bytemessage);
-            Array.Resize(ref bytemessage, nbData);
-            AutorisedUrls = JsonSerializer.Deserialize<List<string>>(Encoding.Default.GetString(bytemessage));
-        }
-
-        /// <summary>
-        /// Fonction qui recoit un message du professeur
-        /// </summary>
-        public void ReceiveMessage()
-        {
-            byte[] bytemessage = new byte[1024];
-            int nbData = SocketToTeacher.Receive(bytemessage);
-            Array.Resize(ref bytemessage, nbData);
-            tbxMessage.Invoke(new MethodInvoker(delegate { tbxMessage.Items.Add(DateTime.Now.ToString("hh:mm ") + Encoding.Default.GetString(bytemessage)); }));
-        }
-
-        /// <summary>
-        /// Fonction qui recoit la diffusion multicast envoyée par le professeur
-        /// </summary>
-        public void ReceiveMulticastStream()
-        {
-            Socket s = new(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
-            IPEndPoint ipep = new(IPAddress.Any, 45678);
-            s.Bind(ipep);
-            IPAddress ip = IPAddress.Parse("232.1.2.3");
-            s.SetSocketOption(SocketOptionLevel.IP, SocketOptionName.AddMembership, new MulticastOption(ip, IPAddress.Any));
-            for (int i = 0; i > -1; i++)
-            {
-                byte[] imageArray = new byte[9999999];
-                int size = 0;
-                int lastId = 0;
-                do
-                {
-                    try
-                    {
-                        byte[] message = new byte[65000];
-                        size = s.Receive(message);
-                        Array.Resize(ref message, size);
-                        Array.Copy(message, 0, imageArray, lastId, size);
-                        lastId += size;
-                    }
-                    catch
-                    {
-                        lbxConnexion.Invoke(new MethodInvoker(delegate { lbxConnexion.Items.Add("Error: " + i); }));
-                    }
-                } while (size == 65000);
-                Array.Resize(ref imageArray, lastId);
-                try
-                {
-                    Bitmap bitmap = new(new MemoryStream(imageArray));
-                    pbxScreeShot.Invoke(new MethodInvoker(delegate { pbxScreeShot.Image = bitmap; }));
-                    if (i % 100 == 0) { lbxConnexion.Invoke(new MethodInvoker(delegate { lbxConnexion.Items.Add(i); })); }
-                }
-                catch { lbxConnexion.Invoke(new MethodInvoker(delegate { lbxConnexion.Items.Add("Erreur avec l'image " + i); })); }
-
-            }
-        }
+        #endregion
     }
 
     [DataContract]
@@ -789,7 +837,7 @@ namespace LibraryData
 
         #region Instance Variables
 
-        public List<Keys> HookedKeys = new List<Keys>();
+        public List<Keys> HookedKeys = new();
         private IntPtr hHook = IntPtr.Zero;
         private static KeyboardHookProc hookProc;
 
@@ -807,25 +855,25 @@ namespace LibraryData
         public GlobalKeyboardHook()
         {
             hookProc = HookCallback;
-            hook();
+            Hook();
         }
 
         ~GlobalKeyboardHook()
         {
-            unhook();
+            Unhook();
         }
 
         #endregion
 
         #region Public Methods
 
-        public void hook()
+        public void Hook()
         {
             IntPtr hInstance = LoadLibrary("User32");
             hHook = SetWindowsHookEx(WH_KEYBOARD_LL, hookProc, hInstance, 0);
         }
 
-        public void unhook()
+        public void Unhook()
         {
             UnhookWindowsHookEx(hHook);
         }
@@ -841,7 +889,7 @@ namespace LibraryData
                 Keys key = (Keys)lParam.vkCode;
                 if (HookedKeys.Contains(key))
                 {
-                    KeyEventArgs kea = new KeyEventArgs(key);
+                    KeyEventArgs kea = new(key);
                     if ((wParam == WM_KEYDOWN || wParam == WM_SYSKEYDOWN) && (KeyDown != null))
                     {
                         KeyDown(this, kea);
@@ -870,5 +918,37 @@ namespace LibraryData
         [DllImport("kernel32.dll")]
         static extern IntPtr LoadLibrary(string lpFileName);
         #endregion
+    }
+
+    public class WindowMinimize
+    {
+        const int SW_SHOWMINNOACTIVE = 7;
+
+        [DllImport("user32.dll")]
+        static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
+
+        public static void MinimizeUnAuthorised(List<string> autorisedProcesses)
+        {
+            Process thisProcess = Process.GetCurrentProcess();
+            List<Process> processes = Process.GetProcesses().ToList();
+            bool remove;
+            for (int i = 0; i < processes.Count; i++)
+            {
+                remove = false;
+                IntPtr handle = processes[i].MainWindowHandle;
+                if (handle == IntPtr.Zero){ remove = true; };
+                for (int j = 0; j < autorisedProcesses.Count; j++)
+                {
+                    if (processes[i].ProcessName == autorisedProcesses[j]) { remove = true; }
+                }
+                if (processes[i].ProcessName == thisProcess.ProcessName) { remove = true; };
+                if (remove) { processes.Remove(processes[i]); }
+            }
+
+            foreach (Process process in processes)
+            {
+                ShowWindow(process.MainWindowHandle, SW_SHOWMINNOACTIVE);
+            }
+        }
     }
 }
