@@ -5,9 +5,9 @@ using System.Windows.Forms;
 
 namespace ApplicationTeacher
 {   
-    public partial class ChooseStudentToShareScreen : Form
+    public partial class ChooseStreamOptions : Form
     {
-        public ChooseStudentToShareScreen(List<DataForTeacher> list)
+        public ChooseStreamOptions(List<DataForTeacher> list)
         {
             InitializeComponent();
             lbxStudents.SelectionMode = SelectionMode.MultiExtended;

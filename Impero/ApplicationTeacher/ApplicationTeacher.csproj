@@ -87,11 +87,11 @@
     <Compile Include="AskToChoseIp.Designer.cs">
       <DependentUpon>AskToChoseIp.cs</DependentUpon>
     </Compile>
-    <Compile Include="ChooseStudentToShareScreen.cs">
+    <Compile Include="ChooseStreamOptions.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="ChooseStudentToShareScreen.Designer.cs">
-      <DependentUpon>ChooseStudentToShareScreen.cs</DependentUpon>
+    <Compile Include="ChooseStreamOptions.Designer.cs">
+      <DependentUpon>ChooseStreamOptions.cs</DependentUpon>
     </Compile>
     <Compile Include="Configuration.cs" />
     <Compile Include="DisplayStudent.cs">
@@ -111,8 +111,8 @@
     <EmbeddedResource Include="AskToChoseIp.resx">
       <DependentUpon>AskToChoseIp.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="ChooseStudentToShareScreen.resx">
-      <DependentUpon>ChooseStudentToShareScreen.cs</DependentUpon>
+    <EmbeddedResource Include="ChooseStreamOptions.resx">
+      <DependentUpon>ChooseStreamOptions.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="DisplayStudent.resx">
       <DependentUpon>DisplayStudent.cs</DependentUpon>

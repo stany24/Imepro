@@ -42,46 +42,31 @@ namespace ApplicationTeacher
         /// </summary>
         public void LoadConfigurationLists()
         {
+            LoadFileToList(Configuration.pathToSaveFolder + Configuration.FileNameIgnoredProcesses, Configuration.IgnoredProcesses, lbxConnexion);
+            LoadFileToList(Configuration.pathToSaveFolder + Configuration.FileNameAlertedProcesses, Configuration.AlertedProcesses, lbxConnexion);
+            LoadFileToList(Configuration.pathToSaveFolder + Configuration.FileNameAlertedUrl, Configuration.AlertedUrls, lbxConnexion);
+            LoadFileToList(Configuration.pathToSaveFolder + Configuration.FileNameAutorisedWebsite, Configuration.AutorisedWebsite, lbxConnexion);
+        }
+
+        public void LoadFileToList(string pathToFile,List<string> list, ListBox lbxOutput)
+        {
             try
             {
-                using StreamReader fichier = new(Configuration.pathToSaveFolder + Configuration.FileNameIgnoredProcesses);
-                Configuration.IgnoredProcesses = new(JsonSerializer.Deserialize<List<string>>(fichier.ReadToEnd()));
+                using StreamReader fichier = new(pathToFile);
+                list = new(JsonSerializer.Deserialize<List<string>>(fichier.ReadToEnd()));
                 fichier.Close();
             }
             catch (Exception e)
             {
-                lbxConnexion.Invoke(new MethodInvoker(delegate { lbxConnexion.Items.Add("Problème au chargement de la list des processus ignorées : " + e.ToString()); }));
+                lbxOutput.Invoke(new MethodInvoker(delegate { lbxOutput.Items.Add("Problème au chargement de la list des urls autorisé  : " + e.ToString()); }));
             }
-            try
-            {
-                using StreamReader fichier = new(Configuration.pathToSaveFolder + Configuration.FileNameAlertedProcesses);
-                Configuration.AlertedProcesses = new(JsonSerializer.Deserialize<List<string>>(fichier.ReadToEnd()));
-                fichier.Close();
-            }
-            catch (Exception e)
-            {
-                lbxConnexion.Invoke(new MethodInvoker(delegate { lbxConnexion.Items.Add("Problème au chargement de la list des processus alerté : " + e.ToString()); }));
-            }
-            try
-            {
-                using StreamReader fichier = new(Configuration.pathToSaveFolder + Configuration.FileNameAlertedUrl);
-                Configuration.AlertedUrls = new(JsonSerializer.Deserialize<List<string>>(fichier.ReadToEnd()));
-                fichier.Close();
-            }
-            catch (Exception e)
-            {
-                lbxConnexion.Invoke(new MethodInvoker(delegate { lbxConnexion.Items.Add("Problème au chargement de la list des urls alerté  : " + e.ToString()); }));
-            }
-            try
-            {
-                using StreamReader fichier = new(Configuration.pathToSaveFolder + Configuration.FileNameAutorisedWebsite);
-                Configuration.AutorisedWebsite = new(JsonSerializer.Deserialize<List<string>>(fichier.ReadToEnd()));
-                fichier.Close();
-            }
-            catch (Exception e)
-            {
-                lbxConnexion.Invoke(new MethodInvoker(delegate { lbxConnexion.Items.Add("Problème au chargement de la list des urls autorisé  : " + e.ToString()); }));
-            }
+        }
+
+        public void SaveListToFile(string pathToFile, List<string> list)
+        {
+            using StreamWriter writeFichierProcesusIgnore = new(pathToFile);
+            writeFichierProcesusIgnore.WriteLine(JsonSerializer.Serialize(list));
+            writeFichierProcesusIgnore.Close();
         }
 
         /// <summary>
@@ -89,18 +74,10 @@ namespace ApplicationTeacher
         /// </summary>
         public void SaveConfigurationLists()
         {
-            using StreamWriter writeFichierProcesusIgnore = new(Configuration.pathToSaveFolder + Configuration.FileNameIgnoredProcesses);
-            writeFichierProcesusIgnore.WriteLine(JsonSerializer.Serialize(Configuration.IgnoredProcesses));
-            writeFichierProcesusIgnore.Close();
-            using StreamWriter writeFichierProcesusAlerte = new(Configuration.pathToSaveFolder + Configuration.FileNameAlertedProcesses);
-            writeFichierProcesusAlerte.WriteLine(JsonSerializer.Serialize(Configuration.AlertedProcesses));
-            writeFichierProcesusAlerte.Close();
-            using StreamWriter writeFichierUrlsAlerte = new(Configuration.pathToSaveFolder + Configuration.FileNameAlertedUrl);
-            writeFichierUrlsAlerte.WriteLine(JsonSerializer.Serialize(Configuration.AlertedUrls));
-            writeFichierUrlsAlerte.Close();
-            using StreamWriter writeFichierAutorisedUrl = new(Configuration.pathToSaveFolder + Configuration.FileNameAutorisedWebsite);
-            writeFichierAutorisedUrl.WriteLine(JsonSerializer.Serialize(Configuration.AutorisedWebsite));
-            writeFichierAutorisedUrl.Close();
+            SaveListToFile(Configuration.pathToSaveFolder + Configuration.FileNameIgnoredProcesses, Configuration.IgnoredProcesses);
+            SaveListToFile(Configuration.pathToSaveFolder + Configuration.FileNameAlertedProcesses, Configuration.AlertedProcesses);
+            SaveListToFile(Configuration.pathToSaveFolder + Configuration.FileNameAlertedUrl, Configuration.AlertedUrls);
+            SaveListToFile(Configuration.pathToSaveFolder + Configuration.FileNameAutorisedWebsite, Configuration.AutorisedWebsite);
         }
 
         /// <summary>
@@ -195,43 +172,12 @@ namespace ApplicationTeacher
                     DateTime StartUpdate = DateTime.Now;
                     DateTime NextUpdate = DateTime.Now.AddSeconds(Configuration.DurationBetweenDemand);
                     List<DataForTeacher> ClientToRemove = new();
-                    for (int i = 0; i < AllStudents.Count; i++)
-                    {
-                        Socket socket = AllStudents[i].SocketToStudent;
-                        socket.ReceiveTimeout = Configuration.DefaultTimeout;
-                        socket.SendTimeout = Configuration.DefaultTimeout;
-                        try
-                        {
-                            //demande les données
-                            socket.Send(Encoding.ASCII.GetBytes("data"));
-                            lbxRequetes.Invoke(new MethodInvoker(delegate { lbxRequetes.Items.Add(DateTime.Now.ToString("HH:mm:ss") + " Demande des données à " + AllStudents[i].UserName); }));
-                            Task.Run(() => AllStudents[i] = ReceiveData(AllStudents[i])).Wait();
-                            //demande le screenshot
-                            socket.Send(Encoding.ASCII.GetBytes("image"));
-                            lbxRequetes.Invoke(new MethodInvoker(delegate { lbxRequetes.Items.Add(DateTime.Now.ToString("HH:mm:ss") + " Demande de l'image à " + AllStudents[i].UserName); }));
-                            Task.Run(() => ReceiveImage(AllStudents[i])).Wait();
-                        }
-                        catch ( SocketException)
-                        {
-                            socket.Shutdown(SocketShutdown.Both);
-                            socket.Close();
-                            ClientToRemove.Add(AllStudents[i]);
-                        }
-                    }
+                    UpdateEleves(ClientToRemove);
                     foreach (DataForTeacher client in ClientToRemove)
                     {
                         RemoveStudent(client);
                     }
-                    foreach(DisplayStudent display in AllStudentsDisplay)
-                    {
-                        foreach(DataForTeacher student in AllStudents)
-                        {
-                            if(display.Student.ID == student.ID)
-                            {
-                                display.UpdateAffichage(student);
-                            }
-                        }
-                    }
+                    UpdateAllIndividualDisplay();
                     //foreach (DataForTeacher client in AllClients) { client.UpdateAffichage(); }
                     DateTime FinishedUpdate = DateTime.Now;
                     TimeSpan UpdateDuration = FinishedUpdate - StartUpdate;
@@ -244,6 +190,48 @@ namespace ApplicationTeacher
                     }
                 }
                 else { Thread.Sleep(100); }
+            }
+        }
+
+        public void UpdateAllIndividualDisplay()
+        {
+            foreach (DisplayStudent display in AllStudentsDisplay)
+            {
+                foreach (DataForTeacher student in AllStudents)
+                {
+                    if (display.Student.ID == student.ID)
+                    {
+                        display.UpdateAffichage(student);
+                    }
+                }
+            }
+        }
+
+
+        public void UpdateEleves(List<DataForTeacher> ClientToRemove)
+        {
+            for (int i = 0; i < AllStudents.Count; i++)
+            {
+                Socket socket = AllStudents[i].SocketToStudent;
+                socket.ReceiveTimeout = Configuration.DefaultTimeout;
+                socket.SendTimeout = Configuration.DefaultTimeout;
+                try
+                {
+                    //demande les données
+                    socket.Send(Encoding.ASCII.GetBytes("data"));
+                    lbxRequetes.Invoke(new MethodInvoker(delegate { lbxRequetes.Items.Add(DateTime.Now.ToString("HH:mm:ss") + " Demande des données à " + AllStudents[i].UserName); }));
+                    Task.Run(() => AllStudents[i] = ReceiveData(AllStudents[i])).Wait();
+                    //demande le screenshot
+                    socket.Send(Encoding.ASCII.GetBytes("image"));
+                    lbxRequetes.Invoke(new MethodInvoker(delegate { lbxRequetes.Items.Add(DateTime.Now.ToString("HH:mm:ss") + " Demande de l'image à " + AllStudents[i].UserName); }));
+                    Task.Run(() => ReceiveImage(AllStudents[i])).Wait();
+                }
+                catch (SocketException)
+                {
+                    socket.Shutdown(SocketShutdown.Both);
+                    socket.Close();
+                    ClientToRemove.Add(AllStudents[i]);
+                }
             }
         }
 
@@ -413,25 +401,29 @@ namespace ApplicationTeacher
                 }
                 if (FilterEnabled)
                 {
-                    for (int i = 0; i < NodeBrowser.Nodes.Count; i++)
-                    {
-                        for (int j = 0; j < Configuration.AlertedUrls.Count; j++)
-                        {
-                            if (NodeBrowser.Nodes[i].Text.ToLower().Contains(Configuration.AlertedUrls[j]))
-                            {
-                                TreeNode NodeUrl = NodeBrowser.Nodes[i];
-                                NodeUrl.BackColor = Color.Red;
-                                while (NodeUrl.Parent != null)
-                                {
-                                    NodeUrl = NodeUrl.Parent;
-                                    NodeUrl.BackColor = Color.Red;
-                                }
-                            }
-                        }
-                    }
-
+                    ApplyFilter(NodeBrowser);
                 }
             }));
+        }
+
+        public void ApplyFilter(TreeNode NodeBrowser)
+        {
+            for (int i = 0; i < NodeBrowser.Nodes.Count; i++)
+            {
+                for (int j = 0; j < Configuration.AlertedUrls.Count; j++)
+                {
+                    if (NodeBrowser.Nodes[i].Text.ToLower().Contains(Configuration.AlertedUrls[j]))
+                    {
+                        TreeNode NodeUrl = NodeBrowser.Nodes[i];
+                        NodeUrl.BackColor = Color.Red;
+                        while (NodeUrl.Parent != null)
+                        {
+                            NodeUrl = NodeUrl.Parent;
+                            NodeUrl.BackColor = Color.Red;
+                        }
+                    }
+                }
+            }
         }
 
         /// <summary>

@@ -1,6 +1,6 @@
 ﻿namespace ApplicationTeacher
 {
-    partial class ChooseStudentToShareScreen
+    partial class ChooseStreamOptions
     {
         /// <summary>
         /// Required designer variable.
