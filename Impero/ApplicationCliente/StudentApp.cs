@@ -241,6 +241,8 @@ namespace ApplicationCliente
                     Client.SocketToTeacher.Send(Encoding.ASCII.GetBytes("stop"));
                     Client.SocketToTeacher.Disconnect(false);
                     Client.SocketToTeacher = null;
+                    TrayIconStudent.Visible= false;
+                    TrayIconStudent.Dispose();
                     firefoxdriver?.Dispose();
                     chromedriver?.Dispose();
                 }

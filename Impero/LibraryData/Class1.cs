@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
+using System.Management;
 using System.Net;
 using System.Net.Sockets;
 using System.Runtime.InteropServices;
@@ -419,6 +421,14 @@ namespace LibraryData
         /// </summary>
         public void ReceiveMulticastStream()
         {
+            switch (options.focus)
+            {
+                case Focus.Everything:
+                    break;
+                default:
+                    Task.Run(MinimizeUnAutorisedEverySecond);
+                    break;
+            }
             Socket s = new(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
             IPEndPoint ipep = new(IPAddress.Any, 45678);
             s.Bind(ipep);
@@ -487,14 +497,6 @@ namespace LibraryData
                         break;
                 }
             }));
-            switch (options.focus)
-            {
-                case Focus.Everything:
-                    break;
-                default:
-                    Task.Run(MinimizeUnAutorisedEverySecond);
-                    break;
-            }
         }
 
         #endregion
@@ -512,57 +514,6 @@ namespace LibraryData
         }
 
 
-        [DllImport("user32.dll")]
-        private static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
-
-        [DllImport("user32.dll")]
-        private static extern bool IsIconic(IntPtr hWnd);
-
-        public void ApplyAuthorisedFocus()
-        {
-            List<Process> ProcessToMinimize = Process.GetProcesses().ToList();
-            const int SW_MINIMIZE = 6;
-            foreach (Process process in ProcessToMinimize)
-            {
-                if (process.ProcessName == "client") { ProcessToMinimize.Remove(process); }
-            }
-            List<string> processToRemove = new();
-            switch (options.focus)
-            {
-                case Focus.VSCode:
-                    processToRemove = new List<string>() { "code" };
-                    break;
-                case Focus.OneNote:
-                    processToRemove = new List<string>() { "ONENOTE" };
-                    break;
-                case Focus.VisualStudio:
-                    processToRemove = new List<string>() { "devenv" };
-                    break;
-                case Focus.Word:
-                    processToRemove = new List<string>() { "WINWORD" };
-                    break;
-                case Focus.Everything: return;
-            }
-
-            foreach (Process process in ProcessToMinimize)
-            {
-                foreach (string key in processToRemove)
-                    if (process.ProcessName == key) { ProcessToMinimize.Remove(process); }
-            }
-
-            while (true)
-            {
-                foreach (Process process in ProcessToMinimize)
-                {
-                    if (!IsIconic(process.MainWindowHandle))
-                    {
-                        // Minimize the window
-                        ShowWindow(process.MainWindowHandle, SW_MINIMIZE);
-                    }
-                }
-            }
-        }
-
         void GKH_KeyUp(object sender, KeyEventArgs e)
         {
             e.Handled = true;
@@ -578,8 +529,9 @@ namespace LibraryData
             while (isReceiving)
             {
                 WindowMinimize.MinimizeUnAuthorised(options.AutorisedOpenedProcess);
-                Thread.Sleep(1000);
+                Thread.Sleep(3000);
             }
+            WindowMinimize.ShowBack();
         }
 
         private void DisableMouseEverySecond()
@@ -922,7 +874,9 @@ namespace LibraryData
 
     public class WindowMinimize
     {
-        const int SW_SHOWMINNOACTIVE = 7;
+        const int SW_HIDE = 0;
+        const int SW_SHOWMINIMIZED = 2;
+        const int SW_SHOW = 5;
 
         [DllImport("user32.dll")]
         static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
@@ -931,23 +885,22 @@ namespace LibraryData
         {
             Process thisProcess = Process.GetCurrentProcess();
             List<Process> processes = Process.GetProcesses().ToList();
-            bool remove;
-            for (int i = 0; i < processes.Count; i++)
-            {
-                remove = false;
-                IntPtr handle = processes[i].MainWindowHandle;
-                if (handle == IntPtr.Zero){ remove = true; };
-                for (int j = 0; j < autorisedProcesses.Count; j++)
-                {
-                    if (processes[i].ProcessName == autorisedProcesses[j]) { remove = true; }
-                }
-                if (processes[i].ProcessName == thisProcess.ProcessName) { remove = true; };
-                if (remove) { processes.Remove(processes[i]); }
-            }
 
             foreach (Process process in processes)
             {
-                ShowWindow(process.MainWindowHandle, SW_SHOWMINNOACTIVE);
+                if(process.ProcessName != autorisedProcesses[0] && process.ProcessName != thisProcess.ProcessName)
+                {
+                    try { ShowWindow(process.MainWindowHandle, SW_SHOWMINIMIZED); } catch { }
+                }
+            }
+        }
+
+        public static void ShowBack()
+        {
+            List<Process> processes = Process.GetProcesses().ToList();
+            foreach (Process process in processes)
+            {
+                try { ShowWindow(process.MainWindowHandle, SW_SHOW); } catch { }
             }
         }
     }

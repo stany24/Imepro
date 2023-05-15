@@ -11,6 +11,7 @@ namespace ApplicationTeacher
 {
     public static class Configuration
     {
+        public static Dictionary<string,string> DifferentFocus = new();
         public static List<string> IgnoredProcesses = new();
         public static List<string> AlertedProcesses = new();
         public static List<string> AlertedUrls = new();
@@ -22,6 +23,7 @@ namespace ApplicationTeacher
         public static string FileNameAlertedProcesses = "ProcessusAlerté.txt";
         public static string FileNameAlertedUrl = "UrlsAlerté.txt";
         public static string FileNameAutorisedWebsite = "SitesAutorise.txt";
+        public static string FileNameDifferentFocus = "ChoixFocus.txt";
         public static int DurationBetweenDemand = 15;
         public static int DefaultTimeout = 2000;
     }

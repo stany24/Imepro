@@ -589,6 +589,8 @@ namespace ApplicationTeacher
                 student.SocketToStudent.Dispose();
                 //student.SocketToStudent.Disconnect(false);
             }
+            TrayIconTeacher.Visible = false;
+            TrayIconTeacher.Dispose();
             SaveConfigurationLists();
         }
 

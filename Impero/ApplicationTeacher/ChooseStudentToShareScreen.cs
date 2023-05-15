@@ -48,7 +48,7 @@ namespace ApplicationTeacher
                     break;
                 case LibraryData.Focus.Word:list = new() { "WINWORD","sppsvc" };
                     break;
-                case LibraryData.Focus.VisualStudio:list = new() { "devenv" };
+                case LibraryData.Focus.VisualStudio:list = new() { "devenv","ServiceHub","" };
                     break;
                 case LibraryData.Focus.OneNote:list = new() { "onenoteim" };
                     break;
