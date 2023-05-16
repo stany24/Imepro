@@ -129,3 +129,29 @@ classDiagram
         -int SW_SHOWMINIMIZED
         +MinimizeUnAutorised(List~string~):void
     }
+    class MiniatureDisplayer{
+        +List~Miniature~ MiniatureList
+        -int MaxWidth
+        -int Marge
+        +double zoom
+        +ChangeZoom():void
+        -LaunchTimeUpdate():void
+        -UpdateAllTimes():void
+        +UpdateAllLocations(int):void
+        +UpdateMiniature(int,string,Bitmap):void
+        +AddMiniature(Miniature):void
+        +RemoveMiniature(int, string):void
+    }
+    class Miniature{
+        +int StudentID
+        +PictureBox pbxImage
+        -Label lblComputerInformations
+        -Button btnSaveScreenShot
+        -int MargeBetweenText
+        +int TimeSinceUpdate
+        +string ComputerName
+        -string SavePath
+        -SaveScreenShot(object, EventArgs):void
+        +UpdateTime():void
+        -UpdatePositionsRelativeToImage(object, EventArgs)
+    }

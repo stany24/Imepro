@@ -392,7 +392,7 @@ namespace LibraryData
                 {
                     case "data": SendData(); break;
                     case "image": ; SendImage(TakeAllScreenShot(),SocketToTeacher); break;
-                    //case "kill": KillSelectedProcess(Convert.ToInt32(text.Split(' ')[1])); break;
+                    case "kill": KillSelectedProcess(Convert.ToInt32(text.Split(' ')[1])); break;
                     case "receive":isReceiving = true;Task.Run(ReceiveMulticastStream); break;
                     case "apply": ApplyMulticastSettings(); break;
                     case "stops":Stop();break;
@@ -406,6 +406,15 @@ namespace LibraryData
                     case "shutdown":ShutDown();return;
                 }
             }
+        }
+
+        /// <summary>
+        /// Fonction qui arrête un processus
+        /// </summary>
+        /// <param name="id">l'id du processus que l'on veux arreter</param>
+        private void KillSelectedProcess(int id)
+        {
+            Process.GetProcessById(id).Kill();
         }
 
         /// <summary>
@@ -621,6 +630,21 @@ namespace LibraryData
             EnableMouse();
         }
 
+        
+        /// <summary>
+        /// Fonction qui bloque la souris
+        /// </summary>
+        private void DisableMouse()
+        {
+            Cursor.Clip = new Rectangle(0, 60, 1, 1);
+            Cursor.Hide();
+            Application.AddMessageFilter(this);
+            foreach (var process in Process.GetProcessesByName("Taskmgr"))
+            {
+                process.Kill();
+            }
+        }
+
         /// <summary>
         /// Fonction qui réactive la souris
         /// </summary>
@@ -636,20 +660,6 @@ namespace LibraryData
             if (m.Msg == 0x201 || m.Msg == 0x202 || m.Msg == 0x203) return true;
             if (m.Msg == 0x204 || m.Msg == 0x205 || m.Msg == 0x206) return true;
             return false;
-        }
-
-        /// <summary>
-        /// Fonction qui bloque la souris
-        /// </summary>
-        private void DisableMouse()
-        {
-            Cursor.Clip = new Rectangle(0, 60, 1, 1);
-            Cursor.Hide();
-            Application.AddMessageFilter(this);
-            foreach (var process in Process.GetProcessesByName("Taskmgr"))
-            {
-                process.Kill();
-            }
         }
 
         #endregion
@@ -1015,12 +1025,12 @@ namespace LibraryData
     {
         public int StudentID;
         public PictureBox PbxImage = new();
-        public readonly Label lblComputerInformations = new();
-        public readonly Button btnSaveScreenShot = new();
+        private readonly Label lblComputerInformations = new();
+        private readonly Button btnSaveScreenShot = new();
         readonly int MargeBetweenText = 5;
         public int TimeSinceUpdate = 0;
         public string ComputerName;
-        readonly string SavePath;
+        private readonly string SavePath;
 
         /// <summary>
         /// Consctucteur pour créer et positionner un miniature
@@ -1072,7 +1082,7 @@ namespace LibraryData
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        public void SaveScreenShot(object sender, EventArgs e)
+        private void SaveScreenShot(object sender, EventArgs e)
         {
             PbxImage.Image.Save(SavePath + ComputerName + DateTime.Now.ToString("_yyyy-mm-dd_hh-mm-ss") + ".jpg", ImageFormat.Jpeg);
         }
@@ -1092,7 +1102,7 @@ namespace LibraryData
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        public void UpdatePositionsRelativeToImage(object sender, EventArgs e)
+        private void UpdatePositionsRelativeToImage(object sender, EventArgs e)
         {
             //taille de la picturebox
             Size = new Size(PbxImage.Width, PbxImage.Height + 3 * MargeBetweenText + lblComputerInformations.Height);
@@ -1111,8 +1121,8 @@ namespace LibraryData
     public class MiniatureDisplayer
     {
         public List<Miniature> MiniatureList = new();
-        int MaxWidth;
-        readonly int Marge = 10;
+        private int MaxWidth;
+        private readonly int Marge = 10;
         public double zoom = 0.1;
 
         /// <summary>
@@ -1139,7 +1149,7 @@ namespace LibraryData
         /// <summary>
         /// Fonction qui toutes les seconde lance une mise à jour du temps
         /// </summary>
-        public void LaunchTimeUpdate()
+        private void LaunchTimeUpdate()
         {
             Thread.Sleep(3000);
             while (true)
@@ -1152,7 +1162,7 @@ namespace LibraryData
         /// <summary>
         /// Fonction qui lance la mise à jour du temps dans toutes les miniatures
         /// </summary>
-        public void UpdateAllTimes()
+        private void UpdateAllTimes()
         {
             foreach (Miniature miniature in MiniatureList)
             {
