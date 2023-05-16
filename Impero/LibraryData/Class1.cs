@@ -85,7 +85,6 @@ namespace LibraryData
         public Socket SocketControl = null;
         public int ID;
         public int NumberOfFailure;
-        public List<Message> Messages = new();
 
         public DataForTeacher(Socket socket, int id)
         {
@@ -110,28 +109,27 @@ namespace LibraryData
     public class DataForStudent : Data, IMessageFilter
     {
         #region Variables/Constructeur
-        public int screenToStream;
-        readonly GlobalKeyboardHook gkh = new();
-        Rectangle OldRect = Rectangle.Empty;
-        StreamOptions options;
-        bool mouseDisabled = false;
-        public bool isReceiving = false;
-        bool isControled = false;
+        private int screenToStream;
+        private readonly GlobalKeyboardHook gkh = new();
+        private Rectangle OldRect = Rectangle.Empty;
+        private StreamOptions options;
+        private bool mouseDisabled = false;
+        private bool isReceiving = false;
+        private bool isControled = false;
         public Socket SocketToTeacher;
-        public Socket SocketControl;
-        public List<string> DefaultProcess = new();
+        private Socket SocketControl;
+        readonly private List<string> DefaultProcess = new();
         readonly private ListBox lbxConnexion;
-        readonly private PictureBox pbxScreeShot;
+        readonly private PictureBox pbxScreenShot;
         readonly private IPAddress IpToTeacher;
         readonly private ListBox tbxMessage;
         readonly private Form form;
-        public List<Message> Messages = new();
         public List<string> AutorisedUrls = new();
-        readonly public List<string> browsersList = new() { "chrome", "firefox", "iexplore", "safari", "opera", "msedge" };
+        readonly private List<string> browsersList = new() { "chrome", "firefox", "iexplore", "safari", "opera", "msedge" };
         public DataForStudent(ListBox lbxconnexion, PictureBox pbxscreenshot, ListBox tbxmessage, IPAddress ipToTeacher, Form form)
         {
             lbxConnexion = lbxconnexion;
-            pbxScreeShot = pbxscreenshot;
+            pbxScreenShot = pbxscreenshot;
             tbxMessage = tbxmessage;
             IpToTeacher = ipToTeacher;
             this.form = form;
@@ -143,7 +141,7 @@ namespace LibraryData
         /// <summary>
         /// Fonction qui permet de trouver le nom d'utilisateur et le nom de la machine
         /// </summary>
-        public void GetNames()
+        private void GetNames()
         {
             ComputerName = Environment.MachineName;
             UserName = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
@@ -153,7 +151,7 @@ namespace LibraryData
         /// Fonction qui retourne un instance de la classe parente
         /// </summary>
         /// <returns></returns>
-        public Data ToData()
+        private Data ToData()
         {
             return new Data(UserName, ComputerName, Urls, Processes);
         }
@@ -162,7 +160,7 @@ namespace LibraryData
 
         #region Récupération Url/Processus/Image
 
-        public void GetAllTabNameEvery5Seconds()
+        private void GetAllTabNameEvery5Seconds()
         {
             while (true)
             {
@@ -174,7 +172,7 @@ namespace LibraryData
         /// <summary>
         /// Fonction qui permet de récuperer le nom de l'onglet actif dans tous les navigateurs ouverts
         /// </summary>
-        public void GetCurrentWebTabsName()
+        private void GetCurrentWebTabsName()
         {
             [DllImport("user32.dll")]
             static extern int GetWindowTextLength(IntPtr hWnd);
@@ -205,7 +203,7 @@ namespace LibraryData
         /// <summary>
         /// Fonction qui crée une list de processus lancé par l'ordinateur au démarrage de l'application
         /// </summary>
-        public void GetDefaultProcesses()
+        private void GetDefaultProcesses()
         {
             foreach (Process process in Process.GetProcesses().OrderBy(x => x.ProcessName)) { DefaultProcess.Add(process.ProcessName); }
         }
@@ -213,7 +211,7 @@ namespace LibraryData
         /// <summary>
         /// Fonction qui met à jour la list des processus lancé par l'utilisateur
         /// </summary>
-        public void GetUserProcesses()
+        private void GetUserProcesses()
         {
             Processes.Clear();
             List<Process> list = Process.GetProcesses().OrderBy(x => x.ProcessName).ToList();
@@ -226,7 +224,7 @@ namespace LibraryData
         /// <summary>
         /// Fonction qui permet de prendre une capture d'écran de tous les écran puis de les recomposer en une seul image
         /// </summary>
-        public Bitmap TakeAllScreenShot()
+        private Bitmap TakeAllScreenShot()
         {
             int TotalWidth = 0;
             int MaxHeight = 0;
@@ -258,7 +256,7 @@ namespace LibraryData
             return null;
         }
 
-        public Bitmap TakeSreenShot(Screen screen)
+        private Bitmap TakeSreenShot(Screen screen)
         {
             Bitmap Bitmap = new(screen.Bounds.Width, screen.Bounds.Height, PixelFormat.Format16bppRgb565);
             Rectangle ScreenSize = screen.Bounds;
@@ -277,7 +275,7 @@ namespace LibraryData
         /// <summary>
         /// Fonction qui sérialize les données puis les envoient au professeur
         /// </summary>
-        public void SendData()
+        private void SendData()
         {
             GetCurrentWebTabsName();
             GetUserProcesses();
@@ -290,7 +288,7 @@ namespace LibraryData
         /// <summary>
         /// Fonction qui envoie le screenshot au professeur
         /// </summary>
-        public void SendImage(Bitmap image,Socket socket)
+        private void SendImage(Bitmap image,Socket socket)
         {
             byte[] imagebytes;
             ImageConverter converter = new();
@@ -305,7 +303,7 @@ namespace LibraryData
         /// <summary>
         /// Fonction qui connecte cette application à l'application du professeur
         /// </summary>
-        public Socket ConnectToMaster(int port)
+        public Socket ConnectToTeacher(int port)
         {
             try
             {
@@ -360,7 +358,7 @@ namespace LibraryData
         /// <summary>
         /// Fonction qui attend les demandes du professeur et lance la bonne fonction pour y répondre
         /// </summary>
-        public void WaitForDemand()
+        private void WaitForDemand()
         {
             while(SocketToTeacher == null) {Thread.Sleep(100);}
             while (true)
@@ -382,7 +380,7 @@ namespace LibraryData
                     case "stops":Stop();break;
                     case "message": ReceiveMessage(); break;
                     case "url": ReceiveAuthorisedUrls(); break;
-                    case "control": Task.Run(()=>SendStream(Convert.ToInt32(text.Split(' ')[1])));break;
+                    case "control":screenToStream = Convert.ToInt32(text.Split(' ')[1]);  Task.Run(()=>SendStream());break;
                     case "stopc":isControled = false; break;
                     case "mouse": break;
                     case "key": break;
@@ -392,45 +390,45 @@ namespace LibraryData
             }
         }
 
-        public void Disconnect()
+        private void Disconnect()
         {
             SocketToTeacher.Disconnect(false);
             SocketToTeacher = null;
             lbxConnexion.Invoke(new MethodInvoker(delegate { lbxConnexion.Items.Add("Le professeur a coupé la connexion"); }));
             Thread.Sleep(1000);
-            SocketToTeacher = Task.Run(() => ConnectToMaster(11111)).Result;
+            SocketToTeacher = Task.Run(() => ConnectToTeacher(11111)).Result;
         }
 
-        public void ShutDown()
+        private void ShutDown()
         {
             SocketToTeacher.Disconnect(false);
             SocketToTeacher = null;
             Application.Exit();
         }
 
-        public void Stop()
+        private void Stop()
         {
             isReceiving = false;
             mouseDisabled = false;
             form.Invoke(new MethodInvoker(delegate { form.FormBorderStyle = FormBorderStyle.Sizable; }));
-            pbxScreeShot.Invoke(new MethodInvoker(delegate { pbxScreeShot.Visible = false; }));
+            pbxScreenShot.Invoke(new MethodInvoker(delegate { pbxScreenShot.Visible = false; }));
             gkh.Unhook();
         }
 
-        public void SendStream(int nbScreen)
+        private void SendStream()
         {
             isControled = true;
-            SocketControl = ConnectToMaster(11112);
+            SocketControl = ConnectToTeacher(11112);
             while(isControled)
             {
-                SendImage(TakeSreenShot(Screen.AllScreens[nbScreen]),SocketControl);
+                SendImage(TakeSreenShot(Screen.AllScreens[screenToStream]),SocketControl);
             }
         }
 
         /// <summary>
         /// Fonction qui recoit la liste des urls autorisés
         /// </summary>
-        public void ReceiveAuthorisedUrls()
+        private void ReceiveAuthorisedUrls()
         {
             byte[] bytemessage = new byte[102400];
             int nbData = SocketToTeacher.Receive(bytemessage);
@@ -441,7 +439,7 @@ namespace LibraryData
         /// <summary>
         /// Fonction qui recoit un message du professeur
         /// </summary>
-        public void ReceiveMessage()
+        private void ReceiveMessage()
         {
             byte[] bytemessage = new byte[1024];
             int nbData = SocketToTeacher.Receive(bytemessage);
@@ -456,7 +454,7 @@ namespace LibraryData
         /// <summary>
         /// Fonction qui recoit la diffusion multicast envoyée par le professeur
         /// </summary>
-        public void ReceiveMulticastStream()
+        private void ReceiveMulticastStream()
         {
             switch (options.focus)
             {
@@ -492,24 +490,24 @@ namespace LibraryData
                 try
                 {
                     Bitmap bitmap = new(new MemoryStream(imageArray));
-                    pbxScreeShot.Invoke(new MethodInvoker(delegate { pbxScreeShot.Image = bitmap; }));
+                    pbxScreenShot.Invoke(new MethodInvoker(delegate { pbxScreenShot.Image = bitmap; }));
                 }
                 catch { }
             }
         }
 
-        public void ApplyMulticastSettings()
+        private void ApplyMulticastSettings()
         {
             byte[] message = new byte[128];
             int size = SocketToTeacher.Receive(message);
             Array.Resize(ref message, size);
             options = JsonSerializer.Deserialize<StreamOptions>(Encoding.Default.GetString(message));
-            pbxScreeShot.Invoke(new MethodInvoker(delegate { pbxScreeShot.Visible = true; }));
-            pbxScreeShot.Invoke(new MethodInvoker(delegate { pbxScreeShot.Dock = DockStyle.Fill; }));
+            pbxScreenShot.Invoke(new MethodInvoker(delegate { pbxScreenShot.Visible = true; }));
+            pbxScreenShot.Invoke(new MethodInvoker(delegate { pbxScreenShot.Dock = DockStyle.Fill; }));
             form.Invoke(new MethodInvoker(delegate
             {
                 form.Show();
-                form.Controls.SetChildIndex(pbxScreeShot, 0);
+                form.Controls.SetChildIndex(pbxScreenShot, 0);
                 switch (options.priority)
                 {
                     case Priority.Fullscreen:
@@ -530,7 +528,7 @@ namespace LibraryData
                         form.WindowState = FormWindowState.Maximized;
                         break;
                     case Priority.Widowed:
-                        form.Controls.SetChildIndex(pbxScreeShot, 0);
+                        form.Controls.SetChildIndex(pbxScreenShot, 0);
                         break;
                 }
             }));
@@ -546,17 +544,12 @@ namespace LibraryData
             {
                 gkh.HookedKeys.Add(key);
             }
-            gkh.KeyDown += new KeyEventHandler(GKH_KeyDown);
-            gkh.KeyUp += new KeyEventHandler(GKH_KeyUp);
+            gkh.KeyDown += new KeyEventHandler(HandleKeyPress);
+            gkh.KeyUp += new KeyEventHandler(HandleKeyPress);
         }
 
 
-        void GKH_KeyUp(object sender, KeyEventArgs e)
-        {
-            e.Handled = true;
-        }
-
-        void GKH_KeyDown(object sender, KeyEventArgs e)
+        private void HandleKeyPress(object sender, KeyEventArgs e)
         {
             e.Handled = true;
         }
@@ -677,7 +670,7 @@ namespace LibraryData
                 default: break;
             }
         }
-        public void VerifyUrl(List<Url> list, Url url)
+        private void VerifyUrl(List<Url> list, Url url)
         {
             if (list.Count == 0) { list.Add(url); return; }
             if (list.Last().Name != url.Name) { list.Add(url); return; }
@@ -911,8 +904,8 @@ namespace LibraryData
 
     public class WindowMinimize
     {
-        const int SW_SHOWMINIMIZED = 2;
-        const int SW_SHOW = 5;
+        private const int SW_SHOWMINIMIZED = 2;
+        private const int SW_SHOW = 5;
 
         [DllImport("user32.dll")]
         static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);

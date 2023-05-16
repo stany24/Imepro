@@ -20,8 +20,8 @@ namespace ApplicationCliente
     {
         readonly DataForStudent Client;
         IPAddress IpToTeacher;
-        readonly string pathToConfigurationFolder = "C:\\Users\\gouvernonst\\Downloads\\";
-        readonly string FileNameConfigurationIp = "iPToTeacher.txt";
+        readonly string pathToConfigurationFolder = "C:\\ProgramData\\Imepro\\";
+        readonly string FileNameConfigurationIp = "iPToTeacher.json";
         IWebDriver FirefoxDriver;
         IWebDriver ChromeDriver;
         public StudentApp()
@@ -35,7 +35,7 @@ namespace ApplicationCliente
         public void LaunchTasks()
         {
             while (!IsHandleCreated) {Thread.Sleep(100);}
-            Client.SocketToTeacher = Task.Run(() => Client.ConnectToMaster(11111)).Result;
+            Client.SocketToTeacher = Task.Run(() => Client.ConnectToTeacher(11111)).Result;
             Task.Run(AutomaticChecker);
         }
 

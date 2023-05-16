@@ -18,11 +18,11 @@ namespace ApplicationTeacher
         public static List<string> AutorisedWebsite = new();
         public static List<DataForTeacher> StudentToShareScreen = new();
         public static StreamOptions streamoptions;
-        public static string pathToSaveFolder = "C:\\Users\\gouvernonst\\Downloads\\";
-        public static string FileNameIgnoredProcesses = "ProcessusIgnore.txt";
-        public static string FileNameAlertedProcesses = "ProcessusAlerté.txt";
-        public static string FileNameAlertedUrl = "UrlsAlerté.txt";
-        public static string FileNameAutorisedWebsite = "SitesAutorise.txt";
+        public static string pathToSaveFolder = "C:\\ProgramData\\Imepro\\";
+        public static string FileNameIgnoredProcesses = "ProcessusIgnore.json";
+        public static string FileNameAlertedProcesses = "ProcessusAlerté.json";
+        public static string FileNameAlertedUrl = "UrlsAlerté.json";
+        public static string FileNameAutorisedWebsite = "SitesAutorise.json";
         public static string FileNameDifferentFocus = "ChoixFocus.txt";
         public static int DurationBetweenDemand = 15;
         public static int DefaultTimeout = 2000;

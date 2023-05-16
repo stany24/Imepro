@@ -1,0 +1,131 @@
+classDiagram
+    Data <|-- DataForTEacher
+    Data <|-- DataForStudent
+    class IpForTheWeek{
+        +String[] lundi
+        +String[] mardi
+        +String[] mercredi
+        +String[] jeudi
+        +String[] vendredi
+        +String[] samedi
+        +String[] dimanche
+        +SetIp(string) void
+        +GetIp() string
+    }
+    class Url{
+        +DateTime CaptureTime
+        +String Browser
+        +String Name
+        +ToString() String
+    }
+    class HistoriqueUrl{
+        +List~Url~ chrome
+        +List~Url~ firefox
+        +List~Url~ seleniumchrome
+        +List~Url~ seleniumfirefox
+        +List~Url~ opera
+        +List~Url~ edge
+        +List~Url~ safari
+        +List~Url~ iexplorer
+        +List~Url~ custom
+        +AddUrl(Url) void
+        -VerifiyUrl(List~Url~, Url) void 
+    }
+    class GlobalKeyboardHook{
+        +List~Key~ HookedKeys
+        -IntPtr hHook
+        -KeyboardHookProc hookProc
+        -int WH_KEYBOARD_LL
+        -int WM_KEYDOWN
+        -int WM_KEYUP
+        -int WM_SYSKEYDOWN
+        -int WM_SYSKEYUP
+        +Hook() void
+        +Unhook() void
+        -HookCallBack(int,int,KeyboardHookStruct) int
+    }
+    class Data{
+        +String UserName
+        +String ComputerName
+        +HistoriqueUrl Urls
+        +Dictionary<int,string> Processes
+        +BitMap ScreenShot
+    }
+    class StreamOptions{
+        +Priority priority
+        +Focus focus
+    }
+    class Priority{
+        <<enumeration>>
+        Widowed
+        Fullscreen
+        Topmost
+        Blocking
+    }
+    class Focus{
+        <<enumeration>>
+        Everything
+        OneNote
+        VisualStudio
+        VSCode
+        Word
+    }
+    class DataForTEacher{
+        +Socket SocketControl
+        +Socket SocketToStudent
+        +int ID
+        +int NumberOfFailure
+        +ToString() string
+    }
+
+    class DataForStudent{
+        -int screenToStream
+        -GlobalKeyboardHook ghk
+        -Rectangle OldRect
+        -StreamOptions options
+        -bool mouseDisabled
+        -bool isReceiving
+        -bool isControled
+        +Socket SocketToTeacher
+        -Socket SocketControl
+        -List~string~ DefaultProcess
+        -ListBox lbxConnexion
+        -PictureBox pbxScreenShot
+        -IPAdress IPToTeacher
+        -ListBox tbxMessage
+        -Form Form
+        +List~string~ AutorisedUrls
+        -List~string~ browserList
+        -GetNames():void
+        -ToData():Data
+        -GetAllTabNameEvery5Seconds():void
+        -GetCurrentWebTabsName():void
+        -GetDefaultProcesses():void
+        -GetUserProcesses():void
+        -TakeAllScreenShot():BitMap
+        -TakeSreenShot(Screen):BitMap
+        -SendData():void
+        -SendImage(Bitmap,Socket) :void
+        +ConnectToTeacher(int) : Socket
+        -WaitForDemand():void
+        -Disconnect():void
+        -ShutDown():void
+        -Stop():void
+        -SendStream(int):void
+        -ReceiveAuthorisedUrls():void
+        -ReceiveMessage():void
+        -ReceiveMulticastStream():void
+        -ApplyMulticastSettings():void
+        -DisableKeyboard():void
+        -HandleKeyPress(object,KeyEventArgs):void
+        -MinimizeUnAutorisedEverySecond():void
+        -DisableMouse():void
+        -DisableMouseEverySecond():void
+        -EnableMouse():void
+        +PreFilterMessage(ref Message):bool
+    }
+    class WindowMinimize{
+        -int SW_SHOWMINIMIZED
+        -int SW_SHOWMINIMIZED
+        +MinimizeUnAutorised(List~string~):void
+    }

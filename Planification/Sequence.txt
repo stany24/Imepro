@@ -1,0 +1,46 @@
+sequenceDiagram
+    Participant S as Selenium
+    Actor E as Eleve
+    Participant AE as ApplicationEleve
+    Participant AP as ApplicationProfesseur
+    Actor P as Professeur
+    E->>AE:Démmarage
+    AE->>E:IP de ton professeur ?
+    AP->>P:Affiche l'IP
+    P->>E:Donne l'IP à ses élèves
+    E->>AE:157.26.227.198
+    AE->>AP:Demande de connxion
+    AE->>S:Démmarage
+    loop Toutes les 2 secondes
+        AE->>S:Vérification de l'url
+    end
+    loop Toutes les 15 secondes
+        AP->>AE:Demande d'informations
+        AE->>AE:Récupération des données
+        AE->>AP:Envoi des informatinos
+        AP->>AE:Demande de la capture d'écran
+        AE->>AE:Prise de la capture d'écran
+        AE->>AP:Envoi de la catpute d'écran
+    end
+    P->>AP:Demande de prise de contrôle
+    AP->>AC:Demande de streaming
+    loop Aussi vite que possible
+        AC->>AP:Envoi d'image
+        AP->>AC:Envoi de commande
+    end
+    P->>AP:Demande d'arrêt du control
+    AP->>AC:Demande d'arrêt
+    loop Quand le professeur le veux
+        P->>AP:Visualisation des informations
+    end
+    P->>AP:Démmarage du Streaming
+    AP->>AE:Préviens les élèves concernés
+    AE->>AE:Lance la réception
+    loop Jusqu'a ce que le professeur arrête le partage
+        AP->>AE:Image
+    end
+    E->>AE:Arret
+    AE->>AP:Signalement de l'arret
+    AE->>S:Arret de selenium
+    P->>AP:Arret
+    AP->>AE:Signalement de l'arret
