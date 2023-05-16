@@ -3,21 +3,30 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.Net.Sockets;
+using System.Net;
 using System.Text;
+using System.Threading.Tasks;
+using System.Threading;
 using System.Windows.Forms;
+using System.IO;
 
 namespace ApplicationTeacher
 {
     public partial class DisplayStudent : Form
     {
-        public DataForTeacher Student;
-        public DisplayStudent()
+        public DataForTeacher Student = null;
+        public IPAddress ipAddr = null;
+        PictureBox pbxStream;
+        public DisplayStudent(IPAddress ip)
         {
+            ipAddr= ip;
             InitializeComponent();
         }
 
         public void UpdateAffichage(DataForTeacher student)
         {
+            if(Student != null && Student.SocketControl != null) { student.SocketControl = Student.SocketControl; }
             Student= student;
             if (InvokeRequired)
             {
@@ -149,6 +158,66 @@ namespace ApplicationTeacher
         {
             Student.SocketToStudent.Send(Encoding.ASCII.GetBytes("message"));
             Student.SocketToStudent.Send(Encoding.ASCII.GetBytes(tbxMessage.Text));
+        }
+
+        private void TakeControl_Click(object sender, EventArgs e)
+        {
+            Student.SocketToStudent.Send(Encoding.ASCII.GetBytes("control 0"));
+            ConnectStudentForControl();
+            pbxStream = new(){
+                Dock = DockStyle.Fill,
+                SizeMode = PictureBoxSizeMode.Zoom
+            };
+            Controls.Add(pbxStream);
+            Controls.SetChildIndex(pbxStream, 0);
+            Task.Run(ReceiveStream);
+        }
+
+        private void ReceiveStream()
+        {
+            while (true)
+            {
+                pbxStream.Image = ReceiveImage();
+            }
+        }
+
+        private Bitmap ReceiveImage()
+        {
+            try
+            {
+                byte[] imageBuffer = new byte[10485760];
+                int nbData = Student.SocketControl.Receive(imageBuffer, 0, imageBuffer.Length, SocketFlags.None);
+                Array.Resize(ref imageBuffer, nbData);
+                return new Bitmap(new MemoryStream(imageBuffer));
+            }
+            catch{ return null; }
+        }
+
+        /// <summary>
+        /// Fonction qui permet de connecter les élèves qui en font la demande
+        /// </summary>
+        public void ConnectStudentForControl()
+        {
+            while (IsHandleCreated == false) { Thread.Sleep(100); }
+            IPEndPoint localEndPoint = new(ipAddr, 11112);
+            // Creation TCP/IP Socket using Socket Class Constructor
+            Socket listener = new(ipAddr.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
+            // Using Bind() method we associate a network address to the Server Socket
+            // All client that will connect to this Server Socket must know this network Address
+            listener.Bind(localEndPoint);
+            // Using Listen() method we create the Client list that will want to connect to Server
+            listener.Listen(1);
+            while (Student.SocketControl == null)
+            {
+                try
+                {
+                    // Suspend while waiting for incoming connection Using Accept() method the server will accept connection of client
+                    Student.SocketControl = listener.Accept();
+                    Student.SocketControl.ReceiveTimeout = Configuration.DefaultTimeout;
+                    return;
+                }
+                catch{}
+            }
         }
     }
 }

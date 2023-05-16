@@ -29,7 +29,13 @@ namespace ApplicationCliente
             InitializeComponent();
             LoadTeacherIP();
             Client = new(lbxConnexion,pbxScreeShot,lbxMessages, IpToTeacher,this);
-            Task.Run(Client.ConnectToMaster);
+            Task.Run(LaunchTasks);
+        }
+
+        public void LaunchTasks()
+        {
+            while (!IsHandleCreated) {Thread.Sleep(100);}
+            Client.SocketToTeacher = Task.Run(() => Client.ConnectToMaster(11111)).Result;
             Task.Run(AutomaticChecker);
         }
 

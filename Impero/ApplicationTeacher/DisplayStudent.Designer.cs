@@ -40,9 +40,10 @@
             this.TreeViewProcesses = new System.Windows.Forms.TreeView();
             this.SplitterImage = new System.Windows.Forms.SplitContainer();
             this.SplitterTreeInfo = new System.Windows.Forms.SplitContainer();
-            this.SplitterTreeTree = new System.Windows.Forms.SplitContainer();
             this.SplitterInfoMessage = new System.Windows.Forms.SplitContainer();
+            this.btnTakeControl = new System.Windows.Forms.Button();
             this.SplitterMessageButton = new System.Windows.Forms.SplitContainer();
+            this.SplitterTreeTree = new System.Windows.Forms.SplitContainer();
             ((System.ComponentModel.ISupportInitialize)(this.pbxScreenShot)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.SplitterImage)).BeginInit();
             this.SplitterImage.Panel1.SuspendLayout();
@@ -52,10 +53,6 @@
             this.SplitterTreeInfo.Panel1.SuspendLayout();
             this.SplitterTreeInfo.Panel2.SuspendLayout();
             this.SplitterTreeInfo.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.SplitterTreeTree)).BeginInit();
-            this.SplitterTreeTree.Panel1.SuspendLayout();
-            this.SplitterTreeTree.Panel2.SuspendLayout();
-            this.SplitterTreeTree.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.SplitterInfoMessage)).BeginInit();
             this.SplitterInfoMessage.Panel1.SuspendLayout();
             this.SplitterInfoMessage.Panel2.SuspendLayout();
@@ -64,6 +61,10 @@
             this.SplitterMessageButton.Panel1.SuspendLayout();
             this.SplitterMessageButton.Panel2.SuspendLayout();
             this.SplitterMessageButton.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.SplitterTreeTree)).BeginInit();
+            this.SplitterTreeTree.Panel1.SuspendLayout();
+            this.SplitterTreeTree.Panel2.SuspendLayout();
+            this.SplitterTreeTree.SuspendLayout();
             this.SuspendLayout();
             // 
             // btnKillProcess
@@ -128,7 +129,7 @@
             this.tbxMessage.Location = new System.Drawing.Point(0, 0);
             this.tbxMessage.Multiline = true;
             this.tbxMessage.Name = "tbxMessage";
-            this.tbxMessage.Size = new System.Drawing.Size(1100, 70);
+            this.tbxMessage.Size = new System.Drawing.Size(1005, 70);
             this.tbxMessage.TabIndex = 32;
             // 
             // btnSend
@@ -136,7 +137,7 @@
             this.btnSend.Dock = System.Windows.Forms.DockStyle.Fill;
             this.btnSend.Location = new System.Drawing.Point(0, 0);
             this.btnSend.Name = "btnSend";
-            this.btnSend.Size = new System.Drawing.Size(68, 70);
+            this.btnSend.Size = new System.Drawing.Size(63, 70);
             this.btnSend.TabIndex = 33;
             this.btnSend.Text = "Envoyer";
             this.btnSend.UseVisualStyleBackColor = true;
@@ -186,6 +187,54 @@
             this.SplitterTreeInfo.SplitterDistance = 70;
             this.SplitterTreeInfo.TabIndex = 0;
             // 
+            // SplitterInfoMessage
+            // 
+            this.SplitterInfoMessage.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.SplitterInfoMessage.Location = new System.Drawing.Point(0, 0);
+            this.SplitterInfoMessage.Name = "SplitterInfoMessage";
+            // 
+            // SplitterInfoMessage.Panel1
+            // 
+            this.SplitterInfoMessage.Panel1.Controls.Add(this.btnTakeControl);
+            this.SplitterInfoMessage.Panel1.Controls.Add(this.lblUserName);
+            this.SplitterInfoMessage.Panel1.Controls.Add(this.lblPoste);
+            this.SplitterInfoMessage.Panel1.Controls.Add(this.btnKillProcess);
+            this.SplitterInfoMessage.Panel1.Controls.Add(this.btnSaveImage);
+            // 
+            // SplitterInfoMessage.Panel2
+            // 
+            this.SplitterInfoMessage.Panel2.Controls.Add(this.SplitterMessageButton);
+            this.SplitterInfoMessage.Size = new System.Drawing.Size(1476, 70);
+            this.SplitterInfoMessage.SplitterDistance = 400;
+            this.SplitterInfoMessage.TabIndex = 0;
+            // 
+            // btnTakeControl
+            // 
+            this.btnTakeControl.Location = new System.Drawing.Point(293, 9);
+            this.btnTakeControl.Name = "btnTakeControl";
+            this.btnTakeControl.Size = new System.Drawing.Size(104, 50);
+            this.btnTakeControl.TabIndex = 32;
+            this.btnTakeControl.Text = "Prendre le control";
+            this.btnTakeControl.UseVisualStyleBackColor = true;
+            this.btnTakeControl.Click += new System.EventHandler(this.TakeControl_Click);
+            // 
+            // SplitterMessageButton
+            // 
+            this.SplitterMessageButton.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.SplitterMessageButton.Location = new System.Drawing.Point(0, 0);
+            this.SplitterMessageButton.Name = "SplitterMessageButton";
+            // 
+            // SplitterMessageButton.Panel1
+            // 
+            this.SplitterMessageButton.Panel1.Controls.Add(this.tbxMessage);
+            // 
+            // SplitterMessageButton.Panel2
+            // 
+            this.SplitterMessageButton.Panel2.Controls.Add(this.btnSend);
+            this.SplitterMessageButton.Size = new System.Drawing.Size(1072, 70);
+            this.SplitterMessageButton.SplitterDistance = 1005;
+            this.SplitterMessageButton.TabIndex = 36;
+            // 
             // SplitterTreeTree
             // 
             this.SplitterTreeTree.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -202,43 +251,6 @@
             this.SplitterTreeTree.Size = new System.Drawing.Size(1476, 126);
             this.SplitterTreeTree.SplitterDistance = 492;
             this.SplitterTreeTree.TabIndex = 0;
-            // 
-            // SplitterInfoMessage
-            // 
-            this.SplitterInfoMessage.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.SplitterInfoMessage.Location = new System.Drawing.Point(0, 0);
-            this.SplitterInfoMessage.Name = "SplitterInfoMessage";
-            // 
-            // SplitterInfoMessage.Panel1
-            // 
-            this.SplitterInfoMessage.Panel1.Controls.Add(this.lblUserName);
-            this.SplitterInfoMessage.Panel1.Controls.Add(this.lblPoste);
-            this.SplitterInfoMessage.Panel1.Controls.Add(this.btnKillProcess);
-            this.SplitterInfoMessage.Panel1.Controls.Add(this.btnSaveImage);
-            // 
-            // SplitterInfoMessage.Panel2
-            // 
-            this.SplitterInfoMessage.Panel2.Controls.Add(this.SplitterMessageButton);
-            this.SplitterInfoMessage.Size = new System.Drawing.Size(1476, 70);
-            this.SplitterInfoMessage.SplitterDistance = 300;
-            this.SplitterInfoMessage.TabIndex = 0;
-            // 
-            // SplitterMessageButton
-            // 
-            this.SplitterMessageButton.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.SplitterMessageButton.Location = new System.Drawing.Point(0, 0);
-            this.SplitterMessageButton.Name = "SplitterMessageButton";
-            // 
-            // SplitterMessageButton.Panel1
-            // 
-            this.SplitterMessageButton.Panel1.Controls.Add(this.tbxMessage);
-            // 
-            // SplitterMessageButton.Panel2
-            // 
-            this.SplitterMessageButton.Panel2.Controls.Add(this.btnSend);
-            this.SplitterMessageButton.Size = new System.Drawing.Size(1172, 70);
-            this.SplitterMessageButton.SplitterDistance = 1100;
-            this.SplitterMessageButton.TabIndex = 36;
             // 
             // DisplayStudent
             // 
@@ -257,10 +269,6 @@
             this.SplitterTreeInfo.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.SplitterTreeInfo)).EndInit();
             this.SplitterTreeInfo.ResumeLayout(false);
-            this.SplitterTreeTree.Panel1.ResumeLayout(false);
-            this.SplitterTreeTree.Panel2.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.SplitterTreeTree)).EndInit();
-            this.SplitterTreeTree.ResumeLayout(false);
             this.SplitterInfoMessage.Panel1.ResumeLayout(false);
             this.SplitterInfoMessage.Panel1.PerformLayout();
             this.SplitterInfoMessage.Panel2.ResumeLayout(false);
@@ -271,6 +279,10 @@
             this.SplitterMessageButton.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.SplitterMessageButton)).EndInit();
             this.SplitterMessageButton.ResumeLayout(false);
+            this.SplitterTreeTree.Panel1.ResumeLayout(false);
+            this.SplitterTreeTree.Panel2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.SplitterTreeTree)).EndInit();
+            this.SplitterTreeTree.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -291,5 +303,6 @@
         private System.Windows.Forms.SplitContainer SplitterInfoMessage;
         private System.Windows.Forms.SplitContainer SplitterMessageButton;
         private System.Windows.Forms.SplitContainer SplitterTreeTree;
+        private System.Windows.Forms.Button btnTakeControl;
     }
 }

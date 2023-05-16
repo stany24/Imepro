@@ -517,7 +517,7 @@ namespace ApplicationTeacher
                 {
                     try
                     {
-                        Configuration.StudentToShareScreen[i].SocketToStudent.Send(Encoding.Default.GetBytes("stop"));
+                        Configuration.StudentToShareScreen[i].SocketToStudent.Send(Encoding.Default.GetBytes("stops"));
                     }
                     catch { }
                     Configuration.StudentToShareScreen.Remove(Configuration.StudentToShareScreen[i]);
@@ -635,7 +635,7 @@ namespace ApplicationTeacher
             {
                 if (display.Student.ID == student.ID) { return; }
             }
-            DisplayStudent newDisplay = new();
+            DisplayStudent newDisplay = new(ipAddr);
             AllStudentsDisplay.Add(newDisplay);
             newDisplay.UpdateAffichage(student);
             newDisplay.FormClosing += new FormClosingEventHandler(RemovePrivateDisplay);

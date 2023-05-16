@@ -82,6 +82,7 @@ namespace LibraryData
     public class DataForTeacher : Data
     {
         public Socket SocketToStudent;
+        public Socket SocketControl = null;
         public int ID;
         public int NumberOfFailure;
         public List<Message> Messages = new();
@@ -109,13 +110,15 @@ namespace LibraryData
     public class DataForStudent : Data, IMessageFilter
     {
         #region Variables/Constructeur
-
-        public bool isReceiving = false;
+        public int screenToStream;
         readonly GlobalKeyboardHook gkh = new();
         Rectangle OldRect = Rectangle.Empty;
         StreamOptions options;
         bool mouseDisabled = false;
+        public bool isReceiving = false;
+        bool isControled = false;
         public Socket SocketToTeacher;
+        public Socket SocketControl;
         public List<string> DefaultProcess = new();
         readonly private ListBox lbxConnexion;
         readonly private PictureBox pbxScreeShot;
@@ -223,7 +226,7 @@ namespace LibraryData
         /// <summary>
         /// Fonction qui permet de prendre une capture d'écran de tous les écran puis de les recomposer en une seul image
         /// </summary>
-        public void TakeScreenShot()
+        public Bitmap TakeAllScreenShot()
         {
             int TotalWidth = 0;
             int MaxHeight = 0;
@@ -231,16 +234,10 @@ namespace LibraryData
             //prend une capture d'écran de tout les écran
             foreach (Screen screen in Screen.AllScreens)
             {
-                Bitmap Bitmap = new(screen.Bounds.Width, screen.Bounds.Height, PixelFormat.Format32bppArgb);
-                Rectangle ScreenSize = screen.Bounds;
-                try
-                {
-                    Graphics.FromImage(Bitmap).CopyFromScreen(ScreenSize.Left, ScreenSize.Top, 0, 0, ScreenSize.Size);
-                    images.Add(Bitmap);
-                    TotalWidth += ScreenSize.Width;
-                    if (ScreenSize.Height > MaxHeight) { MaxHeight = ScreenSize.Height; }
-                }
-                catch (Exception) { }
+                TakeSreenShot(screen);
+                images.Add(TakeSreenShot(screen));
+                TotalWidth += screen.Bounds.Width;
+                if (screen.Bounds.Height > MaxHeight) { MaxHeight = screen.Bounds.Height; }
             }
             if (MaxHeight > 0)
             {
@@ -255,9 +252,22 @@ namespace LibraryData
                     offsetLeft += image.Width;
                 }
                 //FullImage = (new Bitmap(FullImage, new Size(200,200)));
-                ScreenShot = FullImage;
                 FullGraphics.Dispose();
+                return FullImage;
             }
+            return null;
+        }
+
+        public Bitmap TakeSreenShot(Screen screen)
+        {
+            Bitmap Bitmap = new(screen.Bounds.Width, screen.Bounds.Height, PixelFormat.Format32bppArgb);
+            Rectangle ScreenSize = screen.Bounds;
+            try
+            {
+                Graphics.FromImage(Bitmap).CopyFromScreen(ScreenSize.Left, ScreenSize.Top, 0, 0, ScreenSize.Size);
+            }
+            catch (Exception) { }
+            return Bitmap;
         }
 
         #endregion
@@ -280,13 +290,12 @@ namespace LibraryData
         /// <summary>
         /// Fonction qui envoie le screenshot au professeur
         /// </summary>
-        public void SendImage()
+        public void SendImage(Bitmap image,Socket socket)
         {
-            TakeScreenShot();
-            byte[] image;
+            byte[] imagebytes;
             ImageConverter converter = new();
-            image = (byte[])converter.ConvertTo(ScreenShot, typeof(byte[]));
-            SocketToTeacher.Send(image, 0, image.Length, SocketFlags.None);
+            imagebytes = (byte[])converter.ConvertTo(image, typeof(byte[]));
+            socket.Send(imagebytes, 0, imagebytes.Length, SocketFlags.None);
         }
 
         #endregion
@@ -296,17 +305,17 @@ namespace LibraryData
         /// <summary>
         /// Fonction qui connecte cette application à l'application du professeur
         /// </summary>
-        public void ConnectToMaster()
+        public Socket ConnectToMaster(int port)
         {
             try
             {
                 // Establish the remote endpoint for the socket. This example uses port 11111 on the local computer.
                 IPHostEntry ipHost = Dns.GetHostEntry(Dns.GetHostName());
-                IPEndPoint localEndPoint = new(IpToTeacher, 11111);
+                IPEndPoint localEndPoint = new(IpToTeacher, port);
 
                 // Creation TCP/IP Socket using Socket Class Constructor
                 Socket sender = new(localEndPoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
-                while (SocketToTeacher == null)
+                while (true)
                 {
                     // Si l'addresse du professeur a changé on adapte le socket
                     if (localEndPoint.Address != IpToTeacher)
@@ -318,9 +327,9 @@ namespace LibraryData
                     {
                         // Connect Socket to the remote endpoint using method Connect()
                         sender.Connect(localEndPoint);
-                        SocketToTeacher = sender;
                         Task.Run(WaitForDemand);
                         lbxConnexion.Invoke(new MethodInvoker(delegate { lbxConnexion.Items.Add("Connected"); }));
+                        return sender;
                     }
                     // Manage of Socket's Exceptions
                     catch (ArgumentNullException ane)
@@ -345,6 +354,7 @@ namespace LibraryData
                 lbxConnexion.Invoke(new MethodInvoker(delegate { lbxConnexion.Items.Add(e.ToString()); }));
                 Thread.Sleep(1000);
             }
+            return null;
         }
 
         /// <summary>
@@ -352,6 +362,7 @@ namespace LibraryData
         /// </summary>
         public void WaitForDemand()
         {
+            while(SocketToTeacher == null) {Thread.Sleep(100);}
             while (true)
             {
                 byte[] info = new byte[12];
@@ -364,29 +375,47 @@ namespace LibraryData
                 switch (Encoding.Default.GetString(info).Split(' ')[0])
                 {
                     case "data": SendData(); break;
-                    case "image": SendImage(); break;
+                    case "image": ; SendImage(TakeAllScreenShot(),SocketToTeacher); break;
                     //case "kill": KillSelectedProcess(Convert.ToInt32(text.Split(' ')[1])); break;
-                    case "receive":
-                        isReceiving = true;
-                        Task.Run(ReceiveMulticastStream); break;
+                    case "receive":isReceiving = true;Task.Run(ReceiveMulticastStream); break;
+                    case "apply": ApplyMulticastSettings(); break;
+                    case "stops":Stop();break;
                     case "message": ReceiveMessage(); break;
                     case "url": ReceiveAuthorisedUrls(); break;
-                    case "apply": ApplyMulticastSettings(); break;
-                    case "stop":
-                        isReceiving = false;
-                        mouseDisabled = false;
-                        form.Invoke(new MethodInvoker(delegate { form.FormBorderStyle = FormBorderStyle.Sizable; }));
-                        pbxScreeShot.Invoke(new MethodInvoker(delegate { pbxScreeShot.Visible = false; }));
-                        gkh.Unhook();
-                        break;
-                    case "shutdown":
-                        SocketToTeacher.Disconnect(false);
-                        SocketToTeacher = null;
-                        lbxConnexion.Invoke(new MethodInvoker(delegate { lbxConnexion.Items.Add("Le professeur a coupé la connexion"); }));
-                        Thread.Sleep(1000);
-                        Task.Run(() => ConnectToMaster());
-                        return;
+                    case "control": Task.Run(()=>SendStream(Convert.ToInt32(text.Split(' ')[1])));break;
+                    case "stopc":isControled = false; break;
+                    case "mouse": break;
+                    case "key": break;
+                    case "shutdown":ShutDown();return;
                 }
+            }
+        }
+
+        public void ShutDown()
+        {
+            SocketToTeacher.Disconnect(false);
+            SocketToTeacher = null;
+            lbxConnexion.Invoke(new MethodInvoker(delegate { lbxConnexion.Items.Add("Le professeur a coupé la connexion"); }));
+            Thread.Sleep(1000);
+            SocketToTeacher = Task.Run(() => ConnectToMaster(11111)).Result;
+        }
+
+        public void Stop()
+        {
+            isReceiving = false;
+            mouseDisabled = false;
+            form.Invoke(new MethodInvoker(delegate { form.FormBorderStyle = FormBorderStyle.Sizable; }));
+            pbxScreeShot.Invoke(new MethodInvoker(delegate { pbxScreeShot.Visible = false; }));
+            gkh.Unhook();
+        }
+
+        public void SendStream(int nbScreen)
+        {
+            isControled = true;
+            SocketControl = ConnectToMaster(11112);
+            while(isControled)
+            {
+                SendImage(TakeSreenShot(Screen.AllScreens[nbScreen]),SocketControl);
             }
         }
 
@@ -874,7 +903,6 @@ namespace LibraryData
 
     public class WindowMinimize
     {
-        const int SW_HIDE = 0;
         const int SW_SHOWMINIMIZED = 2;
         const int SW_SHOW = 5;
 
