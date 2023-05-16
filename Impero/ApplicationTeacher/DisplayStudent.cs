@@ -177,20 +177,15 @@ namespace ApplicationTeacher
         {
             while (true)
             {
-                pbxStream.Image = ReceiveImage();
+                try
+                {
+                    byte[] imageBuffer = new byte[10485760];
+                    int nbData = Student.SocketControl.Receive(imageBuffer, 0, imageBuffer.Length, SocketFlags.None);
+                    Array.Resize(ref imageBuffer, nbData);
+                    pbxStream.Image = new Bitmap(new MemoryStream(imageBuffer));
+                }
+                catch {}
             }
-        }
-
-        private Bitmap ReceiveImage()
-        {
-            try
-            {
-                byte[] imageBuffer = new byte[10485760];
-                int nbData = Student.SocketControl.Receive(imageBuffer, 0, imageBuffer.Length, SocketFlags.None);
-                Array.Resize(ref imageBuffer, nbData);
-                return new Bitmap(new MemoryStream(imageBuffer));
-            }
-            catch{ return null; }
         }
 
         /// <summary>
@@ -218,6 +213,13 @@ namespace ApplicationTeacher
                 }
                 catch{}
             }
+        }
+
+        private void btnStop_Click(object sender, EventArgs e)
+        {
+            Student.SocketToStudent.Send(Encoding.ASCII.GetBytes("shutdown"));
+            Student.SocketToStudent.Disconnect(false);
+            this.Close();
         }
     }
 }

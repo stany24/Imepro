@@ -577,24 +577,13 @@ namespace ApplicationTeacher
         {
             foreach (DataForTeacher student in AllStudents)
             {
-                try { student.SocketToStudent.Send(Encoding.ASCII.GetBytes("shutdown")); } catch { }
+                try { student.SocketToStudent.Send(Encoding.ASCII.GetBytes("disconnect")); } catch { }
                 student.SocketToStudent.Dispose();
                 //student.SocketToStudent.Disconnect(false);
             }
             TrayIconTeacher.Visible = false;
             TrayIconTeacher.Dispose();
             SaveConfigurationLists();
-        }
-
-        /// <summary>
-        /// Fonction qui permet d'arêter la communication avec un client
-        /// </summary>
-        /// <param name="student"></param>
-        public void StopClient(object sender, EventArgs e)
-        {
-            //if (lbxClients.SelectedItem is not DataForTeacher student) { return; }
-            //student.SocketToStudent.Send(Encoding.ASCII.GetBytes("stop"));
-            //student.SocketToStudent.Disconnect(false);
         }
 
         /// <summary>
@@ -698,6 +687,34 @@ namespace ApplicationTeacher
             foreach (TreeNode subnode in node.Nodes)
             {
                 RemoveFilter(subnode);
+            }
+        }
+
+        private void HideTreeView_Click(object sender, EventArgs e)
+        {
+            TreeNodeCollection nodes = TreeViewDetails.Nodes;
+            foreach(TreeNode node in nodes)
+            {
+                node.Collapse(false);
+            }
+            nodes = TreeViewSelect.Nodes;
+            foreach (TreeNode node in nodes)
+            {
+                node.Collapse(false);
+            }
+        }
+
+        private void ShowTreeView_Click(object sender, EventArgs e)
+        {
+            TreeNodeCollection nodes = TreeViewDetails.Nodes;
+            foreach (TreeNode node in nodes)
+            {
+                node.ExpandAll();
+            }
+            nodes = TreeViewSelect.Nodes;
+            foreach (TreeNode node in nodes)
+            {
+                node.ExpandAll();
             }
         }
     }

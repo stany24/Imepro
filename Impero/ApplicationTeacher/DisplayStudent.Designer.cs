@@ -44,6 +44,7 @@
             this.btnTakeControl = new System.Windows.Forms.Button();
             this.SplitterMessageButton = new System.Windows.Forms.SplitContainer();
             this.SplitterTreeTree = new System.Windows.Forms.SplitContainer();
+            this.btnStop = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.pbxScreenShot)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.SplitterImage)).BeginInit();
             this.SplitterImage.Panel1.SuspendLayout();
@@ -195,6 +196,7 @@
             // 
             // SplitterInfoMessage.Panel1
             // 
+            this.SplitterInfoMessage.Panel1.Controls.Add(this.btnStop);
             this.SplitterInfoMessage.Panel1.Controls.Add(this.btnTakeControl);
             this.SplitterInfoMessage.Panel1.Controls.Add(this.lblUserName);
             this.SplitterInfoMessage.Panel1.Controls.Add(this.lblPoste);
@@ -212,7 +214,7 @@
             // 
             this.btnTakeControl.Location = new System.Drawing.Point(293, 9);
             this.btnTakeControl.Name = "btnTakeControl";
-            this.btnTakeControl.Size = new System.Drawing.Size(104, 50);
+            this.btnTakeControl.Size = new System.Drawing.Size(104, 23);
             this.btnTakeControl.TabIndex = 32;
             this.btnTakeControl.Text = "Prendre le control";
             this.btnTakeControl.UseVisualStyleBackColor = true;
@@ -251,6 +253,16 @@
             this.SplitterTreeTree.Size = new System.Drawing.Size(1476, 126);
             this.SplitterTreeTree.SplitterDistance = 492;
             this.SplitterTreeTree.TabIndex = 0;
+            // 
+            // btnStop
+            // 
+            this.btnStop.Location = new System.Drawing.Point(294, 36);
+            this.btnStop.Name = "btnStop";
+            this.btnStop.Size = new System.Drawing.Size(104, 23);
+            this.btnStop.TabIndex = 33;
+            this.btnStop.Text = "Arrêter";
+            this.btnStop.UseVisualStyleBackColor = true;
+            this.btnStop.Click += new System.EventHandler(this.btnStop_Click);
             // 
             // DisplayStudent
             // 
@@ -304,5 +316,6 @@
         private System.Windows.Forms.SplitContainer SplitterMessageButton;
         private System.Windows.Forms.SplitContainer SplitterTreeTree;
         private System.Windows.Forms.Button btnTakeControl;
+        private System.Windows.Forms.Button btnStop;
     }
 }

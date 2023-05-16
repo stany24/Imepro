@@ -35,17 +35,18 @@
             this.btnShare = new System.Windows.Forms.Button();
             this.TrayIconTeacher = new System.Windows.Forms.NotifyIcon(this.components);
             this.lblIP = new System.Windows.Forms.Label();
-            this.btnDisconnect = new System.Windows.Forms.Button();
             this.Slider = new System.Windows.Forms.TrackBar();
             this.TreeViewDetails = new System.Windows.Forms.TreeView();
             this.TreeViewSelect = new System.Windows.Forms.TreeView();
             this.panelMiniatures = new System.Windows.Forms.Panel();
             this.SplitterPrincipal = new System.Windows.Forms.SplitContainer();
             this.SplitterInfoTree = new System.Windows.Forms.SplitContainer();
+            this.btnHideTreeView = new System.Windows.Forms.Button();
+            this.btnFilter = new System.Windows.Forms.Button();
             this.SplitterTree = new System.Windows.Forms.SplitContainer();
             this.SplitterImageLog = new System.Windows.Forms.SplitContainer();
             this.SplitterConnexionRequetes = new System.Windows.Forms.SplitContainer();
-            this.btnFilter = new System.Windows.Forms.Button();
+            this.btnShowTreeView = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.Slider)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.SplitterPrincipal)).BeginInit();
             this.SplitterPrincipal.Panel1.SuspendLayout();
@@ -113,16 +114,6 @@
             this.lblIP.TabIndex = 10;
             this.lblIP.Text = "IP:";
             // 
-            // btnDisconnect
-            // 
-            this.btnDisconnect.Location = new System.Drawing.Point(92, 3);
-            this.btnDisconnect.Name = "btnDisconnect";
-            this.btnDisconnect.Size = new System.Drawing.Size(64, 21);
-            this.btnDisconnect.TabIndex = 11;
-            this.btnDisconnect.Text = "Disconect";
-            this.btnDisconnect.UseVisualStyleBackColor = true;
-            this.btnDisconnect.Click += new System.EventHandler(this.StopClient);
-            // 
             // Slider
             // 
             this.Slider.Location = new System.Drawing.Point(3, 30);
@@ -139,7 +130,7 @@
             this.TreeViewDetails.Dock = System.Windows.Forms.DockStyle.Fill;
             this.TreeViewDetails.Location = new System.Drawing.Point(0, 0);
             this.TreeViewDetails.Name = "TreeViewDetails";
-            this.TreeViewDetails.Size = new System.Drawing.Size(280, 427);
+            this.TreeViewDetails.Size = new System.Drawing.Size(280, 417);
             this.TreeViewDetails.TabIndex = 12;
             // 
             // TreeViewSelect
@@ -148,7 +139,7 @@
             this.TreeViewSelect.Dock = System.Windows.Forms.DockStyle.Fill;
             this.TreeViewSelect.Location = new System.Drawing.Point(0, 0);
             this.TreeViewSelect.Name = "TreeViewSelect";
-            this.TreeViewSelect.Size = new System.Drawing.Size(280, 426);
+            this.TreeViewSelect.Size = new System.Drawing.Size(280, 416);
             this.TreeViewSelect.TabIndex = 0;
             this.TreeViewSelect.AfterCheck += new System.Windows.Forms.TreeViewEventHandler(this.TreeNodeChecked);
             this.TreeViewSelect.NodeMouseDoubleClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.TreeViewDoubleClick);
@@ -188,9 +179,10 @@
             // 
             // SplitterInfoTree.Panel1
             // 
+            this.SplitterInfoTree.Panel1.Controls.Add(this.btnShowTreeView);
+            this.SplitterInfoTree.Panel1.Controls.Add(this.btnHideTreeView);
             this.SplitterInfoTree.Panel1.Controls.Add(this.btnFilter);
             this.SplitterInfoTree.Panel1.Controls.Add(this.btnShare);
-            this.SplitterInfoTree.Panel1.Controls.Add(this.btnDisconnect);
             this.SplitterInfoTree.Panel1.Controls.Add(this.lblIP);
             this.SplitterInfoTree.Panel1.Controls.Add(this.Slider);
             // 
@@ -198,8 +190,28 @@
             // 
             this.SplitterInfoTree.Panel2.Controls.Add(this.SplitterTree);
             this.SplitterInfoTree.Size = new System.Drawing.Size(280, 961);
-            this.SplitterInfoTree.SplitterDistance = 100;
+            this.SplitterInfoTree.SplitterDistance = 120;
             this.SplitterInfoTree.TabIndex = 14;
+            // 
+            // btnHideTreeView
+            // 
+            this.btnHideTreeView.Location = new System.Drawing.Point(12, 81);
+            this.btnHideTreeView.Name = "btnHideTreeView";
+            this.btnHideTreeView.Size = new System.Drawing.Size(85, 21);
+            this.btnHideTreeView.TabIndex = 14;
+            this.btnHideTreeView.Text = "Masquer tout";
+            this.btnHideTreeView.UseVisualStyleBackColor = true;
+            this.btnHideTreeView.Click += new System.EventHandler(this.HideTreeView_Click);
+            // 
+            // btnFilter
+            // 
+            this.btnFilter.Location = new System.Drawing.Point(92, 3);
+            this.btnFilter.Name = "btnFilter";
+            this.btnFilter.Size = new System.Drawing.Size(120, 21);
+            this.btnFilter.TabIndex = 13;
+            this.btnFilter.Text = "Désactiver Les filtres";
+            this.btnFilter.UseVisualStyleBackColor = true;
+            this.btnFilter.Click += new System.EventHandler(this.ButtonFilter_Click);
             // 
             // SplitterTree
             // 
@@ -215,8 +227,8 @@
             // SplitterTree.Panel2
             // 
             this.SplitterTree.Panel2.Controls.Add(this.TreeViewSelect);
-            this.SplitterTree.Size = new System.Drawing.Size(280, 857);
-            this.SplitterTree.SplitterDistance = 427;
+            this.SplitterTree.Size = new System.Drawing.Size(280, 837);
+            this.SplitterTree.SplitterDistance = 417;
             this.SplitterTree.TabIndex = 13;
             // 
             // SplitterImageLog
@@ -254,15 +266,15 @@
             this.SplitterConnexionRequetes.SplitterDistance = 500;
             this.SplitterConnexionRequetes.TabIndex = 6;
             // 
-            // btnFilter
+            // btnShowTreeView
             // 
-            this.btnFilter.Location = new System.Drawing.Point(162, 3);
-            this.btnFilter.Name = "btnFilter";
-            this.btnFilter.Size = new System.Drawing.Size(68, 21);
-            this.btnFilter.TabIndex = 13;
-            this.btnFilter.Text = "Désactiver";
-            this.btnFilter.UseVisualStyleBackColor = true;
-            this.btnFilter.Click += new System.EventHandler(this.ButtonFilter_Click);
+            this.btnShowTreeView.Location = new System.Drawing.Point(103, 81);
+            this.btnShowTreeView.Name = "btnShowTreeView";
+            this.btnShowTreeView.Size = new System.Drawing.Size(85, 21);
+            this.btnShowTreeView.TabIndex = 15;
+            this.btnShowTreeView.Text = "Afficher Tout";
+            this.btnShowTreeView.UseVisualStyleBackColor = true;
+            this.btnShowTreeView.Click += new System.EventHandler(this.ShowTreeView_Click);
             // 
             // TeacherApp
             // 
@@ -307,7 +319,6 @@
         private System.Windows.Forms.Button btnShare;
         private System.Windows.Forms.NotifyIcon TrayIconTeacher;
         private System.Windows.Forms.Label lblIP;
-        private System.Windows.Forms.Button btnDisconnect;
         private System.Windows.Forms.TrackBar Slider;
         private System.Windows.Forms.TreeView TreeViewDetails;
         private System.Windows.Forms.TreeView TreeViewSelect;
@@ -318,6 +329,8 @@
         private System.Windows.Forms.SplitContainer SplitterTree;
         private System.Windows.Forms.SplitContainer SplitterInfoTree;
         private System.Windows.Forms.Button btnFilter;
+        private System.Windows.Forms.Button btnHideTreeView;
+        private System.Windows.Forms.Button btnShowTreeView;
     }
 }
 

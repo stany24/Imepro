@@ -260,5 +260,11 @@ namespace ApplicationCliente
             Show();
             WindowState = FormWindowState.Normal;
         }
+
+        private void ResetAllIP_Click(object sender, EventArgs e)
+        {
+            using StreamWriter writeFichier = new(pathToConfigurationFolder + FileNameConfigurationIp);
+            writeFichier.WriteLine(JsonSerializer.Serialize(new IpForTheWeek(), new JsonSerializerOptions { IncludeFields = true, }));
+        }
     }
 }

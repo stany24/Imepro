@@ -40,6 +40,7 @@
             this.lbxMessages = new System.Windows.Forms.ListBox();
             this.btnFirefox = new System.Windows.Forms.Button();
             this.btnChrome = new System.Windows.Forms.Button();
+            this.btnResetAllIP = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.pbxScreeShot)).BeginInit();
             this.SuspendLayout();
             // 
@@ -129,11 +130,22 @@
             this.btnChrome.UseVisualStyleBackColor = true;
             this.btnChrome.Click += new System.EventHandler(this.NewChrome);
             // 
+            // btnResetAllIP
+            // 
+            this.btnResetAllIP.Location = new System.Drawing.Point(1375, 158);
+            this.btnResetAllIP.Name = "btnResetAllIP";
+            this.btnResetAllIP.Size = new System.Drawing.Size(75, 23);
+            this.btnResetAllIP.TabIndex = 14;
+            this.btnResetAllIP.Text = "Reset IPs";
+            this.btnResetAllIP.UseVisualStyleBackColor = true;
+            this.btnResetAllIP.Click += new System.EventHandler(this.ResetAllIP_Click);
+            // 
             // StudentApp
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1474, 711);
+            this.Controls.Add(this.btnResetAllIP);
             this.Controls.Add(this.btnChrome);
             this.Controls.Add(this.btnFirefox);
             this.Controls.Add(this.lbxMessages);
@@ -163,6 +175,7 @@
         private System.Windows.Forms.ListBox lbxMessages;
         private System.Windows.Forms.Button btnFirefox;
         private System.Windows.Forms.Button btnChrome;
+        private System.Windows.Forms.Button btnResetAllIP;
     }
 }
 

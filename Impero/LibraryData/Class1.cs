@@ -241,7 +241,7 @@ namespace LibraryData
             }
             if (MaxHeight > 0)
             {
-                Bitmap FullImage = new(TotalWidth, MaxHeight, PixelFormat.Format32bppArgb);
+                Bitmap FullImage = new(TotalWidth, MaxHeight, PixelFormat.Format16bppRgb565);
                 Graphics FullGraphics = Graphics.FromImage(FullImage);
 
                 int offsetLeft = 0;
@@ -260,7 +260,7 @@ namespace LibraryData
 
         public Bitmap TakeSreenShot(Screen screen)
         {
-            Bitmap Bitmap = new(screen.Bounds.Width, screen.Bounds.Height, PixelFormat.Format32bppArgb);
+            Bitmap Bitmap = new(screen.Bounds.Width, screen.Bounds.Height, PixelFormat.Format16bppRgb565);
             Rectangle ScreenSize = screen.Bounds;
             try
             {
@@ -386,18 +386,26 @@ namespace LibraryData
                     case "stopc":isControled = false; break;
                     case "mouse": break;
                     case "key": break;
+                    case "disconnect":Disconnect();return;
                     case "shutdown":ShutDown();return;
                 }
             }
         }
 
-        public void ShutDown()
+        public void Disconnect()
         {
             SocketToTeacher.Disconnect(false);
             SocketToTeacher = null;
             lbxConnexion.Invoke(new MethodInvoker(delegate { lbxConnexion.Items.Add("Le professeur a coupé la connexion"); }));
             Thread.Sleep(1000);
             SocketToTeacher = Task.Run(() => ConnectToMaster(11111)).Result;
+        }
+
+        public void ShutDown()
+        {
+            SocketToTeacher.Disconnect(false);
+            SocketToTeacher = null;
+            Application.Exit();
         }
 
         public void Stop()
