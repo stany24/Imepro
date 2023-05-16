@@ -1,16 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
-using System.Management;
 using System.Net;
 using System.Net.Sockets;
 using System.Runtime.InteropServices;
-using System.Runtime.Serialization;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -20,6 +17,9 @@ using System.Windows.Forms;
 
 namespace LibraryData
 {
+    /// <summary>
+    /// Class parente, utilisé pour les données qui sont transferé de l'élève au professeur
+    /// </summary>
     [Serializable]
     public class Data
     {
@@ -45,6 +45,9 @@ namespace LibraryData
         public Data() { }
     }
 
+    /// <summary>
+    /// Classe qui contient les options du stream
+    /// </summary>
     [Serializable]
     public class StreamOptions
     {
@@ -79,6 +82,9 @@ namespace LibraryData
         Word,
     }
 
+    /// <summary>
+    /// Classe qui représente un élève dans l'application professeur
+    /// </summary>
     public class DataForTeacher : Data
     {
         public Socket SocketToStudent;
@@ -106,9 +112,13 @@ namespace LibraryData
         }
     }
 
+    /// <summary>
+    /// Classe qui contient toute la logique pour faire fonctionner l'application cliente
+    /// </summary>
     public class DataForStudent : Data, IMessageFilter
     {
         #region Variables/Constructeur
+
         private int screenToStream;
         private readonly GlobalKeyboardHook gkh = new();
         private Rectangle OldRect = Rectangle.Empty;
@@ -160,6 +170,9 @@ namespace LibraryData
 
         #region Récupération Url/Processus/Image
 
+        /// <summary>
+        /// Fonction qui récupére les urls toutes les secondes
+        /// </summary>
         private void GetAllTabNameEvery5Seconds()
         {
             while (true)
@@ -256,6 +269,11 @@ namespace LibraryData
             return null;
         }
 
+        /// <summary>
+        /// Fonction qui prend en screenshot l'écran demandé
+        /// </summary>
+        /// <param name="screen">L'écran que l'on veux prendre en screenshot</param>
+        /// <returns></returns>
         private Bitmap TakeSreenShot(Screen screen)
         {
             Bitmap Bitmap = new(screen.Bounds.Width, screen.Bounds.Height, PixelFormat.Format16bppRgb565);
@@ -390,6 +408,9 @@ namespace LibraryData
             }
         }
 
+        /// <summary>
+        /// Fonction qui permet à l'élève de se reconnecter après une déconnection
+        /// </summary>
         private void Disconnect()
         {
             SocketToTeacher.Disconnect(false);
@@ -399,6 +420,9 @@ namespace LibraryData
             SocketToTeacher = Task.Run(() => ConnectToTeacher(11111)).Result;
         }
 
+        /// <summary>
+        /// Fonction qui arrête le l'application à la demande du professeur
+        /// </summary>
         private void ShutDown()
         {
             SocketToTeacher.Disconnect(false);
@@ -406,6 +430,9 @@ namespace LibraryData
             Application.Exit();
         }
 
+        /// <summary>
+        /// Fonction qui remet l'application dans un état normal après un stream
+        /// </summary>
         private void Stop()
         {
             isReceiving = false;
@@ -415,6 +442,9 @@ namespace LibraryData
             gkh.Unhook();
         }
 
+        /// <summary>
+        /// Fonction qui envoie le stream au professeur
+        /// </summary>
         private void SendStream()
         {
             isControled = true;
@@ -496,6 +526,9 @@ namespace LibraryData
             }
         }
 
+        /// <summary>
+        /// Fonction qui recoit les paramêtre du stream et les appliques
+        /// </summary>
         private void ApplyMulticastSettings()
         {
             byte[] message = new byte[128];
@@ -538,6 +571,9 @@ namespace LibraryData
 
         #region Blocage
 
+        /// <summary>
+        /// Fonction qui bloque toutes les touches du clavier
+        /// </summary>
         private void DisableKeyboard()
         {
             foreach (Keys key in Enum.GetValues(typeof(Keys)))
@@ -548,12 +584,19 @@ namespace LibraryData
             gkh.KeyUp += new KeyEventHandler(HandleKeyPress);
         }
 
-
+        /// <summary>
+        /// Fonction qui gére les touches pressé en les ignorants
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void HandleKeyPress(object sender, KeyEventArgs e)
         {
             e.Handled = true;
         }
 
+        /// <summary>
+        /// Fonction qui mininmize les applications non autorisées toutes les secondes
+        /// </summary>
         private void MinimizeUnAutorisedEverySecond()
         {
             while (isReceiving)
@@ -564,6 +607,9 @@ namespace LibraryData
             WindowMinimize.ShowBack();
         }
 
+        /// <summary>
+        /// Fonction qui désactive la souris toutes les seconde
+        /// </summary>
         private void DisableMouseEverySecond()
         {
             OldRect = Cursor.Clip;
@@ -575,21 +621,28 @@ namespace LibraryData
             EnableMouse();
         }
 
+        /// <summary>
+        /// Fonction qui réactive la souris
+        /// </summary>
         private void EnableMouse()
         {
             Cursor.Clip = OldRect;
             Cursor.Show();
             Application.RemoveMessageFilter(this);
         }
+
         public bool PreFilterMessage(ref Message m)
         {
             if (m.Msg == 0x201 || m.Msg == 0x202 || m.Msg == 0x203) return true;
             if (m.Msg == 0x204 || m.Msg == 0x205 || m.Msg == 0x206) return true;
             return false;
         }
+
+        /// <summary>
+        /// Fonction qui bloque la souris
+        /// </summary>
         private void DisableMouse()
         {
-            // Arbitrary location.
             Cursor.Clip = new Rectangle(0, 60, 1, 1);
             Cursor.Hide();
             Application.AddMessageFilter(this);
@@ -602,18 +655,9 @@ namespace LibraryData
         #endregion
     }
 
-    [DataContract]
-    public class ScreenShotPart
-    {
-        [DataMember]
-        public byte[] Part;
-
-        public ScreenShotPart(byte[] part)
-        {
-            Part = part;
-        }
-    }
-
+    /// <summary>
+    /// Classe qui reprèsente un historique des urls pour tous les navigateurs
+    /// </summary>
     [Serializable]
     public class HistoriqueUrls
     {
@@ -670,6 +714,12 @@ namespace LibraryData
                 default: break;
             }
         }
+
+        /// <summary>
+        /// Fonction qui vérifie si l'url que l'on donne n'est pas déja le dernier de la list
+        /// </summary>
+        /// <param name="list">la list d'url</param>
+        /// <param name="url">le nouvelle url</param>
         private void VerifyUrl(List<Url> list, Url url)
         {
             if (list.Count == 0) { list.Add(url); return; }
@@ -677,6 +727,9 @@ namespace LibraryData
         }
     }
 
+    /// <summary>
+    /// Classe qui représente un Url
+    /// </summary>
     [Serializable]
     public class Url
     {
@@ -699,6 +752,9 @@ namespace LibraryData
         }
     }
 
+    /// <summary>
+    /// Classe qui contient toutes les adresses ip pour une semaine
+    /// </summary>
     [Serializable]
     public class IpForTheWeek
     {
@@ -793,7 +849,9 @@ namespace LibraryData
         }
     }
 
-
+    /// <summary>
+    /// Classe pour intercepter les touches du clavier avant quelles n'attaigne les applications
+    /// </summary>
     public class GlobalKeyboardHook
     {
         #region Constant, Structure, and Delegate Definitions
@@ -849,12 +907,18 @@ namespace LibraryData
 
         #region Public Methods
 
+        /// <summary>
+        /// Démmare l'interception des touches
+        /// </summary>
         public void Hook()
         {
             IntPtr hInstance = LoadLibrary("User32");
             hHook = SetWindowsHookEx(WH_KEYBOARD_LL, hookProc, hInstance, 0);
         }
 
+        /// <summary>
+        /// Arrête l'interception des touches
+        /// </summary>
         public void Unhook()
         {
             UnhookWindowsHookEx(hHook);
@@ -902,6 +966,9 @@ namespace LibraryData
         #endregion
     }
 
+    /// <summary>
+    /// Classe pour gérer l'affichage des autres applications
+    /// </summary>
     public class WindowMinimize
     {
         private const int SW_SHOWMINIMIZED = 2;
@@ -910,6 +977,10 @@ namespace LibraryData
         [DllImport("user32.dll")]
         static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
 
+        /// <summary>
+        /// Fonction qui minimize toutes les applications interdites
+        /// </summary>
+        /// <param name="autorisedProcesses"></param>
         public static void MinimizeUnAuthorised(List<string> autorisedProcesses)
         {
             Process thisProcess = Process.GetCurrentProcess();
@@ -923,13 +994,241 @@ namespace LibraryData
                 }
             }
         }
-
+        /// <summary>
+        /// Fonction qui affiche à nouveau toutes les applications
+        /// </summary>
         public static void ShowBack()
         {
             List<Process> processes = Process.GetProcesses().ToList();
             foreach (Process process in processes)
             {
                 try { ShowWindow(process.MainWindowHandle, SW_SHOW); } catch { }
+            }
+        }
+    }
+
+
+    /// <summary>
+    /// Classe pour les miniatures: une capture d'écran avec en desous le nom du poste
+    /// </summary>
+    public class Miniature : UserControl
+    {
+        public int StudentID;
+        public PictureBox PbxImage = new();
+        public readonly Label lblComputerInformations = new();
+        public readonly Button btnSaveScreenShot = new();
+        readonly int MargeBetweenText = 5;
+        public int TimeSinceUpdate = 0;
+        public string ComputerName;
+        readonly string SavePath;
+
+        /// <summary>
+        /// Consctucteur pour créer et positionner un miniature
+        /// </summary>
+        /// <param name="image">L'image à afficher</param>
+        /// <param name="name">Le nom de l'ordinateur</param>
+        /// <param name="studentID">L'id de l'élève</param>
+        /// <param name="savepath">Le chemin de sauvegarde des images</param>
+        public Miniature(Bitmap image, string name, int studentID, string savepath)
+        {
+            //valeurs pour la fenêtre de control
+            Size = PbxImage.Size;
+            StudentID = studentID;
+            ComputerName = name;
+            SavePath = savepath;
+
+            PbxImage = new PictureBox
+            {
+                Location = new Point(0, 0),
+                Image = image,
+                SizeMode = PictureBoxSizeMode.StretchImage,
+                Size = new Size(400, 100),
+            };
+            PbxImage.SizeChanged += new EventHandler(UpdatePositionsRelativeToImage);
+            PbxImage.LocationChanged += new EventHandler(UpdatePositionsRelativeToImage);
+            Controls.Add(PbxImage);
+
+            lblComputerInformations = new Label
+            {
+                Location = new Point(140, 0),
+                Size = new Size(100, 20),
+                Text = ComputerName + " " + TimeSinceUpdate,
+            };
+            Controls.Add(lblComputerInformations);
+
+            btnSaveScreenShot = new Button
+            {
+                Location = new Point(0, 0),
+                Size = new Size(80, 21),
+                Text = "Sauvegarder"
+            };
+            btnSaveScreenShot.Click += new EventHandler(SaveScreenShot);
+            Controls.Add(btnSaveScreenShot);
+            UpdatePositionsRelativeToImage(new object(), new EventArgs());
+        }
+
+        /// <summary>
+        /// Fonction pour sauvegarder la capture d'écran actuel
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        public void SaveScreenShot(object sender, EventArgs e)
+        {
+            PbxImage.Image.Save(SavePath + ComputerName + DateTime.Now.ToString("_yyyy-mm-dd_hh-mm-ss") + ".jpg", ImageFormat.Jpeg);
+        }
+
+        /// <summary>
+        /// Fonction qui ajoute une seconde au temps depuis la mise à jour de l'image et change le texte du label.
+        /// </summary>
+        public void UpdateTime()
+        {
+            TimeSinceUpdate++;
+            try { lblComputerInformations.Invoke(new MethodInvoker(delegate { lblComputerInformations.Text = ComputerName + " " + TimeSinceUpdate + "s"; })); }
+            catch { };
+        }
+
+        /// <summary>
+        /// Fonction qui positionne le label par rapport à la picturebox
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        public void UpdatePositionsRelativeToImage(object sender, EventArgs e)
+        {
+            //taille de la picturebox
+            Size = new Size(PbxImage.Width, PbxImage.Height + 3 * MargeBetweenText + lblComputerInformations.Height);
+            //postion du bouton
+            btnSaveScreenShot.Left = PbxImage.Location.X + PbxImage.Width / 2 + MargeBetweenText / 2;
+            btnSaveScreenShot.Top = PbxImage.Location.Y + PbxImage.Height + MargeBetweenText;
+            //position du label
+            lblComputerInformations.Left = PbxImage.Location.X + PbxImage.Width / 2 - lblComputerInformations.Width - MargeBetweenText / 2;
+            lblComputerInformations.Top = btnSaveScreenShot.Location.Y + (btnSaveScreenShot.Height - lblComputerInformations.Height);
+        }
+    }
+
+    /// <summary>
+    /// Classe pour Afficher plusieurs miniatures dans un panel
+    /// </summary>
+    public class MiniatureDisplayer
+    {
+        public List<Miniature> MiniatureList = new();
+        int MaxWidth;
+        readonly int Marge = 10;
+        public double zoom = 0.1;
+
+        /// <summary>
+        /// Fonction qui permet de zoomer dans les miniatures en changant leur taille
+        /// </summary>
+        public void ChangeZoom()
+        {
+            foreach (Miniature miniature in MiniatureList)
+            {
+                double NewHeight = miniature.PbxImage.Image.Height * zoom;
+                double NewWidth = miniature.PbxImage.Image.Width * zoom;
+                miniature.PbxImage.Height = Convert.ToInt32(NewHeight);
+                miniature.PbxImage.Width = Convert.ToInt32(NewWidth);
+            }
+            UpdateAllLocations(MaxWidth);
+        }
+
+        public MiniatureDisplayer(int maxwidth)
+        {
+            MaxWidth = maxwidth;
+            Task.Run(LaunchTimeUpdate);
+        }
+
+        /// <summary>
+        /// Fonction qui toutes les seconde lance une mise à jour du temps
+        /// </summary>
+        public void LaunchTimeUpdate()
+        {
+            Thread.Sleep(3000);
+            while (true)
+            {
+                Thread.Sleep(1000);
+                Task.Run(UpdateAllTimes);
+            }
+        }
+
+        /// <summary>
+        /// Fonction qui lance la mise à jour du temps dans toutes les miniatures
+        /// </summary>
+        public void UpdateAllTimes()
+        {
+            foreach (Miniature miniature in MiniatureList)
+            {
+                miniature.UpdateTime();
+            }
+        }
+
+        /// <summary>
+        /// Fonction qui place toutes les miniatures au bon endroit
+        /// </summary>
+        public void UpdateAllLocations(int maxwidth)
+        {
+            MaxWidth = maxwidth;
+            int OffsetTop = 0;
+            int OffsetRight = 0;
+            int MaxHeightInRow = 0;
+            for (int i = 0; i < MiniatureList.Count; i++)
+            {
+                if (OffsetRight + MiniatureList[i].Width > MaxWidth)
+                {
+                    OffsetTop += MaxHeightInRow;
+                    MaxHeightInRow = 0;
+                    OffsetRight = 0;
+                }
+                MiniatureList[i].Top = OffsetTop;
+                MiniatureList[i].Left = OffsetRight + Marge;
+                OffsetRight += MiniatureList[i].Width + Marge;
+                if (MiniatureList[i].Height > MaxHeightInRow) { MaxHeightInRow = MiniatureList[i].Height; }
+            }
+        }
+
+        /// <summary>
+        /// Fonction pour mettre à jour l'image d'une miniature
+        /// </summary>
+        /// <param name="id">Id de l'élève</param>
+        /// <param name="computername"> Nom de l'ordinateur</param>
+        /// <param name="image">La nouvelle image que l'on veux mettre</param>
+        public void UpdateMiniature(int id, string computername, Bitmap image)
+        {
+            foreach (Miniature miniature in MiniatureList)
+            {
+                if (miniature.StudentID == id && miniature.ComputerName == computername)
+                {
+                    miniature.PbxImage.Image = image;
+                    miniature.TimeSinceUpdate = 0;
+                    return;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Fonction pour ajouter une miniature que le miniatureDisplayer doit gérer
+        /// </summary>
+        /// <param name="miniature"></param>
+        public void AddMiniature(Miniature miniature)
+        {
+            MiniatureList.Add(miniature);
+            ChangeZoom();
+        }
+
+        /// <summary>
+        /// Fonction pour enlever un miniature de la liste que le miniatureDisplayer doit gérer
+        /// </summary>
+        /// <param name="id">Id de l'éléve</param>
+        /// <param name="computername">Le nom de l'ordinateur</param>
+        public void RemoveMiniature(int id, string computername)
+        {
+            foreach (Miniature miniature in MiniatureList)
+            {
+                if (miniature.StudentID == id && miniature.ComputerName == computername)
+                {
+                    MiniatureList.Remove(miniature);
+                    miniature.Dispose();
+                    UpdateAllLocations(MaxWidth);
+                    break;
+                }
             }
         }
     }

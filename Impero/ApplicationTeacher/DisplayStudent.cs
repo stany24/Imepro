@@ -24,6 +24,10 @@ namespace ApplicationTeacher
             InitializeComponent();
         }
 
+        /// <summary>
+        /// Fonction qui met à jour l'affichage individuel
+        /// </summary>
+        /// <param name="student">Les nouvelles données</param>
         public void UpdateAffichage(DataForTeacher student)
         {
             if(Student != null && Student.SocketControl != null) { student.SocketControl = Student.SocketControl; }
@@ -149,17 +153,32 @@ namespace ApplicationTeacher
             }
         }
 
+        /// <summary>
+        /// Fonction qui permet de sauvegarder le screenshot
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         public void SaveScreenShot(object sender, EventArgs e)
         {
             pbxScreenShot.Image.Save(Configuration.pathToSaveFolder +Student.ComputerName+ DateTime.Now.ToString("_yyyy-MM-dd_HH-mm-ss") + ".jpg", ImageFormat.Jpeg);
         }
 
+        /// <summary>
+        /// Fonction qui permet d'envoyer un message à l'élève
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void SendMessage(object sender, EventArgs e)
         {
             Student.SocketToStudent.Send(Encoding.ASCII.GetBytes("message"));
             Student.SocketToStudent.Send(Encoding.ASCII.GetBytes(tbxMessage.Text));
         }
 
+        /// <summary>
+        /// Fonction qui permet de prendre le controle de l'élève
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void TakeControl_Click(object sender, EventArgs e)
         {
             Student.SocketToStudent.Send(Encoding.ASCII.GetBytes("control 0"));
@@ -173,6 +192,9 @@ namespace ApplicationTeacher
             Task.Run(ReceiveStream);
         }
 
+        /// <summary>
+        /// Fonction qui permet de recevoir le stream de l'élève
+        /// </summary>
         private void ReceiveStream()
         {
             while (true)
@@ -215,6 +237,11 @@ namespace ApplicationTeacher
             }
         }
 
+        /// <summary>
+        /// Fonction qui permet d'arreter une application élève
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void btnStop_Click(object sender, EventArgs e)
         {
             Student.SocketToStudent.Send(Encoding.ASCII.GetBytes("shutdown"));

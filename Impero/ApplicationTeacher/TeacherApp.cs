@@ -48,6 +48,12 @@ namespace ApplicationTeacher
             LoadFileToList(Configuration.pathToSaveFolder + Configuration.FileNameAutorisedWebsite, Configuration.AutorisedWebsite, lbxConnexion);
         }
 
+        /// <summary>
+        /// Fonction qui permet de charger un fichier dans une liste
+        /// </summary>
+        /// <param name="pathToFile"></param>
+        /// <param name="list"></param>
+        /// <param name="lbxOutput"></param>
         public void LoadFileToList(string pathToFile,List<string> list, ListBox lbxOutput)
         {
             try
@@ -62,6 +68,11 @@ namespace ApplicationTeacher
             }
         }
 
+        /// <summary>
+        /// Fonction qui permet de sauvgareder une liste dans un fichier
+        /// </summary>
+        /// <param name="pathToFile"></param>
+        /// <param name="list"></param>
         public void SaveListToFile(string pathToFile, List<string> list)
         {
             using StreamWriter writeFichierProcesusIgnore = new(pathToFile);
@@ -193,6 +204,9 @@ namespace ApplicationTeacher
             }
         }
 
+        /// <summary>
+        /// Fonction qui met à jour tous les affichage individuels
+        /// </summary>
         public void UpdateAllIndividualDisplay()
         {
             foreach (DisplayStudent display in AllStudentsDisplay)
@@ -207,7 +221,10 @@ namespace ApplicationTeacher
             }
         }
 
-
+        /// <summary>
+        /// Fonction qui fais les demandes à un élèves pour ces données et son image
+        /// </summary>
+        /// <param name="ClientToRemove"></param>
         public void UpdateEleves(List<DataForTeacher> ClientToRemove)
         {
             for (int i = 0; i < AllStudents.Count; i++)
@@ -406,6 +423,10 @@ namespace ApplicationTeacher
             }));
         }
 
+        /// <summary>
+        /// Fonction qui active les filtre dans les TreeViews
+        /// </summary>
+        /// <param name="NodeBrowser"></param>
         public void ApplyFilter(TreeNode NodeBrowser)
         {
             for (int i = 0; i < NodeBrowser.Nodes.Count; i++)
@@ -528,6 +549,9 @@ namespace ApplicationTeacher
             }
         }
 
+        /// <summary>
+        /// Fonction qui envoie les configurations du stream aux élèves concernés
+        /// </summary>
         private void SendStreamConfiguration()
         {
             byte[] bytes = Encoding.Default.GetBytes(JsonSerializer.Serialize(Configuration.streamoptions));
@@ -690,6 +714,11 @@ namespace ApplicationTeacher
             }
         }
 
+        /// <summary>
+        /// Fonction qui minimise tous les noeuds des treeveiw
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void HideTreeView_Click(object sender, EventArgs e)
         {
             TreeNodeCollection nodes = TreeViewDetails.Nodes;
@@ -704,6 +733,11 @@ namespace ApplicationTeacher
             }
         }
 
+        /// <summary>
+        /// Fonction qui ouvre tous les noeuds des treeveiw
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void ShowTreeView_Click(object sender, EventArgs e)
         {
             TreeNodeCollection nodes = TreeViewDetails.Nodes;

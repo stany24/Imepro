@@ -32,6 +32,9 @@ namespace ApplicationCliente
             Task.Run(LaunchTasks);
         }
 
+        /// <summary>
+        /// Fonction qui attend qui le formulaire soit complétement initialisé avant de lancer les tâches
+        /// </summary>
         public void LaunchTasks()
         {
             while (!IsHandleCreated) {Thread.Sleep(100);}
@@ -59,6 +62,9 @@ namespace ApplicationCliente
             FirefoxDriver = new FirefoxDriver();
         }
 
+        /// <summary>
+        /// Fonction qui récupère les urls des navigateurs sélénium toutes les 2 secondes
+        /// </summary>
         public void AutomaticChecker()
         {
             while(true)
@@ -69,6 +75,11 @@ namespace ApplicationCliente
             }
         }
 
+        /// <summary>
+        /// Fonction qui vérifie l'url actuel et l'ajoute dans l'historique
+        /// </summary>
+        /// <param name="navigateur"></param>
+        /// <param name="navigateurName"></param>
         public void VerifyUrlOfWebDriver(WebDriver navigateur,string navigateurName)
         {
             try
@@ -261,6 +272,11 @@ namespace ApplicationCliente
             WindowState = FormWindowState.Normal;
         }
 
+        /// <summary>
+        /// Fonction qui permet de supprimer toutes les ip sauvegardées
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void ResetAllIP_Click(object sender, EventArgs e)
         {
             using StreamWriter writeFichier = new(pathToConfigurationFolder + FileNameConfigurationIp);
