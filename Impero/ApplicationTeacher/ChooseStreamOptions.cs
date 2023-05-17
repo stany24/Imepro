@@ -14,6 +14,7 @@ namespace ApplicationTeacher
             lbxStudents.DataSource = list;
             lbxFocus.DataSource = Enum.GetNames(typeof(Focus));
             lbxPriorite.DataSource = Enum.GetNames(typeof(Priority));
+            lbxScreen.DataSource = Screen.AllScreens;
         }
 
         private void SelectAll(object sender, EventArgs e)
@@ -53,6 +54,7 @@ namespace ApplicationTeacher
                 case LibraryData.Focus.OneNote:list = new() { "onenoteim" };
                     break;
             }
+            Configuration.ScreenToShareIndex = lbxScreen.SelectedIndex;
             Configuration.streamoptions = new StreamOptions(priorite, focus,list);
         }
     }

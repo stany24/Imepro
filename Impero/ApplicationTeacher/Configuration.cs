@@ -29,5 +29,6 @@ namespace ApplicationTeacher
         public static string FileNameDifferentFocus = "ChoixFocus.txt";
         public static int DurationBetweenDemand = 15;
         public static int DefaultTimeout = 2000;
+        public static int ScreenToShareIndex;
     }
 }

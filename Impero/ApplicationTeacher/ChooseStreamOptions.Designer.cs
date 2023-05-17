@@ -38,6 +38,8 @@
             this.lblEleves = new System.Windows.Forms.Label();
             this.lblFocus = new System.Windows.Forms.Label();
             this.lblError = new System.Windows.Forms.Label();
+            this.lblScreen = new System.Windows.Forms.Label();
+            this.lbxScreen = new System.Windows.Forms.ListBox();
             this.SuspendLayout();
             // 
             // lbxStudents
@@ -45,12 +47,12 @@
             this.lbxStudents.FormattingEnabled = true;
             this.lbxStudents.Location = new System.Drawing.Point(12, 25);
             this.lbxStudents.Name = "lbxStudents";
-            this.lbxStudents.Size = new System.Drawing.Size(162, 212);
+            this.lbxStudents.Size = new System.Drawing.Size(162, 251);
             this.lbxStudents.TabIndex = 0;
             // 
             // btnSelectAll
             // 
-            this.btnSelectAll.Location = new System.Drawing.Point(12, 243);
+            this.btnSelectAll.Location = new System.Drawing.Point(12, 278);
             this.btnSelectAll.Name = "btnSelectAll";
             this.btnSelectAll.Size = new System.Drawing.Size(80, 23);
             this.btnSelectAll.TabIndex = 1;
@@ -60,7 +62,7 @@
             // 
             // btnSelectNone
             // 
-            this.btnSelectNone.Location = new System.Drawing.Point(98, 243);
+            this.btnSelectNone.Location = new System.Drawing.Point(98, 278);
             this.btnSelectNone.Name = "btnSelectNone";
             this.btnSelectNone.Size = new System.Drawing.Size(76, 23);
             this.btnSelectNone.TabIndex = 2;
@@ -71,7 +73,7 @@
             // btnBeginSharing
             // 
             this.btnBeginSharing.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this.btnBeginSharing.Location = new System.Drawing.Point(202, 243);
+            this.btnBeginSharing.Location = new System.Drawing.Point(202, 278);
             this.btnBeginSharing.Name = "btnBeginSharing";
             this.btnBeginSharing.Size = new System.Drawing.Size(132, 23);
             this.btnBeginSharing.TabIndex = 3;
@@ -84,7 +86,7 @@
             this.lbxFocus.FormattingEnabled = true;
             this.lbxFocus.Location = new System.Drawing.Point(180, 119);
             this.lbxFocus.Name = "lbxFocus";
-            this.lbxFocus.Size = new System.Drawing.Size(179, 95);
+            this.lbxFocus.Size = new System.Drawing.Size(179, 69);
             this.lbxFocus.TabIndex = 4;
             // 
             // lbxPriorite
@@ -130,11 +132,30 @@
             this.lblError.Size = new System.Drawing.Size(0, 13);
             this.lblError.TabIndex = 9;
             // 
-            // ChooseStudentToShareScreen
+            // lblScreen
+            // 
+            this.lblScreen.AutoSize = true;
+            this.lblScreen.Location = new System.Drawing.Point(181, 191);
+            this.lblScreen.Name = "lblScreen";
+            this.lblScreen.Size = new System.Drawing.Size(35, 13);
+            this.lblScreen.TabIndex = 11;
+            this.lblScreen.Text = "Écran";
+            // 
+            // lbxScreen
+            // 
+            this.lbxScreen.FormattingEnabled = true;
+            this.lbxScreen.Location = new System.Drawing.Point(180, 207);
+            this.lbxScreen.Name = "lbxScreen";
+            this.lbxScreen.Size = new System.Drawing.Size(179, 69);
+            this.lbxScreen.TabIndex = 10;
+            // 
+            // ChooseStreamOptions
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(367, 274);
+            this.ClientSize = new System.Drawing.Size(367, 313);
+            this.Controls.Add(this.lblScreen);
+            this.Controls.Add(this.lbxScreen);
             this.Controls.Add(this.lblError);
             this.Controls.Add(this.lblFocus);
             this.Controls.Add(this.lblEleves);
@@ -145,8 +166,8 @@
             this.Controls.Add(this.btnSelectNone);
             this.Controls.Add(this.btnSelectAll);
             this.Controls.Add(this.lbxStudents);
-            this.Name = "ChooseStudentToShareScreen";
-            this.Text = "ChooseStudentToShareScreen";
+            this.Name = "ChooseStreamOptions";
+            this.Text = "ChooseStreamOptions";
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -164,5 +185,7 @@
         private System.Windows.Forms.Label lblEleves;
         private System.Windows.Forms.Label lblFocus;
         private System.Windows.Forms.Label lblError;
+        private System.Windows.Forms.Label lblScreen;
+        private System.Windows.Forms.ListBox lbxScreen;
     }
 }

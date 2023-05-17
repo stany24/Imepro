@@ -58,13 +58,14 @@ namespace ApplicationTeacher
         {
             try
             {
+                if (!File.Exists(pathToFile)) { File.Create(pathToFile); }
                 using StreamReader fichier = new(pathToFile);
                 list = new(JsonSerializer.Deserialize<List<string>>(fichier.ReadToEnd()));
                 fichier.Close();
             }
             catch (Exception e)
             {
-                lbxOutput.Invoke(new MethodInvoker(delegate { lbxOutput.Items.Add("Problème au chargement de la list des urls autorisé  : " + e.ToString()); }));
+                lbxOutput.Invoke(new MethodInvoker(delegate { lbxOutput.Items.Add("Problème au chargement de la list : " + e.ToString()); }));
             }
         }
 
@@ -73,11 +74,19 @@ namespace ApplicationTeacher
         /// </summary>
         /// <param name="pathToFile"></param>
         /// <param name="list"></param>
-        public void SaveListToFile(string pathToFile, List<string> list)
+        public void SaveListToFile(string pathToFile, List<string> list, ListBox lbxOutput)
         {
-            using StreamWriter writeFichierProcesusIgnore = new(pathToFile);
-            writeFichierProcesusIgnore.WriteLine(JsonSerializer.Serialize(list));
-            writeFichierProcesusIgnore.Close();
+            try
+            {
+                if (!File.Exists(pathToFile)){File.Create(pathToFile );}
+                using StreamWriter writeFichierProcesusIgnore = new(pathToFile);
+                writeFichierProcesusIgnore.WriteLine(JsonSerializer.Serialize(list));
+                writeFichierProcesusIgnore.Close();
+            }
+            catch (Exception e)
+            {
+                lbxOutput.Invoke(new MethodInvoker(delegate { lbxOutput.Items.Add("Problème au chargement de la list : " + e.ToString()); }));
+            }
         }
 
         /// <summary>
@@ -85,10 +94,10 @@ namespace ApplicationTeacher
         /// </summary>
         public void SaveConfigurationLists()
         {
-            SaveListToFile(Configuration.pathToSaveFolder + Configuration.FileNameIgnoredProcesses, Configuration.IgnoredProcesses);
-            SaveListToFile(Configuration.pathToSaveFolder + Configuration.FileNameAlertedProcesses, Configuration.AlertedProcesses);
-            SaveListToFile(Configuration.pathToSaveFolder + Configuration.FileNameAlertedUrl, Configuration.AlertedUrls);
-            SaveListToFile(Configuration.pathToSaveFolder + Configuration.FileNameAutorisedWebsite, Configuration.AutorisedWebsite);
+            SaveListToFile(Configuration.pathToSaveFolder + Configuration.FileNameIgnoredProcesses, Configuration.IgnoredProcesses, lbxConnexion);
+            SaveListToFile(Configuration.pathToSaveFolder + Configuration.FileNameAlertedProcesses, Configuration.AlertedProcesses, lbxConnexion);
+            SaveListToFile(Configuration.pathToSaveFolder + Configuration.FileNameAlertedUrl, Configuration.AlertedUrls, lbxConnexion);
+            SaveListToFile(Configuration.pathToSaveFolder + Configuration.FileNameAutorisedWebsite, Configuration.AutorisedWebsite, lbxConnexion);
         }
 
         /// <summary>
@@ -496,7 +505,7 @@ namespace ApplicationTeacher
             while (isSharing)
             {
                 byte[] message = new byte[65000];
-                Screen screen = Screen.AllScreens[1];
+                Screen screen = Screen.AllScreens[Configuration.ScreenToShareIndex];
                 Bitmap bitmap = new(screen.Bounds.Width, screen.Bounds.Height, PixelFormat.Format16bppRgb565);
                 Rectangle ScreenSize = screen.Bounds;
                 Graphics.FromImage(bitmap).CopyFromScreen(ScreenSize.Left, ScreenSize.Top, 0, 0, ScreenSize.Size);
