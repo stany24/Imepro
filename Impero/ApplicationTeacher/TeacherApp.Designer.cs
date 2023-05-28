@@ -41,12 +41,12 @@
             this.panelMiniatures = new System.Windows.Forms.Panel();
             this.SplitterPrincipal = new System.Windows.Forms.SplitContainer();
             this.SplitterInfoTree = new System.Windows.Forms.SplitContainer();
+            this.btnShowTreeView = new System.Windows.Forms.Button();
             this.btnHideTreeView = new System.Windows.Forms.Button();
             this.btnFilter = new System.Windows.Forms.Button();
             this.SplitterTree = new System.Windows.Forms.SplitContainer();
             this.SplitterImageLog = new System.Windows.Forms.SplitContainer();
             this.SplitterConnexionRequetes = new System.Windows.Forms.SplitContainer();
-            this.btnShowTreeView = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.Slider)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.SplitterPrincipal)).BeginInit();
             this.SplitterPrincipal.Panel1.SuspendLayout();
@@ -146,6 +146,7 @@
             // 
             // panelMiniatures
             // 
+            this.panelMiniatures.AutoScroll = true;
             this.panelMiniatures.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panelMiniatures.Location = new System.Drawing.Point(0, 0);
             this.panelMiniatures.Name = "panelMiniatures";
@@ -192,6 +193,16 @@
             this.SplitterInfoTree.Size = new System.Drawing.Size(280, 961);
             this.SplitterInfoTree.SplitterDistance = 120;
             this.SplitterInfoTree.TabIndex = 14;
+            // 
+            // btnShowTreeView
+            // 
+            this.btnShowTreeView.Location = new System.Drawing.Point(103, 81);
+            this.btnShowTreeView.Name = "btnShowTreeView";
+            this.btnShowTreeView.Size = new System.Drawing.Size(85, 21);
+            this.btnShowTreeView.TabIndex = 15;
+            this.btnShowTreeView.Text = "Afficher Tout";
+            this.btnShowTreeView.UseVisualStyleBackColor = true;
+            this.btnShowTreeView.Click += new System.EventHandler(this.ShowTreeView_Click);
             // 
             // btnHideTreeView
             // 
@@ -265,16 +276,6 @@
             this.SplitterConnexionRequetes.Size = new System.Drawing.Size(1500, 57);
             this.SplitterConnexionRequetes.SplitterDistance = 500;
             this.SplitterConnexionRequetes.TabIndex = 6;
-            // 
-            // btnShowTreeView
-            // 
-            this.btnShowTreeView.Location = new System.Drawing.Point(103, 81);
-            this.btnShowTreeView.Name = "btnShowTreeView";
-            this.btnShowTreeView.Size = new System.Drawing.Size(85, 21);
-            this.btnShowTreeView.TabIndex = 15;
-            this.btnShowTreeView.Text = "Afficher Tout";
-            this.btnShowTreeView.UseVisualStyleBackColor = true;
-            this.btnShowTreeView.Click += new System.EventHandler(this.ShowTreeView_Click);
             // 
             // TeacherApp
             // 

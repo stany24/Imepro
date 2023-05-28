@@ -58,10 +58,9 @@ namespace ApplicationTeacher
         {
             try
             {
-                if (!File.Exists(pathToFile)) { File.Create(pathToFile); }
-                using StreamReader fichier = new(pathToFile);
-                list = new(JsonSerializer.Deserialize<List<string>>(fichier.ReadToEnd()));
-                fichier.Close();
+                if (!Directory.Exists(Configuration.pathToSaveFolder)) {Directory.CreateDirectory( Configuration.pathToSaveFolder);}
+                if (!File.Exists(pathToFile)) {File.WriteAllText(pathToFile, "[]");}
+                list = new(JsonSerializer.Deserialize<List<string>>(File.ReadAllText(pathToFile)));
             }
             catch (Exception e)
             {

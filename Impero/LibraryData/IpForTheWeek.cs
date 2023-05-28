@@ -88,20 +88,30 @@ namespace LibraryData
 
         public IpForTheWeek()
         {
-            lundi[0] = "157.26.227.198";
-            lundi[1] = "157.26.227.198";
-            mardi[0] = "157.26.227.198";
-            mardi[1] = "157.26.227.198";
-            mercredi[0] = "157.26.227.198";
-            mercredi[1] = "157.26.227.198";
-            jeudi[0] = "157.26.227.198";
-            jeudi[1] = "157.26.227.198";
-            vendredi[0] = "157.26.227.198";
-            vendredi[1] = "157.26.227.198";
-            samedi[0] = "157.26.227.198";
-            samedi[1] = "157.26.227.198";
-            dimanche[0] = "157.26.227.198";
-            dimanche[1] = "157.26.227.198";
+            instanciate(IPAddress.Parse("1.1.1.1"));
+        }
+        public IpForTheWeek(IPAddress ip)
+        {
+            instanciate(ip);
+        }
+
+        private void instanciate(IPAddress ip)
+        {
+            string strIP = ip.ToString();
+            lundi[0] = strIP;
+            lundi[1] = strIP;
+            mardi[0] = strIP;
+            mardi[1] = strIP;
+            mercredi[0] = strIP;
+            mercredi[1] = strIP;
+            jeudi[0] = strIP;
+            jeudi[1] = strIP;
+            vendredi[0] = strIP;
+            vendredi[1] = strIP;
+            samedi[0] = strIP;
+            samedi[1] = strIP;
+            dimanche[0] = strIP;
+            dimanche[1] = strIP;
         }
     }
 }
