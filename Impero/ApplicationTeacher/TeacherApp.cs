@@ -350,20 +350,16 @@ namespace ApplicationTeacher
             TreeViewDetails.Invoke(new MethodInvoker(delegate {
                 //Trouver ou créer la node pour l'élève
                 TreeNode nodeStudent;
-                try { nodeStudent = TreeViewDetails.Nodes.Find(Convert.ToString(student.UserName), false)[0]; }
-                catch { nodeStudent = TreeViewDetails.Nodes.Add(student.UserName, student.UserName); }
-                //Trouver ou créer la node pour le pc
-                TreeNode nodeComputer;
-                try { nodeComputer = nodeStudent.Nodes.Find(Convert.ToString(student.ID),false)[0]; }
-                catch { nodeComputer = nodeStudent.Nodes.Add(Convert.ToString(student.ID), student.ComputerName); }
+                try { nodeStudent = TreeViewDetails.Nodes.Find(Convert.ToString(student.ID), false)[0]; }
+                catch { nodeStudent = TreeViewDetails.Nodes.Add(Convert.ToString(student.ID),student.UserName+" : "+student.ComputerName); }
                 //Trouver ou créer la node pour les processus du pc
                 TreeNode nodeProcess;
-                try{ nodeProcess = nodeComputer.Nodes[0]; }
-                catch { nodeProcess = nodeComputer.Nodes.Add("Processus:"); }
+                try{ nodeProcess = nodeStudent.Nodes[0]; }
+                catch { nodeProcess = nodeStudent.Nodes.Add("Processus:"); }
                 //Trouver ou créer la node pour les urls du pc
                 TreeNode nodeNavigateurs;
-                try { nodeNavigateurs = nodeComputer.Nodes[1]; }
-                catch { nodeNavigateurs = nodeComputer.Nodes.Add("Navigateurs:"); }
+                try { nodeNavigateurs = nodeStudent.Nodes[1]; }
+                catch { nodeNavigateurs = nodeStudent.Nodes.Add("Navigateurs:"); }
                 //Mise à jour des processus
                 nodeProcess.Nodes.Clear();
                 foreach(KeyValuePair<int,string> process in student.Processes) {
@@ -397,12 +393,8 @@ namespace ApplicationTeacher
             TreeViewSelect.Invoke(new MethodInvoker(delegate {
                 //Trouver ou créer la node pour l'élève
                 TreeNode nodeStudent;
-                try { nodeStudent = TreeViewSelect.Nodes.Find(Convert.ToString(student.UserName), false)[0]; }
-                catch { nodeStudent = TreeViewSelect.Nodes.Add(student.UserName, student.UserName); }
-                //Trouver ou créer la node pour le pc
-                TreeNode nodeComputer;
-                try { nodeComputer = nodeStudent.Nodes.Find(Convert.ToString(student.ID), false)[0]; }
-                catch { nodeComputer = nodeStudent.Nodes.Add(Convert.ToString(student.ID), student.ComputerName); }
+                try { nodeStudent = TreeViewSelect.Nodes.Find(Convert.ToString(student.ID), false)[0]; }
+                catch { nodeStudent = TreeViewSelect.Nodes.Add(Convert.ToString(student.ID), student.UserName + " : " + student.ComputerName); }
             }));
         }
 
@@ -463,14 +455,12 @@ namespace ApplicationTeacher
         private void TreeNodeChecked(object sender, TreeViewEventArgs e)
         {
             if (e.Node == null) { return; } // no node selected
-            if (e.Node.Parent == null) { return; } //vérification du niveau de la node
-            if (e.Node.Parent.Parent != null) { return; }
             if (e.Node.Checked)
             {
                 DataForTeacher student = null;
                 foreach (DataForTeacher students in AllStudents)
                 {
-                    if (students.ComputerName == e.Node.Text) { student = students; }
+                    if (Convert.ToString(students.ID) == e.Node.Name) { student = students; }
                 }
                 if (student == null) { return; }
                 foreach(Miniature mini in Displayer.MiniatureList) { if (mini.ComputerName == student.ComputerName && mini.StudentID == student.ID) { return; } }
@@ -638,8 +628,6 @@ namespace ApplicationTeacher
         {
             //vérification que la node est un ordinateur
             if(e.Node== null) return;
-            if(e.Node.Parent == null) return;
-            if (e.Node.Parent.Parent != null) return;
             foreach(DataForTeacher student in AllStudents)
             {
                 if(student.ID == Convert.ToInt32(e.Node.Name)) { OpenPrivateDisplay(student);return; }
