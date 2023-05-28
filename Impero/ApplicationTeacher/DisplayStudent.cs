@@ -38,7 +38,7 @@ namespace ApplicationTeacher
                 lblUserName.Invoke(new MethodInvoker(delegate { lblUserName.Text = "Nom: " + student.UserName; }));
                 TreeViewProcesses.Invoke(new MethodInvoker(delegate {
                     foreach (KeyValuePair<int, string> process in student.Processes) {
-                        TreeNode current = TreeViewProcesses.Nodes.Add(process.Value);
+                        TreeNode current = TreeViewProcesses.Nodes.Add(Convert.ToString(process.Key), process.Value);
                         if (Configuration.AlertedProcesses.Find(x => x == process.Value) != null)
                         {
                             current.BackColor = Color.Red;
@@ -68,7 +68,7 @@ namespace ApplicationTeacher
                 lblUserName.Text = "Nom: " + student.UserName;
                 foreach (KeyValuePair<int, string> process in student.Processes)
                 {
-                    TreeNode current = TreeViewProcesses.Nodes.Add(process.Value);
+                    TreeNode current = TreeViewProcesses.Nodes.Add(Convert.ToString(process.Key), process.Value);
                     if (Configuration.AlertedProcesses.Find(x => x == process.Value) != null)
                     {
                         current.BackColor = Color.Red;
@@ -247,6 +247,13 @@ namespace ApplicationTeacher
             Student.SocketToStudent.Send(Encoding.ASCII.GetBytes("shutdown"));
             Student.SocketToStudent.Disconnect(false);
             this.Close();
+        }
+
+        private void btnKillProcess_Click(object sender, EventArgs e)
+        {
+            if (TreeViewProcesses.SelectedNode == null) { return; }
+            Student.SocketToStudent.Send(Encoding.ASCII.GetBytes("kill "+TreeViewProcesses.SelectedNode.Name));
+            TreeViewProcesses.SelectedNode.Remove();
         }
     }
 }
