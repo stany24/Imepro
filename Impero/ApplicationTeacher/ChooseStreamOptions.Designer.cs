@@ -167,7 +167,7 @@
             this.Controls.Add(this.btnSelectAll);
             this.Controls.Add(this.lbxStudents);
             this.Name = "ChooseStreamOptions";
-            this.Text = "ChooseStreamOptions";
+            this.Text = "Imepro Options";
             this.ResumeLayout(false);
             this.PerformLayout();
 

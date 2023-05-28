@@ -269,16 +269,10 @@ namespace ApplicationTeacher
             AllStudents.Remove(student);
             lbxRequetes.Invoke(new MethodInvoker(delegate { lbxRequetes.Items.Add(DateTime.Now.ToString("HH:mm:ss") + " L'élève " + student.UserName + " est déconnecté"); }));
             TreeViewDetails.Invoke(new MethodInvoker(delegate {
-                TreeNode[] students = TreeViewDetails.Nodes.Find(Convert.ToString(student.UserName), false);
-                TreeNode[] computers = students[0].Nodes.Find(student.ComputerName,false);
-                if(computers.Length > 0) { computers[0].Remove(); }
-                if (students[0].Nodes.Count == 0) { students[0].Remove(); }
+                TreeViewDetails.Nodes.Find(Convert.ToString(student.ID), false)[0].Remove();
             }));
             TreeViewSelect.Invoke(new MethodInvoker(delegate {
-                TreeNode[] students = TreeViewSelect.Nodes.Find(Convert.ToString(student.UserName), false);
-                TreeNode[] computers = students[0].Nodes.Find(student.ComputerName, false);
-                if (computers.Length > 0) { computers[0].Remove(); }
-                if (students[0].Nodes.Count == 0) { students[0].Remove(); }
+                TreeViewSelect.Nodes.Find(Convert.ToString(student.ID), false)[0].Remove();
             }));
         }
 

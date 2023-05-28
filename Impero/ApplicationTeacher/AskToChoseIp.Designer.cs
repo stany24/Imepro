@@ -62,7 +62,7 @@
             this.Controls.Add(this.btnConfirmer);
             this.Controls.Add(this.lbxAdresses);
             this.Name = "AskToChoseIp";
-            this.Text = "AskToChoseIp";
+            this.Text = "Imepro IP";
             this.ResumeLayout(false);
 
         }

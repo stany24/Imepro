@@ -272,7 +272,7 @@
             this.ClientSize = new System.Drawing.Size(1476, 727);
             this.Controls.Add(this.SplitterImage);
             this.Name = "DisplayStudent";
-            this.Text = "DisplayStudent";
+            this.Text = "Imepro Individuel";
             ((System.ComponentModel.ISupportInitialize)(this.pbxScreenShot)).EndInit();
             this.SplitterImage.Panel1.ResumeLayout(false);
             this.SplitterImage.Panel2.ResumeLayout(false);
