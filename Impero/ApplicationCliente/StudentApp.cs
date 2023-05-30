@@ -18,8 +18,7 @@ namespace ApplicationCliente
 {
     public partial class StudentApp : Form
     {
-        readonly DataForStudent Client;
-        IPAddress IpToTeacher;
+        readonly DataForStudent Student;
         readonly string pathToConfigurationFolder = "C:\\ProgramData\\Imepro\\";
         readonly string FileNameConfigurationIp = "iPToTeacher.json";
         IWebDriver FirefoxDriver;
@@ -27,8 +26,8 @@ namespace ApplicationCliente
         public StudentApp()
         {
             InitializeComponent();
+            Student = new(lbxConnexion,pbxScreeShot,lbxMessages, this);
             LoadTeacherIP();
-            Client = new(lbxConnexion,pbxScreeShot,lbxMessages, IpToTeacher,this);
             Task.Run(LaunchTasks);
         }
 
@@ -38,7 +37,7 @@ namespace ApplicationCliente
         public void LaunchTasks()
         {
             while (!IsHandleCreated) {Thread.Sleep(100);}
-            Client.SocketToTeacher = Task.Run(() => Client.ConnectToTeacher(11111)).Result;
+            Student.SocketToTeacher = Task.Run(() => Student.ConnectToTeacher(11111)).Result;
             Task.Run(AutomaticChecker);
         }
 
@@ -85,9 +84,9 @@ namespace ApplicationCliente
             try
             {
                 if (navigateur == null){return;}
-                Client.Urls.AddUrl(new Url(DateTime.Now, navigateurName, navigateur.Url));
+                Student.Urls.AddUrl(new Url(DateTime.Now, navigateurName, navigateur.Url));
                 bool navigateback = true;
-                foreach (string url in Client.AutorisedUrls)
+                foreach (string url in Student.AutorisedUrls)
                 {
                     if (navigateur.Url.Contains(url)) { navigateback = false; }
                 }
@@ -111,8 +110,8 @@ namespace ApplicationCliente
             if (prompt.ShowDialog(this) != DialogResult.OK) { return; }
             try
             {
-                IpToTeacher = IPAddress.Parse(prompt.LastVerifiedIp);
-                IpForTheWeek allIP = new();
+                Student.IpToTeacher = IPAddress.Parse(prompt.LastVerifiedIp);
+                IpForTheWeek allIP = ReadConfIp();
                 allIP.SetIp(prompt.LastVerifiedIp);
                 using StreamWriter writeFichier = new(pathToConfigurationFolder + FileNameConfigurationIp);
                 writeFichier.WriteLine(JsonSerializer.Serialize(allIP, new JsonSerializerOptions { IncludeFields = true, }));
@@ -128,10 +127,10 @@ namespace ApplicationCliente
         /// <returns></returns>
         public IpForTheWeek ReadConfIp()
         {
-            try { 
-                using StreamReader fichier = new(pathToConfigurationFolder + FileNameConfigurationIp);
-                IpForTheWeek allIP = new(JsonSerializer.Deserialize<IpForTheWeek>(fichier.ReadToEnd()));
-                fichier.Close();
+            try {
+                if (!Directory.Exists(pathToConfigurationFolder)) { Directory.CreateDirectory(pathToConfigurationFolder); }
+                if (!File.Exists(pathToConfigurationFolder + FileNameConfigurationIp)) { File.WriteAllText(pathToConfigurationFolder + FileNameConfigurationIp, "[]"); }
+                IpForTheWeek allIP = new(JsonSerializer.Deserialize<IpForTheWeek>(File.ReadAllText(pathToConfigurationFolder + FileNameConfigurationIp)));
                 return allIP;
             } 
             catch(Exception e) {
@@ -149,7 +148,7 @@ namespace ApplicationCliente
             {
                 IpForTheWeek allIP = ReadConfIp();
                 if (allIP == null) { NewTeacherIP(new object(),new EventArgs()); return; }
-                IpToTeacher = IPAddress.Parse(allIP.GetIp());
+                Student.IpToTeacher = IPAddress.Parse(allIP.GetIp());
             }
             catch{NewTeacherIP(new object(), new EventArgs());}
         }
@@ -168,7 +167,7 @@ namespace ApplicationCliente
                 IPInterfaceProperties properities = current.GetIPProperties();
                 foreach(UnicastIPAddressInformation ip in properities.UnicastAddresses.Where(addr => addr.Address.AddressFamily == AddressFamily.InterNetwork))
                 {
-                    if (IsOnSameNetwork(IpToTeacher,ip.Address,ip.IPv4Mask)){isCorrect = true;}
+                    if (IsOnSameNetwork(Student.IpToTeacher,ip.Address,ip.IPv4Mask)){isCorrect = true;}
                 }
                 if (isCorrect == false) { command += "netsh interface ipv4 set interface \"" + current.Name + "\" forwarding=disable\r\n"; }
                 else { command += "netsh interface ipv4 set interface \"" + current.Name + "\" forwarding=enable\r\n"; }
@@ -229,12 +228,12 @@ namespace ApplicationCliente
         /// <param name="e"></param>
         public void OnClosing(object sender, FormClosedEventArgs e)
         {
-            if (Client.SocketToTeacher == null){return;}
+            if (Student.SocketToTeacher == null){return;}
             try
             {
-                Client.SocketToTeacher.Send(Encoding.ASCII.GetBytes("stop"));
-                Client.SocketToTeacher.Disconnect(false);
-                Client.SocketToTeacher = null;
+                Student.SocketToTeacher.Send(Encoding.ASCII.GetBytes("stop"));
+                Student.SocketToTeacher.Disconnect(false);
+                Student.SocketToTeacher = null;
                 FirefoxDriver?.Dispose();
                 ChromeDriver?.Dispose();
             }

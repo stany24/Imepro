@@ -92,9 +92,9 @@
             // 
             this.btnShare.Location = new System.Drawing.Point(3, 3);
             this.btnShare.Name = "btnShare";
-            this.btnShare.Size = new System.Drawing.Size(83, 21);
+            this.btnShare.Size = new System.Drawing.Size(94, 21);
             this.btnShare.TabIndex = 8;
-            this.btnShare.Text = "Share Screen";
+            this.btnShare.Text = "Partager l\'écran";
             this.btnShare.UseVisualStyleBackColor = true;
             this.btnShare.Click += new System.EventHandler(this.ShareScreen);
             // 
@@ -216,7 +216,7 @@
             // 
             // btnFilter
             // 
-            this.btnFilter.Location = new System.Drawing.Point(92, 3);
+            this.btnFilter.Location = new System.Drawing.Point(103, 3);
             this.btnFilter.Name = "btnFilter";
             this.btnFilter.Size = new System.Drawing.Size(120, 21);
             this.btnFilter.TabIndex = 13;
@@ -284,7 +284,7 @@
             this.ClientSize = new System.Drawing.Size(1784, 961);
             this.Controls.Add(this.SplitterPrincipal);
             this.Name = "TeacherApp";
-            this.Text = "Teacher";
+            this.Text = "Imepro";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.OnClosing);
             this.SizeChanged += new System.EventHandler(this.TeacherAppResized);
             ((System.ComponentModel.ISupportInitialize)(this.Slider)).EndInit();

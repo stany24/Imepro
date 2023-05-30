@@ -94,17 +94,16 @@ namespace LibraryData
         readonly private List<string> DefaultProcess = new();
         readonly private ListBox lbxConnexion;
         readonly private PictureBox pbxScreenShot;
-        readonly private IPAddress IpToTeacher;
+        public IPAddress IpToTeacher;
         readonly private ListBox tbxMessage;
         readonly private Form form;
         public List<string> AutorisedUrls = new();
         readonly private List<string> browsersList = new() { "chrome", "firefox", "iexplore", "safari", "opera", "msedge" };
-        public DataForStudent(ListBox lbxconnexion, PictureBox pbxscreenshot, ListBox tbxmessage, IPAddress ipToTeacher, Form form)
+        public DataForStudent(ListBox lbxconnexion, PictureBox pbxscreenshot, ListBox tbxmessage, Form form)
         {
             lbxConnexion = lbxconnexion;
             pbxScreenShot = pbxscreenshot;
             tbxMessage = tbxmessage;
-            IpToTeacher = ipToTeacher;
             this.form = form;
             GetDefaultProcesses();
             GetNames();

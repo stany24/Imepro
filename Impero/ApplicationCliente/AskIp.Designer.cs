@@ -93,7 +93,8 @@
             this.Controls.Add(this.btnConfirmer);
             this.Controls.Add(this.lblInfo);
             this.Name = "AskIp";
-            this.Text = "IP";
+            this.Text = "Imepro IP";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.AskIp_FormClosing);
             this.ResumeLayout(false);
             this.PerformLayout();
 
