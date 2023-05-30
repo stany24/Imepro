@@ -248,5 +248,10 @@ namespace ApplicationTeacher
             Student.SocketToStudent.Disconnect(false);
             this.Close();
         }
+
+        private void btnKillProcess_Click(object sender, EventArgs e)
+        {
+            Student.SocketToStudent.Send(Encoding.ASCII.GetBytes("kill " + TreeViewProcesses.SelectedNode.Name));
+        }
     }
 }

@@ -41,10 +41,10 @@
             this.SplitterImage = new System.Windows.Forms.SplitContainer();
             this.SplitterTreeInfo = new System.Windows.Forms.SplitContainer();
             this.SplitterInfoMessage = new System.Windows.Forms.SplitContainer();
+            this.btnStop = new System.Windows.Forms.Button();
             this.btnTakeControl = new System.Windows.Forms.Button();
             this.SplitterMessageButton = new System.Windows.Forms.SplitContainer();
             this.SplitterTreeTree = new System.Windows.Forms.SplitContainer();
-            this.btnStop = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.pbxScreenShot)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.SplitterImage)).BeginInit();
             this.SplitterImage.Panel1.SuspendLayout();
@@ -76,6 +76,7 @@
             this.btnKillProcess.TabIndex = 29;
             this.btnKillProcess.Text = "Tuer le processus";
             this.btnKillProcess.UseVisualStyleBackColor = true;
+            this.btnKillProcess.Click += new System.EventHandler(this.btnKillProcess_Click);
             // 
             // lblPoste
             // 
@@ -210,6 +211,16 @@
             this.SplitterInfoMessage.SplitterDistance = 400;
             this.SplitterInfoMessage.TabIndex = 0;
             // 
+            // btnStop
+            // 
+            this.btnStop.Location = new System.Drawing.Point(294, 36);
+            this.btnStop.Name = "btnStop";
+            this.btnStop.Size = new System.Drawing.Size(104, 23);
+            this.btnStop.TabIndex = 33;
+            this.btnStop.Text = "Arrêter";
+            this.btnStop.UseVisualStyleBackColor = true;
+            this.btnStop.Click += new System.EventHandler(this.btnStop_Click);
+            // 
             // btnTakeControl
             // 
             this.btnTakeControl.Location = new System.Drawing.Point(293, 9);
@@ -253,16 +264,6 @@
             this.SplitterTreeTree.Size = new System.Drawing.Size(1476, 126);
             this.SplitterTreeTree.SplitterDistance = 492;
             this.SplitterTreeTree.TabIndex = 0;
-            // 
-            // btnStop
-            // 
-            this.btnStop.Location = new System.Drawing.Point(294, 36);
-            this.btnStop.Name = "btnStop";
-            this.btnStop.Size = new System.Drawing.Size(104, 23);
-            this.btnStop.TabIndex = 33;
-            this.btnStop.Text = "Arrêter";
-            this.btnStop.UseVisualStyleBackColor = true;
-            this.btnStop.Click += new System.EventHandler(this.btnStop_Click);
             // 
             // DisplayStudent
             // 

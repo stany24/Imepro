@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing.Imaging;
-using System.Drawing;
-using System.Threading.Tasks;
-using System.Threading;
-using System.Windows.Forms;
+﻿using System.Collections.Generic;
 using LibraryData;
 
 namespace ApplicationTeacher

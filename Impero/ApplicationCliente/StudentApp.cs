@@ -170,8 +170,6 @@ namespace ApplicationCliente
                 {
                     if (IsOnSameNetwork(IpToTeacher,ip.Address,ip.IPv4Mask)){isCorrect = true;}
                 }
-                //IPv4InterfaceProperties ipv4 = properities.GetIPv4Properties();
-                //ipv4.IsForwardingEnabled not working
                 if (isCorrect == false) { command += "netsh interface ipv4 set interface \"" + current.Name + "\" forwarding=disable\r\n"; }
                 else { command += "netsh interface ipv4 set interface \"" + current.Name + "\" forwarding=enable\r\n"; }
             }
