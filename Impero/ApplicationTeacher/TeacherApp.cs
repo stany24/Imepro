@@ -480,28 +480,23 @@ namespace ApplicationTeacher
             IPAddress ip = IPAddress.Parse("232.1.2.3");
             s.SetSocketOption(SocketOptionLevel.IP,SocketOptionName.AddMembership, new MulticastOption(ip));
             s.SetSocketOption(SocketOptionLevel.IP, SocketOptionName.MulticastInterface, IPAddress.Parse("232.1.2.3").GetAddressBytes());
-            s.SetSocketOption(SocketOptionLevel.IP,SocketOptionName.MulticastTimeToLive, 3);
+            s.SetSocketOption(SocketOptionLevel.IP,SocketOptionName.MulticastTimeToLive, 10);
             IPEndPoint ipep = new(ip, 45678);
             s.Connect(ipep);
-            Random random= new();
+            Thread.Sleep(1000);
 
             while (isSharing)
             {
-                byte[] message = new byte[65000];
                 Screen screen = Screen.AllScreens[Configuration.ScreenToShareIndex];
                 Bitmap bitmap = new(screen.Bounds.Width, screen.Bounds.Height, PixelFormat.Format16bppRgb565);
                 Rectangle ScreenSize = screen.Bounds;
                 Graphics.FromImage(bitmap).CopyFromScreen(ScreenSize.Left, ScreenSize.Top, 0, 0, ScreenSize.Size);
                 ImageConverter converter = new();
                 byte[] imageArray = (byte[])converter.ConvertTo(bitmap, typeof(byte[]));
-                for (int j = 0; j < imageArray.Length/65000+1; j++)
+                CustomMessageSender Sender = new(imageArray);
+                foreach(CustomMessage message in Sender.GetMessages())
                 {
-                    try { Array.Copy(imageArray, j * 65000, message, 0, 65000); }
-                    catch { 
-                        Array.Copy(imageArray, j *65000 , message, 0, imageArray.Length % 65000);
-                        Array.Resize(ref message, imageArray.Length % 65000);
-                    }
-                    s.Send(message, message.Length, SocketFlags.None);
+                    s.Send(message.GetContent().ToArray());
                 }
             }
         }
@@ -593,6 +588,7 @@ namespace ApplicationTeacher
         {
             foreach (DataForTeacher student in AllStudents)
             {
+                try{student.SocketToStudent.Send(Encoding.Default.GetBytes("stops"));}catch { }
                 try { student.SocketToStudent.Send(Encoding.ASCII.GetBytes("disconnect")); } catch { }
                 student.SocketToStudent.Dispose();
                 //student.SocketToStudent.Disconnect(false);

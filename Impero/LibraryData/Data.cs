@@ -355,7 +355,7 @@ namespace LibraryData
                     case "data": SendData(); break;
                     case "image":; SendImage(TakeAllScreenShot(), SocketToTeacher); break;
                     case "kill": KillSelectedProcess(Convert.ToInt32(text.Split(' ')[1])); break;
-                    case "receive": isReceiving = true; Task.Run(ReceiveMulticastStream); break;
+                    case "receive": Task.Run(ReceiveMulticastStream); break;
                     case "apply": ApplyMulticastSettings(); break;
                     case "stops": Stop(); break;
                     case "message": ReceiveMessage(); break;
@@ -465,35 +465,57 @@ namespace LibraryData
                     Task.Run(MinimizeUnAutorisedEverySecond);
                     break;
             }
-            Socket s = new(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+            SocketMulticast = new(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
             IPEndPoint ipep = new(IPAddress.Any, 45678);
-            s.Bind(ipep);
+            SocketMulticast.Bind(ipep);
             IPAddress ip = IPAddress.Parse("232.1.2.3");
-            s.SetSocketOption(SocketOptionLevel.IP, SocketOptionName.AddMembership, new MulticastOption(ip, IPAddress.Any));
-            while (isReceiving)
+            SocketMulticast.SetSocketOption(SocketOptionLevel.IP, SocketOptionName.AddMembership, new MulticastOption(ip, IPAddress.Any));
+
+            receiveArgs = new SocketAsyncEventArgs();
+            receiveArgs.SetBuffer(new byte[65000], 0, 65000);
+            receiveArgs.Completed += ReceiveCompleted;
+            BeginReceive(receiveArgs);
+        }
+        Socket SocketMulticast;
+        SocketAsyncEventArgs receiveArgs;
+        List<byte> byteImage = new();
+
+        private void BeginReceive(SocketAsyncEventArgs args)
+        {
+            isReceiving = true;
+            bool willRaiseEvent = SocketMulticast.ReceiveAsync(args);
+            if (!willRaiseEvent)
+                ProcessReceive(args);
+        }
+
+        private void ReceiveCompleted(object sender, SocketAsyncEventArgs args)
+        {
+            ProcessReceive(args);
+        }
+
+        private void ProcessReceive(SocketAsyncEventArgs args)
+        {
+            Socket socket = (Socket)args.UserToken;
+            if (args.SocketError == SocketError.Success && args.BytesTransferred > 0)
             {
-                byte[] imageArray = new byte[9999999];
-                int size = 0;
-                int lastId = 0;
-                do
-                {
-                    try
-                    {
-                        byte[] message = new byte[65000];
-                        size = s.Receive(message);
-                        Array.Resize(ref message, size);
-                        Array.Copy(message, 0, imageArray, lastId, size);
-                        lastId += size;
-                    }
-                    catch { }
-                } while (size == 65000);
-                Array.Resize(ref imageArray, lastId);
-                try
-                {
-                    Bitmap bitmap = new(new MemoryStream(imageArray));
+
+                int size = args.BytesTransferred;
+                byte[] receivedData = new byte[size];
+                Array.Copy(args.Buffer, args.Offset, receivedData, 0, size);
+                byteImage.AddRange(receivedData);
+                if(size != 65000){
+                    Bitmap bitmap = new(new MemoryStream(byteImage.ToArray()));
                     pbxScreenShot.Invoke(new MethodInvoker(delegate { pbxScreenShot.Image = bitmap; }));
+                    byteImage.Clear();
                 }
-                catch { }
+
+                // Continue receiving if needed
+                BeginReceive(args);
+            }
+            else
+            {
+                lbxConnexion.Invoke(new MethodInvoker(delegate { lbxConnexion.Items.Add("Erreur de reception"); }));
+                isReceiving = false;
             }
         }
 
@@ -507,7 +529,7 @@ namespace LibraryData
             Array.Resize(ref message, size);
             options = JsonSerializer.Deserialize<StreamOptions>(Encoding.Default.GetString(message));
             pbxScreenShot.Invoke(new MethodInvoker(delegate { pbxScreenShot.Visible = true; }));
-            pbxScreenShot.Invoke(new MethodInvoker(delegate { pbxScreenShot.Dock = DockStyle.Fill; }));
+            //pbxScreenShot.Invoke(new MethodInvoker(delegate { pbxScreenShot.Dock = DockStyle.Fill; }));
             form.Invoke(new MethodInvoker(delegate
             {
                 form.Show();
