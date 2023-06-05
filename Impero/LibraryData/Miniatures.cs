@@ -220,11 +220,11 @@ namespace LibraryData
         /// </summary>
         /// <param name="id">Id de l'éléve</param>
         /// <param name="computername">Le nom de l'ordinateur</param>
-        public void RemoveMiniature(int id, string computername)
+        public void RemoveMiniature(int id)
         {
             foreach (Miniature miniature in MiniatureList)
             {
-                if (miniature.StudentID == id && miniature.ComputerName == computername)
+                if (miniature.StudentID == id)
                 {
                     MiniatureList.Remove(miniature);
                     miniature.Dispose();

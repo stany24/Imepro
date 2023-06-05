@@ -32,6 +32,12 @@ namespace ApplicationTeacher
             InitializeComponent();
             Displayer = new(panelMiniatures.Width);
             FindIp();
+            Task.Run(StartTasks);
+        }
+
+        public void StartTasks()
+        {
+            while (!IsHandleCreated) { Thread.Sleep(10); }
             LoadConfigurationLists();
             Task.Run(AskingData);
             Task.Run(LogClients);
@@ -42,10 +48,10 @@ namespace ApplicationTeacher
         /// </summary>
         public void LoadConfigurationLists()
         {
-            LoadFileToList(Configuration.pathToSaveFolder + Configuration.FileNameIgnoredProcesses, Configuration.IgnoredProcesses, lbxConnexion);
-            LoadFileToList(Configuration.pathToSaveFolder + Configuration.FileNameAlertedProcesses, Configuration.AlertedProcesses, lbxConnexion);
-            LoadFileToList(Configuration.pathToSaveFolder + Configuration.FileNameAlertedUrl, Configuration.AlertedUrls, lbxConnexion);
-            LoadFileToList(Configuration.pathToSaveFolder + Configuration.FileNameAutorisedWebsite, Configuration.AutorisedWebsite, lbxConnexion);
+            LoadFileToList(Configuration.pathToSaveFolder + Configuration.FileNameIgnoredProcesses,ref Configuration.IgnoredProcesses, lbxConnexion);
+            LoadFileToList(Configuration.pathToSaveFolder + Configuration.FileNameAlertedProcesses,ref Configuration.AlertedProcesses, lbxConnexion);
+            LoadFileToList(Configuration.pathToSaveFolder + Configuration.FileNameAlertedUrl,ref Configuration.AlertedUrls, lbxConnexion);
+            LoadFileToList(Configuration.pathToSaveFolder + Configuration.FileNameAutorisedWebsite,ref Configuration.AutorisedWebsite, lbxConnexion);
         }
 
         /// <summary>
@@ -54,7 +60,7 @@ namespace ApplicationTeacher
         /// <param name="pathToFile"></param>
         /// <param name="list"></param>
         /// <param name="lbxOutput"></param>
-        public void LoadFileToList(string pathToFile,List<string> list, ListBox lbxOutput)
+        public void LoadFileToList(string pathToFile, ref List<string> list, ListBox lbxOutput)
         {
             try
             {
@@ -408,11 +414,11 @@ namespace ApplicationTeacher
                 TreeNode NodeBrowser = NodeAllNavigateur.Nodes.Find(ProcessName, false)[0]; ;
                 for (int i = NodeAllNavigateur.Nodes.Find(ProcessName, false)[0].Nodes.Count; i < urls.Count; i++)
                 {
-                    TreeNode NodeUrl = NodeBrowser.Nodes.Add(urls[i].ToString());
+                    NodeBrowser.Nodes.Add(urls[i].ToString());
                 }
                 if (FilterEnabled)
                 {
-                    ApplyFilter(NodeBrowser);
+                    ApplyUrlFilter(NodeBrowser);
                 }
             }));
         }
@@ -421,7 +427,7 @@ namespace ApplicationTeacher
         /// Fonction qui active les filtre dans les TreeViews
         /// </summary>
         /// <param name="NodeBrowser"></param>
-        public void ApplyFilter(TreeNode NodeBrowser)
+        public void ApplyUrlFilter(TreeNode NodeBrowser)
         {
             for (int i = 0; i < NodeBrowser.Nodes.Count; i++)
             {
@@ -465,7 +471,7 @@ namespace ApplicationTeacher
             }
             else
             {
-                Displayer.RemoveMiniature(Convert.ToInt32(e.Node.Name),e.Node.Text);
+                Displayer.RemoveMiniature(Convert.ToInt32(e.Node.Name));
             }
         }
 

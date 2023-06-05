@@ -569,6 +569,7 @@ namespace LibraryData
         /// </summary>
         private void DisableKeyboard()
         {
+            gkh.Hook();
             foreach (Keys key in Enum.GetValues(typeof(Keys)))
             {
                 gkh.HookedKeys.Add(key);
