@@ -41,6 +41,7 @@
             this.panelMiniatures = new System.Windows.Forms.Panel();
             this.SplitterPrincipal = new System.Windows.Forms.SplitContainer();
             this.SplitterInfoTree = new System.Windows.Forms.SplitContainer();
+            this.btnOpenConfigWindow = new System.Windows.Forms.Button();
             this.btnShowTreeView = new System.Windows.Forms.Button();
             this.btnHideTreeView = new System.Windows.Forms.Button();
             this.btnFilter = new System.Windows.Forms.Button();
@@ -130,7 +131,7 @@
             this.TreeViewDetails.Dock = System.Windows.Forms.DockStyle.Fill;
             this.TreeViewDetails.Location = new System.Drawing.Point(0, 0);
             this.TreeViewDetails.Name = "TreeViewDetails";
-            this.TreeViewDetails.Size = new System.Drawing.Size(280, 417);
+            this.TreeViewDetails.Size = new System.Drawing.Size(280, 412);
             this.TreeViewDetails.TabIndex = 12;
             // 
             // TreeViewSelect
@@ -139,7 +140,7 @@
             this.TreeViewSelect.Dock = System.Windows.Forms.DockStyle.Fill;
             this.TreeViewSelect.Location = new System.Drawing.Point(0, 0);
             this.TreeViewSelect.Name = "TreeViewSelect";
-            this.TreeViewSelect.Size = new System.Drawing.Size(280, 416);
+            this.TreeViewSelect.Size = new System.Drawing.Size(280, 411);
             this.TreeViewSelect.TabIndex = 0;
             this.TreeViewSelect.AfterCheck += new System.Windows.Forms.TreeViewEventHandler(this.TreeNodeChecked);
             this.TreeViewSelect.NodeMouseDoubleClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.TreeViewDoubleClick);
@@ -180,6 +181,7 @@
             // 
             // SplitterInfoTree.Panel1
             // 
+            this.SplitterInfoTree.Panel1.Controls.Add(this.btnOpenConfigWindow);
             this.SplitterInfoTree.Panel1.Controls.Add(this.btnShowTreeView);
             this.SplitterInfoTree.Panel1.Controls.Add(this.btnHideTreeView);
             this.SplitterInfoTree.Panel1.Controls.Add(this.btnFilter);
@@ -191,8 +193,18 @@
             // 
             this.SplitterInfoTree.Panel2.Controls.Add(this.SplitterTree);
             this.SplitterInfoTree.Size = new System.Drawing.Size(280, 961);
-            this.SplitterInfoTree.SplitterDistance = 120;
+            this.SplitterInfoTree.SplitterDistance = 130;
             this.SplitterInfoTree.TabIndex = 14;
+            // 
+            // btnOpenConfigWindow
+            // 
+            this.btnOpenConfigWindow.Location = new System.Drawing.Point(12, 106);
+            this.btnOpenConfigWindow.Name = "btnOpenConfigWindow";
+            this.btnOpenConfigWindow.Size = new System.Drawing.Size(85, 21);
+            this.btnOpenConfigWindow.TabIndex = 16;
+            this.btnOpenConfigWindow.Text = "Configuration";
+            this.btnOpenConfigWindow.UseVisualStyleBackColor = true;
+            this.btnOpenConfigWindow.Click += new System.EventHandler(this.btnOpenConfigWindow_Click);
             // 
             // btnShowTreeView
             // 
@@ -238,8 +250,8 @@
             // SplitterTree.Panel2
             // 
             this.SplitterTree.Panel2.Controls.Add(this.TreeViewSelect);
-            this.SplitterTree.Size = new System.Drawing.Size(280, 837);
-            this.SplitterTree.SplitterDistance = 417;
+            this.SplitterTree.Size = new System.Drawing.Size(280, 827);
+            this.SplitterTree.SplitterDistance = 412;
             this.SplitterTree.TabIndex = 13;
             // 
             // SplitterImageLog
@@ -332,6 +344,7 @@
         private System.Windows.Forms.Button btnFilter;
         private System.Windows.Forms.Button btnHideTreeView;
         private System.Windows.Forms.Button btnShowTreeView;
+        private System.Windows.Forms.Button btnOpenConfigWindow;
     }
 }
 

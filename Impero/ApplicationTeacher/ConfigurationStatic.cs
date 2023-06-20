@@ -1,12 +1,24 @@
-﻿using System.Collections.Generic;
-using LibraryData;
+﻿using LibraryData;
+using System.Collections.Generic;
 
 namespace ApplicationTeacher
 {
+    public class ConfigurationDynamique
+    {
+        public Dictionary<string,List<string>> AllLists = new();
+
+        public ConfigurationDynamique()
+        {
+            AllLists.Add("Processus ignorés", ConfigurationStatic.IgnoredProcesses);
+            AllLists.Add("Urls alertés", ConfigurationStatic.AlertedUrls);
+            AllLists.Add("Processus alertés", ConfigurationStatic.AlertedProcesses);
+            AllLists.Add("Urls autorisés", ConfigurationStatic.AutorisedWebsite);
+        }
+    }
     /// <summary>
     /// Classe pour tous les paramètres de configuraion
     /// </summary>
-    public static class Configuration
+    public static class ConfigurationStatic
     {
         public static Dictionary<string,string> DifferentFocus = new();
         public static List<string> IgnoredProcesses = new();

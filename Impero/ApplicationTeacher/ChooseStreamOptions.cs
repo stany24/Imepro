@@ -35,10 +35,10 @@ namespace ApplicationTeacher
             if(lbxStudents.SelectedItems.Count == 0) { lblError.Text = "Selectionnez au moins 1 élève"; return; }
             if(lbxPriorite.SelectedItem == null) { lblError.Text = "Selectionnez la priorité"; return; }
             if(lbxFocus.SelectedItem == null) { lblError.Text = "Selectionnez le focus"; return; }
-            Configuration.StudentToShareScreen.Clear();
+            ConfigurationStatic.StudentToShareScreen.Clear();
             foreach(DataForTeacher student in lbxStudents.SelectedItems)
             {
-                Configuration.StudentToShareScreen.Add(student);
+                ConfigurationStatic.StudentToShareScreen.Add(student);
             }
             Focus focus = (Focus)Enum.Parse(typeof(Focus), lbxFocus.SelectedItem.ToString());
             Priority priorite = (Priority)Enum.Parse(typeof(Priority), lbxPriorite.SelectedItem.ToString());
@@ -54,8 +54,8 @@ namespace ApplicationTeacher
                 case LibraryData.Focus.OneNote:list = new() { "onenoteim" };
                     break;
             }
-            Configuration.ScreenToShareIndex = lbxScreen.SelectedIndex;
-            Configuration.streamoptions = new StreamOptions(priorite, focus,list);
+            ConfigurationStatic.ScreenToShareIndex = lbxScreen.SelectedIndex;
+            ConfigurationStatic.streamoptions = new StreamOptions(priorite, focus,list);
         }
     }
 }

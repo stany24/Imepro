@@ -48,10 +48,10 @@ namespace ApplicationTeacher
         /// </summary>
         public void LoadConfigurationLists()
         {
-            LoadFileToList(Configuration.pathToSaveFolder + Configuration.FileNameIgnoredProcesses,ref Configuration.IgnoredProcesses, lbxConnexion);
-            LoadFileToList(Configuration.pathToSaveFolder + Configuration.FileNameAlertedProcesses,ref Configuration.AlertedProcesses, lbxConnexion);
-            LoadFileToList(Configuration.pathToSaveFolder + Configuration.FileNameAlertedUrl,ref Configuration.AlertedUrls, lbxConnexion);
-            LoadFileToList(Configuration.pathToSaveFolder + Configuration.FileNameAutorisedWebsite,ref Configuration.AutorisedWebsite, lbxConnexion);
+            LoadFileToList(ConfigurationStatic.pathToSaveFolder + ConfigurationStatic.FileNameIgnoredProcesses,ref ConfigurationStatic.IgnoredProcesses, lbxConnexion);
+            LoadFileToList(ConfigurationStatic.pathToSaveFolder + ConfigurationStatic.FileNameAlertedProcesses,ref ConfigurationStatic.AlertedProcesses, lbxConnexion);
+            LoadFileToList(ConfigurationStatic.pathToSaveFolder + ConfigurationStatic.FileNameAlertedUrl,ref ConfigurationStatic.AlertedUrls, lbxConnexion);
+            LoadFileToList(ConfigurationStatic.pathToSaveFolder + ConfigurationStatic.FileNameAutorisedWebsite,ref ConfigurationStatic.AutorisedWebsite, lbxConnexion);
         }
 
         /// <summary>
@@ -64,7 +64,7 @@ namespace ApplicationTeacher
         {
             try
             {
-                if (!Directory.Exists(Configuration.pathToSaveFolder)) {Directory.CreateDirectory( Configuration.pathToSaveFolder);}
+                if (!Directory.Exists(ConfigurationStatic.pathToSaveFolder)) {Directory.CreateDirectory( ConfigurationStatic.pathToSaveFolder);}
                 if (!File.Exists(pathToFile)) {File.WriteAllText(pathToFile, "[]");}
                 list = new(JsonSerializer.Deserialize<List<string>>(File.ReadAllText(pathToFile)));
             }
@@ -99,10 +99,10 @@ namespace ApplicationTeacher
         /// </summary>
         public void SaveConfigurationLists()
         {
-            SaveListToFile(Configuration.pathToSaveFolder + Configuration.FileNameIgnoredProcesses, Configuration.IgnoredProcesses, lbxConnexion);
-            SaveListToFile(Configuration.pathToSaveFolder + Configuration.FileNameAlertedProcesses, Configuration.AlertedProcesses, lbxConnexion);
-            SaveListToFile(Configuration.pathToSaveFolder + Configuration.FileNameAlertedUrl, Configuration.AlertedUrls, lbxConnexion);
-            SaveListToFile(Configuration.pathToSaveFolder + Configuration.FileNameAutorisedWebsite, Configuration.AutorisedWebsite, lbxConnexion);
+            SaveListToFile(ConfigurationStatic.pathToSaveFolder + ConfigurationStatic.FileNameIgnoredProcesses, ConfigurationStatic.IgnoredProcesses, lbxConnexion);
+            SaveListToFile(ConfigurationStatic.pathToSaveFolder + ConfigurationStatic.FileNameAlertedProcesses, ConfigurationStatic.AlertedProcesses, lbxConnexion);
+            SaveListToFile(ConfigurationStatic.pathToSaveFolder + ConfigurationStatic.FileNameAlertedUrl, ConfigurationStatic.AlertedUrls, lbxConnexion);
+            SaveListToFile(ConfigurationStatic.pathToSaveFolder + ConfigurationStatic.FileNameAutorisedWebsite, ConfigurationStatic.AutorisedWebsite, lbxConnexion);
         }
 
         /// <summary>
@@ -176,7 +176,7 @@ namespace ApplicationTeacher
             isAsking = true;
             socket.Send(Encoding.Default.GetBytes("url"));
             //serialization
-            string jsonString = JsonSerializer.Serialize(Configuration.AutorisedWebsite);
+            string jsonString = JsonSerializer.Serialize(ConfigurationStatic.AutorisedWebsite);
             //envoi
             Thread.Sleep(100);
             socket.Send(Encoding.ASCII.GetBytes(jsonString), Encoding.ASCII.GetBytes(jsonString).Length, SocketFlags.None);
@@ -195,7 +195,7 @@ namespace ApplicationTeacher
                     while (isAsking) { Thread.Sleep(10); }
                     isAsking = true;
                     DateTime StartUpdate = DateTime.Now;
-                    DateTime NextUpdate = DateTime.Now.AddSeconds(Configuration.DurationBetweenDemand);
+                    DateTime NextUpdate = DateTime.Now.AddSeconds(ConfigurationStatic.DurationBetweenDemand);
                     List<DataForTeacher> ClientToRemove = new();
                     UpdateEleves(ClientToRemove);
                     foreach (DataForTeacher client in ClientToRemove)
@@ -244,8 +244,8 @@ namespace ApplicationTeacher
             for (int i = 0; i < AllStudents.Count; i++)
             {
                 Socket socket = AllStudents[i].SocketToStudent;
-                socket.ReceiveTimeout = Configuration.DefaultTimeout;
-                socket.SendTimeout = Configuration.DefaultTimeout;
+                socket.ReceiveTimeout = ConfigurationStatic.DefaultTimeout;
+                socket.SendTimeout = ConfigurationStatic.DefaultTimeout;
                 try
                 {
                     //demande les données
@@ -294,7 +294,7 @@ namespace ApplicationTeacher
                 Socket socket = student.SocketToStudent;
                 int id = student.ID;
                 byte[] dataBuffer = new byte[100000];
-                socket.ReceiveTimeout = Configuration.DefaultTimeout;
+                socket.ReceiveTimeout = ConfigurationStatic.DefaultTimeout;
                 int nbData = socket.Receive(dataBuffer);
                 Array.Resize(ref dataBuffer, nbData);
                 Data data = JsonSerializer.Deserialize<Data>(Encoding.Default.GetString(dataBuffer));
@@ -326,7 +326,7 @@ namespace ApplicationTeacher
             {
                 Socket socket = student.SocketToStudent;
                 byte[] imageBuffer = new byte[10485760];
-                socket.ReceiveTimeout = Configuration.DefaultTimeout;
+                socket.ReceiveTimeout = ConfigurationStatic.DefaultTimeout;
                 int nbData = socket.Receive(imageBuffer, 0, imageBuffer.Length, SocketFlags.None);
                 Array.Resize(ref imageBuffer, nbData);
                 student.ScreenShot = new Bitmap(new MemoryStream(imageBuffer));
@@ -366,7 +366,7 @@ namespace ApplicationTeacher
                     TreeNode current = nodeProcess.Nodes.Add(process.Value);
                     if (FilterEnabled)
                     {
-                        if (Configuration.AlertedProcesses.Find(x => x == process.Value) != null)
+                        if (ConfigurationStatic.AlertedProcesses.Find(x => x == process.Value) != null)
                         {
                             current.BackColor = Color.Red;
                             while (current.Parent != null)
@@ -376,7 +376,7 @@ namespace ApplicationTeacher
                             }
                         }
                     }
-                    else{if(Configuration.IgnoredProcesses.Find(x => x == process.Value) != null){current.BackColor = Color.Yellow;/*current.Remove();*/ }}
+                    else{if(ConfigurationStatic.IgnoredProcesses.Find(x => x == process.Value) != null){current.BackColor = Color.Yellow;/*current.Remove();*/ }}
                 }
                 //Mise à jour des urls
                 UpdateUrlsTree(nodeNavigateurs, student.Urls.chrome, "chrome","Chrome");
@@ -431,9 +431,9 @@ namespace ApplicationTeacher
         {
             for (int i = 0; i < NodeBrowser.Nodes.Count; i++)
             {
-                for (int j = 0; j < Configuration.AlertedUrls.Count; j++)
+                for (int j = 0; j < ConfigurationStatic.AlertedUrls.Count; j++)
                 {
-                    if (NodeBrowser.Nodes[i].Text.ToLower().Contains(Configuration.AlertedUrls[j]))
+                    if (NodeBrowser.Nodes[i].Text.ToLower().Contains(ConfigurationStatic.AlertedUrls[j]))
                     {
                         TreeNode NodeUrl = NodeBrowser.Nodes[i];
                         NodeUrl.BackColor = Color.Red;
@@ -464,7 +464,7 @@ namespace ApplicationTeacher
                 }
                 if (student == null) { return; }
                 foreach(Miniature mini in Displayer.MiniatureList) { if (mini.ComputerName == student.ComputerName && mini.StudentID == student.ID) { return; } }
-                Miniature miniature = new(student.ScreenShot, student.ComputerName, student.ID, Configuration.pathToSaveFolder);
+                Miniature miniature = new(student.ScreenShot, student.ComputerName, student.ID, ConfigurationStatic.pathToSaveFolder);
                 Displayer.AddMiniature(miniature);
                 panelMiniatures.Controls.Add(miniature);
                 panelMiniatures.Controls.SetChildIndex(miniature, 0);
@@ -480,7 +480,7 @@ namespace ApplicationTeacher
         /// </summary>
         public void RecordAndStreamScreen()
         {
-            foreach (DataForTeacher student in Configuration.StudentToShareScreen) { student.SocketToStudent.Send(Encoding.ASCII.GetBytes("receive")); }
+            foreach (DataForTeacher student in ConfigurationStatic.StudentToShareScreen) { student.SocketToStudent.Send(Encoding.ASCII.GetBytes("receive")); }
 
             Socket s = new(AddressFamily.InterNetwork,SocketType.Dgram, ProtocolType.Udp);
             IPAddress ip = IPAddress.Parse("232.1.2.3");
@@ -493,7 +493,7 @@ namespace ApplicationTeacher
 
             while (isSharing)
             {
-                Screen screen = Screen.AllScreens[Configuration.ScreenToShareIndex];
+                Screen screen = Screen.AllScreens[ConfigurationStatic.ScreenToShareIndex];
                 Bitmap bitmap = new(screen.Bounds.Width, screen.Bounds.Height, PixelFormat.Format16bppRgb565);
                 Rectangle ScreenSize = screen.Bounds;
                 Graphics.FromImage(bitmap).CopyFromScreen(ScreenSize.Left, ScreenSize.Top, 0, 0, ScreenSize.Size);
@@ -518,7 +518,7 @@ namespace ApplicationTeacher
             {
                 ChooseStreamOptions prompt = new(AllStudents);
                 if (prompt.ShowDialog(this) != DialogResult.OK){return;}
-                if (Configuration.StudentToShareScreen.Count == 0){return;}
+                if (ConfigurationStatic.StudentToShareScreen.Count == 0){return;}
                 isSharing= true;
                 SendStreamConfiguration();
                 ScreenSharer = Task.Run(RecordAndStreamScreen);
@@ -527,14 +527,14 @@ namespace ApplicationTeacher
             else
             {
                 isSharing = false;
-                for (int i = 0; i < Configuration.StudentToShareScreen.Count; i++)
+                for (int i = 0; i < ConfigurationStatic.StudentToShareScreen.Count; i++)
                 {
                     try
                     {
-                        Configuration.StudentToShareScreen[i].SocketToStudent.Send(Encoding.Default.GetBytes("stops"));
+                        ConfigurationStatic.StudentToShareScreen[i].SocketToStudent.Send(Encoding.Default.GetBytes("stops"));
                     }
                     catch { }
-                    Configuration.StudentToShareScreen.Remove(Configuration.StudentToShareScreen[i]);
+                    ConfigurationStatic.StudentToShareScreen.Remove(ConfigurationStatic.StudentToShareScreen[i]);
                 }
                 btnShare.Text = "Share screen";
                 ScreenSharer.Wait();
@@ -547,13 +547,13 @@ namespace ApplicationTeacher
         /// </summary>
         private void SendStreamConfiguration()
         {
-            byte[] bytes = Encoding.Default.GetBytes(JsonSerializer.Serialize(Configuration.streamoptions));
-            foreach(DataForTeacher student in Configuration.StudentToShareScreen)
+            byte[] bytes = Encoding.Default.GetBytes(JsonSerializer.Serialize(ConfigurationStatic.streamoptions));
+            foreach(DataForTeacher student in ConfigurationStatic.StudentToShareScreen)
             {
                 student.SocketToStudent.Send(Encoding.Default.GetBytes("apply"));
             }
             Thread.Sleep(100);
-            foreach (DataForTeacher student in Configuration.StudentToShareScreen)
+            foreach (DataForTeacher student in ConfigurationStatic.StudentToShareScreen)
             {
                 student.SocketToStudent.Send(bytes);
             }
@@ -742,6 +742,12 @@ namespace ApplicationTeacher
             {
                 node.ExpandAll();
             }
+        }
+
+        private void btnOpenConfigWindow_Click(object sender, EventArgs e)
+        {
+            ConfigurationWindow configWindow = new ConfigurationWindow();
+            configWindow.Show();
         }
     }
 }
