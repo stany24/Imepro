@@ -38,71 +38,8 @@ namespace ApplicationTeacher
         public void StartTasks()
         {
             while (!IsHandleCreated) { Thread.Sleep(10); }
-            LoadConfigurationLists();
             Task.Run(AskingData);
             Task.Run(LogClients);
-        }
-
-        /// <summary>
-        /// Fonction qui charge toutes les fichier de configuration
-        /// </summary>
-        public void LoadConfigurationLists()
-        {
-            LoadFileToList(ConfigurationStatic.pathToSaveFolder + ConfigurationStatic.FileNameIgnoredProcesses,ref ConfigurationStatic.IgnoredProcesses, lbxConnexion);
-            LoadFileToList(ConfigurationStatic.pathToSaveFolder + ConfigurationStatic.FileNameAlertedProcesses,ref ConfigurationStatic.AlertedProcesses, lbxConnexion);
-            LoadFileToList(ConfigurationStatic.pathToSaveFolder + ConfigurationStatic.FileNameAlertedUrl,ref ConfigurationStatic.AlertedUrls, lbxConnexion);
-            LoadFileToList(ConfigurationStatic.pathToSaveFolder + ConfigurationStatic.FileNameAutorisedWebsite,ref ConfigurationStatic.AutorisedWebsite, lbxConnexion);
-        }
-
-        /// <summary>
-        /// Fonction qui permet de charger un fichier dans une liste
-        /// </summary>
-        /// <param name="pathToFile"></param>
-        /// <param name="list"></param>
-        /// <param name="lbxOutput"></param>
-        public void LoadFileToList(string pathToFile, ref List<string> list, ListBox lbxOutput)
-        {
-            try
-            {
-                if (!Directory.Exists(ConfigurationStatic.pathToSaveFolder)) {Directory.CreateDirectory( ConfigurationStatic.pathToSaveFolder);}
-                if (!File.Exists(pathToFile)) {File.WriteAllText(pathToFile, "[]");}
-                list = new(JsonSerializer.Deserialize<List<string>>(File.ReadAllText(pathToFile)));
-            }
-            catch (Exception e)
-            {
-                lbxOutput.Invoke(new MethodInvoker(delegate { lbxOutput.Items.Add("Problème au chargement de la list : " + e.ToString()); }));
-            }
-        }
-
-        /// <summary>
-        /// Fonction qui permet de sauvgareder une liste dans un fichier
-        /// </summary>
-        /// <param name="pathToFile"></param>
-        /// <param name="list"></param>
-        public void SaveListToFile(string pathToFile, List<string> list, ListBox lbxOutput)
-        {
-            try
-            {
-                if (!File.Exists(pathToFile)){File.Create(pathToFile );}
-                using StreamWriter writeFichierProcesusIgnore = new(pathToFile);
-                writeFichierProcesusIgnore.WriteLine(JsonSerializer.Serialize(list));
-                writeFichierProcesusIgnore.Close();
-            }
-            catch (Exception e)
-            {
-                lbxOutput.Invoke(new MethodInvoker(delegate { lbxOutput.Items.Add("Problème au chargement de la list : " + e.ToString()); }));
-            }
-        }
-
-        /// <summary>
-        /// Fonction qui sauvegarde toutes les configuration dans des fichiers
-        /// </summary>
-        public void SaveConfigurationLists()
-        {
-            SaveListToFile(ConfigurationStatic.pathToSaveFolder + ConfigurationStatic.FileNameIgnoredProcesses, ConfigurationStatic.IgnoredProcesses, lbxConnexion);
-            SaveListToFile(ConfigurationStatic.pathToSaveFolder + ConfigurationStatic.FileNameAlertedProcesses, ConfigurationStatic.AlertedProcesses, lbxConnexion);
-            SaveListToFile(ConfigurationStatic.pathToSaveFolder + ConfigurationStatic.FileNameAlertedUrl, ConfigurationStatic.AlertedUrls, lbxConnexion);
-            SaveListToFile(ConfigurationStatic.pathToSaveFolder + ConfigurationStatic.FileNameAutorisedWebsite, ConfigurationStatic.AutorisedWebsite, lbxConnexion);
         }
 
         /// <summary>
@@ -176,7 +113,7 @@ namespace ApplicationTeacher
             isAsking = true;
             socket.Send(Encoding.Default.GetBytes("url"));
             //serialization
-            string jsonString = JsonSerializer.Serialize(ConfigurationStatic.AutorisedWebsite);
+            string jsonString = JsonSerializer.Serialize(Properties.Settings.Default.AutorisedWebsite);
             //envoi
             Thread.Sleep(100);
             socket.Send(Encoding.ASCII.GetBytes(jsonString), Encoding.ASCII.GetBytes(jsonString).Length, SocketFlags.None);
@@ -195,7 +132,7 @@ namespace ApplicationTeacher
                     while (isAsking) { Thread.Sleep(10); }
                     isAsking = true;
                     DateTime StartUpdate = DateTime.Now;
-                    DateTime NextUpdate = DateTime.Now.AddSeconds(ConfigurationStatic.DurationBetweenDemand);
+                    DateTime NextUpdate = DateTime.Now.AddSeconds(Properties.Settings.Default.TimeBetweenDemand);
                     List<DataForTeacher> ClientToRemove = new();
                     UpdateEleves(ClientToRemove);
                     foreach (DataForTeacher client in ClientToRemove)
@@ -244,8 +181,8 @@ namespace ApplicationTeacher
             for (int i = 0; i < AllStudents.Count; i++)
             {
                 Socket socket = AllStudents[i].SocketToStudent;
-                socket.ReceiveTimeout = ConfigurationStatic.DefaultTimeout;
-                socket.SendTimeout = ConfigurationStatic.DefaultTimeout;
+                socket.ReceiveTimeout = Properties.Settings.Default.DefaultTimeout;
+                socket.SendTimeout = Properties.Settings.Default.DefaultTimeout;
                 try
                 {
                     //demande les données
@@ -294,7 +231,7 @@ namespace ApplicationTeacher
                 Socket socket = student.SocketToStudent;
                 int id = student.ID;
                 byte[] dataBuffer = new byte[100000];
-                socket.ReceiveTimeout = ConfigurationStatic.DefaultTimeout;
+                socket.ReceiveTimeout = Properties.Settings.Default.DefaultTimeout;
                 int nbData = socket.Receive(dataBuffer);
                 Array.Resize(ref dataBuffer, nbData);
                 Data data = JsonSerializer.Deserialize<Data>(Encoding.Default.GetString(dataBuffer));
@@ -326,7 +263,7 @@ namespace ApplicationTeacher
             {
                 Socket socket = student.SocketToStudent;
                 byte[] imageBuffer = new byte[10485760];
-                socket.ReceiveTimeout = ConfigurationStatic.DefaultTimeout;
+                socket.ReceiveTimeout = Properties.Settings.Default.DefaultTimeout;
                 int nbData = socket.Receive(imageBuffer, 0, imageBuffer.Length, SocketFlags.None);
                 Array.Resize(ref imageBuffer, nbData);
                 student.ScreenShot = new Bitmap(new MemoryStream(imageBuffer));
@@ -366,7 +303,7 @@ namespace ApplicationTeacher
                     TreeNode current = nodeProcess.Nodes.Add(process.Value);
                     if (FilterEnabled)
                     {
-                        if (ConfigurationStatic.AlertedProcesses.Find(x => x == process.Value) != null)
+                        if (Properties.Settings.Default.AlertedProcesses.Find(x => x == process.Value) != null)
                         {
                             current.BackColor = Color.Red;
                             while (current.Parent != null)
@@ -376,7 +313,7 @@ namespace ApplicationTeacher
                             }
                         }
                     }
-                    else{if(ConfigurationStatic.IgnoredProcesses.Find(x => x == process.Value) != null){current.BackColor = Color.Yellow;/*current.Remove();*/ }}
+                    else{if(Properties.Settings.Default.IgnoredProcesses.Find(x => x == process.Value) != null){current.BackColor = Color.Yellow;/*current.Remove();*/ }}
                 }
                 //Mise à jour des urls
                 UpdateUrlsTree(nodeNavigateurs, student.Urls.chrome, "chrome","Chrome");
@@ -431,9 +368,9 @@ namespace ApplicationTeacher
         {
             for (int i = 0; i < NodeBrowser.Nodes.Count; i++)
             {
-                for (int j = 0; j < ConfigurationStatic.AlertedUrls.Count; j++)
+                for (int j = 0; j < Properties.Settings.Default.AlertedUrls.Count; j++)
                 {
-                    if (NodeBrowser.Nodes[i].Text.ToLower().Contains(ConfigurationStatic.AlertedUrls[j]))
+                    if (NodeBrowser.Nodes[i].Text.ToLower().Contains(Properties.Settings.Default.AlertedUrls[j]))
                     {
                         TreeNode NodeUrl = NodeBrowser.Nodes[i];
                         NodeUrl.BackColor = Color.Red;
@@ -464,7 +401,7 @@ namespace ApplicationTeacher
                 }
                 if (student == null) { return; }
                 foreach(Miniature mini in Displayer.MiniatureList) { if (mini.ComputerName == student.ComputerName && mini.StudentID == student.ID) { return; } }
-                Miniature miniature = new(student.ScreenShot, student.ComputerName, student.ID, ConfigurationStatic.pathToSaveFolder);
+                Miniature miniature = new(student.ScreenShot, student.ComputerName, student.ID, Properties.Settings.Default.PathToSaveFolder);
                 Displayer.AddMiniature(miniature);
                 panelMiniatures.Controls.Add(miniature);
                 panelMiniatures.Controls.SetChildIndex(miniature, 0);
@@ -493,7 +430,7 @@ namespace ApplicationTeacher
 
             while (isSharing)
             {
-                Screen screen = Screen.AllScreens[ConfigurationStatic.ScreenToShareIndex];
+                Screen screen = Screen.AllScreens[Properties.Settings.Default.ScreenToShareId];
                 Bitmap bitmap = new(screen.Bounds.Width, screen.Bounds.Height, PixelFormat.Format16bppRgb565);
                 Rectangle ScreenSize = screen.Bounds;
                 Graphics.FromImage(bitmap).CopyFromScreen(ScreenSize.Left, ScreenSize.Top, 0, 0, ScreenSize.Size);
@@ -601,7 +538,6 @@ namespace ApplicationTeacher
             }
             TrayIconTeacher.Visible = false;
             TrayIconTeacher.Dispose();
-            SaveConfigurationLists();
         }
 
         /// <summary>
@@ -744,9 +680,9 @@ namespace ApplicationTeacher
             }
         }
 
-        private void btnOpenConfigWindow_Click(object sender, EventArgs e)
+        private void OpenConfigWindow_Click(object sender, EventArgs e)
         {
-            ConfigurationWindow configWindow = new ConfigurationWindow();
+            ConfigurationWindow configWindow = new();
             configWindow.Show();
         }
     }

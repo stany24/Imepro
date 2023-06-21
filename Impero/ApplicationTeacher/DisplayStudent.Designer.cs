@@ -76,7 +76,7 @@
             this.btnKillProcess.TabIndex = 29;
             this.btnKillProcess.Text = "Tuer le processus";
             this.btnKillProcess.UseVisualStyleBackColor = true;
-            this.btnKillProcess.Click += new System.EventHandler(this.btnKillProcess_Click);
+            this.btnKillProcess.Click += new System.EventHandler(this.KillProcess_Click);
             // 
             // lblPoste
             // 
@@ -219,7 +219,7 @@
             this.btnStop.TabIndex = 33;
             this.btnStop.Text = "Arrêter";
             this.btnStop.UseVisualStyleBackColor = true;
-            this.btnStop.Click += new System.EventHandler(this.btnStop_Click);
+            this.btnStop.Click += new System.EventHandler(this.ShutDown_Click);
             // 
             // btnTakeControl
             // 

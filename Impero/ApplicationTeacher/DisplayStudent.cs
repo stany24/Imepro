@@ -39,7 +39,7 @@ namespace ApplicationTeacher
                 TreeViewProcesses.Invoke(new MethodInvoker(delegate {
                     foreach (KeyValuePair<int, string> process in student.Processes) {
                         TreeNode current = TreeViewProcesses.Nodes.Add(Convert.ToString(process.Key), process.Value);
-                        if (ConfigurationStatic.AlertedProcesses.Find(x => x == process.Value) != null)
+                        if (Properties.Settings.Default.AlertedProcesses.Find(x => x == process.Value) != null)
                         {
                             current.BackColor = Color.Red;
                             while (current.Parent != null)
@@ -69,7 +69,7 @@ namespace ApplicationTeacher
                 foreach (KeyValuePair<int, string> process in student.Processes)
                 {
                     TreeNode current = TreeViewProcesses.Nodes.Add(Convert.ToString(process.Key), process.Value);
-                    if (ConfigurationStatic.AlertedProcesses.Find(x => x == process.Value) != null)
+                    if (Properties.Settings.Default.AlertedProcesses.Find(x => x == process.Value) != null)
                     {
                         current.BackColor = Color.Red;
                         while (current.Parent != null)
@@ -104,9 +104,9 @@ namespace ApplicationTeacher
                         for (int i = NodeNavigateur.Nodes.Count; i < urls.Count; i++)
                         {
                             TreeNode NodeUrl = NodeNavigateur.Nodes.Add(urls[i].ToString());
-                            for (int j = 0; j < ConfigurationStatic.AlertedUrls.Count; j++)
+                            for (int j = 0; j < Properties.Settings.Default.AlertedUrls.Count; j++)
                             {
-                                if (urls[i].Name.ToLower().Contains(ConfigurationStatic.AlertedUrls[j]))
+                                if (urls[i].Name.ToLower().Contains(Properties.Settings.Default.AlertedUrls[j]))
                                 {
                                     NodeUrl.BackColor = Color.Red;
                                     NodeNavigateur.BackColor = Color.Red;
@@ -134,9 +134,9 @@ namespace ApplicationTeacher
                 for (int i = NodeNavigateur.Nodes.Count; i < urls.Count; i++)
                 {
                     TreeNode NodeUrl = NodeNavigateur.Nodes.Add(urls[i].ToString());
-                    for (int j = 0; j < ConfigurationStatic.AlertedUrls.Count; j++)
+                    for (int j = 0; j < Properties.Settings.Default.AlertedUrls.Count; j++)
                     {
-                        if (urls[i].Name.ToLower().Contains(ConfigurationStatic.AlertedUrls[j]))
+                        if (urls[i].Name.ToLower().Contains(Properties.Settings.Default.AlertedUrls[j]))
                         {
                             NodeUrl.BackColor = Color.Red;
                             NodeNavigateur.BackColor = Color.Red;
@@ -160,7 +160,7 @@ namespace ApplicationTeacher
         /// <param name="e"></param>
         public void SaveScreenShot(object sender, EventArgs e)
         {
-            pbxScreenShot.Image.Save(ConfigurationStatic.pathToSaveFolder +Student.ComputerName+ DateTime.Now.ToString("_yyyy-MM-dd_HH-mm-ss") + ".jpg", ImageFormat.Jpeg);
+            pbxScreenShot.Image.Save(Properties.Settings.Default.PathToSaveFolder +Student.ComputerName+ DateTime.Now.ToString("_yyyy-MM-dd_HH-mm-ss") + ".jpg", ImageFormat.Jpeg);
         }
 
         /// <summary>
@@ -230,7 +230,7 @@ namespace ApplicationTeacher
                 {
                     // Suspend while waiting for incoming connection Using Accept() method the server will accept connection of client
                     Student.SocketControl = listener.Accept();
-                    Student.SocketControl.ReceiveTimeout = ConfigurationStatic.DefaultTimeout;
+                    Student.SocketControl.ReceiveTimeout = Properties.Settings.Default.TimeBetweenDemand;
                     return;
                 }
                 catch{}
@@ -242,14 +242,14 @@ namespace ApplicationTeacher
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void btnStop_Click(object sender, EventArgs e)
+        private void ShutDown_Click(object sender, EventArgs e)
         {
             Student.SocketToStudent.Send(Encoding.ASCII.GetBytes("shutdown"));
             Student.SocketToStudent.Disconnect(false);
             this.Close();
         }
 
-        private void btnKillProcess_Click(object sender, EventArgs e)
+        private void KillProcess_Click(object sender, EventArgs e)
         {
             if (TreeViewProcesses.SelectedNode == null) { return; }
             Student.SocketToStudent.Send(Encoding.ASCII.GetBytes("kill "+TreeViewProcesses.SelectedNode.Name));

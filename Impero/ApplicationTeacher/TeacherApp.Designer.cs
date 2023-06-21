@@ -204,7 +204,7 @@
             this.btnOpenConfigWindow.TabIndex = 16;
             this.btnOpenConfigWindow.Text = "Configuration";
             this.btnOpenConfigWindow.UseVisualStyleBackColor = true;
-            this.btnOpenConfigWindow.Click += new System.EventHandler(this.btnOpenConfigWindow_Click);
+            this.btnOpenConfigWindow.Click += new System.EventHandler(this.OpenConfigWindow_Click);
             // 
             // btnShowTreeView
             // 

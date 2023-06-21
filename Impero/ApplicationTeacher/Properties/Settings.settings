@@ -1,7 +1,33 @@
 ﻿<?xml version='1.0' encoding='utf-8'?>
-<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)">
-  <Profiles>
-    <Profile Name="(Default)" />
-  </Profiles>
-  <Settings />
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="ApplicationTeacher.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="TimeBetweenDemand" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">15</Value>
+    </Setting>
+	<Setting Name="ScreenToShareId" Type="System.Int32" Scope="User">
+		<Value Profile="(Default)" />
+	</Setting>
+	  <Setting Name="PathToSaveFolder" Type="System.String" Scope="User">
+		  <Value Profile="(Default)" />
+	  </Setting>
+    <Setting Name="IgnoredProcesses" Type="System.Collections.Generic.List&lt;System.String&gt;" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="AlertedProcesses" Type="System.Collections.Generic.List&lt;System.String&gt;" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="AlertedUrls" Type="System.Collections.Generic.List&lt;System.String&gt;" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="AutorisedWebsite" Type="System.Collections.Generic.List&lt;System.String&gt;" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+	<Setting Name="AllFocus" Type="System.Collections.Generic.Dictionary&lt;System.String&#44;System.Collections.Generic.List&lt;System.String&gt;&gt;" Scope="User">
+		<Value Profile="(Default)" />
+	</Setting>
+    <Setting Name="DefaultTimeout" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">2000</Value>
+    </Setting>
+  </Settings>
 </SettingsFile>

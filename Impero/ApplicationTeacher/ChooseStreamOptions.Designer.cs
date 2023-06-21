@@ -79,7 +79,7 @@
             this.btnBeginSharing.TabIndex = 3;
             this.btnBeginSharing.Text = "Commencer la diffusion";
             this.btnBeginSharing.UseVisualStyleBackColor = true;
-            this.btnBeginSharing.Click += new System.EventHandler(this.btnBeginSharing_Click);
+            this.btnBeginSharing.Click += new System.EventHandler(this.BeginSharing_Click);
             // 
             // lbxFocus
             // 

@@ -30,7 +30,7 @@ namespace ApplicationTeacher
             lbxStudents.SelectedItems.Clear();
         }
 
-        private void btnBeginSharing_Click(object sender, EventArgs e)
+        private void BeginSharing_Click(object sender, EventArgs e)
         {
             if(lbxStudents.SelectedItems.Count == 0) { lblError.Text = "Selectionnez au moins 1 élève"; return; }
             if(lbxPriorite.SelectedItem == null) { lblError.Text = "Selectionnez la priorité"; return; }
@@ -54,7 +54,7 @@ namespace ApplicationTeacher
                 case LibraryData.Focus.OneNote:list = new() { "onenoteim" };
                     break;
             }
-            ConfigurationStatic.ScreenToShareIndex = lbxScreen.SelectedIndex;
+            Properties.Settings.Default.ScreenToShareId = lbxScreen.SelectedIndex;
             ConfigurationStatic.streamoptions = new StreamOptions(priorite, focus,list);
         }
     }
