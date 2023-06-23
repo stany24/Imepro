@@ -73,7 +73,7 @@
             this.btnKillProcess.Location = new System.Drawing.Point(168, 9);
             this.btnKillProcess.Name = "btnKillProcess";
             this.btnKillProcess.Size = new System.Drawing.Size(119, 23);
-            this.btnKillProcess.TabIndex = 29;
+            this.btnKillProcess.TabIndex = 2;
             this.btnKillProcess.Text = "Tuer le processus";
             this.btnKillProcess.UseVisualStyleBackColor = true;
             this.btnKillProcess.Click += new System.EventHandler(this.KillProcess_Click);
@@ -84,7 +84,7 @@
             this.lblPoste.Location = new System.Drawing.Point(12, 36);
             this.lblPoste.Name = "lblPoste";
             this.lblPoste.Size = new System.Drawing.Size(34, 13);
-            this.lblPoste.TabIndex = 28;
+            this.lblPoste.TabIndex = 1;
             this.lblPoste.Text = "Poste";
             // 
             // lblUserName
@@ -93,7 +93,7 @@
             this.lblUserName.Location = new System.Drawing.Point(12, 9);
             this.lblUserName.Name = "lblUserName";
             this.lblUserName.Size = new System.Drawing.Size(29, 13);
-            this.lblUserName.TabIndex = 27;
+            this.lblUserName.TabIndex = 0;
             this.lblUserName.Text = "Nom";
             // 
             // pbxScreenShot
@@ -113,14 +113,14 @@
             this.TreeViewUrls.Location = new System.Drawing.Point(0, 0);
             this.TreeViewUrls.Name = "TreeViewUrls";
             this.TreeViewUrls.Size = new System.Drawing.Size(980, 126);
-            this.TreeViewUrls.TabIndex = 30;
+            this.TreeViewUrls.TabIndex = 0;
             // 
             // btnSaveImage
             // 
             this.btnSaveImage.Location = new System.Drawing.Point(168, 36);
             this.btnSaveImage.Name = "btnSaveImage";
             this.btnSaveImage.Size = new System.Drawing.Size(119, 23);
-            this.btnSaveImage.TabIndex = 31;
+            this.btnSaveImage.TabIndex = 3;
             this.btnSaveImage.Text = "Sauvegarder l\'image";
             this.btnSaveImage.UseVisualStyleBackColor = true;
             this.btnSaveImage.Click += new System.EventHandler(this.SaveScreenShot);
@@ -132,7 +132,7 @@
             this.tbxMessage.Multiline = true;
             this.tbxMessage.Name = "tbxMessage";
             this.tbxMessage.Size = new System.Drawing.Size(1005, 70);
-            this.tbxMessage.TabIndex = 32;
+            this.tbxMessage.TabIndex = 0;
             // 
             // btnSend
             // 
@@ -140,7 +140,7 @@
             this.btnSend.Location = new System.Drawing.Point(0, 0);
             this.btnSend.Name = "btnSend";
             this.btnSend.Size = new System.Drawing.Size(63, 70);
-            this.btnSend.TabIndex = 33;
+            this.btnSend.TabIndex = 0;
             this.btnSend.Text = "Envoyer";
             this.btnSend.UseVisualStyleBackColor = true;
             this.btnSend.Click += new System.EventHandler(this.SendMessage);
@@ -151,7 +151,7 @@
             this.TreeViewProcesses.Location = new System.Drawing.Point(0, 0);
             this.TreeViewProcesses.Name = "TreeViewProcesses";
             this.TreeViewProcesses.Size = new System.Drawing.Size(492, 126);
-            this.TreeViewProcesses.TabIndex = 34;
+            this.TreeViewProcesses.TabIndex = 0;
             // 
             // SplitterImage
             // 
@@ -216,7 +216,7 @@
             this.btnStop.Location = new System.Drawing.Point(294, 36);
             this.btnStop.Name = "btnStop";
             this.btnStop.Size = new System.Drawing.Size(104, 23);
-            this.btnStop.TabIndex = 33;
+            this.btnStop.TabIndex = 5;
             this.btnStop.Text = "Arrêter";
             this.btnStop.UseVisualStyleBackColor = true;
             this.btnStop.Click += new System.EventHandler(this.ShutDown_Click);
@@ -226,7 +226,7 @@
             this.btnTakeControl.Location = new System.Drawing.Point(293, 9);
             this.btnTakeControl.Name = "btnTakeControl";
             this.btnTakeControl.Size = new System.Drawing.Size(104, 23);
-            this.btnTakeControl.TabIndex = 32;
+            this.btnTakeControl.TabIndex = 4;
             this.btnTakeControl.Text = "Prendre le control";
             this.btnTakeControl.UseVisualStyleBackColor = true;
             this.btnTakeControl.Click += new System.EventHandler(this.TakeControl_Click);

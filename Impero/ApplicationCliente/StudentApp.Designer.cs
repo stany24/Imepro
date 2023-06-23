@@ -59,14 +59,15 @@
             this.lbxConnexion.Location = new System.Drawing.Point(12, 12);
             this.lbxConnexion.Name = "lbxConnexion";
             this.lbxConnexion.Size = new System.Drawing.Size(1454, 134);
-            this.lbxConnexion.TabIndex = 3;
+            this.lbxConnexion.TabIndex = 7;
+            this.lbxConnexion.TabStop = false;
             // 
             // btnHelp
             // 
             this.btnHelp.Location = new System.Drawing.Point(1213, 158);
             this.btnHelp.Name = "btnHelp";
             this.btnHelp.Size = new System.Drawing.Size(75, 23);
-            this.btnHelp.TabIndex = 5;
+            this.btnHelp.TabIndex = 0;
             this.btnHelp.Text = "Aide";
             this.btnHelp.UseVisualStyleBackColor = true;
             this.btnHelp.Click += new System.EventHandler(this.HelpReceive);
@@ -76,7 +77,7 @@
             this.btnChangeIP.Location = new System.Drawing.Point(1294, 158);
             this.btnChangeIP.Name = "btnChangeIP";
             this.btnChangeIP.Size = new System.Drawing.Size(75, 23);
-            this.btnChangeIP.TabIndex = 6;
+            this.btnChangeIP.TabIndex = 1;
             this.btnChangeIP.Text = "Changer l\'IP";
             this.btnChangeIP.UseVisualStyleBackColor = true;
             this.btnChangeIP.Click += new System.EventHandler(this.NewTeacherIP);
@@ -99,7 +100,7 @@
             this.lblMessage.Location = new System.Drawing.Point(1203, 225);
             this.lblMessage.Name = "lblMessage";
             this.lblMessage.Size = new System.Drawing.Size(50, 13);
-            this.lblMessage.TabIndex = 8;
+            this.lblMessage.TabIndex = 3;
             this.lblMessage.Text = "Message";
             // 
             // lbxMessages
@@ -108,14 +109,15 @@
             this.lbxMessages.Location = new System.Drawing.Point(1206, 241);
             this.lbxMessages.Name = "lbxMessages";
             this.lbxMessages.Size = new System.Drawing.Size(260, 264);
-            this.lbxMessages.TabIndex = 9;
+            this.lbxMessages.TabIndex = 4;
+            this.lbxMessages.TabStop = false;
             // 
             // btnFirefox
             // 
             this.btnFirefox.Location = new System.Drawing.Point(1206, 511);
             this.btnFirefox.Name = "btnFirefox";
             this.btnFirefox.Size = new System.Drawing.Size(75, 23);
-            this.btnFirefox.TabIndex = 12;
+            this.btnFirefox.TabIndex = 5;
             this.btnFirefox.Text = "Firefox";
             this.btnFirefox.UseVisualStyleBackColor = true;
             this.btnFirefox.Click += new System.EventHandler(this.NewFirefox);
@@ -125,7 +127,7 @@
             this.btnChrome.Location = new System.Drawing.Point(1287, 511);
             this.btnChrome.Name = "btnChrome";
             this.btnChrome.Size = new System.Drawing.Size(75, 23);
-            this.btnChrome.TabIndex = 13;
+            this.btnChrome.TabIndex = 6;
             this.btnChrome.Text = "Chrome";
             this.btnChrome.UseVisualStyleBackColor = true;
             this.btnChrome.Click += new System.EventHandler(this.NewChrome);
@@ -135,7 +137,7 @@
             this.btnResetAllIP.Location = new System.Drawing.Point(1213, 187);
             this.btnResetAllIP.Name = "btnResetAllIP";
             this.btnResetAllIP.Size = new System.Drawing.Size(156, 23);
-            this.btnResetAllIP.TabIndex = 14;
+            this.btnResetAllIP.TabIndex = 2;
             this.btnResetAllIP.Text = "Réinitialiser les IPs";
             this.btnResetAllIP.UseVisualStyleBackColor = true;
             this.btnResetAllIP.Click += new System.EventHandler(this.ResetAllIP_Click);

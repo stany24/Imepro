@@ -78,7 +78,7 @@
             this.lbxConnexion.Location = new System.Drawing.Point(0, 0);
             this.lbxConnexion.Name = "lbxConnexion";
             this.lbxConnexion.Size = new System.Drawing.Size(500, 57);
-            this.lbxConnexion.TabIndex = 4;
+            this.lbxConnexion.TabIndex = 0;
             // 
             // lbxRequetes
             // 
@@ -87,14 +87,14 @@
             this.lbxRequetes.Location = new System.Drawing.Point(0, 0);
             this.lbxRequetes.Name = "lbxRequetes";
             this.lbxRequetes.Size = new System.Drawing.Size(996, 57);
-            this.lbxRequetes.TabIndex = 5;
+            this.lbxRequetes.TabIndex = 0;
             // 
             // btnShare
             // 
             this.btnShare.Location = new System.Drawing.Point(3, 3);
             this.btnShare.Name = "btnShare";
             this.btnShare.Size = new System.Drawing.Size(94, 21);
-            this.btnShare.TabIndex = 8;
+            this.btnShare.TabIndex = 0;
             this.btnShare.Text = "Partager l\'écran";
             this.btnShare.UseVisualStyleBackColor = true;
             this.btnShare.Click += new System.EventHandler(this.ShareScreen);
@@ -112,7 +112,7 @@
             this.lblIP.Location = new System.Drawing.Point(12, 62);
             this.lblIP.Name = "lblIP";
             this.lblIP.Size = new System.Drawing.Size(20, 13);
-            this.lblIP.TabIndex = 10;
+            this.lblIP.TabIndex = 6;
             this.lblIP.Text = "IP:";
             // 
             // Slider
@@ -122,7 +122,7 @@
             this.Slider.Minimum = 5;
             this.Slider.Name = "Slider";
             this.Slider.Size = new System.Drawing.Size(250, 45);
-            this.Slider.TabIndex = 12;
+            this.Slider.TabIndex = 2;
             this.Slider.Value = 10;
             this.Slider.Scroll += new System.EventHandler(this.Slider_Scroll);
             // 
@@ -132,7 +132,7 @@
             this.TreeViewDetails.Location = new System.Drawing.Point(0, 0);
             this.TreeViewDetails.Name = "TreeViewDetails";
             this.TreeViewDetails.Size = new System.Drawing.Size(280, 412);
-            this.TreeViewDetails.TabIndex = 12;
+            this.TreeViewDetails.TabIndex = 0;
             // 
             // TreeViewSelect
             // 
@@ -152,7 +152,7 @@
             this.panelMiniatures.Location = new System.Drawing.Point(0, 0);
             this.panelMiniatures.Name = "panelMiniatures";
             this.panelMiniatures.Size = new System.Drawing.Size(1500, 900);
-            this.panelMiniatures.TabIndex = 13;
+            this.panelMiniatures.TabIndex = 0;
             this.panelMiniatures.Resize += new System.EventHandler(this.PanelMiniatures_Resize);
             // 
             // SplitterPrincipal
@@ -194,14 +194,14 @@
             this.SplitterInfoTree.Panel2.Controls.Add(this.SplitterTree);
             this.SplitterInfoTree.Size = new System.Drawing.Size(280, 961);
             this.SplitterInfoTree.SplitterDistance = 130;
-            this.SplitterInfoTree.TabIndex = 14;
+            this.SplitterInfoTree.TabIndex = 0;
             // 
             // btnOpenConfigWindow
             // 
             this.btnOpenConfigWindow.Location = new System.Drawing.Point(12, 106);
             this.btnOpenConfigWindow.Name = "btnOpenConfigWindow";
             this.btnOpenConfigWindow.Size = new System.Drawing.Size(85, 21);
-            this.btnOpenConfigWindow.TabIndex = 16;
+            this.btnOpenConfigWindow.TabIndex = 5;
             this.btnOpenConfigWindow.Text = "Configuration";
             this.btnOpenConfigWindow.UseVisualStyleBackColor = true;
             this.btnOpenConfigWindow.Click += new System.EventHandler(this.OpenConfigWindow_Click);
@@ -211,7 +211,7 @@
             this.btnShowTreeView.Location = new System.Drawing.Point(103, 81);
             this.btnShowTreeView.Name = "btnShowTreeView";
             this.btnShowTreeView.Size = new System.Drawing.Size(85, 21);
-            this.btnShowTreeView.TabIndex = 15;
+            this.btnShowTreeView.TabIndex = 4;
             this.btnShowTreeView.Text = "Afficher Tout";
             this.btnShowTreeView.UseVisualStyleBackColor = true;
             this.btnShowTreeView.Click += new System.EventHandler(this.ShowTreeView_Click);
@@ -221,7 +221,7 @@
             this.btnHideTreeView.Location = new System.Drawing.Point(12, 81);
             this.btnHideTreeView.Name = "btnHideTreeView";
             this.btnHideTreeView.Size = new System.Drawing.Size(85, 21);
-            this.btnHideTreeView.TabIndex = 14;
+            this.btnHideTreeView.TabIndex = 3;
             this.btnHideTreeView.Text = "Masquer tout";
             this.btnHideTreeView.UseVisualStyleBackColor = true;
             this.btnHideTreeView.Click += new System.EventHandler(this.HideTreeView_Click);
@@ -231,7 +231,7 @@
             this.btnFilter.Location = new System.Drawing.Point(103, 3);
             this.btnFilter.Name = "btnFilter";
             this.btnFilter.Size = new System.Drawing.Size(120, 21);
-            this.btnFilter.TabIndex = 13;
+            this.btnFilter.TabIndex = 1;
             this.btnFilter.Text = "Désactiver Les filtres";
             this.btnFilter.UseVisualStyleBackColor = true;
             this.btnFilter.Click += new System.EventHandler(this.ButtonFilter_Click);
@@ -270,7 +270,7 @@
             this.SplitterImageLog.Panel2.Controls.Add(this.SplitterConnexionRequetes);
             this.SplitterImageLog.Size = new System.Drawing.Size(1500, 961);
             this.SplitterImageLog.SplitterDistance = 900;
-            this.SplitterImageLog.TabIndex = 14;
+            this.SplitterImageLog.TabIndex = 0;
             // 
             // SplitterConnexionRequetes
             // 

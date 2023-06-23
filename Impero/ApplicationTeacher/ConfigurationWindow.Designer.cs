@@ -63,14 +63,14 @@
             this.lbxStrings.Name = "lbxStrings";
             this.lbxStrings.SelectionMode = System.Windows.Forms.SelectionMode.MultiSimple;
             this.lbxStrings.Size = new System.Drawing.Size(199, 368);
-            this.lbxStrings.TabIndex = 1;
+            this.lbxStrings.TabIndex = 12;
             // 
             // btnRemove
             // 
             this.btnRemove.Location = new System.Drawing.Point(95, 212);
             this.btnRemove.Name = "btnRemove";
             this.btnRemove.Size = new System.Drawing.Size(75, 23);
-            this.btnRemove.TabIndex = 2;
+            this.btnRemove.TabIndex = 4;
             this.btnRemove.Text = "Retirer";
             this.btnRemove.UseVisualStyleBackColor = true;
             this.btnRemove.Click += new System.EventHandler(this.RemoveSelectedString_Click);
@@ -90,7 +90,7 @@
             this.tbxAddString.Location = new System.Drawing.Point(14, 186);
             this.tbxAddString.Name = "tbxAddString";
             this.tbxAddString.Size = new System.Drawing.Size(156, 20);
-            this.tbxAddString.TabIndex = 4;
+            this.tbxAddString.TabIndex = 2;
             // 
             // lblChooseCategory
             // 
@@ -98,7 +98,7 @@
             this.lblChooseCategory.Location = new System.Drawing.Point(9, 9);
             this.lblChooseCategory.Name = "lblChooseCategory";
             this.lblChooseCategory.Size = new System.Drawing.Size(96, 13);
-            this.lblChooseCategory.TabIndex = 5;
+            this.lblChooseCategory.TabIndex = 9;
             this.lblChooseCategory.Text = "Choisir la categorie";
             // 
             // lblAddedString
@@ -107,7 +107,7 @@
             this.lblAddedString.Location = new System.Drawing.Point(12, 170);
             this.lblAddedString.Name = "lblAddedString";
             this.lblAddedString.Size = new System.Drawing.Size(84, 13);
-            this.lblAddedString.TabIndex = 6;
+            this.lblAddedString.TabIndex = 11;
             this.lblAddedString.Text = "Chaine a ajouter";
             // 
             // lblTimeBetweenAsking
@@ -116,7 +116,7 @@
             this.lblTimeBetweenAsking.Location = new System.Drawing.Point(389, 12);
             this.lblTimeBetweenAsking.Name = "lblTimeBetweenAsking";
             this.lblTimeBetweenAsking.Size = new System.Drawing.Size(134, 13);
-            this.lblTimeBetweenAsking.TabIndex = 7;
+            this.lblTimeBetweenAsking.TabIndex = 13;
             this.lblTimeBetweenAsking.Text = "Temps entre les demandes";
             // 
             // nudTimeBetweenAsking
@@ -134,7 +134,7 @@
             0});
             this.nudTimeBetweenAsking.Name = "nudTimeBetweenAsking";
             this.nudTimeBetweenAsking.Size = new System.Drawing.Size(57, 20);
-            this.nudTimeBetweenAsking.TabIndex = 8;
+            this.nudTimeBetweenAsking.TabIndex = 6;
             this.nudTimeBetweenAsking.Value = new decimal(new int[] {
             1,
             0,
@@ -156,7 +156,7 @@
             this.cbxParameter.Location = new System.Drawing.Point(12, 106);
             this.cbxParameter.Name = "cbxParameter";
             this.cbxParameter.Size = new System.Drawing.Size(156, 21);
-            this.cbxParameter.TabIndex = 9;
+            this.cbxParameter.TabIndex = 1;
             this.cbxParameter.SelectedIndexChanged += new System.EventHandler(this.ParameterChanged);
             // 
             // btnApply
@@ -164,7 +164,7 @@
             this.btnApply.Location = new System.Drawing.Point(12, 241);
             this.btnApply.Name = "btnApply";
             this.btnApply.Size = new System.Drawing.Size(158, 23);
-            this.btnApply.TabIndex = 11;
+            this.btnApply.TabIndex = 5;
             this.btnApply.Text = "Appliquer les changements";
             this.btnApply.UseVisualStyleBackColor = true;
             this.btnApply.Click += new System.EventHandler(this.ApplyChanges);
@@ -175,7 +175,7 @@
             this.lblSaveFolder.Location = new System.Drawing.Point(389, 51);
             this.lblSaveFolder.Name = "lblSaveFolder";
             this.lblSaveFolder.Size = new System.Drawing.Size(110, 13);
-            this.lblSaveFolder.TabIndex = 13;
+            this.lblSaveFolder.TabIndex = 14;
             this.lblSaveFolder.Text = "Dossier de sauvgarde";
             // 
             // btnChangeSaveFolder
@@ -183,7 +183,7 @@
             this.btnChangeSaveFolder.Location = new System.Drawing.Point(392, 104);
             this.btnChangeSaveFolder.Name = "btnChangeSaveFolder";
             this.btnChangeSaveFolder.Size = new System.Drawing.Size(75, 23);
-            this.btnChangeSaveFolder.TabIndex = 14;
+            this.btnChangeSaveFolder.TabIndex = 8;
             this.btnChangeSaveFolder.Text = "Changer";
             this.btnChangeSaveFolder.UseVisualStyleBackColor = true;
             this.btnChangeSaveFolder.Click += new System.EventHandler(this.ChangeSaveFolder_Click);
@@ -194,10 +194,11 @@
             this.tbxSaveFolder.Name = "tbxSaveFolder";
             this.tbxSaveFolder.ReadOnly = true;
             this.tbxSaveFolder.Size = new System.Drawing.Size(156, 20);
-            this.tbxSaveFolder.TabIndex = 15;
+            this.tbxSaveFolder.TabIndex = 7;
             // 
             // ConfigurationWindow
             // 
+            this.AcceptButton = this.btnApply;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(653, 392);

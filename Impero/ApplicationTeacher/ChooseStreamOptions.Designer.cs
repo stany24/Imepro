@@ -37,7 +37,6 @@
             this.lblPriorite = new System.Windows.Forms.Label();
             this.lblEleves = new System.Windows.Forms.Label();
             this.lblFocus = new System.Windows.Forms.Label();
-            this.lblError = new System.Windows.Forms.Label();
             this.lblScreen = new System.Windows.Forms.Label();
             this.lbxScreen = new System.Windows.Forms.ListBox();
             this.SuspendLayout();
@@ -55,7 +54,7 @@
             this.btnSelectAll.Location = new System.Drawing.Point(12, 278);
             this.btnSelectAll.Name = "btnSelectAll";
             this.btnSelectAll.Size = new System.Drawing.Size(80, 23);
-            this.btnSelectAll.TabIndex = 1;
+            this.btnSelectAll.TabIndex = 4;
             this.btnSelectAll.Text = "Tous";
             this.btnSelectAll.UseVisualStyleBackColor = true;
             this.btnSelectAll.Click += new System.EventHandler(this.SelectAll);
@@ -65,7 +64,7 @@
             this.btnSelectNone.Location = new System.Drawing.Point(98, 278);
             this.btnSelectNone.Name = "btnSelectNone";
             this.btnSelectNone.Size = new System.Drawing.Size(76, 23);
-            this.btnSelectNone.TabIndex = 2;
+            this.btnSelectNone.TabIndex = 5;
             this.btnSelectNone.Text = "Aucun";
             this.btnSelectNone.UseVisualStyleBackColor = true;
             this.btnSelectNone.Click += new System.EventHandler(this.SelectNone);
@@ -76,7 +75,7 @@
             this.btnBeginSharing.Location = new System.Drawing.Point(202, 278);
             this.btnBeginSharing.Name = "btnBeginSharing";
             this.btnBeginSharing.Size = new System.Drawing.Size(132, 23);
-            this.btnBeginSharing.TabIndex = 3;
+            this.btnBeginSharing.TabIndex = 6;
             this.btnBeginSharing.Text = "Commencer la diffusion";
             this.btnBeginSharing.UseVisualStyleBackColor = true;
             this.btnBeginSharing.Click += new System.EventHandler(this.BeginSharing_Click);
@@ -87,7 +86,7 @@
             this.lbxFocus.Location = new System.Drawing.Point(180, 119);
             this.lbxFocus.Name = "lbxFocus";
             this.lbxFocus.Size = new System.Drawing.Size(179, 69);
-            this.lbxFocus.TabIndex = 4;
+            this.lbxFocus.TabIndex = 2;
             // 
             // lbxPriorite
             // 
@@ -95,7 +94,7 @@
             this.lbxPriorite.Location = new System.Drawing.Point(180, 28);
             this.lbxPriorite.Name = "lbxPriorite";
             this.lbxPriorite.Size = new System.Drawing.Size(179, 69);
-            this.lbxPriorite.TabIndex = 5;
+            this.lbxPriorite.TabIndex = 1;
             // 
             // lblPriorite
             // 
@@ -103,7 +102,7 @@
             this.lblPriorite.Location = new System.Drawing.Point(181, 12);
             this.lblPriorite.Name = "lblPriorite";
             this.lblPriorite.Size = new System.Drawing.Size(39, 13);
-            this.lblPriorite.TabIndex = 6;
+            this.lblPriorite.TabIndex = 8;
             this.lblPriorite.Text = "Priorité";
             // 
             // lblEleves
@@ -121,16 +120,8 @@
             this.lblFocus.Location = new System.Drawing.Point(181, 103);
             this.lblFocus.Name = "lblFocus";
             this.lblFocus.Size = new System.Drawing.Size(36, 13);
-            this.lblFocus.TabIndex = 8;
+            this.lblFocus.TabIndex = 9;
             this.lblFocus.Text = "Focus";
-            // 
-            // lblError
-            // 
-            this.lblError.AutoSize = true;
-            this.lblError.Location = new System.Drawing.Point(181, 224);
-            this.lblError.Name = "lblError";
-            this.lblError.Size = new System.Drawing.Size(0, 13);
-            this.lblError.TabIndex = 9;
             // 
             // lblScreen
             // 
@@ -138,7 +129,7 @@
             this.lblScreen.Location = new System.Drawing.Point(181, 191);
             this.lblScreen.Name = "lblScreen";
             this.lblScreen.Size = new System.Drawing.Size(35, 13);
-            this.lblScreen.TabIndex = 11;
+            this.lblScreen.TabIndex = 10;
             this.lblScreen.Text = "Écran";
             // 
             // lbxScreen
@@ -147,7 +138,7 @@
             this.lbxScreen.Location = new System.Drawing.Point(180, 207);
             this.lbxScreen.Name = "lbxScreen";
             this.lbxScreen.Size = new System.Drawing.Size(179, 69);
-            this.lbxScreen.TabIndex = 10;
+            this.lbxScreen.TabIndex = 3;
             // 
             // ChooseStreamOptions
             // 
@@ -156,7 +147,6 @@
             this.ClientSize = new System.Drawing.Size(367, 313);
             this.Controls.Add(this.lblScreen);
             this.Controls.Add(this.lbxScreen);
-            this.Controls.Add(this.lblError);
             this.Controls.Add(this.lblFocus);
             this.Controls.Add(this.lblEleves);
             this.Controls.Add(this.lblPriorite);
@@ -184,7 +174,6 @@
         private System.Windows.Forms.Label lblPriorite;
         private System.Windows.Forms.Label lblEleves;
         private System.Windows.Forms.Label lblFocus;
-        private System.Windows.Forms.Label lblError;
         private System.Windows.Forms.Label lblScreen;
         private System.Windows.Forms.ListBox lbxScreen;
     }
