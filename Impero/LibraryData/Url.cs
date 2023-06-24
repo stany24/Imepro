@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 
 namespace LibraryData
 {
@@ -13,6 +11,7 @@ namespace LibraryData
     [Serializable]
     public class HistoriqueUrls
     {
+        public Dictionary<string, List<Url>> AllBrowser = new();
         [JsonInclude]
         public List<Url> chrome = new();
         [JsonInclude]
@@ -24,7 +23,7 @@ namespace LibraryData
         [JsonInclude]
         public List<Url> opera = new();
         [JsonInclude]
-        public List<Url> edge = new();
+        public List<Url> msedge = new();
         [JsonInclude]
         public List<Url> safari = new();
         [JsonInclude]
@@ -34,37 +33,20 @@ namespace LibraryData
 
         public void AddUrl(Url url)
         {
-            switch (url.Browser)
-            {
-                case "chrome":
-                    VerifyUrl(chrome, url);
-                    break;
-                case "firefox":
-                    VerifyUrl(firefox, url);
-                    break;
-                case "seleniumchrome":
-                    VerifyUrl(seleniumchrome, url);
-                    break;
-                case "seleniumfirefox":
-                    VerifyUrl(seleniumfirefox, url);
-                    break;
-                case "opera":
-                    VerifyUrl(opera, url);
-                    break;
-                case "msedge":
-                    VerifyUrl(edge, url);
-                    break;
-                case "safari":
-                    VerifyUrl(safari, url);
-                    break;
-                case "iexplorer":
-                    VerifyUrl(iexplorer, url);
-                    break;
-                case "custom":
-                    VerifyUrl(custom, url);
-                    break;
-                default: break;
-            }
+            VerifyUrl(AllBrowser[url.Browser], url);
+        }
+
+        public HistoriqueUrls()
+        {
+            AllBrowser.Add("chrome", chrome);
+            AllBrowser.Add("firefox",firefox);
+            AllBrowser.Add("seleniumchrome",seleniumchrome);
+            AllBrowser.Add("seleniumfirefox",seleniumfirefox);
+            AllBrowser.Add("opera",opera);
+            AllBrowser.Add("msedge",msedge);
+            AllBrowser.Add("safari",safari);
+            AllBrowser.Add("iexplorer",iexplorer);
+            AllBrowser.Add("custom",custom);
         }
 
         /// <summary>
