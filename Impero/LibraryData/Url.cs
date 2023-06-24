@@ -11,25 +11,8 @@ namespace LibraryData
     [Serializable]
     public class HistoriqueUrls
     {
+        [JsonInclude]
         public Dictionary<string, List<Url>> AllBrowser = new();
-        [JsonInclude]
-        public List<Url> chrome = new();
-        [JsonInclude]
-        public List<Url> firefox = new();
-        [JsonInclude]
-        public List<Url> seleniumchrome = new();
-        [JsonInclude]
-        public List<Url> seleniumfirefox = new();
-        [JsonInclude]
-        public List<Url> opera = new();
-        [JsonInclude]
-        public List<Url> msedge = new();
-        [JsonInclude]
-        public List<Url> safari = new();
-        [JsonInclude]
-        public List<Url> iexplorer = new();
-        [JsonInclude]
-        public List<Url> custom = new();
 
         public void AddUrl(Url url)
         {
@@ -38,15 +21,15 @@ namespace LibraryData
 
         public HistoriqueUrls()
         {
-            AllBrowser.Add("chrome", chrome);
-            AllBrowser.Add("firefox",firefox);
-            AllBrowser.Add("seleniumchrome",seleniumchrome);
-            AllBrowser.Add("seleniumfirefox",seleniumfirefox);
-            AllBrowser.Add("opera",opera);
-            AllBrowser.Add("msedge",msedge);
-            AllBrowser.Add("safari",safari);
-            AllBrowser.Add("iexplorer",iexplorer);
-            AllBrowser.Add("custom",custom);
+            AllBrowser.Add("chrome", new List<Url>());
+            AllBrowser.Add("firefox", new List<Url>());
+            AllBrowser.Add("seleniumchrome", new List<Url>());
+            AllBrowser.Add("seleniumfirefox", new List<Url>());
+            AllBrowser.Add("opera", new List<Url>());
+            AllBrowser.Add("msedge", new List<Url>());
+            AllBrowser.Add("safari", new List<Url>());
+            AllBrowser.Add("iexplorer", new List<Url>());
+            AllBrowser.Add("custom", new List<Url>());
         }
 
         /// <summary>

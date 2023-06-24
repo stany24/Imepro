@@ -316,15 +316,15 @@ namespace ApplicationTeacher
                     else{if(Properties.Settings.Default.IgnoredProcesses.Find(x => x == process.Value) != null){current.BackColor = Color.Yellow;/*current.Remove();*/ }}
                 }
                 //Mise à jour des urls
-                UpdateUrlsTree(nodeNavigateurs, student.Urls.chrome, "chrome","Chrome");
-                UpdateUrlsTree(nodeNavigateurs, student.Urls.firefox, "firefox","Firefox");
-                UpdateUrlsTree(nodeNavigateurs, student.Urls.seleniumchrome, "seleniumchrome", "Selenium Chrome");
-                UpdateUrlsTree(nodeNavigateurs, student.Urls.seleniumfirefox, "seleniumfirefox", "Selenium Firefox");
-                UpdateUrlsTree(nodeNavigateurs, student.Urls.edge, "msedge", "Edge");
-                UpdateUrlsTree(nodeNavigateurs, student.Urls.opera, "opera", "Opera");
-                UpdateUrlsTree(nodeNavigateurs, student.Urls.iexplorer, "iexplorer", "Internet Explorer");
-                UpdateUrlsTree(nodeNavigateurs, student.Urls.safari, "safari", "Safari");
-                UpdateUrlsTree(nodeNavigateurs, student.Urls.custom, "custom", "Custom");
+                UpdateUrlsTree(nodeNavigateurs, student.Urls.AllBrowser["chrome"], "chrome", "Chrome");
+                UpdateUrlsTree(nodeNavigateurs, student.Urls.AllBrowser["firefox"], "firefox", "Firefox");
+                UpdateUrlsTree(nodeNavigateurs, student.Urls.AllBrowser["msedge"], "msedge", "Edge");
+                UpdateUrlsTree(nodeNavigateurs, student.Urls.AllBrowser["opera"], "opera", "Opera");
+                UpdateUrlsTree(nodeNavigateurs, student.Urls.AllBrowser["iexplorer"], "iexplorer", "Internet Explorer");
+                UpdateUrlsTree(nodeNavigateurs, student.Urls.AllBrowser["safari"], "safari", "Safari");
+                UpdateUrlsTree(nodeNavigateurs, student.Urls.AllBrowser["seleniumchrome"], "seleniumchrome", "Selenium Chrome");
+                UpdateUrlsTree(nodeNavigateurs, student.Urls.AllBrowser["seleniumfirefox"], "seleniumfirefox", "Selenium Firefox");
+                UpdateUrlsTree(nodeNavigateurs, student.Urls.AllBrowser["custom"], "custom", "Custom");
             }));
             // Mise à jour du TreeView pour la sélection
             TreeViewSelect.Invoke(new MethodInvoker(delegate {

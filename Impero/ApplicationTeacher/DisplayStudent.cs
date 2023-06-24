@@ -52,12 +52,12 @@ namespace ApplicationTeacher
                 }));
 
                 TreeViewUrls.Invoke(new MethodInvoker(delegate {
-                    UpdateUrlsTree(student.Urls.chrome, "chrome","Chrome");
-                    UpdateUrlsTree(student.Urls.firefox, "firefox","Firefox");
-                    UpdateUrlsTree(student.Urls.edge, "msedge","Edge");
-                    UpdateUrlsTree(student.Urls.opera, "opera","Opera");
-                    UpdateUrlsTree(student.Urls.iexplorer, "iexplorer","Internet Explorer");
-                    UpdateUrlsTree(student.Urls.safari, "safari","Safari");
+                    UpdateUrlsTree(student.Urls.AllBrowser["chrome"] , "chrome","Chrome");
+                    UpdateUrlsTree(student.Urls.AllBrowser["firefox"], "firefox","Firefox");
+                    UpdateUrlsTree(student.Urls.AllBrowser["msedge"], "msedge","Edge");
+                    UpdateUrlsTree(student.Urls.AllBrowser["opera"], "opera","Opera");
+                    UpdateUrlsTree(student.Urls.AllBrowser["iexplorer"], "iexplorer","Internet Explorer");
+                    UpdateUrlsTree(student.Urls.AllBrowser["safari"], "safari","Safari");
                 }));
                 pbxScreenShot.Invoke(new MethodInvoker(delegate { pbxScreenShot.Image = student.ScreenShot; }));
             }
@@ -79,12 +79,12 @@ namespace ApplicationTeacher
                         }
                     }
                 }
-                UpdateUrlsTree(student.Urls.chrome, "chrome", "Chrome");
-                UpdateUrlsTree(student.Urls.firefox, "firefox", "Firefox");
-                UpdateUrlsTree(student.Urls.edge, "msedge", "Edge");
-                UpdateUrlsTree(student.Urls.opera, "opera", "Opera");
-                UpdateUrlsTree(student.Urls.iexplorer, "iexplorer", "Internet Explorer");
-                UpdateUrlsTree(student.Urls.safari, "safari", "Safari");
+                UpdateUrlsTree(student.Urls.AllBrowser["chrome"], "chrome", "Chrome");
+                UpdateUrlsTree(student.Urls.AllBrowser["firefox"], "firefox", "Firefox");
+                UpdateUrlsTree(student.Urls.AllBrowser["msedge"], "msedge", "Edge");
+                UpdateUrlsTree(student.Urls.AllBrowser["opera"], "opera", "Opera");
+                UpdateUrlsTree(student.Urls.AllBrowser["iexplorer"], "iexplorer", "Internet Explorer");
+                UpdateUrlsTree(student.Urls.AllBrowser["safari"], "safari", "Safari");
                 pbxScreenShot.Image = student.ScreenShot;
             }
         }

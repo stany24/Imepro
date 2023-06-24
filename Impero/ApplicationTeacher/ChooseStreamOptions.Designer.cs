@@ -39,6 +39,7 @@
             this.lblFocus = new System.Windows.Forms.Label();
             this.lblScreen = new System.Windows.Forms.Label();
             this.lbxScreen = new System.Windows.Forms.ListBox();
+            this.lblError = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // lbxStudents
@@ -140,11 +141,20 @@
             this.lbxScreen.Size = new System.Drawing.Size(179, 69);
             this.lbxScreen.TabIndex = 3;
             // 
+            // lblError
+            // 
+            this.lblError.AutoSize = true;
+            this.lblError.Location = new System.Drawing.Point(16, 315);
+            this.lblError.Name = "lblError";
+            this.lblError.Size = new System.Drawing.Size(0, 13);
+            this.lblError.TabIndex = 11;
+            // 
             // ChooseStreamOptions
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(367, 313);
+            this.ClientSize = new System.Drawing.Size(367, 337);
+            this.Controls.Add(this.lblError);
             this.Controls.Add(this.lblScreen);
             this.Controls.Add(this.lbxScreen);
             this.Controls.Add(this.lblFocus);
@@ -176,5 +186,6 @@
         private System.Windows.Forms.Label lblFocus;
         private System.Windows.Forms.Label lblScreen;
         private System.Windows.Forms.ListBox lbxScreen;
+        private System.Windows.Forms.Label lblError;
     }
 }
