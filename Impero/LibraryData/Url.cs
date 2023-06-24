@@ -12,7 +12,7 @@ namespace LibraryData
     [Serializable]
     public class HistoriqueUrls
     {
-        string[] AllBrowserName = { "chrome","firefox","seleniumchrome","seleniumfirefox", "opera","msedge", "safari", "iexplorer", "custom" };
+        public string[] AllBrowserName = { "chrome","firefox","seleniumchrome","seleniumfirefox", "opera","msedge", "safari", "iexplorer", "custom" };
         [JsonInclude]
         public Dictionary<string, List<Url>> AllBrowser = new();
 
