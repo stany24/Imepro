@@ -5,12 +5,14 @@ using System.Text.Json.Serialization;
 
 namespace LibraryData
 {
+    
     /// <summary>
     /// Classe qui reprèsente un historique des urls pour tous les navigateurs
     /// </summary>
     [Serializable]
     public class HistoriqueUrls
     {
+        string[] AllBrowserName = { "chrome","firefox","seleniumchrome","seleniumfirefox", "opera","msedge", "safari", "iexplorer", "custom" };
         [JsonInclude]
         public Dictionary<string, List<Url>> AllBrowser = new();
 
@@ -21,15 +23,7 @@ namespace LibraryData
 
         public HistoriqueUrls()
         {
-            AllBrowser.Add("chrome", new List<Url>());
-            AllBrowser.Add("firefox", new List<Url>());
-            AllBrowser.Add("seleniumchrome", new List<Url>());
-            AllBrowser.Add("seleniumfirefox", new List<Url>());
-            AllBrowser.Add("opera", new List<Url>());
-            AllBrowser.Add("msedge", new List<Url>());
-            AllBrowser.Add("safari", new List<Url>());
-            AllBrowser.Add("iexplorer", new List<Url>());
-            AllBrowser.Add("custom", new List<Url>());
+            for (int i = 0;i < AllBrowserName.Count(); i++) { AllBrowser.Add(AllBrowserName[i], new List<Url>()); }
         }
 
         /// <summary>
