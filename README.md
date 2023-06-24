@@ -4,7 +4,12 @@
 The objectif is to give teachers a way to monitor and help there students.
 
 ## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
+Student application
+![image](https://github.com/stany24/Imepro/assets/94054868/b802b1ac-7fef-4ec8-857e-88bee5caf822)
+Teacher application
+![image](https://github.com/stany24/Imepro/assets/94054868/bac470a9-8221-443a-b0c6-62b6446447aa)
+Teacher application focused on one student
+![image](https://github.com/stany24/Imepro/assets/94054868/b74f8c5c-cf2b-41aa-9b4c-712aff1a574b)
 
 ## Installation
 You can clone the git then open it in visual studio.  
