@@ -62,6 +62,8 @@
             this.ClientSize = new System.Drawing.Size(258, 243);
             this.Controls.Add(this.btnConfirmer);
             this.Controls.Add(this.lbxAdresses);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            this.MaximizeBox = false;
             this.Name = "AskToChoseIp";
             this.Text = "Imepro IP";
             this.ResumeLayout(false);

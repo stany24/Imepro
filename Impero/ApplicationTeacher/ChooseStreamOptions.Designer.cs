@@ -166,6 +166,8 @@
             this.Controls.Add(this.btnSelectNone);
             this.Controls.Add(this.btnSelectAll);
             this.Controls.Add(this.lbxStudents);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            this.MinimizeBox = false;
             this.Name = "ChooseStreamOptions";
             this.Text = "Imepro Options";
             this.ResumeLayout(false);

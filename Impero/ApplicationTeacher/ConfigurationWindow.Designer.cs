@@ -217,6 +217,8 @@
             this.Controls.Add(this.btnRemove);
             this.Controls.Add(this.lbxStrings);
             this.Controls.Add(this.cbxCategory);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            this.MaximizeBox = false;
             this.Name = "ConfigurationWindow";
             this.Text = "ConfigurationWindow";
             this.Load += new System.EventHandler(this.ConfigurationWindow_Load);

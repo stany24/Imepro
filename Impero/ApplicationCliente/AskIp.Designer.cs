@@ -93,6 +93,8 @@
             this.Controls.Add(this.tbxIp);
             this.Controls.Add(this.btnConfirmer);
             this.Controls.Add(this.lblInfo);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            this.MaximizeBox = false;
             this.Name = "AskIp";
             this.Text = "Imepro IP";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.AskIp_FormClosing);
