@@ -79,7 +79,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Blocage.cs" />
-    <Compile Include="IpForTheWeek.cs" />
     <Compile Include="CustomMessage.cs" />
     <Compile Include="StreamOptions.cs" />
     <Compile Include="Data.cs" />

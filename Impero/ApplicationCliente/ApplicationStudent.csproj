@@ -101,6 +101,7 @@
     <Compile Include="AskIp.Designer.cs">
       <DependentUpon>AskIp.cs</DependentUpon>
     </Compile>
+    <Compile Include="IpForTheWeek.cs" />
     <Compile Include="StudentApp.cs">
       <SubType>Form</SubType>
     </Compile>

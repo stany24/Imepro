@@ -140,7 +140,6 @@
             this.btnResetAllIP.TabIndex = 2;
             this.btnResetAllIP.Text = "Réinitialiser les IPs";
             this.btnResetAllIP.UseVisualStyleBackColor = true;
-            this.btnResetAllIP.Click += new System.EventHandler(this.ResetAllIP_Click);
             // 
             // StudentApp
             // 

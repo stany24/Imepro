@@ -11,7 +11,6 @@ namespace UnitTestIpForTheWeekClass
         {
             IpForTheWeek Default = new IpForTheWeek();
             IpForTheWeek Instance = new IpForTheWeek("192.168.1.38");
-            IpForTheWeek Copy = new IpForTheWeek(Instance);
             Assert.AreEqual(Default.Days["monday"][0], "1.1.1.1");
             Assert.AreEqual(Instance.Days["monday"][0], "192.168.1.38");
             Assert.AreEqual(Copy.Days["monday"][0], "192.168.1.38");

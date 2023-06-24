@@ -13,21 +13,21 @@ using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Firefox;
 using System.Threading;
+using System.Diagnostics;
 
 namespace ApplicationCliente
 {
     public partial class StudentApp : Form
     {
         readonly DataForStudent Student;
-        readonly string pathToConfigurationFolder = "C:\\ProgramData\\Imepro\\";
-        readonly string FileNameConfigurationIp = "iPToTeacher.json";
         IWebDriver FirefoxDriver;
         IWebDriver ChromeDriver;
         public StudentApp()
         {
             InitializeComponent();
             Student = new(lbxConnexion,pbxScreeShot,lbxMessages, this);
-            LoadTeacherIP();
+            Properties.Settings.Default.Reload();
+            Student.IpToTeacher = IpForTheWeek.GetIp();
             Task.Run(LaunchTasks);
         }
 
@@ -111,46 +111,11 @@ namespace ApplicationCliente
             try
             {
                 Student.IpToTeacher = IPAddress.Parse(prompt.LastVerifiedIp);
-                IpForTheWeek allIP = ReadConfIp();
-                allIP.SetIp(prompt.LastVerifiedIp);
-                using StreamWriter writeFichier = new(pathToConfigurationFolder + FileNameConfigurationIp);
-                writeFichier.WriteLine(JsonSerializer.Serialize(allIP, new JsonSerializerOptions { IncludeFields = true, }));
+                IpForTheWeek.SetIp(prompt.LastVerifiedIp);
                 prompt.Close();
                 prompt.Dispose();
             }
             catch { }
-        }
-
-        /// <summary>
-        /// Fonction qui lit le fichier de configuration où les adresses ip des professeur sont stocké
-        /// </summary>
-        /// <returns></returns>
-        public IpForTheWeek ReadConfIp()
-        {
-            try {
-                if (!Directory.Exists(pathToConfigurationFolder)) { Directory.CreateDirectory(pathToConfigurationFolder); }
-                if (!File.Exists(pathToConfigurationFolder + FileNameConfigurationIp)) { File.WriteAllText(pathToConfigurationFolder + FileNameConfigurationIp, "[]"); }
-                IpForTheWeek allIP = new(JsonSerializer.Deserialize<IpForTheWeek>(File.ReadAllText(pathToConfigurationFolder + FileNameConfigurationIp)));
-                return allIP;
-            } 
-            catch(Exception e) {
-                lbxConnexion.Invoke(new MethodInvoker(delegate { lbxConnexion.Items.Add("Unexpected exception : " + e.ToString()); }));
-                return null;
-            }
-        }
-
-        /// <summary>
-        /// Fonction qui essaye de charger l'adresse ip du professeur
-        /// </summary>
-        public void LoadTeacherIP()
-        {
-            try
-            {
-                IpForTheWeek allIP = ReadConfIp();
-                if (allIP == null) { NewTeacherIP(new object(),new EventArgs()); return; }
-                Student.IpToTeacher = IPAddress.Parse(allIP.GetIp());
-            }
-            catch{NewTeacherIP(new object(), new EventArgs());}
         }
 
         /// <summary>
@@ -267,17 +232,6 @@ namespace ApplicationCliente
         {
             Show();
             WindowState = FormWindowState.Normal;
-        }
-
-        /// <summary>
-        /// Fonction qui permet de supprimer toutes les ip sauvegardées
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void ResetAllIP_Click(object sender, EventArgs e)
-        {
-            using StreamWriter writeFichier = new(pathToConfigurationFolder + FileNameConfigurationIp);
-            writeFichier.WriteLine(JsonSerializer.Serialize(new IpForTheWeek(), new JsonSerializerOptions { IncludeFields = true, }));
         }
     }
 }
