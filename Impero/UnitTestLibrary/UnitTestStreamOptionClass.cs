@@ -1,7 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
 using LibraryData;
-using System.Linq;
 using System.Collections.Generic;
 
 namespace UnitTestStreamOptionClass
