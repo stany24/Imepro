@@ -1,5 +1,0 @@
-netsh interface ip show joins permet de voir sur quel interface le multicast est recu
-Si ce n'est pas sur le même réseau que l'application Teacher il faut activer le forwarding sur la bonne interface:
-netsh interface ipv4 set interface "Ethernet 3" forwarding=enable (PowerShell Administrateur)
-Et désactiver sur les autres:
-netsh interface ipv4 set interface "Ethernet 2" forwarding=disable (PowerShell Administrateur)
