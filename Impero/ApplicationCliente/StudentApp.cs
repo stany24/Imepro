@@ -24,8 +24,13 @@ namespace ApplicationCliente
         {
             InitializeComponent();
             Student = new(lbxConnexion,pbxScreeShot,lbxMessages, this);
-            Properties.Settings.Default.Reload();
-            Student.IpToTeacher = IpForTheWeek.GetIp();
+            try
+            {
+                Student.IpToTeacher = IpForTheWeek.GetIp();
+            }catch(Exception){
+                NewTeacherIP(new object(),new EventArgs());
+                Student.IpToTeacher = IpForTheWeek.GetIp();
+            }
             Task.Run(LaunchTasks);
         }
 
@@ -105,15 +110,9 @@ namespace ApplicationCliente
         public void NewTeacherIP(object sender, EventArgs e)
         {
             AskIp prompt = new();
-            if (prompt.ShowDialog(this) != DialogResult.OK) { return; }
-            try
-            {
-                Student.IpToTeacher = IPAddress.Parse(prompt.LastVerifiedIp);
-                IpForTheWeek.SetIp(prompt.LastVerifiedIp);
-                prompt.Close();
-                prompt.Dispose();
-            }
-            catch { }
+            prompt.ShowDialog();
+            prompt.Close();
+            prompt.Dispose();
         }
 
         /// <summary>

@@ -6,7 +6,6 @@ namespace ApplicationCliente
 {
     public partial class AskIp : Form
     {
-        public string LastVerifiedIp;
         public bool canClose = false;
         public AskIp()
         {
@@ -15,6 +14,7 @@ namespace ApplicationCliente
 
         private void BtnConfirmer_Click(object sender, EventArgs e)
         {
+            IpForTheWeek.SetIp(tbxIp.Text);
             canClose= true;
         }
 
@@ -22,7 +22,6 @@ namespace ApplicationCliente
         {
             try {
                 IPAddress.Parse(tbxIp.Text);
-                LastVerifiedIp = tbxIp.Text;
                 btnConfirmer.Enabled= true;
                 lblErreur.Text = "";
             }

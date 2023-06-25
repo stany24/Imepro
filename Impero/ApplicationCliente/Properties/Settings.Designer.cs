@@ -25,99 +25,13 @@ namespace ApplicationCliente.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<ArrayOfString xmlns:xsd=\"http://www.w3." +
-            "org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\r\n  <s" +
-            "tring>192.168.1.38</string>\r\n  <string>192.168.1.38</string>\r\n</ArrayOfString>")]
-        public global::System.Collections.Specialized.StringCollection monday {
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string IpForTheWeek {
             get {
-                return ((global::System.Collections.Specialized.StringCollection)(this["monday"]));
+                return ((string)(this["IpForTheWeek"]));
             }
             set {
-                this["monday"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<ArrayOfString xmlns:xsd=\"http://www.w3." +
-            "org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\r\n  <s" +
-            "tring>192.168.1.38</string>\r\n  <string>192.168.1.38</string>\r\n</ArrayOfString>")]
-        public global::System.Collections.Specialized.StringCollection tuesday {
-            get {
-                return ((global::System.Collections.Specialized.StringCollection)(this["tuesday"]));
-            }
-            set {
-                this["tuesday"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<ArrayOfString xmlns:xsd=\"http://www.w3." +
-            "org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\r\n  <s" +
-            "tring>192.168.1.38</string>\r\n  <string>192.168.1.38</string>\r\n</ArrayOfString>")]
-        public global::System.Collections.Specialized.StringCollection wednesday {
-            get {
-                return ((global::System.Collections.Specialized.StringCollection)(this["wednesday"]));
-            }
-            set {
-                this["wednesday"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<ArrayOfString xmlns:xsd=\"http://www.w3." +
-            "org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\r\n  <s" +
-            "tring>192.168.1.38</string>\r\n  <string>192.168.1.38</string>\r\n</ArrayOfString>")]
-        public global::System.Collections.Specialized.StringCollection thursday {
-            get {
-                return ((global::System.Collections.Specialized.StringCollection)(this["thursday"]));
-            }
-            set {
-                this["thursday"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<ArrayOfString xmlns:xsd=\"http://www.w3." +
-            "org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\r\n  <s" +
-            "tring>192.168.1.38</string>\r\n  <string>192.168.1.38</string>\r\n</ArrayOfString>")]
-        public global::System.Collections.Specialized.StringCollection friday {
-            get {
-                return ((global::System.Collections.Specialized.StringCollection)(this["friday"]));
-            }
-            set {
-                this["friday"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<ArrayOfString xmlns:xsd=\"http://www.w3." +
-            "org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\r\n  <s" +
-            "tring>192.168.1.38</string>\r\n  <string>192.168.1.38</string>\r\n</ArrayOfString>")]
-        public global::System.Collections.Specialized.StringCollection saturday {
-            get {
-                return ((global::System.Collections.Specialized.StringCollection)(this["saturday"]));
-            }
-            set {
-                this["saturday"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<ArrayOfString xmlns:xsd=\"http://www.w3." +
-            "org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\r\n  <s" +
-            "tring>192.168.1.38</string>\r\n  <string>192.168.1.38</string>\r\n</ArrayOfString>")]
-        public global::System.Collections.Specialized.StringCollection sunday {
-            get {
-                return ((global::System.Collections.Specialized.StringCollection)(this["sunday"]));
-            }
-            set {
-                this["sunday"] = value;
+                this["IpForTheWeek"] = value;
             }
         }
     }

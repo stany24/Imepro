@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Net;
+using System.Text.Json;
 
 namespace ApplicationCliente
 {
@@ -9,6 +11,7 @@ namespace ApplicationCliente
     [Serializable]
     public static class IpForTheWeek
     {
+        static private Dictionary<string, string[]> Days = JsonSerializer.Deserialize<Dictionary<string, string[]>>(Properties.Settings.Default.IpForTheWeek);
         /// <summary>
         /// Fonction qui enregistre l'ip donnée au bonne endroit, qui dépand du jour et de l'heure de l'action
         /// </summary>
@@ -19,16 +22,11 @@ namespace ApplicationCliente
             catch { return; }
             int BeforeAfterNoon = 0;
             if (DateTime.Now.TimeOfDay > new TimeSpan(12, 35, 0)) { BeforeAfterNoon = 1; }
-            switch (DateTime.Now.DayOfWeek)
-            {
-                case DayOfWeek.Monday: Properties.Settings.Default.monday[BeforeAfterNoon] = ip.ToString();break;
-                case DayOfWeek.Tuesday: Properties.Settings.Default.tuesday[BeforeAfterNoon] = ip.ToString(); break;
-                case DayOfWeek.Wednesday: Properties.Settings.Default.wednesday[BeforeAfterNoon] = ip.ToString(); break;
-                case DayOfWeek.Thursday: Properties.Settings.Default.thursday[BeforeAfterNoon] = ip.ToString();break;
-                case DayOfWeek.Friday: Properties.Settings.Default.friday[BeforeAfterNoon] = ip.ToString();break;
-                case DayOfWeek.Saturday: Properties.Settings.Default.saturday[BeforeAfterNoon] = ip.ToString();break;
-                case DayOfWeek.Sunday: Properties.Settings.Default.sunday[BeforeAfterNoon] = ip.ToString();break;
-            }
+            try{
+                Days.Add(DateTime.Now.DayOfWeek.ToString(), new string[2]);
+            }catch {  }
+            Days[DateTime.Now.DayOfWeek.ToString()][BeforeAfterNoon] = ip;
+            Properties.Settings.Default.IpForTheWeek = JsonSerializer.Serialize(Days);
             Properties.Settings.Default.Save();
             Properties.Settings.Default.Reload();
         }
@@ -39,20 +37,9 @@ namespace ApplicationCliente
         /// <returns></returns>
         public static IPAddress GetIp()
         {
-            DayOfWeek day = DateTime.Now.DayOfWeek;
             int BeforeAfterNoon = 0;
             if (DateTime.Now.TimeOfDay > new TimeSpan(12, 35, 0)) { BeforeAfterNoon = 1; }
-            switch (DateTime.Now.DayOfWeek)
-            {
-                case DayOfWeek.Monday: return IPAddress.Parse(Properties.Settings.Default.monday[BeforeAfterNoon]);
-                case DayOfWeek.Tuesday: return IPAddress.Parse(Properties.Settings.Default.tuesday[BeforeAfterNoon]);
-                case DayOfWeek.Wednesday: return IPAddress.Parse(Properties.Settings.Default.wednesday[BeforeAfterNoon]);
-                case DayOfWeek.Thursday: return IPAddress.Parse(Properties.Settings.Default.thursday[BeforeAfterNoon]);
-                case DayOfWeek.Friday: return IPAddress.Parse(Properties.Settings.Default.friday[BeforeAfterNoon]);
-                case DayOfWeek.Saturday: return IPAddress.Parse(Properties.Settings.Default.saturday[BeforeAfterNoon]);
-                case DayOfWeek.Sunday: return IPAddress.Parse(Properties.Settings.Default.sunday[BeforeAfterNoon]);
-            }
-            return IPAddress.Parse("1.1.1.1");
+            return IPAddress.Parse(Days[DateTime.Now.DayOfWeek.ToString()][BeforeAfterNoon]);
         }
     }
 }

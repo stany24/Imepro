@@ -49,7 +49,8 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="UnitTestStreamOptionClass.cs" />
+    <Compile Include="UnitTestStudent.cs" />
+    <Compile Include="UnitTestTeacher.cs" />
     <Compile Include="UnitTestUrlClass.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

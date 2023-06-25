@@ -4,5 +4,9 @@ using System.Collections.Generic;
 
 namespace UnitTestStudent
 {
-    
+    [TestClass]
+    public class UnitTestIpForTheWeek
+    {
+
+    }
 }
