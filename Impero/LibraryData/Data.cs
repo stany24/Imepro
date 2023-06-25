@@ -457,14 +457,7 @@ namespace LibraryData
         /// </summary>
         private void ReceiveMulticastStream()
         {
-            switch (options.focus)
-            {
-                case Focus.Everything:
-                    break;
-                default:
-                    Task.Run(MinimizeUnAutorisedEverySecond);
-                    break;
-            }
+            Task.Run(MinimizeUnAutorisedEverySecond);
             SocketMulticast = new(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
             IPEndPoint ipep = new(IPAddress.Any, 45678);
             SocketMulticast.Bind(ipep);
@@ -476,9 +469,10 @@ namespace LibraryData
             receiveArgs.Completed += ReceiveCompleted;
             BeginReceive(receiveArgs);
         }
+
         Socket SocketMulticast;
         SocketAsyncEventArgs receiveArgs;
-        List<byte> byteImage = new();
+        readonly List<byte> byteImage = new();
 
         private void BeginReceive(SocketAsyncEventArgs args)
         {
@@ -595,7 +589,7 @@ namespace LibraryData
         {
             while (isReceiving)
             {
-                WindowMinimize.MinimizeUnAuthorised(options.AutorisedOpenedProcess);
+                WindowMinimize.MinimizeUnAuthorised(options.focus);
                 Thread.Sleep(3000);
             }
             WindowMinimize.ShowBack();

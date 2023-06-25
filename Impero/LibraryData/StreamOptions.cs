@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Net;
 using System.Text.Json.Serialization;
 
 namespace LibraryData
@@ -14,14 +13,11 @@ namespace LibraryData
         [JsonInclude]
         public Priority priority;
         [JsonInclude]
-        public Focus focus;
-        [JsonInclude]
-        public List<string> AutorisedOpenedProcess;
-        public StreamOptions(Priority priority, Focus focus, List<string> autorisedOpenedProcess)
+        public List<string> focus;
+        public StreamOptions(Priority priority, List<string> focus)
         {
             this.priority = priority;
             this.focus = focus;
-            AutorisedOpenedProcess = autorisedOpenedProcess;
         }
     }
 
@@ -31,14 +27,5 @@ namespace LibraryData
         Fullscreen,
         Topmost,
         Blocking
-    }
-
-    public enum Focus
-    {
-        Everything,
-        OneNote,
-        VisualStudio,
-        VSCode,
-        Word,
     }
 }

@@ -7,12 +7,14 @@ namespace ApplicationTeacher
 {   
     public partial class ChooseStreamOptions : Form
     {
+        ConfigurationDynamique config = new();
         public ChooseStreamOptions(List<DataForTeacher> list)
         {
             InitializeComponent();
             lbxStudents.SelectionMode = SelectionMode.MultiExtended;
             lbxStudents.DataSource = list;
-            lbxFocus.DataSource = Enum.GetNames(typeof(Focus));
+            foreach(KeyValuePair<string,List<string>> focus in config.AllFocus) { lbxFocus.Items.Add(focus); }
+            lbxFocus.DisplayMember= "Key";
             lbxPriorite.DataSource = Enum.GetNames(typeof(Priority));
             lbxScreen.DataSource = Screen.AllScreens;
         }
@@ -40,22 +42,10 @@ namespace ApplicationTeacher
             {
                 ConfigurationStatic.StudentToShareScreen.Add(student);
             }
-            Focus focus = (Focus)Enum.Parse(typeof(Focus), lbxFocus.SelectedItem.ToString());
+            List<string> focus = (List<string>)lbxFocus.SelectedItem;
             Priority priorite = (Priority)Enum.Parse(typeof(Priority), lbxPriorite.SelectedItem.ToString());
-            List<string> list = new();
-            switch(focus)
-            {
-                case LibraryData.Focus.VSCode:list = new() { "Code" };
-                    break;
-                case LibraryData.Focus.Word:list = new() { "WINWORD","sppsvc" };
-                    break;
-                case LibraryData.Focus.VisualStudio:list = new() { "devenv","ServiceHub","" };
-                    break;
-                case LibraryData.Focus.OneNote:list = new() { "onenoteim" };
-                    break;
-            }
             Properties.Settings.Default.ScreenToShareId = lbxScreen.SelectedIndex;
-            ConfigurationStatic.streamoptions = new StreamOptions(priorite, focus,list);
+            ConfigurationStatic.streamoptions = new StreamOptions(priorite, focus);
         }
     }
 }
