@@ -1,5 +1,7 @@
 ﻿using LibraryData;
+using System;
 using System.Collections.Generic;
+using System.Text.Json;
 
 namespace ApplicationTeacher
 {
@@ -14,6 +16,7 @@ namespace ApplicationTeacher
             AllLists.Add("Urls alertés", Properties.Settings.Default.AlertedUrls);
             AllLists.Add("Processus alertés", Properties.Settings.Default.AlertedProcesses);
             AllLists.Add("Urls autorisés", Properties.Settings.Default.AutorisedWebsite);
+            AllFocus = JsonSerializer.Deserialize<Dictionary<string,List<string>>>(Properties.Settings.Default.AllFocus);
         }
     }
     /// <summary>

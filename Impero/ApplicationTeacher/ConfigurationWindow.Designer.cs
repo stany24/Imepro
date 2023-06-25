@@ -44,6 +44,7 @@
             this.fbdSaveFolder = new System.Windows.Forms.FolderBrowserDialog();
             this.btnChangeSaveFolder = new System.Windows.Forms.Button();
             this.tbxSaveFolder = new System.Windows.Forms.TextBox();
+            this.btnNewFocus = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.nudTimeBetweenAsking)).BeginInit();
             this.SuspendLayout();
             // 
@@ -196,12 +197,24 @@
             this.tbxSaveFolder.Size = new System.Drawing.Size(156, 20);
             this.tbxSaveFolder.TabIndex = 7;
             // 
+            // btnNewFocus
+            // 
+            this.btnNewFocus.Location = new System.Drawing.Point(38, 133);
+            this.btnNewFocus.Name = "btnNewFocus";
+            this.btnNewFocus.Size = new System.Drawing.Size(100, 23);
+            this.btnNewFocus.TabIndex = 15;
+            this.btnNewFocus.Text = "Nouveau focus";
+            this.btnNewFocus.UseVisualStyleBackColor = true;
+            this.btnNewFocus.Visible = false;
+            this.btnNewFocus.Click += new System.EventHandler(this.NewFocus_Click);
+            // 
             // ConfigurationWindow
             // 
             this.AcceptButton = this.btnApply;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(653, 392);
+            this.Controls.Add(this.btnNewFocus);
             this.Controls.Add(this.tbxSaveFolder);
             this.Controls.Add(this.btnChangeSaveFolder);
             this.Controls.Add(this.lblSaveFolder);
@@ -246,5 +259,6 @@
         private System.Windows.Forms.FolderBrowserDialog fbdSaveFolder;
         private System.Windows.Forms.Button btnChangeSaveFolder;
         private System.Windows.Forms.TextBox tbxSaveFolder;
+        private System.Windows.Forms.Button btnNewFocus;
     }
 }

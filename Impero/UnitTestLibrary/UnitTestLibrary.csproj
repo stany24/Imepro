@@ -49,7 +49,6 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="UnitTestIpForTheWeek.cs" />
     <Compile Include="UnitTestStreamOptionClass.cs" />
     <Compile Include="UnitTestUrlClass.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

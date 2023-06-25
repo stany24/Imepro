@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text.Json;
 using System.Windows.Forms;
 
 namespace ApplicationTeacher
@@ -31,10 +32,12 @@ namespace ApplicationTeacher
                 case "Listes":
                     foreach (KeyValuePair<string, List<string>> list in config.AllLists)
                     {cbxParameter.Items.Add(list.Key);}
+                    btnNewFocus.Visible= false;
                     break;
                 case "Focus":
                     foreach (KeyValuePair<string, List<string>> list in config.AllFocus)
                     {cbxParameter.Items.Add(list.Key);};
+                    btnNewFocus.Visible= true;
                     break;
             }
         }
@@ -89,6 +92,7 @@ namespace ApplicationTeacher
         private void ApplyChanges(object sender, EventArgs e)
         {
             Properties.Settings.Default.TimeBetweenDemand = (int)nudTimeBetweenAsking.Value;
+            Properties.Settings.Default.AllFocus = JsonSerializer.Serialize(config.AllFocus);
             Properties.Settings.Default.Save();
         }
 
@@ -100,6 +104,20 @@ namespace ApplicationTeacher
             {
                 tbxSaveFolder.Text = fbdSaveFolder.SelectedPath;
                 Properties.Settings.Default.PathToSaveFolder = fbdSaveFolder.SelectedPath;
+            }
+        }
+
+        private void NewFocus_Click(object sender, EventArgs e)
+        {
+            for(int i = 0;i < 11; i++)
+            {
+                try
+                {
+                    config.AllFocus.Add("focus "+i, new());
+                    cbxParameter.Items.Clear();
+                    foreach (KeyValuePair<string, List<string>> list in config.AllFocus){ cbxParameter.Items.Add(list.Key); };
+                    return;
+                }catch(Exception) { }
             }
         }
     }

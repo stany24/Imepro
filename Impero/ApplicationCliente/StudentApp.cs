@@ -1,19 +1,17 @@
-﻿using System;
-using System.Net.Sockets;
-using System.Net;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using LibraryData;
-using System.Text;
-using System.Text.Json;
-using System.IO;
-using System.Net.NetworkInformation;
-using System.Linq;
+﻿using LibraryData;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Firefox;
+using System;
+using System.IO;
+using System.Linq;
+using System.Net;
+using System.Net.NetworkInformation;
+using System.Net.Sockets;
+using System.Text;
 using System.Threading;
-using System.Diagnostics;
+using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace ApplicationCliente
 {

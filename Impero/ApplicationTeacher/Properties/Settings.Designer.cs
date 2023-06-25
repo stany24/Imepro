@@ -104,17 +104,6 @@ namespace ApplicationTeacher.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        public global::System.Collections.Generic.Dictionary<System.String,System.Collections.Generic.List<System.String>> AllFocus {
-            get {
-                return ((global::System.Collections.Generic.Dictionary<System.String,System.Collections.Generic.List<System.String>>)(this["AllFocus"]));
-            }
-            set {
-                this["AllFocus"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("2000")]
         public int DefaultTimeout {
             get {
@@ -122,6 +111,18 @@ namespace ApplicationTeacher.Properties {
             }
             set {
                 this["DefaultTimeout"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string AllFocus {
+            get {
+                return ((string)(this["AllFocus"]));
+            }
+            set {
+                this["AllFocus"] = value;
             }
         }
     }
