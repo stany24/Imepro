@@ -5,7 +5,7 @@ using System.Text.Json.Serialization;
 
 namespace LibraryData
 {
-    
+
     /// <summary>
     /// Classe qui reprèsente un historique des urls pour tous les navigateurs
     /// </summary>

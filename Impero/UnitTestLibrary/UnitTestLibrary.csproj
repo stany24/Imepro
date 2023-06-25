@@ -58,6 +58,14 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\ApplicationCliente\ApplicationStudent.csproj">
+      <Project>{ecee4e3a-7b3f-42ed-9211-7cc32ffaaa98}</Project>
+      <Name>ApplicationStudent</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ApplicationTeacher\ApplicationTeacher.csproj">
+      <Project>{ad2faa27-3dd8-4f77-82b8-00c104a2280a}</Project>
+      <Name>ApplicationTeacher</Name>
+    </ProjectReference>
     <ProjectReference Include="..\LibraryData\ClassLibrary.csproj">
       <Project>{3c15d5e3-049b-4b63-b3f8-668f9d3e6f9d}</Project>
       <Name>ClassLibrary</Name>

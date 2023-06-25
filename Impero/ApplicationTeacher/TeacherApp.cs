@@ -1,17 +1,17 @@
-﻿using System;
+﻿using LibraryData;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Net.Sockets;
+using System.Drawing.Imaging;
+using System.IO;
+using System.Linq;
 using System.Net;
+using System.Net.Sockets;
 using System.Text;
+using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using LibraryData;
-using System.Threading;
-using System.IO;
-using System.Text.Json;
-using System.Drawing.Imaging;
-using System.Linq;
 
 namespace ApplicationTeacher
 {
