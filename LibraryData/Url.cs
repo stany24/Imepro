@@ -16,25 +16,17 @@ namespace LibraryData
         [JsonInclude]
         public Dictionary<string, List<Url>> AllBrowser = new();
 
-        public void AddUrl(Url url)
+        public void AddUrl(Url url,string browser)
         {
-            VerifyUrl(AllBrowser[url.Browser], url);
+            if (AllBrowser[browser].Count == 0 && AllBrowser["selenium" + browser].Count == 0) { AllBrowser[browser].Add(url); return; }
+            if (AllBrowser[browser].Last().Name == url.Name) { return; }
+            if (AllBrowser["selenium" + browser].Last().Name == url.Name) { return; }
+            AllBrowser[browser].Add(url);
         }
 
         public HistoriqueUrls()
         {
             for (int i = 0;i < AllBrowserName.Count(); i++) { AllBrowser.Add(AllBrowserName[i], new List<Url>()); }
-        }
-
-        /// <summary>
-        /// Fonction qui vérifie si l'url que l'on donne n'est pas déja le dernier de la list
-        /// </summary>
-        /// <param name="list">la list d'url</param>
-        /// <param name="url">le nouvelle url</param>
-        private void VerifyUrl(List<Url> list, Url url)
-        {
-            if (list.Count == 0) { list.Add(url); return; }
-            if (list.Last().Name != url.Name) { list.Add(url); return; }
         }
     }
 
@@ -47,14 +39,11 @@ namespace LibraryData
         [JsonInclude]
         readonly public DateTime CaptureTime;
         [JsonInclude]
-        readonly public string Browser;
-        [JsonInclude]
         readonly public string Name;
 
-        public Url(DateTime capturetime, string browser, string name)
+        public Url(DateTime capturetime, string name)
         {
             CaptureTime = capturetime;
-            Browser = browser;
             Name = name;
         }
         public override string ToString()

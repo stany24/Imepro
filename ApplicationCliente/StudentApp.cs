@@ -87,7 +87,7 @@ namespace ApplicationCliente
             try
             {
                 if (navigateur == null){return;}
-                Student.Urls.AddUrl(new Url(DateTime.Now, navigateurName, navigateur.Url));
+                Student.Urls.AddUrl(new Url(DateTime.Now, navigateur.Url),navigateurName);
                 bool navigateback = true;
                 foreach (string url in Student.AutorisedUrls)
                 {

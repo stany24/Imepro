@@ -315,16 +315,19 @@ namespace ApplicationTeacher
                     }
                     else{if(Properties.Settings.Default.IgnoredProcesses.Find(x => x == process.Value) != null){current.BackColor = Color.Yellow;/*current.Remove();*/ }}
                 }
-                //Mise à jour des urls
-                UpdateUrlsTree(nodeNavigateurs, student.Urls.AllBrowser["chrome"], "chrome", "Chrome");
-                UpdateUrlsTree(nodeNavigateurs, student.Urls.AllBrowser["firefox"], "firefox", "Firefox");
-                UpdateUrlsTree(nodeNavigateurs, student.Urls.AllBrowser["msedge"], "msedge", "Edge");
-                UpdateUrlsTree(nodeNavigateurs, student.Urls.AllBrowser["opera"], "opera", "Opera");
-                UpdateUrlsTree(nodeNavigateurs, student.Urls.AllBrowser["iexplorer"], "iexplorer", "Internet Explorer");
-                UpdateUrlsTree(nodeNavigateurs, student.Urls.AllBrowser["safari"], "safari", "Safari");
-                UpdateUrlsTree(nodeNavigateurs, student.Urls.AllBrowser["seleniumchrome"], "seleniumchrome", "Selenium Chrome");
-                UpdateUrlsTree(nodeNavigateurs, student.Urls.AllBrowser["seleniumfirefox"], "seleniumfirefox", "Selenium Firefox");
-                UpdateUrlsTree(nodeNavigateurs, student.Urls.AllBrowser["custom"], "custom", "Custom");
+                foreach (KeyValuePair<string, List<Url>> browser in student.Urls.AllBrowser)
+                {
+                    if (browser.Value.Count > 0)
+                    {
+                        if (nodeNavigateurs.Nodes.Find(browser.Key, false).Count() == 0) { nodeNavigateurs.Nodes.Add(browser.Key, browser.Key); }
+                        TreeNode nodeBrowser = nodeNavigateurs.Nodes.Find(browser.Key, false)[0];
+                        for (int i = nodeBrowser.Nodes.Count; i < browser.Value.Count; i++)
+                        {
+                            nodeBrowser.Nodes.Add(browser.Value[i].ToString());
+                        }
+
+                    }
+                }
             }));
             // Mise à jour du TreeView pour la sélection
             TreeViewSelect.Invoke(new MethodInvoker(delegate {
@@ -332,31 +335,6 @@ namespace ApplicationTeacher
                 TreeNode nodeStudent;
                 try { nodeStudent = TreeViewSelect.Nodes.Find(Convert.ToString(student.ID), false)[0]; }
                 catch { nodeStudent = TreeViewSelect.Nodes.Add(Convert.ToString(student.ID), student.UserName + " : " + student.ComputerName); }
-            }));
-        }
-
-        /// <summary>
-        /// Fonction qui met à jour les urls montré dans le TreeView
-        /// </summary>
-        /// <param name="NodeAllNavigateur">TreeNode qui contient tout les navigateurs</param>
-        /// <param name="urls">List des urls pour ce navigateur</param>
-        /// <param name="ProcessName">Nom du processus pour ce navigateur</param>
-        /// <param name="DisplayName">Nom d'affichage pour ce navigateur</param>
-        /// <returns></returns>
-        public void UpdateUrlsTree(TreeNode NodeAllNavigateur, List<Url> urls, string ProcessName, string DisplayName) {
-            if(urls.Count == 0) { try { NodeAllNavigateur.Nodes.Find(ProcessName, false)[0].Remove(); } catch { }; return; }
-            TreeViewDetails.Invoke(new MethodInvoker(delegate {
-                TreeNode[] nodeNavigateur = NodeAllNavigateur.Nodes.Find(ProcessName, false);
-                if (nodeNavigateur.Count() == 0 ) {NodeAllNavigateur.Nodes.Add(ProcessName,DisplayName);}
-                TreeNode NodeBrowser = NodeAllNavigateur.Nodes.Find(ProcessName, false)[0]; ;
-                for (int i = NodeAllNavigateur.Nodes.Find(ProcessName, false)[0].Nodes.Count; i < urls.Count; i++)
-                {
-                    NodeBrowser.Nodes.Add(urls[i].ToString());
-                }
-                if (FilterEnabled)
-                {
-                    ApplyUrlFilter(NodeBrowser);
-                }
             }));
         }
 
