@@ -11,13 +11,17 @@ namespace ApplicationCliente
     [Serializable]
     public static class IpForTheWeek
     {
-        static private Dictionary<string, string[]> Days = JsonSerializer.Deserialize<Dictionary<string, string[]>>(Properties.Settings.Default.IpForTheWeek);
         /// <summary>
         /// Fonction qui enregistre l'ip donnée au bonne endroit, qui dépand du jour et de l'heure de l'action
         /// </summary>
         /// <param name="ip"></param>
         public static void SetIp(string ip)
         {
+            Dictionary<string, string[]> Days;
+            try
+            {
+                Days = JsonSerializer.Deserialize<Dictionary<string, string[]>>(Properties.Settings.Default.IpForTheWeek);
+            }catch(Exception) { Days = new(); }
             try { IPAddress.Parse(ip); }
             catch { return; }
             int BeforeAfterNoon = 0;
@@ -37,6 +41,7 @@ namespace ApplicationCliente
         /// <returns></returns>
         public static IPAddress GetIp()
         {
+            Dictionary<string, string[]> Days = JsonSerializer.Deserialize<Dictionary<string, string[]>>(Properties.Settings.Default.IpForTheWeek);
             int BeforeAfterNoon = 0;
             if (DateTime.Now.TimeOfDay > new TimeSpan(12, 35, 0)) { BeforeAfterNoon = 1; }
             return IPAddress.Parse(Days[DateTime.Now.DayOfWeek.ToString()][BeforeAfterNoon]);
