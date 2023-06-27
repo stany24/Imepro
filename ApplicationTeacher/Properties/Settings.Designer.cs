@@ -60,9 +60,12 @@ namespace ApplicationTeacher.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        public global::System.Collections.Generic.List<System.String> IgnoredProcesses {
+        [global::System.Configuration.DefaultSettingValueAttribute("<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<ArrayOfString xmlns:xsd=\"http://www.w3." +
+            "org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\r\n  <s" +
+            "tring>chrome</string>\r\n</ArrayOfString>")]
+        public global::System.Collections.Specialized.StringCollection IgnoredProcesses {
             get {
-                return ((global::System.Collections.Generic.List<System.String>)(this["IgnoredProcesses"]));
+                return ((global::System.Collections.Specialized.StringCollection)(this["IgnoredProcesses"]));
             }
             set {
                 this["IgnoredProcesses"] = value;
@@ -71,9 +74,12 @@ namespace ApplicationTeacher.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        public global::System.Collections.Generic.List<System.String> AlertedProcesses {
+        [global::System.Configuration.DefaultSettingValueAttribute("<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<ArrayOfString xmlns:xsd=\"http://www.w3." +
+            "org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\r\n  <s" +
+            "tring>steam</string>\r\n  <string>discord</string>\r\n</ArrayOfString>")]
+        public global::System.Collections.Specialized.StringCollection AlertedProcesses {
             get {
-                return ((global::System.Collections.Generic.List<System.String>)(this["AlertedProcesses"]));
+                return ((global::System.Collections.Specialized.StringCollection)(this["AlertedProcesses"]));
             }
             set {
                 this["AlertedProcesses"] = value;
@@ -82,9 +88,16 @@ namespace ApplicationTeacher.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        public global::System.Collections.Generic.List<System.String> AlertedUrls {
+        [global::System.Configuration.DefaultSettingValueAttribute(@"<?xml version=""1.0"" encoding=""utf-16""?>
+<ArrayOfString xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
+  <string>porn</string>
+  <string>xxx</string>
+  <string>game</string>
+  <string>jeux</string>
+</ArrayOfString>")]
+        public global::System.Collections.Specialized.StringCollection AlertedUrls {
             get {
-                return ((global::System.Collections.Generic.List<System.String>)(this["AlertedUrls"]));
+                return ((global::System.Collections.Specialized.StringCollection)(this["AlertedUrls"]));
             }
             set {
                 this["AlertedUrls"] = value;
@@ -93,9 +106,13 @@ namespace ApplicationTeacher.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        public global::System.Collections.Generic.List<System.String> AutorisedWebsite {
+        [global::System.Configuration.DefaultSettingValueAttribute("<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<ArrayOfString xmlns:xsd=\"http://www.w3." +
+            "org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\r\n  <s" +
+            "tring>stackoverflow.com</string>\r\n  <string>github.com</string>\r\n</ArrayOfString" +
+            ">")]
+        public global::System.Collections.Specialized.StringCollection AutorisedWebsite {
             get {
-                return ((global::System.Collections.Generic.List<System.String>)(this["AutorisedWebsite"]));
+                return ((global::System.Collections.Specialized.StringCollection)(this["AutorisedWebsite"]));
             }
             set {
                 this["AutorisedWebsite"] = value;

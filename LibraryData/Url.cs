@@ -18,9 +18,9 @@ namespace LibraryData
 
         public void AddUrl(Url url,string browser)
         {
-            if (AllBrowser[browser].Count == 0 && AllBrowser["selenium" + browser].Count == 0) { AllBrowser[browser].Add(url); return; }
+
+            if (AllBrowser[browser].Count == 0 ) { AllBrowser[browser].Add(url); return; }
             if (AllBrowser[browser].Last().Name == url.Name) { return; }
-            if (AllBrowser["selenium" + browser].Last().Name == url.Name) { return; }
             AllBrowser[browser].Add(url);
         }
 

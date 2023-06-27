@@ -40,28 +40,24 @@ namespace ApplicationCliente
         public void LaunchTasks()
         {
             while (!IsHandleCreated) {Thread.Sleep(100);}
-            Student.SocketToTeacher = Task.Run(() => Student.ConnectToTeacher(11111)).Result;
             Task.Run(AutomaticChecker);
+            Student.SocketToTeacher = Task.Run(() => Student.ConnectToTeacher(11111)).Result;
         }
 
         public void NewChrome(object sender, EventArgs e)
         {
-            Task.Run(StartChrome);
-        }
-
-        public void StartChrome()
-        {
-            ChromeDriver = new ChromeDriver();
+            ChromeDriverService service = ChromeDriverService.CreateDefaultService();
+            ChromeDriver = new ChromeDriver(service);
+            Student.SeleniumProcessesID.Add(service.ProcessId);
         }
 
         public void NewFirefox(object sender, EventArgs e)
         {
-            Task.Run(StartFirefox);
-        }
-
-        public void StartFirefox()
-        {
-            FirefoxDriver = new FirefoxDriver();
+            FirefoxOptions options = new();
+            FirefoxDriverService service = FirefoxDriverService.CreateDefaultService(".", "geckodriver.exe");
+            options.BrowserExecutableLocation = "C:\\Program Files\\Mozilla Firefox\\firefox.exe";
+            FirefoxDriver = new FirefoxDriver(service, options);
+            Student.SeleniumProcessesID.Add(service.ProcessId);
         }
 
         /// <summary>
@@ -84,8 +80,6 @@ namespace ApplicationCliente
         /// <param name="navigateurName"></param>
         public void VerifyUrlOfWebDriver(WebDriver navigateur,string navigateurName)
         {
-            try
-            {
                 if (navigateur == null){return;}
                 Student.Urls.AddUrl(new Url(DateTime.Now, navigateur.Url),navigateurName);
                 bool navigateback = true;
@@ -93,13 +87,8 @@ namespace ApplicationCliente
                 {
                     if (navigateur.Url.Contains(url)) { navigateback = false; }
                 }
-                if (navigateback)
-                {
-                    string url = navigateur.Url;
-                    navigateur.Navigate().Back();
-                }
-            }
-            catch { navigateur.Dispose(); }
+                if(navigateur.Url == null) { navigateback= false; }
+                if (navigateback){navigateur.Navigate().Back();}
         }
 
         /// <summary>

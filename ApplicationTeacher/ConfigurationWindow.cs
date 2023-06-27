@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Text.Json;
 using System.Windows.Forms;
 
@@ -29,7 +30,7 @@ namespace ApplicationTeacher
             switch (cbxCategory.SelectedItem.ToString())
             {
                 case "Listes":
-                    foreach (KeyValuePair<string, List<string>> list in config.AllLists)
+                    foreach (KeyValuePair<string, StringCollection> list in config.AllLists)
                     {cbxParameter.Items.Add(list.Key);}
                     btnNewFocus.Visible= false;
                     break;

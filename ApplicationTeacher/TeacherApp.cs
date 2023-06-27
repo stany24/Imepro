@@ -303,7 +303,7 @@ namespace ApplicationTeacher
                     TreeNode current = nodeProcess.Nodes.Add(process.Value);
                     if (FilterEnabled)
                     {
-                        if (Properties.Settings.Default.AlertedProcesses.Find(x => x == process.Value) != null)
+                        if (Properties.Settings.Default.AlertedProcesses.Contains(process.Value))
                         {
                             current.BackColor = Color.Red;
                             while (current.Parent != null)
@@ -313,7 +313,12 @@ namespace ApplicationTeacher
                             }
                         }
                     }
-                    else{if(Properties.Settings.Default.IgnoredProcesses.Find(x => x == process.Value) != null){current.BackColor = Color.Yellow;/*current.Remove();*/ }}
+                    else{
+                        if(Properties.Settings.Default.IgnoredProcesses.Contains(process.Value))
+                        {
+                            current.BackColor = Color.Yellow;/*current.Remove();*/
+                        }
+                    }
                 }
                 foreach (KeyValuePair<string, List<Url>> browser in student.Urls.AllBrowser)
                 {

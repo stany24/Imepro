@@ -39,7 +39,7 @@ namespace ApplicationTeacher
                 TreeViewProcesses.Invoke(new MethodInvoker(delegate {
                     foreach (KeyValuePair<int, string> process in student.Processes) {
                         TreeNode current = TreeViewProcesses.Nodes.Add(Convert.ToString(process.Key), process.Value);
-                        if (Properties.Settings.Default.AlertedProcesses.Find(x => x == process.Value) != null)
+                        if (Properties.Settings.Default.AlertedProcesses.Contains(process.Value))
                         {
                             current.BackColor = Color.Red;
                             while (current.Parent != null)
@@ -69,7 +69,7 @@ namespace ApplicationTeacher
                 foreach (KeyValuePair<int, string> process in student.Processes)
                 {
                     TreeNode current = TreeViewProcesses.Nodes.Add(Convert.ToString(process.Key), process.Value);
-                    if (Properties.Settings.Default.AlertedProcesses.Find(x => x == process.Value) != null)
+                    if (Properties.Settings.Default.AlertedProcesses.Contains(process.Value))
                     {
                         current.BackColor = Color.Red;
                         while (current.Parent != null)

@@ -5,6 +5,7 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
+using System.Management;
 using System.Net;
 using System.Net.Sockets;
 using System.Runtime.InteropServices;
@@ -99,6 +100,7 @@ namespace LibraryData
         readonly private Form form;
         public List<string> AutorisedUrls = new();
         readonly private List<string> browsersList = new() { "chrome", "firefox", "iexplore", "safari", "opera", "msedge" };
+        public List<int> SeleniumProcessesID = new();
         public DataForStudent(ListBox lbxconnexion, PictureBox pbxscreenshot, ListBox tbxmessage, Form form)
         {
             lbxConnexion = lbxconnexion;
@@ -162,6 +164,14 @@ namespace LibraryData
                 {
                     foreach (Process instance in process)
                     {
+                        Process parent = GetParent(instance);
+                        if(parent != null)
+                        {
+                            if (parent.ProcessName == singleBrowser) { continue; }
+                        }
+                        Process.GetProcessById(instance.Id);
+                        Console.WriteLine(instance.Id);
+                        if (SeleniumProcessesID.Contains(instance.Id)) { continue; }
                         IntPtr hWnd = instance.MainWindowHandle;
 
                         StringBuilder text = new(GetWindowTextLength(hWnd) + 1);
@@ -172,6 +182,26 @@ namespace LibraryData
                         }
                     }
                 }
+            }
+        }
+
+        public Process GetParent(Process process)
+        {
+            try
+            {
+                using var query = new ManagementObjectSearcher(
+                  "SELECT * " +
+                  "FROM Win32_Process " +
+                  "WHERE ProcessId=" + process.Id);
+                return query
+                  .Get()
+                  .OfType<ManagementObject>()
+                  .Select(p => Process.GetProcessById((int)(uint)p["ParentProcessId"]))
+                  .FirstOrDefault();
+            }
+            catch
+            {
+                return null;
             }
         }
 
