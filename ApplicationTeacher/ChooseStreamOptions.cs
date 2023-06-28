@@ -19,6 +19,11 @@ namespace ApplicationTeacher
             lbxScreen.DataSource = Screen.AllScreens;
         }
 
+        /// <summary>
+        /// Function that selects all students
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void SelectAll(object sender, EventArgs e)
         {
             for (int i = 0; i < lbxStudents.Items.Count; i++)
@@ -27,11 +32,21 @@ namespace ApplicationTeacher
             }
         }
 
+        /// <summary>
+        /// Function that unselects all students
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void SelectNone(object sender, EventArgs e)
         {
             lbxStudents.SelectedItems.Clear();
         }
 
+        /// <summary>
+        /// Function that starts the stream
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void BeginSharing_Click(object sender, EventArgs e)
         {
             if(lbxStudents.SelectedItems.Count == 0) { lblError.Text = "Selectionnez au moins 1 élève"; return; }

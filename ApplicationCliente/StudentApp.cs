@@ -35,7 +35,7 @@ namespace ApplicationCliente
         }
 
         /// <summary>
-        /// Fonction qui attend qui le formulaire soit complétement initialisé avant de lancer les tâches
+        /// Function waiting for the form to be fully created before launching background tasks
         /// </summary>
         public void LaunchTasks()
         {
@@ -44,6 +44,11 @@ namespace ApplicationCliente
             Student.SocketToTeacher = Task.Run(() => Student.ConnectToTeacher(11111)).Result;
         }
 
+        /// <summary>
+        /// Function to start a new instance for chrome controled with selenium
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         public void NewChrome(object sender, EventArgs e)
         {
             ChromeDriverService service = ChromeDriverService.CreateDefaultService();
@@ -51,6 +56,11 @@ namespace ApplicationCliente
             Student.SeleniumProcessesID.Add(service.ProcessId);
         }
 
+        /// <summary>
+        /// Function to start a new instance for firefox controled with selenium
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         public void NewFirefox(object sender, EventArgs e)
         {
             FirefoxOptions options = new();
@@ -61,7 +71,7 @@ namespace ApplicationCliente
         }
 
         /// <summary>
-        /// Fonction qui récupère les urls des navigateurs sélénium toutes les 2 secondes
+        /// Function that verify the urls of browser launched with selenium
         /// </summary>
         public void AutomaticChecker()
         {
@@ -74,7 +84,7 @@ namespace ApplicationCliente
         }
 
         /// <summary>
-        /// Fonction qui vérifie l'url actuel et l'ajoute dans l'historique
+        /// Function that verify if the url is autorised and adds it to the history
         /// </summary>
         /// <param name="navigateur"></param>
         /// <param name="navigateurName"></param>
@@ -92,7 +102,7 @@ namespace ApplicationCliente
         }
 
         /// <summary>
-        /// Fonction qui demande à l'élève une nouvelle adresse ip pour le maitre
+        /// Function that asks to the student the new teacher ip
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -105,7 +115,7 @@ namespace ApplicationCliente
         }
 
         /// <summary>
-        /// Fonction qui vérifie sur toutes les interfaces réseau si le forwarding est activé, et génére un script pour n'activer que l'interface avec le professeur
+        /// Function that verify the interfaces, if they are incorrect it returns a script
         /// </summary>
         /// <returns> La commande à executer en powershell pour modifier les interfaces</returns>
         public string CheckInterfaces()
@@ -127,7 +137,7 @@ namespace ApplicationCliente
         }
 
         /// <summary>
-        /// Fonction qui permet de vérifier si 2 ip sont sur le même réseau ou non
+        /// Function to know if two adresses are on the same network
         /// </summary>
         /// <param name="ipAddress1">La première adresse ip</param>
         /// <param name="ipAddress2">La deuxième adresse ip</param>
@@ -152,7 +162,7 @@ namespace ApplicationCliente
         }
 
         /// <summary>
-        /// Fonction qui aide l'utilisateur à configurer ses interfaces réseaux
+        /// Function to help the user configure its interfaces
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -173,7 +183,7 @@ namespace ApplicationCliente
 
 
         /// <summary>
-        /// Fonction qui à la fermeture annonce au professeur d'arreter de lui communiquer
+        /// Function that communicate to the teacher the closure of the application
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -192,7 +202,7 @@ namespace ApplicationCliente
         }
 
         /// <summary>
-        /// Fonction qui en cas de redimensionement de l'application affiche le TrayIcon si nécessaire
+        /// Function that displays the trayicon if the application is minimized
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -210,7 +220,7 @@ namespace ApplicationCliente
         }
 
         /// <summary>
-        /// Fonction qui en cas de click sur le TrayIcon réaffiche l'application
+        /// Function to show the application when the trayicon is clicked
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>

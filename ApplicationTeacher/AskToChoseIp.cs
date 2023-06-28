@@ -14,19 +14,34 @@ namespace ApplicationTeacher
             foreach(IPAddress address in adresses){lbxAdresses.Items.Add(address);}
         }
 
-        private void btnConfirmer_Click(object sender, EventArgs e)
+        /// <summary>
+        /// Function that confirms the selected ip
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Confirmer_Click(object sender, EventArgs e)
         {
             ChoosenIp = lbxAdresses.SelectedItem as IPAddress;
         }
 
-        private void lbxAdresses_SelectedIndexChanged(object sender, EventArgs e)
+        /// <summary>
+        /// Function that enables the confirm button after selecting an ip
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Adresses_Changed(object sender, EventArgs e)
         {
             btnConfirmer.Enabled = true;
         }
 
-        private void lbxAdresses_MouseDoubleClick(object sender, MouseEventArgs e)
+        /// <summary>
+        /// Function calling Confirmer_Click()
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Adresses_DoubleClick(object sender, MouseEventArgs e)
         {
-            btnConfirmer_Click(sender, e);
+            Confirmer_Click(sender, e);
         }
     }
 }

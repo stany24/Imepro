@@ -136,7 +136,7 @@ namespace LibraryData
         static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
 
         /// <summary>
-        /// Fonction qui minimize toutes les applications interdites
+        /// Function qui minimize toutes les applications interdites
         /// </summary>
         /// <param name="autorisedProcesses"></param>
         public static void MinimizeUnAuthorised(List<string> autorisedProcesses)
@@ -153,7 +153,7 @@ namespace LibraryData
             }
         }
         /// <summary>
-        /// Fonction qui affiche à nouveau toutes les applications
+        /// Function qui affiche à nouveau toutes les applications
         /// </summary>
         public static void ShowBack()
         {

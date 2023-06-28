@@ -16,6 +16,11 @@ namespace ApplicationTeacher
             tbxSaveFolder.Text = Properties.Settings.Default.PathToSaveFolder;
         }
 
+        /// <summary>
+        /// Function that loads the lists and the focuces
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void ConfigurationWindow_Load(object sender, EventArgs e)
         {
             config = new ConfigurationDynamique();
@@ -23,6 +28,11 @@ namespace ApplicationTeacher
             cbxCategory.Items.Add("Focus");
         }
 
+        /// <summary>
+        /// Function to load all parameter in the new category
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void CategoryChanged(object sender, EventArgs e)
         {
             cbxParameter.Items.Clear();
@@ -41,6 +51,12 @@ namespace ApplicationTeacher
                     break;
             }
         }
+
+        /// <summary>
+        /// Function to load the strings in the new parameter
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void ParameterChanged(object sender, EventArgs e)
         {
             lbxStrings.Items.Clear();
@@ -57,6 +73,11 @@ namespace ApplicationTeacher
             }
         }
 
+        /// <summary>
+        /// Function that removes the selected string from the selected parameter
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void RemoveSelectedString_Click(object sender, EventArgs e)
         {
             switch (cbxCategory.SelectedItem.ToString())
@@ -74,6 +95,11 @@ namespace ApplicationTeacher
             {lbxStrings.Items.Remove(lbxStrings.SelectedItems[0]);}
         }
 
+        /// <summary>
+        /// Function that add the string to the selected parameter
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void AddString_Click(object sender, EventArgs e)
         {
             switch (cbxCategory.SelectedItem.ToString())
@@ -89,13 +115,23 @@ namespace ApplicationTeacher
             tbxAddString.Text = string.Empty;
         }
 
+        /// <summary>
+        /// Function that saves the changes the user made
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void ApplyChanges(object sender, EventArgs e)
         {
             Properties.Settings.Default.TimeBetweenDemand = (int)nudTimeBetweenAsking.Value;
             Properties.Settings.Default.AllFocus = JsonSerializer.Serialize(config.AllFocus);
             Properties.Settings.Default.Save();
         }
-
+        
+        /// <summary>
+        /// Function to change the location of the save folder
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void ChangeSaveFolder_Click(object sender, EventArgs e)
         {
             DialogResult result = fbdSaveFolder.ShowDialog();
@@ -107,6 +143,11 @@ namespace ApplicationTeacher
             }
         }
 
+        /// <summary>
+        /// Function to add a new focus
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void NewFocus_Click(object sender, EventArgs e)
         {
             for(int i = 0;i < 11; i++)

@@ -39,8 +39,8 @@
             this.lbxAdresses.Name = "lbxAdresses";
             this.lbxAdresses.Size = new System.Drawing.Size(234, 186);
             this.lbxAdresses.TabIndex = 0;
-            this.lbxAdresses.SelectedIndexChanged += new System.EventHandler(this.lbxAdresses_SelectedIndexChanged);
-            this.lbxAdresses.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.lbxAdresses_MouseDoubleClick);
+            this.lbxAdresses.SelectedIndexChanged += new System.EventHandler(this.Adresses_Changed);
+            this.lbxAdresses.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.Adresses_DoubleClick);
             // 
             // btnConfirmer
             // 
@@ -52,7 +52,7 @@
             this.btnConfirmer.TabIndex = 1;
             this.btnConfirmer.Text = "Confirmer";
             this.btnConfirmer.UseVisualStyleBackColor = true;
-            this.btnConfirmer.Click += new System.EventHandler(this.btnConfirmer_Click);
+            this.btnConfirmer.Click += new System.EventHandler(this.Confirmer_Click);
             // 
             // AskToChoseIp
             // 

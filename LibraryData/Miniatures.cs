@@ -68,7 +68,7 @@ namespace LibraryData
         }
 
         /// <summary>
-        /// Fonction pour sauvegarder la capture d'écran actuel
+        /// Function pour sauvegarder la capture d'écran actuel
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -78,7 +78,7 @@ namespace LibraryData
         }
 
         /// <summary>
-        /// Fonction qui ajoute une seconde au temps depuis la mise à jour de l'image et change le texte du label.
+        /// Function qui ajoute une seconde au temps depuis la mise à jour de l'image et change le texte du label.
         /// </summary>
         public void UpdateTime()
         {
@@ -88,7 +88,7 @@ namespace LibraryData
         }
 
         /// <summary>
-        /// Fonction qui positionne le label par rapport à la picturebox
+        /// Function qui positionne le label par rapport à la picturebox
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -116,7 +116,7 @@ namespace LibraryData
         public double zoom = 0.1;
 
         /// <summary>
-        /// Fonction qui permet de zoomer dans les miniatures en changant leur taille
+        /// Function qui permet de zoomer dans les miniatures en changant leur taille
         /// </summary>
         public void ChangeZoom()
         {
@@ -137,7 +137,7 @@ namespace LibraryData
         }
 
         /// <summary>
-        /// Fonction qui toutes les seconde lance une mise à jour du temps
+        /// Function qui toutes les seconde lance une mise à jour du temps
         /// </summary>
         private void LaunchTimeUpdate()
         {
@@ -150,7 +150,7 @@ namespace LibraryData
         }
 
         /// <summary>
-        /// Fonction qui lance la mise à jour du temps dans toutes les miniatures
+        /// Function qui lance la mise à jour du temps dans toutes les miniatures
         /// </summary>
         private void UpdateAllTimes()
         {
@@ -161,7 +161,7 @@ namespace LibraryData
         }
 
         /// <summary>
-        /// Fonction qui place toutes les miniatures au bon endroit
+        /// Function qui place toutes les miniatures au bon endroit
         /// </summary>
         public void UpdateAllLocations(int maxwidth)
         {
@@ -185,7 +185,7 @@ namespace LibraryData
         }
 
         /// <summary>
-        /// Fonction pour mettre à jour l'image d'une miniature
+        /// Function pour mettre à jour l'image d'une miniature
         /// </summary>
         /// <param name="id">Id de l'élève</param>
         /// <param name="computername"> Nom de l'ordinateur</param>
@@ -204,7 +204,7 @@ namespace LibraryData
         }
 
         /// <summary>
-        /// Fonction pour ajouter une miniature que le miniatureDisplayer doit gérer
+        /// Function pour ajouter une miniature que le miniatureDisplayer doit gérer
         /// </summary>
         /// <param name="miniature"></param>
         public void AddMiniature(Miniature miniature)
@@ -214,7 +214,7 @@ namespace LibraryData
         }
 
         /// <summary>
-        /// Fonction pour enlever un miniature de la liste que le miniatureDisplayer doit gérer
+        /// Function pour enlever un miniature de la liste que le miniatureDisplayer doit gérer
         /// </summary>
         /// <param name="id">Id de l'éléve</param>
         /// <param name="computername">Le nom de l'ordinateur</param>

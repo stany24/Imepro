@@ -25,9 +25,9 @@ namespace ApplicationTeacher
         }
 
         /// <summary>
-        /// Fonction qui met à jour l'affichage individuel
+        /// Function that updates the display with the new data
         /// </summary>
-        /// <param name="student">Les nouvelles données</param>
+        /// <param name="student">the new data</param>
         public void UpdateAffichage(DataForTeacher student)
         {
             if(Student != null && Student.SocketControl != null) { student.SocketControl = Student.SocketControl; }
@@ -89,6 +89,13 @@ namespace ApplicationTeacher
             }
         }
 
+
+        /// <summary>
+        /// Function to update the urls in the treeview 
+        /// </summary>
+        /// <param name="urls"></param>
+        /// <param name="ProcessName"></param>
+        /// <param name="DisplayName"></param>
         public void UpdateUrlsTree(List<Url> urls, string ProcessName, string DisplayName)
         {
             if (InvokeRequired)
@@ -154,7 +161,7 @@ namespace ApplicationTeacher
         }
 
         /// <summary>
-        /// Fonction qui permet de sauvegarder le screenshot
+        /// Function that saves the current screenshot
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -164,7 +171,7 @@ namespace ApplicationTeacher
         }
 
         /// <summary>
-        /// Fonction qui permet d'envoyer un message à l'élève
+        /// Function that sends a message to the student
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -175,7 +182,7 @@ namespace ApplicationTeacher
         }
 
         /// <summary>
-        /// Fonction qui permet de prendre le controle de l'élève
+        /// Function that allow the teacher to take controle of the student computer
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -193,7 +200,7 @@ namespace ApplicationTeacher
         }
 
         /// <summary>
-        /// Fonction qui permet de recevoir le stream de l'élève
+        /// Function To receive the stream from a student
         /// </summary>
         private void ReceiveStream()
         {
@@ -211,7 +218,7 @@ namespace ApplicationTeacher
         }
 
         /// <summary>
-        /// Fonction qui permet de connecter les élèves qui en font la demande
+        /// Function to connect the student to take control
         /// </summary>
         public void ConnectStudentForControl()
         {
@@ -238,7 +245,7 @@ namespace ApplicationTeacher
         }
 
         /// <summary>
-        /// Fonction qui permet d'arreter une application élève
+        /// Function stop the student application remotly
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -249,6 +256,11 @@ namespace ApplicationTeacher
             this.Close();
         }
 
+        /// <summary>
+        /// Function to stop the selected process in the student computer
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void KillProcess_Click(object sender, EventArgs e)
         {
             if (TreeViewProcesses.SelectedNode == null) { return; }

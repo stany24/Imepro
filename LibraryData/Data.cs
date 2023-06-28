@@ -113,7 +113,7 @@ namespace LibraryData
         }
 
         /// <summary>
-        /// Fonction qui permet de trouver le nom d'utilisateur et le nom de la machine
+        /// Function qui permet de trouver le nom d'utilisateur et le nom de la machine
         /// </summary>
         private void GetNames()
         {
@@ -122,7 +122,7 @@ namespace LibraryData
         }
 
         /// <summary>
-        /// Fonction qui retourne un instance de la classe parente
+        /// Function qui retourne un instance de la classe parente
         /// </summary>
         /// <returns></returns>
         private Data ToData()
@@ -135,7 +135,7 @@ namespace LibraryData
         #region Récupération Url/Processus/Image
 
         /// <summary>
-        /// Fonction qui récupére les urls toutes les secondes
+        /// Function qui récupére les urls toutes les secondes
         /// </summary>
         private void GetAllTabNameEvery5Seconds()
         {
@@ -147,7 +147,7 @@ namespace LibraryData
         }
 
         /// <summary>
-        /// Fonction qui permet de récuperer le nom de l'onglet actif dans tous les navigateurs ouverts
+        /// Function qui permet de récuperer le nom de l'onglet actif dans tous les navigateurs ouverts
         /// </summary>
         private void GetCurrentWebTabsName()
         {
@@ -206,7 +206,7 @@ namespace LibraryData
         }
 
         /// <summary>
-        /// Fonction qui crée une list de processus lancé par l'ordinateur au démarrage de l'application
+        /// Function qui crée une list de processus lancé par l'ordinateur au démarrage de l'application
         /// </summary>
         private void GetDefaultProcesses()
         {
@@ -214,7 +214,7 @@ namespace LibraryData
         }
 
         /// <summary>
-        /// Fonction qui met à jour la list des processus lancé par l'utilisateur
+        /// Function qui met à jour la list des processus lancé par l'utilisateur
         /// </summary>
         private void GetUserProcesses()
         {
@@ -227,7 +227,7 @@ namespace LibraryData
         }
 
         /// <summary>
-        /// Fonction qui permet de prendre une capture d'écran de tous les écran puis de les recomposer en une seul image
+        /// Function qui permet de prendre une capture d'écran de tous les écran puis de les recomposer en une seul image
         /// </summary>
         private Bitmap TakeAllScreenShot()
         {
@@ -262,7 +262,7 @@ namespace LibraryData
         }
 
         /// <summary>
-        /// Fonction qui prend en screenshot l'écran demandé
+        /// Function qui prend en screenshot l'écran demandé
         /// </summary>
         /// <param name="screen">L'écran que l'on veux prendre en screenshot</param>
         /// <returns></returns>
@@ -283,7 +283,7 @@ namespace LibraryData
         #region Envoi de données
 
         /// <summary>
-        /// Fonction qui sérialize les données puis les envoient au professeur
+        /// Function qui sérialize les données puis les envoient au professeur
         /// </summary>
         private void SendData()
         {
@@ -296,7 +296,7 @@ namespace LibraryData
         }
 
         /// <summary>
-        /// Fonction qui envoie le screenshot au professeur
+        /// Function qui envoie le screenshot au professeur
         /// </summary>
         private void SendImage(Bitmap image, Socket socket)
         {
@@ -311,7 +311,7 @@ namespace LibraryData
         #region Connexion/Reception
 
         /// <summary>
-        /// Fonction qui connecte cette application à l'application du professeur
+        /// Function qui connecte cette application à l'application du professeur
         /// </summary>
         public Socket ConnectToTeacher(int port)
         {
@@ -366,7 +366,7 @@ namespace LibraryData
         }
 
         /// <summary>
-        /// Fonction qui attend les demandes du professeur et lance la bonne fonction pour y répondre
+        /// Function qui attend les demandes du professeur et lance la bonne fonction pour y répondre
         /// </summary>
         private void WaitForDemand()
         {
@@ -401,7 +401,7 @@ namespace LibraryData
         }
 
         /// <summary>
-        /// Fonction qui arrête un processus
+        /// Function qui arrête un processus
         /// </summary>
         /// <param name="id">l'id du processus que l'on veux arreter</param>
         private void KillSelectedProcess(int id)
@@ -410,7 +410,7 @@ namespace LibraryData
         }
 
         /// <summary>
-        /// Fonction qui permet à l'élève de se reconnecter après une déconnection
+        /// Function qui permet à l'élève de se reconnecter après une déconnection
         /// </summary>
         private void Disconnect()
         {
@@ -422,7 +422,7 @@ namespace LibraryData
         }
 
         /// <summary>
-        /// Fonction qui arrête le l'application à la demande du professeur
+        /// Function qui arrête le l'application à la demande du professeur
         /// </summary>
         private void ShutDown()
         {
@@ -432,7 +432,7 @@ namespace LibraryData
         }
 
         /// <summary>
-        /// Fonction qui remet l'application dans un état normal après un stream
+        /// Function qui remet l'application dans un état normal après un stream
         /// </summary>
         private void Stop()
         {
@@ -444,7 +444,7 @@ namespace LibraryData
         }
 
         /// <summary>
-        /// Fonction qui envoie le stream au professeur
+        /// Function qui envoie le stream au professeur
         /// </summary>
         private void SendStream()
         {
@@ -457,7 +457,7 @@ namespace LibraryData
         }
 
         /// <summary>
-        /// Fonction qui recoit la liste des urls autorisés
+        /// Function qui recoit la liste des urls autorisés
         /// </summary>
         private void ReceiveAuthorisedUrls()
         {
@@ -468,7 +468,7 @@ namespace LibraryData
         }
 
         /// <summary>
-        /// Fonction qui recoit un message du professeur
+        /// Function qui recoit un message du professeur
         /// </summary>
         private void ReceiveMessage()
         {
@@ -483,7 +483,7 @@ namespace LibraryData
         #region Stream
 
         /// <summary>
-        /// Fonction qui recoit la diffusion multicast envoyée par le professeur
+        /// Function qui recoit la diffusion multicast envoyée par le professeur
         /// </summary>
         private void ReceiveMulticastStream()
         {
@@ -544,7 +544,7 @@ namespace LibraryData
         }
 
         /// <summary>
-        /// Fonction qui recoit les paramêtre du stream et les appliques
+        /// Function qui recoit les paramêtre du stream et les appliques
         /// </summary>
         private void ApplyMulticastSettings()
         {
@@ -589,7 +589,7 @@ namespace LibraryData
         #region Blocage
 
         /// <summary>
-        /// Fonction qui bloque toutes les touches du clavier
+        /// Function qui bloque toutes les touches du clavier
         /// </summary>
         private void DisableKeyboard()
         {
@@ -603,7 +603,7 @@ namespace LibraryData
         }
 
         /// <summary>
-        /// Fonction qui gére les touches pressé en les ignorants
+        /// Function qui gére les touches pressé en les ignorants
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -613,7 +613,7 @@ namespace LibraryData
         }
 
         /// <summary>
-        /// Fonction qui mininmize les applications non autorisées toutes les secondes
+        /// Function qui mininmize les applications non autorisées toutes les secondes
         /// </summary>
         private void MinimizeUnAutorisedEverySecond()
         {
@@ -626,7 +626,7 @@ namespace LibraryData
         }
 
         /// <summary>
-        /// Fonction qui désactive la souris toutes les seconde
+        /// Function qui désactive la souris toutes les seconde
         /// </summary>
         private void DisableMouseEverySecond()
         {
@@ -641,7 +641,7 @@ namespace LibraryData
 
 
         /// <summary>
-        /// Fonction qui bloque la souris
+        /// Function qui bloque la souris
         /// </summary>
         private void DisableMouse()
         {
@@ -655,7 +655,7 @@ namespace LibraryData
         }
 
         /// <summary>
-        /// Fonction qui réactive la souris
+        /// Function qui réactive la souris
         /// </summary>
         private void EnableMouse()
         {
