@@ -19,7 +19,7 @@ using System.Windows.Forms;
 namespace LibraryData
 {
     /// <summary>
-    /// Class parente, utilisé pour les données qui sont transferé de l'élève au professeur
+    /// Class  that represent a basic student
     /// </summary>
     [Serializable]
     public class Data
@@ -47,7 +47,7 @@ namespace LibraryData
     }
 
     /// <summary>
-    /// Class qui représente un élève dans l'application professeur
+    /// Class that represent a student in the teacher application
     /// </summary>
     public class DataForTeacher : Data
     {
@@ -68,11 +68,6 @@ namespace LibraryData
             ComputerName = data.ComputerName;
             Urls = data.Urls;
             Processes = data.Processes;
-        }
-
-        public override string ToString()
-        {
-            return UserName + " " + ComputerName;
         }
     }
 
@@ -101,6 +96,9 @@ namespace LibraryData
         public List<string> AutorisedUrls = new();
         readonly private List<string> browsersList = new() { "chrome", "firefox", "iexplore", "safari", "opera", "msedge" };
         public List<int> SeleniumProcessesID = new();
+        Socket SocketMulticast;
+        SocketAsyncEventArgs receiveArgs;
+        readonly List<byte> byteImage = new();
         public DataForStudent(ListBox lbxconnexion, PictureBox pbxscreenshot, ListBox tbxmessage, Form form)
         {
             lbxConnexion = lbxconnexion;
@@ -113,7 +111,7 @@ namespace LibraryData
         }
 
         /// <summary>
-        /// Function qui permet de trouver le nom d'utilisateur et le nom de la machine
+        /// Function to get the computer name and the user name
         /// </summary>
         private void GetNames()
         {
@@ -122,7 +120,7 @@ namespace LibraryData
         }
 
         /// <summary>
-        /// Function qui retourne un instance de la classe parente
+        /// Function returning an instance of the parent class
         /// </summary>
         /// <returns></returns>
         private Data ToData()
@@ -135,7 +133,7 @@ namespace LibraryData
         #region Récupération Url/Processus/Image
 
         /// <summary>
-        /// Function qui récupére les urls toutes les secondes
+        /// Function to get all url every second
         /// </summary>
         private void GetAllTabNameEvery5Seconds()
         {
@@ -147,7 +145,7 @@ namespace LibraryData
         }
 
         /// <summary>
-        /// Function qui permet de récuperer le nom de l'onglet actif dans tous les navigateurs ouverts
+        /// Function to get the tab name in all browser
         /// </summary>
         private void GetCurrentWebTabsName()
         {
@@ -185,6 +183,11 @@ namespace LibraryData
             }
         }
 
+        /// <summary>
+        /// Function to get the parent of a process
+        /// </summary>
+        /// <param name="process"></param>
+        /// <returns></returns>
         public Process GetParent(Process process)
         {
             try
@@ -206,7 +209,7 @@ namespace LibraryData
         }
 
         /// <summary>
-        /// Function qui crée une list de processus lancé par l'ordinateur au démarrage de l'application
+        /// Function to get the default processes when launching the application
         /// </summary>
         private void GetDefaultProcesses()
         {
@@ -214,7 +217,7 @@ namespace LibraryData
         }
 
         /// <summary>
-        /// Function qui met à jour la list des processus lancé par l'utilisateur
+        /// Function to update the processes launched by the user
         /// </summary>
         private void GetUserProcesses()
         {
@@ -227,14 +230,13 @@ namespace LibraryData
         }
 
         /// <summary>
-        /// Function qui permet de prendre une capture d'écran de tous les écran puis de les recomposer en une seul image
+        /// Function to get a screenshot of all screen in one image
         /// </summary>
         private Bitmap TakeAllScreenShot()
         {
             int TotalWidth = 0;
             int MaxHeight = 0;
             List<Bitmap> images = new();
-            //prend une capture d'écran de tout les écran
             foreach (Screen screen in Screen.AllScreens)
             {
                 TakeSreenShot(screen);
@@ -248,13 +250,11 @@ namespace LibraryData
                 Graphics FullGraphics = Graphics.FromImage(FullImage);
 
                 int offsetLeft = 0;
-                //Crée une seul image de toutes les captures d'écran
                 foreach (Bitmap image in images)
                 {
                     FullGraphics.DrawImage(image, new Point(offsetLeft, 0));
                     offsetLeft += image.Width;
                 }
-                //FullImage = (new Bitmap(FullImage, new Size(200,200)));
                 FullGraphics.Dispose();
                 return FullImage;
             }
@@ -262,9 +262,9 @@ namespace LibraryData
         }
 
         /// <summary>
-        /// Function qui prend en screenshot l'écran demandé
+        /// Function to take a screenshot of the given screen
         /// </summary>
-        /// <param name="screen">L'écran que l'on veux prendre en screenshot</param>
+        /// <param name="screen">the screen we want the screenshot</param>
         /// <returns></returns>
         private Bitmap TakeSreenShot(Screen screen)
         {
@@ -283,7 +283,7 @@ namespace LibraryData
         #region Envoi de données
 
         /// <summary>
-        /// Function qui sérialize les données puis les envoient au professeur
+        /// Function send the data to the teacher
         /// </summary>
         private void SendData()
         {
@@ -296,7 +296,7 @@ namespace LibraryData
         }
 
         /// <summary>
-        /// Function qui envoie le screenshot au professeur
+        /// Function to send the screenshot to the teacher
         /// </summary>
         private void SendImage(Bitmap image, Socket socket)
         {
@@ -311,7 +311,7 @@ namespace LibraryData
         #region Connexion/Reception
 
         /// <summary>
-        /// Function qui connecte cette application à l'application du professeur
+        /// Function used to connect to the teacher application
         /// </summary>
         public Socket ConnectToTeacher(int port)
         {
@@ -366,7 +366,7 @@ namespace LibraryData
         }
 
         /// <summary>
-        /// Function qui attend les demandes du professeur et lance la bonne fonction pour y répondre
+        /// Function waiting for teacher demand and responding correctly
         /// </summary>
         private void WaitForDemand()
         {
@@ -401,16 +401,16 @@ namespace LibraryData
         }
 
         /// <summary>
-        /// Function qui arrête un processus
+        /// Function to stop a process
         /// </summary>
-        /// <param name="id">l'id du processus que l'on veux arreter</param>
+        /// <param name="id">the id of the process</param>
         private void KillSelectedProcess(int id)
         {
             Process.GetProcessById(id).Kill();
         }
 
         /// <summary>
-        /// Function qui permet à l'élève de se reconnecter après une déconnection
+        /// Function to reconnect to the teacher
         /// </summary>
         private void Disconnect()
         {
@@ -422,7 +422,7 @@ namespace LibraryData
         }
 
         /// <summary>
-        /// Function qui arrête le l'application à la demande du professeur
+        /// Function to stop the application
         /// </summary>
         private void ShutDown()
         {
@@ -432,7 +432,7 @@ namespace LibraryData
         }
 
         /// <summary>
-        /// Function qui remet l'application dans un état normal après un stream
+        /// Function to go back to normal after a stream
         /// </summary>
         private void Stop()
         {
@@ -444,7 +444,7 @@ namespace LibraryData
         }
 
         /// <summary>
-        /// Function qui envoie le stream au professeur
+        /// Function to send the stream to the teacher
         /// </summary>
         private void SendStream()
         {
@@ -457,7 +457,7 @@ namespace LibraryData
         }
 
         /// <summary>
-        /// Function qui recoit la liste des urls autorisés
+        /// Function to receive the autorised urls
         /// </summary>
         private void ReceiveAuthorisedUrls()
         {
@@ -468,7 +468,7 @@ namespace LibraryData
         }
 
         /// <summary>
-        /// Function qui recoit un message du professeur
+        /// Function to receive a message from the teacher
         /// </summary>
         private void ReceiveMessage()
         {
@@ -483,7 +483,7 @@ namespace LibraryData
         #region Stream
 
         /// <summary>
-        /// Function qui recoit la diffusion multicast envoyée par le professeur
+        /// Function that receive the multicast stream form the teacher
         /// </summary>
         private void ReceiveMulticastStream()
         {
@@ -500,10 +500,10 @@ namespace LibraryData
             BeginReceive(receiveArgs);
         }
 
-        Socket SocketMulticast;
-        SocketAsyncEventArgs receiveArgs;
-        readonly List<byte> byteImage = new();
-
+        /// <summary>
+        /// Function to start receiving the multicast stream
+        /// </summary>
+        /// <param name="args"></param>
         private void BeginReceive(SocketAsyncEventArgs args)
         {
             isReceiving = true;
@@ -512,11 +512,20 @@ namespace LibraryData
                 ProcessReceive(args);
         }
 
+        /// <summary>
+        /// Function to end the multicast stream
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="args"></param>
         private void ReceiveCompleted(object sender, SocketAsyncEventArgs args)
         {
             ProcessReceive(args);
         }
 
+        /// <summary>
+        /// Function to receive the multicast stream
+        /// </summary>
+        /// <param name="args"></param>
         private void ProcessReceive(SocketAsyncEventArgs args)
         {
             Socket socket = (Socket)args.UserToken;
@@ -544,7 +553,7 @@ namespace LibraryData
         }
 
         /// <summary>
-        /// Function qui recoit les paramêtre du stream et les appliques
+        /// Function that receive the multicast stream settings and apply them
         /// </summary>
         private void ApplyMulticastSettings()
         {
@@ -589,7 +598,7 @@ namespace LibraryData
         #region Blocage
 
         /// <summary>
-        /// Function qui bloque toutes les touches du clavier
+        /// Function to block all keyboard inputs
         /// </summary>
         private void DisableKeyboard()
         {
@@ -603,7 +612,7 @@ namespace LibraryData
         }
 
         /// <summary>
-        /// Function qui gére les touches pressé en les ignorants
+        /// Function to ignore pressed key
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -613,7 +622,7 @@ namespace LibraryData
         }
 
         /// <summary>
-        /// Function qui mininmize les applications non autorisées toutes les secondes
+        /// Function to minimized unauthorised application every second
         /// </summary>
         private void MinimizeUnAutorisedEverySecond()
         {
@@ -626,7 +635,7 @@ namespace LibraryData
         }
 
         /// <summary>
-        /// Function qui désactive la souris toutes les seconde
+        /// Function that disables the mouse every second
         /// </summary>
         private void DisableMouseEverySecond()
         {
@@ -641,7 +650,7 @@ namespace LibraryData
 
 
         /// <summary>
-        /// Function qui bloque la souris
+        /// Function to block the mouse
         /// </summary>
         private void DisableMouse()
         {
@@ -655,7 +664,7 @@ namespace LibraryData
         }
 
         /// <summary>
-        /// Function qui réactive la souris
+        /// Function to enable the mouse
         /// </summary>
         private void EnableMouse()
         {
