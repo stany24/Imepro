@@ -27,7 +27,7 @@ namespace ApplicationTeacher
         }
     }
     /// <summary>
-    /// Classe pour tous les paramètres de configuraion
+    /// Class pour tous les paramètres de configuraion
     /// </summary>
     public static class ConfigurationStatic
     {

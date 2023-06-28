@@ -6,7 +6,7 @@ using System.Text.Json;
 namespace ApplicationCliente
 {
     /// <summary>
-    /// Classe containing all ip for a week
+    /// Class containing all ip for a week
     /// </summary>
     [Serializable]
     public static class IpForTheWeek

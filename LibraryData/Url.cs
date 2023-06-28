@@ -7,7 +7,7 @@ namespace LibraryData
 {
 
     /// <summary>
-    /// Classe qui reprèsente un historique des urls pour tous les navigateurs
+    /// Class that holds the history of all browser
     /// </summary>
     [Serializable]
     public class HistoriqueUrls
@@ -16,6 +16,11 @@ namespace LibraryData
         [JsonInclude]
         public Dictionary<string, List<Url>> AllBrowser = new();
 
+        /// <summary>
+        /// Function to add a new url
+        /// </summary>
+        /// <param name="url">the url</param>
+        /// <param name="browser">the browser the url comes from</param>
         public void AddUrl(Url url,string browser)
         {
 
@@ -31,7 +36,7 @@ namespace LibraryData
     }
 
     /// <summary>
-    /// Classe qui représente un Url
+    /// Class representing an url
     /// </summary>
     [Serializable]
     public class Url
@@ -46,6 +51,7 @@ namespace LibraryData
             CaptureTime = capturetime;
             Name = name;
         }
+
         public override string ToString()
         {
             return CaptureTime.ToString("HH:mm:ss") + " " + Name;

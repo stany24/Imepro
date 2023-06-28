@@ -9,7 +9,7 @@ using System.Windows.Forms;
 namespace LibraryData
 {
     /// <summary>
-    /// Classe pour les miniatures: une capture d'écran avec en desous le nom du poste
+    /// Class pour les miniatures: une capture d'écran avec en desous le nom du poste
     /// </summary>
     public class Miniature : UserControl
     {
@@ -106,7 +106,7 @@ namespace LibraryData
     }
 
     /// <summary>
-    /// Classe pour Afficher plusieurs miniatures dans un panel
+    /// Class pour Afficher plusieurs miniatures dans un panel
     /// </summary>
     public class MiniatureDisplayer
     {

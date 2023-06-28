@@ -6,6 +6,9 @@ using System.Text;
 
 namespace LibraryData
 {
+    /// <summary>
+    /// Class that handles sending and receiving a message 
+    /// </summary>
     public class CustomMessage
     {
         readonly List<byte> data = new();

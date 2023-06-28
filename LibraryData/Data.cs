@@ -47,7 +47,7 @@ namespace LibraryData
     }
 
     /// <summary>
-    /// Classe qui représente un élève dans l'application professeur
+    /// Class qui représente un élève dans l'application professeur
     /// </summary>
     public class DataForTeacher : Data
     {
@@ -77,7 +77,7 @@ namespace LibraryData
     }
 
     /// <summary>
-    /// Classe qui contient toute la logique pour faire fonctionner l'application cliente
+    /// Class qui contient toute la logique pour faire fonctionner l'application cliente
     /// </summary>
     public class DataForStudent : Data, IMessageFilter
     {
