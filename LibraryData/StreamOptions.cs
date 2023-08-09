@@ -5,7 +5,7 @@ using System.Text.Json.Serialization;
 namespace LibraryData
 {
     /// <summary>
-    /// Classe qui contient les options du stream
+    /// Class containing the options for the stream
     /// </summary>
     [Serializable]
     public class StreamOptions

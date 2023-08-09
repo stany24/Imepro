@@ -39,8 +39,8 @@
             this.lbxAdresses.Name = "lbxAdresses";
             this.lbxAdresses.Size = new System.Drawing.Size(234, 186);
             this.lbxAdresses.TabIndex = 0;
-            this.lbxAdresses.SelectedIndexChanged += new System.EventHandler(this.SelectedIpAdressChanged);
-            this.lbxAdresses.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.DoubleClickOnIpAdress);
+            this.lbxAdresses.SelectedIndexChanged += new System.EventHandler(this.Adresses_Changed);
+            this.lbxAdresses.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.Adresses_DoubleClick);
             // 
             // btnConfirmer
             // 

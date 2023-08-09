@@ -37,7 +37,7 @@ namespace ApplicationTeacher
         #region Display update
 
         /// <summary>
-        /// Fonction qui met à jour l'affichage individuel
+        /// Function that updates the display with the new data
         /// </summary>
         /// <param name="student">Les nouvelles données</param>
         public void UpdateAffichage(DataForTeacher student,bool filterEnabled)
@@ -70,7 +70,7 @@ namespace ApplicationTeacher
         #region Teacher action
 
         /// <summary>
-        /// Fonction qui permet de sauvegarder le screenshot
+        /// Function that saves the current screenshot
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -80,7 +80,7 @@ namespace ApplicationTeacher
         }
 
         /// <summary>
-        /// Fonction qui permet d'envoyer un message à l'élève
+        /// Function that sends a message to the student
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -91,7 +91,7 @@ namespace ApplicationTeacher
         }
 
         /// <summary>
-        /// Fonction qui permet de prendre le controle de l'élève
+        /// Function that allow the teacher to take controle of the student computer
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -157,7 +157,7 @@ namespace ApplicationTeacher
         }
 
         /// <summary>
-        /// Fonction qui permet de connecter les élèves qui en font la demande
+        /// Function to connect the student to take control
         /// </summary>
         public void ConnectStudentForControl()
         {

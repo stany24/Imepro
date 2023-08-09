@@ -8,7 +8,7 @@ using System.Windows.Forms;
 namespace LibraryData
 {
     /// <summary>
-    /// Classe pour intercepter les touches du clavier avant quelles n'attaigne les applications
+    /// Class to intercept the keyboard strokes to handle them.
     /// </summary>
     public class GlobalKeyboardHook
     {
@@ -125,7 +125,7 @@ namespace LibraryData
     }
 
     /// <summary>
-    /// Classe pour gérer l'affichage des autres applications
+    /// Class to manage the size of other applications
     /// </summary>
     public class WindowMinimize
     {
@@ -146,7 +146,7 @@ namespace LibraryData
         #region Public Methods
 
         /// <summary>
-        /// Fonction qui minimize toutes les applications interdites
+        /// Function that minimize all unautorised applications
         /// </summary>
         /// <param name="autorisedProcesses"></param>
         public static void MinimizeUnAuthorised(List<string> autorisedProcesses)
@@ -163,7 +163,7 @@ namespace LibraryData
             }
         }
         /// <summary>
-        /// Fonction qui affiche à nouveau toutes les applications
+        /// Function that show all application
         /// </summary>
         public static void ShowBack()
         {
