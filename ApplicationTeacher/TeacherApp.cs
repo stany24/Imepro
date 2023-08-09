@@ -17,6 +17,8 @@ namespace ApplicationTeacher
 {
     public partial class TeacherApp : Form
     {
+        #region Variables
+
         bool FilterEnabled = true;
         readonly MiniatureDisplayer Displayer;
         readonly List<DataForTeacher> AllStudents = new();
@@ -26,6 +28,8 @@ namespace ApplicationTeacher
         bool isAsking = false;
         int NextId = 0;
         IPAddress ipAddr = null;
+
+        #endregion
 
         public TeacherApp()
         {
@@ -166,7 +170,7 @@ namespace ApplicationTeacher
                 {
                     if (display.Student.ID == student.ID)
                     {
-                        display.UpdateAffichage(student);
+                        display.UpdateAffichage(student,FilterEnabled);
                     }
                 }
             }
@@ -299,40 +303,8 @@ namespace ApplicationTeacher
                 catch { nodeNavigateurs = nodeStudent.Nodes.Add("Navigateurs:"); }
                 //Mise à jour des processus
                 nodeProcess.Nodes.Clear();
-                foreach(KeyValuePair<int,string> process in student.Processes) {
-                    TreeNode current = nodeProcess.Nodes.Add(process.Value);
-                    if (FilterEnabled)
-                    {
-                        if (Properties.Settings.Default.AlertedProcesses.Contains(process.Value))
-                        {
-                            current.BackColor = Color.Red;
-                            while (current.Parent != null)
-                            {
-                                current = current.Parent;
-                                current.BackColor = Color.Red;
-                            }
-                        }
-                    }
-                    else{
-                        if(Properties.Settings.Default.IgnoredProcesses.Contains(process.Value))
-                        {
-                            current.BackColor = Color.Yellow;/*current.Remove();*/
-                        }
-                    }
-                }
-                foreach (KeyValuePair<string, List<Url>> browser in student.Urls.AllBrowser)
-                {
-                    if (browser.Value.Count > 0)
-                    {
-                        if (nodeNavigateurs.Nodes.Find(browser.Key, false).Count() == 0) { nodeNavigateurs.Nodes.Add(browser.Key, browser.Key); }
-                        TreeNode nodeBrowser = nodeNavigateurs.Nodes.Find(browser.Key, false)[0];
-                        for (int i = nodeBrowser.Nodes.Count; i < browser.Value.Count; i++)
-                        {
-                            nodeBrowser.Nodes.Add(browser.Value[i].ToString());
-                        }
-
-                    }
-                }
+                UpdateTreeView.UpdateProcess(student,nodeProcess,null,FilterEnabled, Properties.Settings.Default.AlertedProcesses, Properties.Settings.Default.IgnoredProcesses);
+                UpdateTreeView.UpdateUrls(student,nodeNavigateurs,null);
             }));
             // Mise à jour du TreeView pour la sélection
             TreeViewSelect.Invoke(new MethodInvoker(delegate {
@@ -561,7 +533,7 @@ namespace ApplicationTeacher
             }
             DisplayStudent newDisplay = new(ipAddr);
             AllStudentsDisplay.Add(newDisplay);
-            newDisplay.UpdateAffichage(student);
+            newDisplay.UpdateAffichage(student,FilterEnabled);
             newDisplay.FormClosing += new FormClosingEventHandler(RemovePrivateDisplay);
             newDisplay.Show();
         }

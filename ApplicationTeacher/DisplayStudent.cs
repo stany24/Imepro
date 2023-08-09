@@ -15,143 +15,54 @@ namespace ApplicationTeacher
 {
     public partial class DisplayStudent : Form
     {
+        #region Variables
+
         public DataForTeacher Student = null;
         public IPAddress ipAddr = null;
         PictureBox pbxStream;
+
+        #endregion
+
         public DisplayStudent(IPAddress ip)
         {
             ipAddr= ip;
             InitializeComponent();
         }
 
+        #region Display update
+
         /// <summary>
         /// Fonction qui met à jour l'affichage individuel
         /// </summary>
         /// <param name="student">Les nouvelles données</param>
-        public void UpdateAffichage(DataForTeacher student)
+        public void UpdateAffichage(DataForTeacher student,bool filterEnabled)
         {
             if(Student != null && Student.SocketControl != null) { student.SocketControl = Student.SocketControl; }
             Student= student;
             if (InvokeRequired)
             {
+                Invoke(new MethodInvoker(delegate { this.Text = student.UserName; }));
                 lblPoste.Invoke(new MethodInvoker(delegate { lblPoste.Text = "Poste: " + student.ComputerName; }));
                 lblUserName.Invoke(new MethodInvoker(delegate { lblUserName.Text = "Nom: " + student.UserName; }));
                 TreeViewProcesses.Invoke(new MethodInvoker(delegate {
-                    foreach (KeyValuePair<int, string> process in student.Processes) {
-                        TreeNode current = TreeViewProcesses.Nodes.Add(Convert.ToString(process.Key), process.Value);
-                        if (Properties.Settings.Default.AlertedProcesses.Contains(process.Value))
-                        {
-                            current.BackColor = Color.Red;
-                            while (current.Parent != null)
-                            {
-                                current = current.Parent;
-                                current.BackColor = Color.Red;
-                            }
-                        }
-                    }
-                }));
-
+                    TreeViewProcesses.Nodes.Clear();
+                    UpdateTreeView.UpdateProcess(student, null, TreeViewProcesses, filterEnabled, Properties.Settings.Default.AlertedProcesses, Properties.Settings.Default.IgnoredProcesses); }));
                 TreeViewUrls.Invoke(new MethodInvoker(delegate {
-                    UpdateUrlsTree(student.Urls.AllBrowser["chrome"] , "chrome","Chrome");
-                    UpdateUrlsTree(student.Urls.AllBrowser["firefox"], "firefox","Firefox");
-                    UpdateUrlsTree(student.Urls.AllBrowser["msedge"], "msedge","Edge");
-                    UpdateUrlsTree(student.Urls.AllBrowser["opera"], "opera","Opera");
-                    UpdateUrlsTree(student.Urls.AllBrowser["iexplorer"], "iexplorer","Internet Explorer");
-                    UpdateUrlsTree(student.Urls.AllBrowser["safari"], "safari","Safari");
-                }));
-                pbxScreenShot.Invoke(new MethodInvoker(delegate { pbxScreenShot.Image = student.ScreenShot; }));
+                    UpdateTreeView.UpdateUrls(student, null, TreeViewUrls); }));
             }
             else
             {
                 Text = student.UserName;
                 lblPoste.Text = "Poste: " + student.ComputerName;
                 lblUserName.Text = "Nom: " + student.UserName;
-                foreach (KeyValuePair<int, string> process in student.Processes)
-                {
-                    TreeNode current = TreeViewProcesses.Nodes.Add(Convert.ToString(process.Key), process.Value);
-                    if (Properties.Settings.Default.AlertedProcesses.Contains(process.Value))
-                    {
-                        current.BackColor = Color.Red;
-                        while (current.Parent != null)
-                        {
-                            current = current.Parent;
-                            current.BackColor = Color.Red;
-                        }
-                    }
-                }
-                UpdateUrlsTree(student.Urls.AllBrowser["chrome"], "chrome", "Chrome");
-                UpdateUrlsTree(student.Urls.AllBrowser["firefox"], "firefox", "Firefox");
-                UpdateUrlsTree(student.Urls.AllBrowser["msedge"], "msedge", "Edge");
-                UpdateUrlsTree(student.Urls.AllBrowser["opera"], "opera", "Opera");
-                UpdateUrlsTree(student.Urls.AllBrowser["iexplorer"], "iexplorer", "Internet Explorer");
-                UpdateUrlsTree(student.Urls.AllBrowser["safari"], "safari", "Safari");
-                pbxScreenShot.Image = student.ScreenShot;
+                UpdateTreeView.UpdateProcess(student,null, TreeViewProcesses, filterEnabled, Properties.Settings.Default.AlertedProcesses, Properties.Settings.Default.IgnoredProcesses);
+                UpdateTreeView.UpdateUrls(student,null ,TreeViewUrls);
             }
         }
 
-        public void UpdateUrlsTree(List<Url> urls, string ProcessName, string DisplayName)
-        {
-            if (InvokeRequired)
-            {
-                TreeViewUrls.Invoke(new MethodInvoker(delegate {
-                    if (urls.Count == 0) { try { TreeViewUrls.Nodes.Find(ProcessName, false)[0].Remove(); } catch { }; return; }
+        #endregion
 
-                    TreeNode NodeNavigateur;
-                    try{NodeNavigateur = TreeViewUrls.Nodes.Find(ProcessName, false)[0];}
-                    catch{NodeNavigateur = TreeViewUrls.Nodes.Add(ProcessName, DisplayName);}
-
-                    bool isAlerted = false;
-                        for (int i = NodeNavigateur.Nodes.Count; i < urls.Count; i++)
-                        {
-                            TreeNode NodeUrl = NodeNavigateur.Nodes.Add(urls[i].ToString());
-                            for (int j = 0; j < Properties.Settings.Default.AlertedUrls.Count; j++)
-                            {
-                                if (urls[i].Name.ToLower().Contains(Properties.Settings.Default.AlertedUrls[j]))
-                                {
-                                    NodeUrl.BackColor = Color.Red;
-                                    NodeNavigateur.BackColor = Color.Red;
-                                    isAlerted = true;
-                                }
-                            }
-                            if (isAlerted == false)
-                            {
-                                NodeUrl.BackColor = Color.White;
-                                NodeNavigateur.BackColor = Color.White;
-                            }
-                        }
-                    return;
-                }));
-            }
-            else
-            {
-                if (urls.Count == 0) { try { TreeViewUrls.Nodes.Find(ProcessName, false)[0].Remove(); } catch { }; return; }
-
-                TreeNode NodeNavigateur;
-                try { NodeNavigateur = TreeViewUrls.Nodes.Find(ProcessName, false)[0]; }
-                catch { NodeNavigateur = TreeViewUrls.Nodes.Add(ProcessName, DisplayName); }
-
-                bool isAlerted = false;
-                for (int i = NodeNavigateur.Nodes.Count; i < urls.Count; i++)
-                {
-                    TreeNode NodeUrl = NodeNavigateur.Nodes.Add(urls[i].ToString());
-                    for (int j = 0; j < Properties.Settings.Default.AlertedUrls.Count; j++)
-                    {
-                        if (urls[i].Name.ToLower().Contains(Properties.Settings.Default.AlertedUrls[j]))
-                        {
-                            NodeUrl.BackColor = Color.Red;
-                            NodeNavigateur.BackColor = Color.Red;
-                            isAlerted = true;
-                        }
-                    }
-                    if (isAlerted == false)
-                    {
-                        NodeUrl.BackColor = Color.White;
-                        NodeNavigateur.BackColor = Color.White;
-                    }
-                }
-                return;
-            }
-        }
+        #region Teacher action
 
         /// <summary>
         /// Fonction qui permet de sauvegarder le screenshot
@@ -191,6 +102,34 @@ namespace ApplicationTeacher
             Controls.SetChildIndex(pbxStream, 0);
             Task.Run(ReceiveStream);
         }
+
+        /// <summary>
+        /// Fonction qui permet d'arreter une application élève
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ShutDown_Click(object sender, EventArgs e)
+        {
+            Student.SocketToStudent.Send(Encoding.ASCII.GetBytes("shutdown"));
+            Student.SocketToStudent.Disconnect(false);
+            this.Close();
+        }
+
+        /// <summary>
+        /// Fonction qui arrete le processus séléctionné chez l'élève
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void KillProcess_Click(object sender, EventArgs e)
+        {
+            if (TreeViewProcesses.SelectedNode == null) { return; }
+            Student.SocketToStudent.Send(Encoding.ASCII.GetBytes("kill " + TreeViewProcesses.SelectedNode.Name));
+            TreeViewProcesses.SelectedNode.Remove();
+        }
+
+        #endregion
+
+        #region Remote control
 
         /// <summary>
         /// Fonction qui permet de recevoir le stream de l'élève
@@ -237,23 +176,6 @@ namespace ApplicationTeacher
             }
         }
 
-        /// <summary>
-        /// Fonction qui permet d'arreter une application élève
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void ShutDown_Click(object sender, EventArgs e)
-        {
-            Student.SocketToStudent.Send(Encoding.ASCII.GetBytes("shutdown"));
-            Student.SocketToStudent.Disconnect(false);
-            this.Close();
-        }
-
-        private void KillProcess_Click(object sender, EventArgs e)
-        {
-            if (TreeViewProcesses.SelectedNode == null) { return; }
-            Student.SocketToStudent.Send(Encoding.ASCII.GetBytes("kill "+TreeViewProcesses.SelectedNode.Name));
-            TreeViewProcesses.SelectedNode.Remove();
-        }
+        #endregion
     }
 }
