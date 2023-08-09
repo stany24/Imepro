@@ -36,7 +36,6 @@ namespace ApplicationCliente
                 Student.IpToTeacher = IpForTheWeek.GetIp();
             }catch(Exception){
                 NewTeacherIP(new object(),new EventArgs());
-                Student.IpToTeacher = IpForTheWeek.GetIp();
             }
             Task.Run(LaunchTasks);
         }
@@ -129,6 +128,7 @@ namespace ApplicationCliente
             prompt.ShowDialog();
             prompt.Close();
             prompt.Dispose();
+            Student.IpToTeacher = IpForTheWeek.GetIp();
         }
 
         /// <summary>

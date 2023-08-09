@@ -303,10 +303,12 @@ namespace ApplicationTeacher
             AllStudents.Remove(student);
             lbxRequetes.Invoke(new MethodInvoker(delegate { lbxRequetes.Items.Add(DateTime.Now.ToString("HH:mm:ss") + " L'élève " + student.UserName + " est déconnecté"); }));
             TreeViewDetails.Invoke(new MethodInvoker(delegate {
-                TreeViewDetails.Nodes.Find(Convert.ToString(student.ID), false)[0].Remove();
+                TreeNode[] nodes = TreeViewDetails.Nodes.Find(Convert.ToString(student.ID), false);
+                if (nodes.Any()) { nodes[0].Remove(); }
             }));
             TreeViewSelect.Invoke(new MethodInvoker(delegate {
-                TreeViewSelect.Nodes.Find(Convert.ToString(student.ID), false)[0].Remove();
+                TreeNode[] nodes = TreeViewDetails.Nodes.Find(Convert.ToString(student.ID), false);
+                if (nodes.Any()) { nodes[0].Remove(); }
             }));
         }
 

@@ -327,13 +327,16 @@ namespace LibraryData
         {
             try
             {
+                int timeout = 2000;
                 // Establish the remote endpoint for the socket. This example uses port 11111 on the local computer.
                 IPEndPoint localEndPoint = new(IpToTeacher, port);
 
-                // Creation TCP/IP Socket using Socket Class Constructor
-                Socket sender = new(localEndPoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
+                
                 while (true)
                 {
+                    // Creation TCP/IP Socket using Socket Class Constructor
+                    Socket sender = new(localEndPoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
+
                     // Si l'addresse du professeur a changé on adapte le socket
                     if (localEndPoint.Address != IpToTeacher)
                     {
@@ -343,10 +346,20 @@ namespace LibraryData
                     try
                     {
                         // Connect Socket to the remote endpoint using method Connect()
-                        sender.Connect(localEndPoint);
-                        Task.Run(WaitForDemand);
-                        lbxConnexion.Invoke(new MethodInvoker(delegate { lbxConnexion.Items.Add("Connected"); }));
-                        return sender;
+                        var result = sender.BeginConnect(localEndPoint, null, null);
+
+                        bool success = result.AsyncWaitHandle.WaitOne(timeout, true);
+                        if (success)
+                        {
+                            sender.EndConnect(result);
+                            Task.Run(WaitForDemand);
+                            lbxConnexion.Invoke(new MethodInvoker(delegate { lbxConnexion.Items.Add("Connected"); }));
+                            return sender;
+                        }
+                        else {
+                            sender.Close();
+                            lbxConnexion.Invoke(new MethodInvoker(delegate { lbxConnexion.Items.Add("Connexion failed to " +IpToTeacher + " Error: "+result); }));
+                        }
                     }
                     // Manage of Socket's Exceptions
                     catch (ArgumentNullException ane)

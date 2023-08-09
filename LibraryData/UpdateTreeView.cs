@@ -45,7 +45,7 @@ namespace LibraryData
                     TreeNode nodeBrowser;
                     if (nodeNavigateurs != null)
                     {
-                        if (nodeNavigateurs.Nodes.Find(browser.Key, false).Any()) { nodeNavigateurs.Nodes.Add(browser.Key, browser.Key); }
+                        if (!nodeNavigateurs.Nodes.Find(browser.Key, false).Any()) { nodeNavigateurs.Nodes.Add(browser.Key, browser.Key); }
                         nodeBrowser = nodeNavigateurs.Nodes.Find(browser.Key, false)[0];
                     }
                     else
