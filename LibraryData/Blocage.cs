@@ -18,11 +18,11 @@ namespace LibraryData
 
         public struct KeyboardHookStruct
         {
-            public int vkCode;
-            public int scanCode;
-            public int flags;
-            public int time;
-            public int dwExtraInfo;
+            public int VkCode { get; set; }
+            public int ScanCode { get; set; }
+            public int Flags { get; set; }
+            public int Time { get; set; }
+            public int DwExtraInfo { get; set; }
         }
 
         private const int WH_KEYBOARD_LL = 13;
@@ -35,7 +35,7 @@ namespace LibraryData
 
         #region Instance Variables
 
-        public List<Keys> HookedKeys = new();
+        public List<Keys> HookedKeys { get; set; }
         private IntPtr hHook = IntPtr.Zero;
         private static KeyboardHookProc hookProc;
 
@@ -52,6 +52,7 @@ namespace LibraryData
 
         public GlobalKeyboardHook()
         {
+            HookedKeys = new();
             hookProc = HookCallback;
             Hook();
         }
@@ -90,7 +91,7 @@ namespace LibraryData
         {
             if (code >= 0)
             {
-                Keys key = (Keys)lParam.vkCode;
+                Keys key = (Keys)lParam.VkCode;
                 if (HookedKeys.Contains(key))
                 {
                     KeyEventArgs kea = new(key);
@@ -127,7 +128,7 @@ namespace LibraryData
     /// <summary>
     /// Class to manage the size of other applications
     /// </summary>
-    public class WindowMinimize
+    public static class WindowMinimize
     {
         #region Constant
 
@@ -158,7 +159,7 @@ namespace LibraryData
             {
                 if (process.ProcessName != autorisedProcesses[0] && process.ProcessName != thisProcess.ProcessName)
                 {
-                    try { ShowWindow(process.MainWindowHandle, SW_SHOWMINIMIZED); } catch { }
+                    ShowWindow(process.MainWindowHandle, SW_SHOWMINIMIZED);
                 }
             }
         }
@@ -170,7 +171,7 @@ namespace LibraryData
             List<Process> processes = Process.GetProcesses().ToList();
             foreach (Process process in processes)
             {
-                try { ShowWindow(process.MainWindowHandle, SW_SHOW); } catch { }
+                ShowWindow(process.MainWindowHandle, SW_SHOW);
             }
         }
 

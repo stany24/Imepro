@@ -28,7 +28,7 @@ namespace UnitTestClassLibrary
         public void HistoriqueUrlConstructor()
         {
             HistoriqueUrls TestHistory= new HistoriqueUrls();
-            Assert.AreEqual(TestHistory.AllBrowser.Count(),TestHistory.AllBrowserName.Count());
+            Assert.AreEqual(TestHistory.AllBrowser.Count,TestHistory.AllBrowserName.Count());
         }
 
         [TestMethod]
@@ -38,9 +38,9 @@ namespace UnitTestClassLibrary
             foreach (KeyValuePair<string, List<Url>> browser in TestHistory.AllBrowser)
             {
                 TestHistory.AddUrl(new Url(DateTime.Now, browser.Key, "testurl"));
-                Assert.AreEqual(TestHistory.AllBrowser[browser.Key].Count, 1);
+                Assert.AreEqual(1,TestHistory.AllBrowser[browser.Key].Count);
                 TestHistory.AddUrl(new Url(DateTime.Now, browser.Key, "testurl"));
-                Assert.AreEqual(TestHistory.AllBrowser[browser.Key].Count, 1);
+                Assert.AreEqual(1,TestHistory.AllBrowser[browser.Key].Count);
             }
         }
     }

@@ -27,15 +27,15 @@ namespace LibraryData
         #region Variables
 
         [JsonInclude]
-        public string UserName = "";
+        public string UserName { get; set; }
         [JsonInclude]
-        public string ComputerName = "";
+        public string ComputerName { get; set; }
         [JsonInclude]
-        public HistoriqueUrls Urls = new();
+        public HistoriqueUrls Urls { get; set; }
         [JsonInclude]
-        public Dictionary<int, string> Processes = new();
+        public Dictionary<int, string> Processes { get; set; }
         [JsonIgnore]
-        public Bitmap ScreenShot;
+        public Bitmap ScreenShot { get; set; }
 
         #endregion
 
@@ -47,9 +47,14 @@ namespace LibraryData
             ComputerName = computerName;
             Urls = urls;
             Processes = processes;
+            Urls = new();
+            Processes = new();
         }
 
-        public Data() { }
+        public Data() {
+            Urls = new();
+            Processes = new();
+        }
 
         #endregion
     }
@@ -61,10 +66,10 @@ namespace LibraryData
     {
         #region Variables
 
-        public Socket SocketToStudent;
-        public Socket SocketControl = null;
-        public int ID;
-        public int NumberOfFailure;
+        public Socket SocketToStudent { get; set; }
+        public Socket SocketControl { get; set; }
+        public int ID { get; set; }
+        public int NumberOfFailure { get; set; }
 
         #endregion
 
@@ -93,6 +98,12 @@ namespace LibraryData
     public class DataForStudent : Data, IMessageFilter
     {
         #region Variables/Constructeur
+        readonly private List<string> DefaultProcess = new();
+        readonly private ListBox lbxConnexion;
+        readonly private PictureBox pbxScreenShot;
+        readonly private ListBox tbxMessage;
+        readonly private Form form;
+        readonly private List<string> browsersList = new() { "chrome", "firefox", "iexplore", "safari", "opera", "msedge" };
 
         private int screenToStream;
         private readonly GlobalKeyboardHook gkh = new();
@@ -101,25 +112,22 @@ namespace LibraryData
         private bool mouseDisabled = false;
         private bool isReceiving = false;
         private bool isControled = false;
-        public Socket SocketToTeacher;
-        readonly private List<string> DefaultProcess = new();
-        readonly private ListBox lbxConnexion;
-        readonly private PictureBox pbxScreenShot;
-        public IPAddress IpToTeacher;
-        readonly private ListBox tbxMessage;
-        readonly private Form form;
-        public List<string> AutorisedUrls = new();
-        readonly private List<string> browsersList = new() { "chrome", "firefox", "iexplore", "safari", "opera", "msedge" };
-        public List<int> SeleniumProcessesID = new();
+
+        public Socket SocketToTeacher { get; set; }
+        public IPAddress IpToTeacher { get; set; }
+        public List<string> AutorisedUrls { get; set; }
+        public List<int> SeleniumProcessesID { get; set; }
         Socket SocketMulticast;
-        SocketAsyncEventArgs receiveArgs;
         readonly List<byte> byteImage = new();
+
         public DataForStudent(ListBox lbxconnexion, PictureBox pbxscreenshot, ListBox tbxmessage, Form form)
         {
             lbxConnexion = lbxconnexion;
             pbxScreenShot = pbxscreenshot;
             tbxMessage = tbxmessage;
             this.form = form;
+            AutorisedUrls = new();
+            SeleniumProcessesID = new();
             GetDefaultProcesses();
             GetNames();
             Task.Run(GetAllTabNameEvery5Seconds);
@@ -516,7 +524,7 @@ namespace LibraryData
             IPAddress ip = IPAddress.Parse("232.1.2.3");
             SocketMulticast.SetSocketOption(SocketOptionLevel.IP, SocketOptionName.AddMembership, new MulticastOption(ip, IPAddress.Any));
 
-            receiveArgs = new SocketAsyncEventArgs();
+            SocketAsyncEventArgs receiveArgs = new();
             receiveArgs.SetBuffer(new byte[65000], 0, 65000);
             receiveArgs.Completed += ReceiveCompleted;
             BeginReceive(receiveArgs);

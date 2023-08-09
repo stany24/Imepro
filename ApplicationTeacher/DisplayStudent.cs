@@ -18,7 +18,7 @@ namespace ApplicationTeacher
         #region Variables
 
         private DataForTeacher Student = null;
-        private IPAddress ipAddr = null;
+        private readonly IPAddress ipAddr = null;
         PictureBox pbxStream;
 
         #endregion

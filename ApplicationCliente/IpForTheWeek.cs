@@ -26,9 +26,7 @@ namespace ApplicationCliente
             catch { return; }
             int BeforeAfterNoon = 0;
             if (DateTime.Now.TimeOfDay > new TimeSpan(12, 35, 0)) { BeforeAfterNoon = 1; }
-            try{
-                Days.Add(DateTime.Now.DayOfWeek.ToString(), new string[2]);
-            }catch {  }
+            Days.Add(DateTime.Now.DayOfWeek.ToString(), new string[2]);
             Days[DateTime.Now.DayOfWeek.ToString()][BeforeAfterNoon] = ip;
             Properties.Settings.Default.IpForTheWeek = JsonSerializer.Serialize(Days);
             Properties.Settings.Default.Save();

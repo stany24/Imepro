@@ -16,7 +16,7 @@ namespace LibraryData
     {
         #region Variables
 
-        public int StudentID;
+        public int StudentID { get; set; }
         public PictureBox PbxImage = new();
         private readonly Label lblComputerInformations = new();
         private readonly Button btnSaveScreenShot = new();
