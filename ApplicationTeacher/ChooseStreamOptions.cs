@@ -7,7 +7,7 @@ namespace ApplicationTeacher
 {
     public partial class ChooseStreamOptions : Form
     {
-        ConfigurationDynamique config = new();
+        readonly ConfigurationDynamique config = new();
         public ChooseStreamOptions(List<DataForTeacher> list)
         {
             InitializeComponent();

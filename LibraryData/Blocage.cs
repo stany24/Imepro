@@ -129,11 +129,21 @@ namespace LibraryData
     /// </summary>
     public class WindowMinimize
     {
+        #region Constant
+
         private const int SW_SHOWMINIMIZED = 2;
         private const int SW_SHOW = 5;
 
+        #endregion
+
+        #region DLL Imports
+
         [DllImport("user32.dll")]
         static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
+
+        #endregion
+
+        #region Public Methods
 
         /// <summary>
         /// Fonction qui minimize toutes les applications interdites
@@ -163,5 +173,7 @@ namespace LibraryData
                 try { ShowWindow(process.MainWindowHandle, SW_SHOW); } catch { }
             }
         }
+
+        #endregion
     }
 }

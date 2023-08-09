@@ -17,11 +17,16 @@ namespace ApplicationTeacher
     {
         #region Variables
 
-        public DataForTeacher Student = null;
-        public IPAddress ipAddr = null;
+        private DataForTeacher Student = null;
+        private IPAddress ipAddr = null;
         PictureBox pbxStream;
 
         #endregion
+
+        public int GetStudentId()
+        {
+            return Student.ID;
+        }
 
         public DisplayStudent(IPAddress ip)
         {
@@ -48,7 +53,7 @@ namespace ApplicationTeacher
                     TreeViewProcesses.Nodes.Clear();
                     UpdateTreeView.UpdateProcess(student, null, TreeViewProcesses, filterEnabled, Properties.Settings.Default.AlertedProcesses, Properties.Settings.Default.IgnoredProcesses); }));
                 TreeViewUrls.Invoke(new MethodInvoker(delegate {
-                    UpdateTreeView.UpdateUrls(student, null, TreeViewUrls); }));
+                    UpdateTreeView.UpdateUrls(student, null, TreeViewUrls);}));
             }
             else
             {
@@ -145,7 +150,9 @@ namespace ApplicationTeacher
                     Array.Resize(ref imageBuffer, nbData);
                     pbxStream.Image = new Bitmap(new MemoryStream(imageBuffer));
                 }
-                catch {}
+                catch {
+                    //lost an image it can happend
+                }
             }
         }
 
@@ -154,7 +161,7 @@ namespace ApplicationTeacher
         /// </summary>
         public void ConnectStudentForControl()
         {
-            while (IsHandleCreated == false) { Thread.Sleep(100); }
+            while (!IsHandleCreated) { Thread.Sleep(100); }
             IPEndPoint localEndPoint = new(ipAddr, 11112);
             // Creation TCP/IP Socket using Socket Class Constructor
             Socket listener = new(ipAddr.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
@@ -172,7 +179,10 @@ namespace ApplicationTeacher
                     Student.SocketControl.ReceiveTimeout = Properties.Settings.Default.TimeBetweenDemand;
                     return;
                 }
-                catch{}
+                catch{
+                    listener.Close();
+                    Student.SocketControl = null;
+                }
             }
         }
 

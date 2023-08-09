@@ -24,6 +24,8 @@ namespace LibraryData
     [Serializable]
     public class Data
     {
+        #region Variables
+
         [JsonInclude]
         public string UserName = "";
         [JsonInclude]
@@ -35,6 +37,10 @@ namespace LibraryData
         [JsonIgnore]
         public Bitmap ScreenShot;
 
+        #endregion
+
+        #region Constructor
+
         public Data(string userName, string computerName, HistoriqueUrls urls, Dictionary<int, string> processes)
         {
             UserName = userName;
@@ -44,6 +50,8 @@ namespace LibraryData
         }
 
         public Data() { }
+
+        #endregion
     }
 
     /// <summary>
@@ -51,10 +59,16 @@ namespace LibraryData
     /// </summary>
     public class DataForTeacher : Data
     {
+        #region Variables
+
         public Socket SocketToStudent;
         public Socket SocketControl = null;
         public int ID;
         public int NumberOfFailure;
+
+        #endregion
+
+        #region Constructor
 
         public DataForTeacher(Socket socket, int id)
         {
@@ -70,10 +84,7 @@ namespace LibraryData
             Processes = data.Processes;
         }
 
-        public override string ToString()
-        {
-            return UserName + " " + ComputerName;
-        }
+        #endregion
     }
 
     /// <summary>
@@ -91,7 +102,6 @@ namespace LibraryData
         private bool isReceiving = false;
         private bool isControled = false;
         public Socket SocketToTeacher;
-        private Socket SocketControl;
         readonly private List<string> DefaultProcess = new();
         readonly private ListBox lbxConnexion;
         readonly private PictureBox pbxScreenShot;
@@ -170,7 +180,6 @@ namespace LibraryData
                             if (parent.ProcessName == singleBrowser) { continue; }
                         }
                         Process.GetProcessById(instance.Id);
-                        Console.WriteLine(instance.Id);
                         if (SeleniumProcessesID.Contains(instance.Id)) { continue; }
                         IntPtr hWnd = instance.MainWindowHandle;
 
@@ -254,7 +263,6 @@ namespace LibraryData
                     FullGraphics.DrawImage(image, new Point(offsetLeft, 0));
                     offsetLeft += image.Width;
                 }
-                //FullImage = (new Bitmap(FullImage, new Size(200,200)));
                 FullGraphics.Dispose();
                 return FullImage;
             }
@@ -270,11 +278,7 @@ namespace LibraryData
         {
             Bitmap Bitmap = new(screen.Bounds.Width, screen.Bounds.Height, PixelFormat.Format16bppRgb565);
             Rectangle ScreenSize = screen.Bounds;
-            try
-            {
-                Graphics.FromImage(Bitmap).CopyFromScreen(ScreenSize.Left, ScreenSize.Top, 0, 0, ScreenSize.Size);
-            }
-            catch (Exception) { }
+            Graphics.FromImage(Bitmap).CopyFromScreen(ScreenSize.Left, ScreenSize.Top, 0, 0, ScreenSize.Size);
             return Bitmap;
         }
 
@@ -318,7 +322,6 @@ namespace LibraryData
             try
             {
                 // Establish the remote endpoint for the socket. This example uses port 11111 on the local computer.
-                IPHostEntry ipHost = Dns.GetHostEntry(Dns.GetHostName());
                 IPEndPoint localEndPoint = new(IpToTeacher, port);
 
                 // Creation TCP/IP Socket using Socket Class Constructor
@@ -382,8 +385,8 @@ namespace LibraryData
                 string text = Encoding.Default.GetString(info);
                 switch (Encoding.Default.GetString(info).Split(' ')[0])
                 {
-                    case "data": SendData(); break;
-                    case "image":; SendImage(TakeAllScreenShot(), SocketToTeacher); break;
+                    case "data":SendData(); break;
+                    case "image":SendImage(TakeAllScreenShot(), SocketToTeacher); break;
                     case "kill": KillSelectedProcess(Convert.ToInt32(text.Split(' ')[1])); break;
                     case "receive": Task.Run(ReceiveMulticastStream); break;
                     case "apply": ApplyMulticastSettings(); break;
@@ -449,7 +452,7 @@ namespace LibraryData
         private void SendStream()
         {
             isControled = true;
-            SocketControl = ConnectToTeacher(11112);
+            Socket SocketControl = ConnectToTeacher(11112);
             while (isControled)
             {
                 SendImage(TakeSreenShot(Screen.AllScreens[screenToStream]), SocketControl);
@@ -519,7 +522,6 @@ namespace LibraryData
 
         private void ProcessReceive(SocketAsyncEventArgs args)
         {
-            Socket socket = (Socket)args.UserToken;
             if (args.SocketError == SocketError.Success && args.BytesTransferred > 0)
             {
 
@@ -553,7 +555,6 @@ namespace LibraryData
             Array.Resize(ref message, size);
             options = JsonSerializer.Deserialize<StreamOptions>(Encoding.Default.GetString(message));
             pbxScreenShot.Invoke(new MethodInvoker(delegate { pbxScreenShot.Visible = true; }));
-            //pbxScreenShot.Invoke(new MethodInvoker(delegate { pbxScreenShot.Dock = DockStyle.Fill; }));
             form.Invoke(new MethodInvoker(delegate
             {
                 form.Show();

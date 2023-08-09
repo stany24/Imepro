@@ -20,7 +20,7 @@ namespace LibraryData
         {
 
             if (AllBrowser[browser].Count == 0 ) { AllBrowser[browser].Add(url); return; }
-            if (AllBrowser[browser].Last().Name == url.Name) { return; }
+            if (AllBrowser[browser][-1].Name == url.Name) { return; }
             AllBrowser[browser].Add(url);
         }
 

@@ -8,7 +8,13 @@ namespace LibraryData
 {
     public class CustomMessage
     {
+        #region Variables
+
         readonly List<byte> data = new();
+
+        #endregion
+
+        #region Constructor
 
         public CustomMessage(byte[] newdata,int size)
         {
@@ -21,6 +27,10 @@ namespace LibraryData
         {
             data.AddRange(receivedmessage);
         }
+
+        #endregion
+
+        #region Getter
 
         public int GetSize()
         {
@@ -35,11 +45,19 @@ namespace LibraryData
             content.RemoveRange(0, 5);
             return content;
         }
+
+        #endregion
     }
 
     public class CustomMessageSender
     {
+        #region Variables
+
         readonly List<CustomMessage> messages = new();
+
+        #endregion
+
+        #region Constructor
 
         public CustomMessageSender(byte[] message)
         {
@@ -60,18 +78,35 @@ namespace LibraryData
             }
         }
 
+        #endregion
+
+        #region Getter
+
         public List<CustomMessage> GetMessages(){ return messages; }
+
+        #endregion
     }
 
     public class CustomMessageReceiver
     {
+        #region Variables
+
         readonly List<byte> remainder = new();
         readonly List<CustomMessage> messages= new();
         readonly Socket socket;
+
+        #endregion
+
+        #region Constructor
+
         public CustomMessageReceiver(Socket socket)
         {
             this.socket = socket;
         }
+
+        #endregion
+
+        #region Receive Data
 
         public void Receive()
         {
@@ -94,6 +129,10 @@ namespace LibraryData
             } while (messageSize == 65005);
         }
 
+        #endregion
+
+        #region Getter
+
         public byte[] GetImageBytes()
         {
             List<byte> imageBytes = new();
@@ -103,5 +142,7 @@ namespace LibraryData
             }
             return imageBytes.ToArray();
         }
+
+        #endregion
     }
 }

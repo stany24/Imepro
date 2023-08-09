@@ -6,7 +6,7 @@ namespace ApplicationCliente
 {
     public partial class AskIp : Form
     {
-        public bool canClose = false;
+        private bool canClose = false;
         public AskIp()
         {
             InitializeComponent();
@@ -35,7 +35,7 @@ namespace ApplicationCliente
 
         private void AskIp_FormClosing(object sender, FormClosingEventArgs e)
         {
-            if(canClose==false) { e.Cancel = true; }
+            if(!canClose) { e.Cancel = true; }
         }
     }
 }

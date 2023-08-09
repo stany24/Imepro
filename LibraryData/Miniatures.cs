@@ -5,6 +5,7 @@ using System.Drawing.Imaging;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Linq;
 
 namespace LibraryData
 {
@@ -13,6 +14,8 @@ namespace LibraryData
     /// </summary>
     public class Miniature : UserControl
     {
+        #region Variables
+
         public int StudentID;
         public PictureBox PbxImage = new();
         private readonly Label lblComputerInformations = new();
@@ -21,6 +24,10 @@ namespace LibraryData
         public int TimeSinceUpdate = 0;
         public string ComputerName;
         private readonly string SavePath;
+
+        #endregion
+
+        #region Constructor
 
         /// <summary>
         /// Consctucteur pour créer et positionner un miniature
@@ -67,6 +74,10 @@ namespace LibraryData
             UpdatePositionsRelativeToImage(new object(), new EventArgs());
         }
 
+        #endregion
+
+        #region Teacher Action
+
         /// <summary>
         /// Fonction pour sauvegarder la capture d'écran actuel
         /// </summary>
@@ -77,14 +88,17 @@ namespace LibraryData
             PbxImage.Image.Save(SavePath + ComputerName + DateTime.Now.ToString("_yyyy-mm-dd_hh-mm-ss") + ".jpg", ImageFormat.Jpeg);
         }
 
+        #endregion
+
+        #region Update
+
         /// <summary>
         /// Fonction qui ajoute une seconde au temps depuis la mise à jour de l'image et change le texte du label.
         /// </summary>
         public void UpdateTime()
         {
             TimeSinceUpdate++;
-            try { lblComputerInformations.Invoke(new MethodInvoker(delegate { lblComputerInformations.Text = ComputerName + " " + TimeSinceUpdate + "s"; })); }
-            catch { };
+            lblComputerInformations.Invoke(new MethodInvoker(delegate { lblComputerInformations.Text = ComputerName + " " + TimeSinceUpdate + "s"; }));
         }
 
         /// <summary>
@@ -103,6 +117,8 @@ namespace LibraryData
             lblComputerInformations.Left = PbxImage.Location.X + PbxImage.Width / 2 - lblComputerInformations.Width - MargeBetweenText / 2;
             lblComputerInformations.Top = btnSaveScreenShot.Location.Y + (btnSaveScreenShot.Height - lblComputerInformations.Height);
         }
+
+        #endregion
     }
 
     /// <summary>
@@ -110,31 +126,47 @@ namespace LibraryData
     /// </summary>
     public class MiniatureDisplayer
     {
+        #region Variables
+
         public List<Miniature> MiniatureList = new();
         private int MaxWidth;
         private readonly int Marge = 10;
         public double zoom = 0.1;
 
-        /// <summary>
-        /// Fonction qui permet de zoomer dans les miniatures en changant leur taille
-        /// </summary>
-        public void ChangeZoom()
-        {
-            foreach (Miniature miniature in MiniatureList)
-            {
-                double NewHeight = miniature.PbxImage.Image.Height * zoom;
-                double NewWidth = miniature.PbxImage.Image.Width * zoom;
-                miniature.PbxImage.Height = Convert.ToInt32(NewHeight);
-                miniature.PbxImage.Width = Convert.ToInt32(NewWidth);
-            }
-            UpdateAllLocations(MaxWidth);
-        }
+        #endregion
+
+        #region Constructor
 
         public MiniatureDisplayer(int maxwidth)
         {
             MaxWidth = maxwidth;
             Task.Run(LaunchTimeUpdate);
         }
+
+        #endregion
+
+        #region Teacher Action
+
+        /// <summary>
+        /// Fonction qui permet de zoomer dans les miniatures en changant leur taille
+        /// </summary>
+        public void ChangeZoom()
+        {
+            foreach (var (miniature, NewHeight, NewWidth) in from Miniature miniature in MiniatureList
+                                                             let NewHeight = miniature.PbxImage.Image.Height * zoom
+                                                             let NewWidth = miniature.PbxImage.Image.Width * zoom
+                                                             select (miniature, NewHeight, NewWidth))
+            {
+                miniature.PbxImage.Height = Convert.ToInt32(NewHeight);
+                miniature.PbxImage.Width = Convert.ToInt32(NewWidth);
+            }
+
+            UpdateAllLocations(MaxWidth);
+        }
+
+        #endregion
+
+        #region Update
 
         /// <summary>
         /// Fonction qui toutes les seconde lance une mise à jour du temps
@@ -203,6 +235,10 @@ namespace LibraryData
             }
         }
 
+        #endregion
+
+        #region Getter / Setter
+
         /// <summary>
         /// Fonction pour ajouter une miniature que le miniatureDisplayer doit gérer
         /// </summary>
@@ -231,5 +267,7 @@ namespace LibraryData
                 }
             }
         }
+
+        #endregion
     }
 }

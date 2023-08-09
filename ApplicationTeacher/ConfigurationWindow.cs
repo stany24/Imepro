@@ -9,6 +9,9 @@ namespace ApplicationTeacher
     public partial class ConfigurationWindow : Form
     {
         ConfigurationDynamique config;
+
+        #region At start
+
         public ConfigurationWindow()
         {
             InitializeComponent();
@@ -23,6 +26,10 @@ namespace ApplicationTeacher
             cbxCategory.Items.Add("Focus");
         }
 
+        #endregion
+
+        #region Display
+
         private void CategoryChanged(object sender, EventArgs e)
         {
             cbxParameter.Items.Clear();
@@ -36,7 +43,7 @@ namespace ApplicationTeacher
                     break;
                 case "Focus":
                     foreach (KeyValuePair<string, List<string>> list in config.AllFocus)
-                    {cbxParameter.Items.Add(list.Key);};
+                    {cbxParameter.Items.Add(list.Key);}
                     btnNewFocus.Visible= true;
                     break;
             }
@@ -49,13 +56,17 @@ namespace ApplicationTeacher
                 case "Listes":
                     foreach (string str in config.AllLists[cbxParameter.SelectedItem.ToString()])
                     {lbxStrings.Items.Add(str);}
-                    ; break;
+                    break;
                 case "Focus":
                     foreach (string str in config.AllFocus[cbxParameter.SelectedItem.ToString()])
                     {lbxStrings.Items.Add(str);}
                     break;
             }
         }
+
+        #endregion
+
+        #region Add/Remove
 
         private void RemoveSelectedString_Click(object sender, EventArgs e)
         {
@@ -89,6 +100,8 @@ namespace ApplicationTeacher
             tbxAddString.Text = string.Empty;
         }
 
+        #endregion
+
         private void ApplyChanges(object sender, EventArgs e)
         {
             Properties.Settings.Default.TimeBetweenDemand = (int)nudTimeBetweenAsking.Value;
@@ -111,13 +124,9 @@ namespace ApplicationTeacher
         {
             for(int i = 0;i < 11; i++)
             {
-                try
-                {
-                    config.AllFocus.Add("focus "+i, new());
-                    cbxParameter.Items.Clear();
-                    foreach (KeyValuePair<string, List<string>> list in config.AllFocus){ cbxParameter.Items.Add(list.Key); };
-                    return;
-                }catch(Exception) { }
+                config.AllFocus.Add("focus "+i, new());
+                cbxParameter.Items.Clear();
+                foreach (KeyValuePair<string, List<string>> list in config.AllFocus){ cbxParameter.Items.Add(list.Key); }
             }
         }
     }

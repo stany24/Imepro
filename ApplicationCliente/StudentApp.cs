@@ -17,9 +17,16 @@ namespace ApplicationCliente
 {
     public partial class StudentApp : Form
     {
+
+        #region Variables
+
         readonly DataForStudent Student;
         IWebDriver FirefoxDriver;
         IWebDriver ChromeDriver;
+
+        #endregion
+
+        #region At start
         public StudentApp()
         {
             InitializeComponent();
@@ -44,6 +51,9 @@ namespace ApplicationCliente
             Student.SocketToTeacher = Task.Run(() => Student.ConnectToTeacher(11111)).Result;
         }
 
+        #endregion
+
+        #region selenium
         public void NewChrome(object sender, EventArgs e)
         {
             ChromeDriverService service = ChromeDriverService.CreateDefaultService();
@@ -67,8 +77,8 @@ namespace ApplicationCliente
         {
             while(true)
             {
-                VerifyUrlOfWebDriver((WebDriver)FirefoxDriver,"seleniumfirefox");
-                VerifyUrlOfWebDriver((WebDriver)ChromeDriver,"seleniumchorme");
+                if(FirefoxDriver != null){VerifyUrlOfWebDriver((WebDriver)FirefoxDriver, "seleniumfirefox");}
+                if(ChromeDriver != null){ VerifyUrlOfWebDriver((WebDriver)ChromeDriver, "seleniumchorme"); }
                 Thread.Sleep(2000);
             }
         }
@@ -80,16 +90,22 @@ namespace ApplicationCliente
         /// <param name="navigateurName"></param>
         public void VerifyUrlOfWebDriver(WebDriver navigateur,string navigateurName)
         {
-                if (navigateur == null){return;}
-                Student.Urls.AddUrl(new Url(DateTime.Now, navigateur.Url),navigateurName);
-                bool navigateback = true;
-                foreach (string url in Student.AutorisedUrls)
-                {
-                    if (navigateur.Url.Contains(url)) { navigateback = false; }
-                }
-                if(navigateur.Url == null) { navigateback= false; }
-                if (navigateback){navigateur.Navigate().Back();}
+            Student.Urls.AddUrl(new Url(DateTime.Now, navigateur.Url),navigateurName);
+            bool navigateback = true;
+            foreach (string url in Student.AutorisedUrls)
+            {
+                if (navigateur.Url.Contains(url)) { navigateback = false; }
+            }
+            if(navigateur.Url == "about:blank") { navigateback= false; }
+            if (navigateback){
+                ((IJavaScriptExecutor)navigateur).ExecuteScript("window.close();");
+                ((IJavaScriptExecutor)navigateur).ExecuteScript("window.open();");
+            }
         }
+
+        #endregion
+
+        #region teacher ip
 
         /// <summary>
         /// Fonction qui demande à l'élève une nouvelle adresse ip pour le maitre
@@ -111,8 +127,8 @@ namespace ApplicationCliente
         public string CheckInterfaces()
         {
             NetworkInterface[] netInterface = NetworkInterface.GetAllNetworkInterfaces();
-            string command = String.Empty;
-            foreach(NetworkInterface current in netInterface)
+            StringBuilder commandBuilder = new();
+            foreach (NetworkInterface current in netInterface)
             {
                 bool isCorrect = false;
                 IPInterfaceProperties properities = current.GetIPProperties();
@@ -120,10 +136,13 @@ namespace ApplicationCliente
                 {
                     if (IsOnSameNetwork(Student.IpToTeacher,ip.Address,ip.IPv4Mask)){isCorrect = true;}
                 }
-                if (isCorrect == false) { command += "netsh interface ipv4 set interface \"" + current.Name + "\" forwarding=disable\r\n"; }
-                else { command += "netsh interface ipv4 set interface \"" + current.Name + "\" forwarding=enable\r\n"; }
+                
+                commandBuilder.Append("netsh interface ipv4 set interface \"");
+                commandBuilder.Append(current.Name);
+                if (!isCorrect) { commandBuilder.Append("\" forwarding=disable\r\n"); }
+                else { commandBuilder.Append("\" forwarding=enable\r\n"); }
             }
-            return command;
+            return commandBuilder.ToString();
         }
 
         /// <summary>
@@ -171,6 +190,9 @@ namespace ApplicationCliente
                 "3) Collez le tout dans le terminal et executez.\r\n", "Attention", MessageBoxButtons.OK, MessageBoxIcon.Warning);
         }
 
+        #endregion
+
+        #region interaction
 
         /// <summary>
         /// Fonction qui à la fermeture annonce au professeur d'arreter de lui communiquer
@@ -188,7 +210,9 @@ namespace ApplicationCliente
                 FirefoxDriver?.Dispose();
                 ChromeDriver?.Dispose();
             }
-            catch { }
+            catch {
+                // Should not happend
+            }
         }
 
         /// <summary>
@@ -219,5 +243,7 @@ namespace ApplicationCliente
             Show();
             WindowState = FormWindowState.Normal;
         }
+
+        #endregion
     }
 }

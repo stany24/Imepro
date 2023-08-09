@@ -31,6 +31,8 @@ namespace ApplicationTeacher
 
         #endregion
 
+        #region At start
+
         public TeacherApp()
         {
             InitializeComponent();
@@ -70,7 +72,7 @@ namespace ApplicationTeacher
                 case 1:ipAddr = PossiblesIp[0]; break;
                 default:
                     AskToChoseIp prompt = new(PossiblesIp);
-                    if (prompt.ShowDialog(this) == DialogResult.OK){ipAddr = prompt.ChoosenIp;}
+                    if (prompt.ShowDialog(this) == DialogResult.OK){ipAddr = prompt.GetChoosenIp();}
                     else { ipAddr = PossiblesIp[0]; }
                     prompt.Dispose();
                     break;
@@ -78,12 +80,16 @@ namespace ApplicationTeacher
             lblIP.Text = "IP: " + ipAddr.ToString();
         }
 
+        #endregion
+
+        #region New Student
+
         /// <summary>
         /// Fonction qui permet de connecter les élèves qui en font la demande
         /// </summary>
         public void LogClients()
         {
-            while (IsHandleCreated == false){Thread.Sleep(100);}
+            while (!IsHandleCreated){Thread.Sleep(100);}
             IPEndPoint localEndPoint = new(ipAddr, 11111);
             // Creation TCP/IP Socket using Socket Class Constructor
             Socket listener = new(ipAddr.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
@@ -124,6 +130,10 @@ namespace ApplicationTeacher
             isAsking = false;
         }
 
+        #endregion
+
+        #region Transfert
+
         /// <summary>
         /// Fonction qui demande à tous les élèves connectés leurs données ainsi que leur image
         /// </summary>
@@ -144,35 +154,17 @@ namespace ApplicationTeacher
                         RemoveStudent(client);
                     }
                     UpdateAllIndividualDisplay();
-                    //foreach (DataForTeacher client in AllClients) { client.UpdateAffichage(); }
                     DateTime FinishedUpdate = DateTime.Now;
                     TimeSpan UpdateDuration = FinishedUpdate - StartUpdate;
                     TimeSpan CycleDuration = NextUpdate - StartUpdate;
                     if (CycleDuration > UpdateDuration)
                     {
                         isAsking = false;
-                        lbxRequetes.Invoke(new MethodInvoker(delegate { lbxRequetes.Items.Add(DateTime.Now.ToString("HH:mm:ss") +  " Attente du prochain cycle dans " + (CycleDuration - UpdateDuration) + " secondes"); }));
+                        lbxRequetes.Invoke(new MethodInvoker(delegate { lbxRequetes.Items.Add(DateTime.Now.ToString("HH:mm:ss") + " Attente du prochain cycle dans " + (CycleDuration - UpdateDuration) + " secondes"); }));
                         Thread.Sleep(CycleDuration - UpdateDuration);
                     }
                 }
                 else { Thread.Sleep(100); }
-            }
-        }
-
-        /// <summary>
-        /// Fonction qui met à jour tous les affichage individuels
-        /// </summary>
-        public void UpdateAllIndividualDisplay()
-        {
-            foreach (DisplayStudent display in AllStudentsDisplay)
-            {
-                foreach (DataForTeacher student in AllStudents)
-                {
-                    if (display.Student.ID == student.ID)
-                    {
-                        display.UpdateAffichage(student,FilterEnabled);
-                    }
-                }
             }
         }
 
@@ -205,22 +197,6 @@ namespace ApplicationTeacher
                     ClientToRemove.Add(AllStudents[i]);
                 }
             }
-        }
-
-        /// <summary>
-        /// Fonction qui enléve un élève en cas de déconnection
-        /// </summary>
-        /// <param name="student">L'élève à enlever</param>
-        public void RemoveStudent(DataForTeacher student)
-        {
-            AllStudents.Remove(student);
-            lbxRequetes.Invoke(new MethodInvoker(delegate { lbxRequetes.Items.Add(DateTime.Now.ToString("HH:mm:ss") + " L'élève " + student.UserName + " est déconnecté"); }));
-            TreeViewDetails.Invoke(new MethodInvoker(delegate {
-                TreeViewDetails.Nodes.Find(Convert.ToString(student.ID), false)[0].Remove();
-            }));
-            TreeViewSelect.Invoke(new MethodInvoker(delegate {
-                TreeViewSelect.Nodes.Find(Convert.ToString(student.ID), false)[0].Remove();
-            }));
         }
 
         /// <summary>
@@ -281,6 +257,10 @@ namespace ApplicationTeacher
             }
         }
 
+        #endregion
+
+        #region TreeView update
+
         /// <summary>
         /// Fonction qui met à jour les TreeViews (détails et sélection)
         /// </summary>
@@ -305,6 +285,7 @@ namespace ApplicationTeacher
                 nodeProcess.Nodes.Clear();
                 UpdateTreeView.UpdateProcess(student,nodeProcess,null,FilterEnabled, Properties.Settings.Default.AlertedProcesses, Properties.Settings.Default.IgnoredProcesses);
                 UpdateTreeView.UpdateUrls(student,nodeNavigateurs,null);
+                UpdateTreeView.ApplyUrlFilter(nodeNavigateurs, Properties.Settings.Default.AlertedUrls);
             }));
             // Mise à jour du TreeView pour la sélection
             TreeViewSelect.Invoke(new MethodInvoker(delegate {
@@ -315,29 +296,25 @@ namespace ApplicationTeacher
             }));
         }
 
+        #endregion
+
         /// <summary>
-        /// Fonction qui active les filtre dans les TreeViews
+        /// Fonction qui enléve un élève en cas de déconnection
         /// </summary>
-        /// <param name="NodeBrowser"></param>
-        public void ApplyUrlFilter(TreeNode NodeBrowser)
+        /// <param name="student">L'élève à enlever</param>
+        public void RemoveStudent(DataForTeacher student)
         {
-            for (int i = 0; i < NodeBrowser.Nodes.Count; i++)
-            {
-                for (int j = 0; j < Properties.Settings.Default.AlertedUrls.Count; j++)
-                {
-                    if (NodeBrowser.Nodes[i].Text.ToLower().Contains(Properties.Settings.Default.AlertedUrls[j]))
-                    {
-                        TreeNode NodeUrl = NodeBrowser.Nodes[i];
-                        NodeUrl.BackColor = Color.Red;
-                        while (NodeUrl.Parent != null)
-                        {
-                            NodeUrl = NodeUrl.Parent;
-                            NodeUrl.BackColor = Color.Red;
-                        }
-                    }
-                }
-            }
+            AllStudents.Remove(student);
+            lbxRequetes.Invoke(new MethodInvoker(delegate { lbxRequetes.Items.Add(DateTime.Now.ToString("HH:mm:ss") + " L'élève " + student.UserName + " est déconnecté"); }));
+            TreeViewDetails.Invoke(new MethodInvoker(delegate {
+                TreeViewDetails.Nodes.Find(Convert.ToString(student.ID), false)[0].Remove();
+            }));
+            TreeViewSelect.Invoke(new MethodInvoker(delegate {
+                TreeViewSelect.Nodes.Find(Convert.ToString(student.ID), false)[0].Remove();
+            }));
         }
+
+        #region Miniatures
 
         /// <summary>
         /// Fonction qui permet la création ou la supresion de miniatures par rapport aux checkbox. 
@@ -346,7 +323,7 @@ namespace ApplicationTeacher
         /// <param name="e"></param>
         private void TreeNodeChecked(object sender, TreeViewEventArgs e)
         {
-            if (e.Node == null) { return; } // no node selected
+            if (e.Node == null) { return; }
             if (e.Node.Checked)
             {
                 DataForTeacher student = null;
@@ -366,6 +343,20 @@ namespace ApplicationTeacher
                 Displayer.RemoveMiniature(Convert.ToInt32(e.Node.Name));
             }
         }
+
+        /// <summary>
+        /// Fonction qui met à jour les miniatures lorsque le panel est redimensionné
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void PanelMiniatures_Resize(object sender, EventArgs e)
+        {
+            Displayer.UpdateAllLocations(panelMiniatures.Width);
+        }
+
+        #endregion
+
+        #region Stream
 
         /// <summary>
         /// Fonction qui permet de capturer l'écran et de le partager en multicast
@@ -406,7 +397,7 @@ namespace ApplicationTeacher
         /// <param name="e"></param>
         private void ShareScreen(object sender, EventArgs e)
         {
-            if(isSharing == false)
+            if(!isSharing)
             {
                 ChooseStreamOptions prompt = new(AllStudents);
                 if (prompt.ShowDialog(this) != DialogResult.OK){return;}
@@ -421,11 +412,7 @@ namespace ApplicationTeacher
                 isSharing = false;
                 for (int i = 0; i < ConfigurationStatic.StudentToShareScreen.Count; i++)
                 {
-                    try
-                    {
-                        ConfigurationStatic.StudentToShareScreen[i].SocketToStudent.Send(Encoding.Default.GetBytes("stops"));
-                    }
-                    catch { }
+                    ConfigurationStatic.StudentToShareScreen[i].SocketToStudent.Send(Encoding.Default.GetBytes("stops"));
                     ConfigurationStatic.StudentToShareScreen.Remove(ConfigurationStatic.StudentToShareScreen[i]);
                 }
                 btnShare.Text = "Share screen";
@@ -450,6 +437,10 @@ namespace ApplicationTeacher
                 student.SocketToStudent.Send(bytes);
             }
         }
+
+        #endregion
+
+        #region Teacher actions
 
         /// <summary>
         /// Fonction qui en cas de redimensionement de l'application affiche le TrayIcon si nécessaire
@@ -484,12 +475,12 @@ namespace ApplicationTeacher
         /// <param name="e"></param>
         public void OnClosing(object sender, FormClosedEventArgs e)
         {
-            foreach (DataForTeacher student in AllStudents)
+            for (int i = 0; i < AllStudents.Count; i++)
             {
-                try{student.SocketToStudent.Send(Encoding.Default.GetBytes("stops"));}catch { }
-                try { student.SocketToStudent.Send(Encoding.ASCII.GetBytes("disconnect")); } catch { }
+                DataForTeacher student = AllStudents[i];
+                student.SocketToStudent.Send(Encoding.Default.GetBytes("stops"));
+                student.SocketToStudent.Send(Encoding.ASCII.GetBytes("disconnect"));
                 student.SocketToStudent.Dispose();
-                //student.SocketToStudent.Disconnect(false);
             }
             TrayIconTeacher.Visible = false;
             TrayIconTeacher.Dispose();
@@ -521,6 +512,27 @@ namespace ApplicationTeacher
             }
         }
 
+        #endregion
+
+        #region Individual display
+
+        /// <summary>
+        /// Fonction qui met à jour tous les affichage individuels
+        /// </summary>
+        public void UpdateAllIndividualDisplay()
+        {
+            foreach (DisplayStudent display in AllStudentsDisplay)
+            {
+                foreach (DataForTeacher student in AllStudents)
+                {
+                    if (display.GetStudentId() == student.ID)
+                    {
+                        display.UpdateAffichage(student, FilterEnabled);
+                    }
+                }
+            }
+        }
+
         /// <summary>
         /// Fonction qui crée un nouvelle affichage individuel pour un élève
         /// </summary>
@@ -529,7 +541,7 @@ namespace ApplicationTeacher
         {
             foreach (DisplayStudent display in AllStudentsDisplay)
             {
-                if (display.Student.ID == student.ID) { return; }
+                if (display.GetStudentId() == student.ID) { return; }
             }
             DisplayStudent newDisplay = new(ipAddr);
             AllStudentsDisplay.Add(newDisplay);
@@ -549,15 +561,9 @@ namespace ApplicationTeacher
             AllStudentsDisplay.Remove(closingDisplay);
         }
 
-        /// <summary>
-        /// Fonction qui met à jour les miniatures lorsque le panel est redimensionné
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void PanelMiniatures_Resize(object sender, EventArgs e)
-        {
-            Displayer.UpdateAllLocations(panelMiniatures.Width);
-        }
+        #endregion
+
+        #region Filter
 
         /// <summary>
         /// Fonction qui active ou désactive les filtres
@@ -597,6 +603,10 @@ namespace ApplicationTeacher
             }
         }
 
+        #endregion
+
+        #region TreeView display
+
         /// <summary>
         /// Fonction qui minimise tous les noeuds des treeveiw
         /// </summary>
@@ -634,6 +644,8 @@ namespace ApplicationTeacher
                 node.ExpandAll();
             }
         }
+
+        #endregion
 
         private void OpenConfigWindow_Click(object sender, EventArgs e)
         {
