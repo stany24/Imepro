@@ -490,7 +490,7 @@ namespace ApplicationTeacher
         /// <param name="e"></param>
         private void Slider_Scroll(object sender, EventArgs e)
         {
-            Displayer.zoom = Slider.Value / 100.0;
+            Displayer.Zoom = Slider.Value / 100.0;
             Displayer.ChangeZoom();
         }
 

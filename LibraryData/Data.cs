@@ -595,7 +595,7 @@ namespace LibraryData
             {
                 form.Show();
                 form.Controls.SetChildIndex(pbxScreenShot, 0);
-                switch (options.priority)
+                switch (options.Priority)
                 {
                     case Priority.Fullscreen:
                         form.FormBorderStyle = FormBorderStyle.None;
@@ -656,7 +656,7 @@ namespace LibraryData
         {
             while (isReceiving)
             {
-                WindowMinimize.MinimizeUnAuthorised(options.focus);
+                WindowMinimize.MinimizeUnAuthorised(options.Focus);
                 Thread.Sleep(3000);
             }
             WindowMinimize.ShowBack();

@@ -12,9 +12,9 @@ namespace LibraryData
     [Serializable]
     public class HistoriqueUrls
     {
-        public string[] AllBrowserName = { "chrome","firefox","seleniumchrome","seleniumfirefox", "opera","msedge", "safari", "iexplorer", "custom" };
+        private string[] AllBrowserName {get;}
         [JsonInclude]
-        public Dictionary<string, List<Url>> AllBrowser = new();
+        private Dictionary<string, List<Url>> AllBrowser { get; set; }
 
         /// <summary>
         /// Function to add a new url
@@ -31,6 +31,8 @@ namespace LibraryData
 
         public HistoriqueUrls()
         {
+            AllBrowser = new();
+            AllBrowserName = new string[9] { "chrome", "firefox", "seleniumchrome", "seleniumfirefox", "opera", "msedge", "safari", "iexplorer", "custom" };
             for (int i = 0;i < AllBrowserName.Count(); i++) { AllBrowser.Add(AllBrowserName[i], new List<Url>()); }
         }
     }

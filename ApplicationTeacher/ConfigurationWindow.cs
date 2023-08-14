@@ -134,7 +134,7 @@ namespace ApplicationTeacher
                 foreach (KeyValuePair<string, List<string>> item in Focus) { cbxSelectFocus.Items.Add(item); }
                 Configuration.SetAllFocus(Focus);
             }
-            catch (Exception) { }
+            catch (Exception) {/* new focus is already created, the user needs to change it's name before creating another one.*/ }
         }
 
         private void SelectedFocusChanged(object sender, EventArgs e)

@@ -17,12 +17,12 @@ namespace LibraryData
         #region Variables
 
         public int StudentID { get; set; }
-        public PictureBox PbxImage = new();
+        internal PictureBox PbxImage { get; set; }
         private readonly Label lblComputerInformations = new();
         private readonly Button btnSaveScreenShot = new();
         readonly int MargeBetweenText = 5;
-        public int TimeSinceUpdate = 0;
-        public string ComputerName;
+        public int TimeSinceUpdate { get; set; }
+        internal string ComputerName { get; set; }
         private readonly string SavePath;
 
         #endregion
@@ -38,6 +38,9 @@ namespace LibraryData
         /// <param name="savepath">Le chemin de sauvegarde des images</param>
         public Miniature(Bitmap image, string name, int studentID, string savepath)
         {
+            TimeSinceUpdate = 0;
+            PbxImage = new();
+
             //valeurs pour la fenêtre de control
             Size = PbxImage.Size;
             StudentID = studentID;
@@ -128,10 +131,10 @@ namespace LibraryData
     {
         #region Variables
 
-        public List<Miniature> MiniatureList = new();
+        public List<Miniature> MiniatureList { get; set; }
         private int MaxWidth;
         private readonly int Marge = 10;
-        public double zoom = 0.1;
+        public double Zoom { get; set; }
 
         #endregion
 
@@ -139,6 +142,8 @@ namespace LibraryData
 
         public MiniatureDisplayer(int maxwidth)
         {
+            Zoom = 0.1;
+            MiniatureList = new();
             MaxWidth = maxwidth;
             Task.Run(LaunchTimeUpdate);
         }
@@ -153,8 +158,8 @@ namespace LibraryData
         public void ChangeZoom()
         {
             foreach (var (miniature, NewHeight, NewWidth) in from Miniature miniature in MiniatureList
-                                                             let NewHeight = miniature.PbxImage.Image.Height * zoom
-                                                             let NewWidth = miniature.PbxImage.Image.Width * zoom
+                                                             let NewHeight = miniature.PbxImage.Image.Height * Zoom
+                                                             let NewWidth = miniature.PbxImage.Image.Width * Zoom
                                                              select (miniature, NewHeight, NewWidth))
             {
                 miniature.PbxImage.Height = Convert.ToInt32(NewHeight);
