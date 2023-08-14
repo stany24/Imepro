@@ -11,15 +11,15 @@ namespace LibraryData
         public static void UpdateProcess(DataForTeacher student, TreeNode nodeProcess, TreeView treeProcess, bool filterEnabled, StringCollection alertedProcesses, StringCollection ignoredProcesses)
         {
 
-            foreach (KeyValuePair<int, string> process in student.Processes)
+            foreach (string process in student.Processes.Select(process => process.Value))
             {
                 TreeNode current;
-                if (nodeProcess != null) { current = nodeProcess.Nodes.Add(process.Value); }
-                else { current = treeProcess.Nodes.Add(process.Value); }
+                if (nodeProcess != null) { current = nodeProcess.Nodes.Add(process); }
+                else { current = treeProcess.Nodes.Add(process); }
 
                 if (filterEnabled)
                 {
-                    if (alertedProcesses.Contains(process.Value))
+                    if (alertedProcesses.Contains(process))
                     {
                         current.BackColor = Color.Red;
                         while (current.Parent != null)
@@ -31,14 +31,14 @@ namespace LibraryData
                 }
                 else
                 {
-                    if (ignoredProcesses.Contains(process.Value)) { current.BackColor = Color.Yellow; }
+                    if (ignoredProcesses.Contains(process)) { current.BackColor = Color.Yellow; }
                 }
             }
         }
 
         public static void UpdateUrls(DataForTeacher student, TreeNode nodeNavigateurs, TreeView treeNavigateurs)
         {
-            foreach (KeyValuePair<string, List<Url>> browser in student.Urls.AllBrowser)
+            foreach (KeyValuePair<string, List<Url>> browser in student.Urls.GetAllBrowser())
             {
                 if (browser.Value.Count > 0)
                 {

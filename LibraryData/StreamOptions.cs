@@ -11,13 +11,16 @@ namespace LibraryData
     public class StreamOptions
     {
         [JsonInclude]
-        private Priority Priority { get; set; }
+        readonly private Priority Priority;
         [JsonInclude]
-        private List<string> Focus { get; set; }
+        readonly private List<string> Focus;
+
+        public Priority GetPriority() { return Priority; }
+        public List<string> GetFocus() { return Focus; }
         public StreamOptions(Priority priority, List<string> focus)
         {
-            this.Priority = priority;
-            this.Focus = focus;
+            Priority = priority;
+            Focus = focus;
         }
     }
 

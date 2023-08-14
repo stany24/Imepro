@@ -330,7 +330,7 @@ namespace ApplicationTeacher
                     if (Convert.ToString(students.ID) == e.Node.Name) { student = students; }
                 }
                 if (student == null) { return; }
-                foreach(Miniature mini in Displayer.MiniatureList) { if (mini.ComputerName == student.ComputerName && mini.StudentID == student.ID) { return; } }
+                foreach(Miniature mini in Displayer.MiniatureList) { if (mini.GetComputerName() == student.ComputerName && mini.StudentID == student.ID) { return; } }
                 Miniature miniature = new(student.ScreenShot, student.ComputerName, student.ID, Properties.Settings.Default.PathToSaveFolder);
                 Displayer.AddMiniature(miniature);
                 panelMiniatures.Controls.Add(miniature);
@@ -475,8 +475,10 @@ namespace ApplicationTeacher
             for (int i = 0; i < AllStudents.Count; i++)
             {
                 DataForTeacher student = AllStudents[i];
-                student.SocketToStudent.Send(Encoding.Default.GetBytes("stops"));
-                student.SocketToStudent.Send(Encoding.ASCII.GetBytes("disconnect"));
+                try {
+                    student.SocketToStudent.Send(Encoding.Default.GetBytes("stops"));
+                    student.SocketToStudent.Send(Encoding.ASCII.GetBytes("disconnect"));
+                }catch {/*Student has already closed the application.*/ }
                 student.SocketToStudent.Dispose();
             }
             TrayIconTeacher.Visible = false;

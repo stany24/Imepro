@@ -93,7 +93,7 @@
     <Compile Include="ChooseStreamOptions.Designer.cs">
       <DependentUpon>ChooseStreamOptions.cs</DependentUpon>
     </Compile>
-    <Compile Include="ConfigurationStatic.cs" />
+    <Compile Include="Configuration.cs" />
     <Compile Include="ConfigurationWindow.cs">
       <SubType>Form</SubType>
     </Compile>

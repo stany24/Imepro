@@ -22,10 +22,12 @@ namespace LibraryData
         private readonly Button btnSaveScreenShot = new();
         readonly int MargeBetweenText = 5;
         public int TimeSinceUpdate { get; set; }
-        internal string ComputerName { get; set; }
+        readonly private string ComputerName;
         private readonly string SavePath;
 
         #endregion
+
+        public string GetComputerName(){ return ComputerName; }
 
         #region Constructor
 
@@ -231,7 +233,7 @@ namespace LibraryData
         {
             foreach (Miniature miniature in MiniatureList)
             {
-                if (miniature.StudentID == id && miniature.ComputerName == computername)
+                if (miniature.StudentID == id && miniature.GetComputerName() == computername)
                 {
                     miniature.PbxImage.Image = image;
                     miniature.TimeSinceUpdate = 0;

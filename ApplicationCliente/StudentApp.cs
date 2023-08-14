@@ -102,9 +102,9 @@ namespace ApplicationCliente
         {
             Student.Urls.AddUrl(new Url(DateTime.Now, navigateur.Url),navigateurName);
             bool navigateback = true;
-            foreach (string url in Student.AutorisedUrls)
+            foreach (string url in Student.AutorisedUrls.Where(url => navigateur.Url.Contains(url)))
             {
-                if (navigateur.Url.Contains(url)) { navigateback = false; }
+                navigateback = false;
             }
             if(navigateur.Url == "about:blank") { navigateback= false; }
             if (navigateback){
@@ -143,7 +143,7 @@ namespace ApplicationCliente
             {
                 bool isCorrect = false;
                 IPInterfaceProperties properities = current.GetIPProperties();
-                foreach(UnicastIPAddressInformation ip in properities.UnicastAddresses.Where(addr => addr.Address.AddressFamily == AddressFamily.InterNetwork))
+                foreach(UnicastIPAddressInformation ip in properities.UnicastAddresses.Where(ip => ip.Address.AddressFamily == AddressFamily.InterNetwork))
                 {
                     if (IsOnSameNetwork(Student.IpToTeacher,ip.Address,ip.IPv4Mask)){isCorrect = true;}
                 }

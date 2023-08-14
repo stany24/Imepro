@@ -186,10 +186,8 @@ namespace LibraryData
                     foreach (Process instance in process)
                     {
                         Process parent = GetParent(instance);
-                        if(parent != null)
-                        {
-                            if (parent.ProcessName == singleBrowser) { continue; }
-                        }
+                        if (parent != null && parent.ProcessName == singleBrowser)
+                        { continue; }
                         Process.GetProcessById(instance.Id);
                         if (SeleniumProcessesID.Contains(instance.Id)) { continue; }
                         IntPtr hWnd = instance.MainWindowHandle;
@@ -309,6 +307,7 @@ namespace LibraryData
             GetUserProcesses();
             //serialization
             string jsonString = JsonSerializer.Serialize(ToData(), new JsonSerializerOptions { IncludeFields = true, });
+            lbxConnexion.Invoke(new MethodInvoker(delegate { lbxConnexion.Items.Add(jsonString); }));
             //envoi
             SocketToTeacher.Send(Encoding.ASCII.GetBytes(jsonString), Encoding.ASCII.GetBytes(jsonString).Length, SocketFlags.None);
         }
@@ -595,7 +594,7 @@ namespace LibraryData
             {
                 form.Show();
                 form.Controls.SetChildIndex(pbxScreenShot, 0);
-                switch (options.Priority)
+                switch (options.GetPriority())
                 {
                     case Priority.Fullscreen:
                         form.FormBorderStyle = FormBorderStyle.None;
@@ -656,7 +655,7 @@ namespace LibraryData
         {
             while (isReceiving)
             {
-                WindowMinimize.MinimizeUnAuthorised(options.Focus);
+                WindowMinimize.MinimizeUnAuthorised(options.GetFocus());
                 Thread.Sleep(3000);
             }
             WindowMinimize.ShowBack();
