@@ -1,38 +1,73 @@
 ﻿using LibraryData;
 using System.Collections.Generic;
-using System.Collections.Specialized;
+using System.Linq;
 using System.Text.Json;
 
 namespace ApplicationTeacher
 {
-    public class ConfigurationDynamique
+    public static class Configuration
     {
-        public Dictionary<string,StringCollection> AllLists = new();
-        public Dictionary<string, List<string>> AllFocus = new();
+        public static List<DataForTeacher> GetStudentToShareScreen()
+        { return JsonSerializer.Deserialize<List<DataForTeacher>>(Properties.Settings.Default.StudentToShareScreen); }
 
-        public ConfigurationDynamique()
+        public static void SetStudentToShareScreen(List<DataForTeacher> studentToShare)
+        {Properties.Settings.Default.StudentToShareScreen = JsonSerializer.Serialize(studentToShare);}
+
+        public static StreamOptions GetStreamOptions()
+        { return JsonSerializer.Deserialize<StreamOptions>(Properties.Settings.Default.StreamOptions); }
+
+        public static void SetStreamOptions(StreamOptions streamOptions)
+        { Properties.Settings.Default.StreamOptions = JsonSerializer.Serialize(streamOptions); }
+
+        public static Dictionary<string,List<string>> GetAllFocus()
         {
-            AllLists.Add("Processus ignorés", Properties.Settings.Default.IgnoredProcesses);
-            AllLists.Add("Urls alertés", Properties.Settings.Default.AlertedUrls);
-            AllLists.Add("Processus alertés", Properties.Settings.Default.AlertedProcesses);
-            AllLists.Add("Urls autorisés", Properties.Settings.Default.AutorisedWebsite);
-            try
-            {
-                AllFocus = JsonSerializer.Deserialize<Dictionary<string,List<string>>>(Properties.Settings.Default.AllFocus);
-            }
-            catch
-            {
-                AllFocus = new();
-            }
+            try { return JsonSerializer.Deserialize<Dictionary<string, List<string>>>(Properties.Settings.Default.AllFocus); }
+            catch { return new Dictionary<string, List<string>>(); }
         }
-    }
-    /// <summary>
-    /// Class pour tous les paramètres de configuraion
-    /// </summary>
-    public static class ConfigurationStatic
-    {
-        public static Dictionary<string,List<string>> DifferentFocus = new();
-        public static List<DataForTeacher> StudentToShareScreen = new();
-        public static StreamOptions streamoptions;
+
+        public static void SetAllFocus(Dictionary<string, List<string>> allFocus)
+        {
+            Properties.Settings.Default.AllFocus = JsonSerializer.Serialize(allFocus);
+            Properties.Settings.Default.Save();
+        }
+
+        public static List<string> GetIgnoredProcesses()
+        { return Properties.Settings.Default.IgnoredProcesses.Cast<string>().ToList();}
+
+        public static void SetIgnoredProcesses(List<string> ignoredProcesses)
+        {
+            Properties.Settings.Default.IgnoredProcesses.Clear();
+            Properties.Settings.Default.IgnoredProcesses.AddRange(ignoredProcesses.ToArray());
+            Properties.Settings.Default.Save();
+        }
+
+        public static List<string> GetAlertedUrls()
+        { return Properties.Settings.Default.AlertedUrls.Cast<string>().ToList(); }
+
+        public static void SetAlertedUrls(List<string> alertedUrls)
+        {
+            Properties.Settings.Default.AlertedUrls.Clear();
+            Properties.Settings.Default.AlertedUrls.AddRange(alertedUrls.ToArray());
+            Properties.Settings.Default.Save();
+        }
+        public static List<string> GetAlertedProcesses()
+        { return Properties.Settings.Default.AlertedProcesses.Cast<string>().ToList(); }
+
+        public static void SetAlertedProcesses(List<string> alertedProcesses)
+        {
+            Properties.Settings.Default.AlertedProcesses.Clear();
+            Properties.Settings.Default.AlertedProcesses.AddRange(alertedProcesses.ToArray());
+            Properties.Settings.Default.Save();
+        }
+
+        public static List<string> GetAutorisedWebsite()
+        { return Properties.Settings.Default.AutorisedWebsite.Cast<string>().ToList(); }
+
+        public static void SetAutorisedWebsite(List<string> autorisedwWbsites)
+        {
+            Properties.Settings.Default.AutorisedWebsite.Clear();
+            Properties.Settings.Default.AutorisedWebsite.AddRange(autorisedwWbsites.ToArray());
+            Properties.Settings.Default.Save();
+        }
     }
 }

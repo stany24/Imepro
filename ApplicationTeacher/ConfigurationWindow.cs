@@ -1,15 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.Text.Json;
 using System.Windows.Forms;
 
 namespace ApplicationTeacher
 {
     public partial class ConfigurationWindow : Form
     {
-        ConfigurationDynamique config;
-
         #region At start
 
         public ConfigurationWindow()
@@ -17,47 +13,13 @@ namespace ApplicationTeacher
             InitializeComponent();
             nudTimeBetweenAsking.Value = Properties.Settings.Default.TimeBetweenDemand;
             tbxSaveFolder.Text = Properties.Settings.Default.PathToSaveFolder;
-        }
-
-        /// <summary>
-        /// Function that loads the lists and the focuces
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void ConfigurationWindow_Load(object sender, EventArgs e)
-        {
-            config = new ConfigurationDynamique();
-            cbxCategory.Items.Add("Listes");
-            cbxCategory.Items.Add("Focus");
+            foreach (KeyValuePair<string,List<string>> entry in Configuration.GetAllFocus()) { cbxSelectFocus.Items.Add(entry); }
+            cbxSelectFocus.DisplayMember = "Key";
         }
 
         #endregion
 
-        #region Display
-
-        /// <summary>
-        /// Function to load all parameter in the new category
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void CategoryChanged(object sender, EventArgs e)
-        {
-            cbxParameter.Items.Clear();
-            lbxStrings.Items.Clear();
-            switch (cbxCategory.SelectedItem.ToString())
-            {
-                case "Listes":
-                    foreach (KeyValuePair<string, StringCollection> list in config.AllLists)
-                    {cbxParameter.Items.Add(list.Key);}
-                    btnNewFocus.Visible= false;
-                    break;
-                case "Focus":
-                    foreach (KeyValuePair<string, List<string>> list in config.AllFocus)
-                    {cbxParameter.Items.Add(list.Key);}
-                    btnNewFocus.Visible= true;
-                    break;
-            }
-        }
+        #region List
 
         /// <summary>
         /// Function to load the strings in the new parameter
@@ -66,23 +28,23 @@ namespace ApplicationTeacher
         /// <param name="e"></param>
         private void ParameterChanged(object sender, EventArgs e)
         {
-            lbxStrings.Items.Clear();
-            switch (cbxCategory.SelectedItem.ToString())
+            lbxStringsList.Items.Clear();
+            switch (cbxSelectList.SelectedItem.ToString())
             {
-                case "Listes":
-                    foreach (string str in config.AllLists[cbxParameter.SelectedItem.ToString()])
-                    {lbxStrings.Items.Add(str);}
+                case "AlertedProcesses":
+                    foreach (string str in Configuration.GetAlertedProcesses()){lbxStringsList.Items.Add(str);}
                     break;
-                case "Focus":
-                    foreach (string str in config.AllFocus[cbxParameter.SelectedItem.ToString()])
-                    {lbxStrings.Items.Add(str);}
+                case "AlertedUrls":
+                    foreach (string str in Configuration.GetAlertedUrls()) { lbxStringsList.Items.Add(str); }
+                    break;
+                case "IgnoredProcesses":
+                    foreach (string str in Configuration.GetIgnoredProcesses()) { lbxStringsList.Items.Add(str); }
+                    break;
+                case "AutorisedWebsite":
+                    foreach (string str in Configuration.GetAutorisedWebsite()) { lbxStringsList.Items.Add(str); }
                     break;
             }
         }
-
-        #endregion
-
-        #region Add/Remove
 
         /// <summary>
         /// Function that removes the selected string from the selected parameter
@@ -91,19 +53,32 @@ namespace ApplicationTeacher
         /// <param name="e"></param>
         private void RemoveSelectedString_Click(object sender, EventArgs e)
         {
-            switch (cbxCategory.SelectedItem.ToString())
+            while (lbxStringsList.SelectedItems.Count > 0)
+            { lbxStringsList.Items.Remove(lbxStringsList.SelectedItems[0]); }
+            switch (cbxSelectList.SelectedItem.ToString())
             {
-                case "Listes":
-                    foreach (string item in lbxStrings.SelectedItems)
-                    { config.AllLists[cbxParameter.SelectedItem.ToString()].Remove(item);}
+                case "AlertedProcesses":
+                    List<string> alertedProcesses = new();
+                    foreach (string str in lbxStringsList.Items) { alertedProcesses.Add(str); }
+                    Configuration.SetAlertedProcesses(alertedProcesses);
                     break;
-                case "Focus":
-                    foreach (string item in lbxStrings.SelectedItems)
-                    { config.AllFocus[cbxParameter.SelectedItem.ToString()].Remove(item);}
+                case "AlertedUrls":
+                    List<string> alertedUrls = new();
+                    foreach (string str in lbxStringsList.Items) { alertedUrls.Add(str); }
+                    Configuration.SetAlertedUrls(alertedUrls);
+                    break;
+                case "IgnoredProcesses":
+                    List<string> ignoredProcesses = new();
+                    foreach (string str in lbxStringsList.Items) { ignoredProcesses.Add(str); }
+                    Configuration.SetIgnoredProcesses(ignoredProcesses);
+                    break;
+                case "AutorisedWebsite":
+                    List<string> autorisedWebsite = new();
+                    foreach (string str in lbxStringsList.Items) { autorisedWebsite.Add(str); }
+                    Configuration.SetAutorisedWebsite(autorisedWebsite);
                     break;
             }
-            while (lbxStrings.SelectedItems.Count > 0)
-            {lbxStrings.Items.Remove(lbxStrings.SelectedItems[0]);}
+            
         }
 
         /// <summary>
@@ -113,33 +88,107 @@ namespace ApplicationTeacher
         /// <param name="e"></param>
         private void AddString_Click(object sender, EventArgs e)
         {
-            switch (cbxCategory.SelectedItem.ToString())
+            switch (cbxSelectList.SelectedItem.ToString())
             {
-                case "Listes":
-                    config.AllLists[cbxParameter.SelectedItem.ToString()].Add(tbxAddString.Text);
+                case "AlertedProcesses":
+                    List<string> alertedProcesses = Configuration.GetAlertedProcesses();
+                    alertedProcesses.Add(tbxAddStringList.Text);
+                    Configuration.SetAlertedProcesses(alertedProcesses);
                     break;
-                case "Focus":
-                    config.AllFocus[cbxParameter.SelectedItem.ToString()].Add(tbxAddString.Text);
+                case "AlertedUrls":
+                    List<string> alertedUrls = Configuration.GetAlertedUrls();
+                    alertedUrls.Add(tbxAddStringList.Text);
+                    Configuration.SetAlertedUrls(alertedUrls);
+                    break;
+                case "IgnoredProcesses":
+                    List<string> ignoredProcesses = Configuration.GetIgnoredProcesses();
+                    ignoredProcesses.Add(tbxAddStringList.Text);
+                    Configuration.SetIgnoredProcesses(ignoredProcesses);
+                    break;
+                case "AutorisedWebsite":
+                    List<string> autorisedWebsite = Configuration.GetAutorisedWebsite();
+                    autorisedWebsite.Add(tbxAddStringList.Text);
+                    Configuration.SetAutorisedWebsite(autorisedWebsite);
                     break;
             }
-            lbxStrings.Items.Add(tbxAddString.Text);
-            tbxAddString.Text = string.Empty;
+            lbxStringsList.Items.Add(tbxAddStringList.Text);
+            tbxAddStringList.Text = string.Empty;
         }
 
         #endregion
 
+        #region Focus
+
         /// <summary>
-        /// Function that saves the changes the user made
+        /// Function to add a new focus
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void ApplyChanges(object sender, EventArgs e)
+        private void NewFocus_Click(object sender, EventArgs e)
         {
-            Properties.Settings.Default.TimeBetweenDemand = (int)nudTimeBetweenAsking.Value;
-            Properties.Settings.Default.AllFocus = JsonSerializer.Serialize(config.AllFocus);
-            Properties.Settings.Default.Save();
+            try
+            {
+                Dictionary<string, List<string>> Focus = Configuration.GetAllFocus();
+                Focus.Add("new focus", new());
+                cbxSelectFocus.Items.Clear();
+                foreach (KeyValuePair<string, List<string>> item in Focus) { cbxSelectFocus.Items.Add(item); }
+                Configuration.SetAllFocus(Focus);
+            }
+            catch (Exception) { }
         }
-        
+
+        private void SelectedFocusChanged(object sender, EventArgs e)
+        {
+            Dictionary<string,List <string>> Focus = Configuration.GetAllFocus();
+            string key = ((KeyValuePair<string, List<string>>)cbxSelectFocus.SelectedItem).Key;
+            tbxFocusName.Text = key;
+            lbxStringsFocus.Items.Clear();
+            lbxStringsFocus.Items.AddRange(Focus[key].ToArray());
+        }
+
+        private void FocusNameChanged(object sender, EventArgs e)
+        {
+            Dictionary<string, List<string>> Focus = Configuration.GetAllFocus();
+            string oldKey = ((KeyValuePair<string, List<string>>)cbxSelectFocus.SelectedItem).Key;
+
+            Focus.Add(tbxFocusName.Text, Focus[oldKey]);
+            Focus.Remove(oldKey);
+            Configuration.SetAllFocus(Focus);
+            cbxSelectFocus.Items.Clear();
+            foreach (KeyValuePair<string, List<string>> entry in Configuration.GetAllFocus())
+            {
+                cbxSelectFocus.Items.Add(entry);
+                if(entry.Key == tbxFocusName.Text) { cbxSelectFocus.SelectedItem = entry; }
+            }
+        }
+
+        private void AddStringToFocus(object sender, EventArgs e)
+        {
+            if(tbxAddStringFocus.Text == string.Empty) { return; }
+            Dictionary<string, List<string>> Focus = Configuration.GetAllFocus();
+            string key = ((KeyValuePair<string, List<string>>)cbxSelectFocus.SelectedItem).Key;
+            Focus[key].Add(tbxAddStringFocus.Text);
+            lbxStringsFocus.Items.Add(tbxAddStringFocus.Text);
+            tbxAddStringFocus.Text = string.Empty;
+            Configuration.SetAllFocus(Focus);
+        }
+
+        private void RemoveStringToFocus(object sender, EventArgs e)
+        {
+            Dictionary<string, List<string>> Focus = Configuration.GetAllFocus();
+            string key = ((KeyValuePair<string, List<string>>)cbxSelectFocus.SelectedItem).Key;
+            while(lbxStringsFocus.SelectedItems.Count>0)
+            {
+                Focus[key].Remove((string)lbxStringsFocus.SelectedItems[0]);
+                lbxStringsFocus.Items.Remove(lbxStringsFocus.SelectedItems[0]);
+            }
+            Configuration.SetAllFocus(Focus);
+        }
+
+        #endregion
+
+        #region Other Parameters
+
         /// <summary>
         /// Function to change the location of the save folder
         /// </summary>
@@ -153,22 +202,19 @@ namespace ApplicationTeacher
             {
                 tbxSaveFolder.Text = fbdSaveFolder.SelectedPath;
                 Properties.Settings.Default.PathToSaveFolder = fbdSaveFolder.SelectedPath;
+                Properties.Settings.Default.Save();
             }
         }
 
-        /// <summary>
-        /// Function to add a new focus
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void NewFocus_Click(object sender, EventArgs e)
+       
+
+        private void ChangeTimeBetweenAsking(object sender, EventArgs e)
         {
-            for(int i = 0;i < 11; i++)
-            {
-                config.AllFocus.Add("focus "+i, new());
-                cbxParameter.Items.Clear();
-                foreach (KeyValuePair<string, List<string>> list in config.AllFocus){ cbxParameter.Items.Add(list.Key); }
-            }
+            Properties.Settings.Default.TimeBetweenDemand = (int)nudTimeBetweenAsking.Value;
+            Properties.Settings.Default.Save();
         }
+        #endregion
+
+
     }
 }

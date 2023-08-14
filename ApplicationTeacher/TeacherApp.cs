@@ -361,7 +361,7 @@ namespace ApplicationTeacher
         /// </summary>
         public void RecordAndStreamScreen()
         {
-            foreach (DataForTeacher student in ConfigurationStatic.StudentToShareScreen) { student.SocketToStudent.Send(Encoding.ASCII.GetBytes("receive")); }
+            foreach (DataForTeacher student in Configuration.GetStudentToShareScreen()) { student.SocketToStudent.Send(Encoding.ASCII.GetBytes("receive")); }
 
             Socket s = new(AddressFamily.InterNetwork,SocketType.Dgram, ProtocolType.Udp);
             IPAddress ip = IPAddress.Parse("232.1.2.3");
@@ -399,7 +399,7 @@ namespace ApplicationTeacher
             {
                 ChooseStreamOptions prompt = new(AllStudents);
                 if (prompt.ShowDialog(this) != DialogResult.OK){return;}
-                if (ConfigurationStatic.StudentToShareScreen.Count == 0){return;}
+                if (Configuration.GetStudentToShareScreen().Count == 0){return;}
                 isSharing= true;
                 SendStreamConfiguration();
                 ScreenSharer = Task.Run(RecordAndStreamScreen);
@@ -408,11 +408,10 @@ namespace ApplicationTeacher
             else
             {
                 isSharing = false;
-                for (int i = 0; i < ConfigurationStatic.StudentToShareScreen.Count; i++)
-                {
-                    ConfigurationStatic.StudentToShareScreen[i].SocketToStudent.Send(Encoding.Default.GetBytes("stops"));
-                    ConfigurationStatic.StudentToShareScreen.Remove(ConfigurationStatic.StudentToShareScreen[i]);
-                }
+                List<DataForTeacher> allSharedStudent = Configuration.GetStudentToShareScreen();
+                Configuration.SetStudentToShareScreen(null);
+                for (int i = 0; i < allSharedStudent.Count; i++)
+                {allSharedStudent[i].SocketToStudent.Send(Encoding.Default.GetBytes("stops"));}
                 btnShare.Text = "Share screen";
                 ScreenSharer.Wait();
                 ScreenSharer.Dispose();
@@ -424,13 +423,13 @@ namespace ApplicationTeacher
         /// </summary>
         private void SendStreamConfiguration()
         {
-            byte[] bytes = Encoding.Default.GetBytes(JsonSerializer.Serialize(ConfigurationStatic.streamoptions));
-            foreach(DataForTeacher student in ConfigurationStatic.StudentToShareScreen)
+            byte[] bytes = Encoding.Default.GetBytes(JsonSerializer.Serialize(Configuration.GetStreamOptions()));
+            foreach(DataForTeacher student in Configuration.GetStudentToShareScreen())
             {
                 student.SocketToStudent.Send(Encoding.Default.GetBytes("apply"));
             }
             Thread.Sleep(100);
-            foreach (DataForTeacher student in ConfigurationStatic.StudentToShareScreen)
+            foreach (DataForTeacher student in Configuration.GetStudentToShareScreen())
             {
                 student.SocketToStudent.Send(bytes);
             }

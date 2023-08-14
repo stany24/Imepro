@@ -142,5 +142,29 @@ namespace ApplicationTeacher.Properties {
                 this["AllFocus"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string StreamOptions {
+            get {
+                return ((string)(this["StreamOptions"]));
+            }
+            set {
+                this["StreamOptions"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string StudentToShareScreen {
+            get {
+                return ((string)(this["StudentToShareScreen"]));
+            }
+            set {
+                this["StudentToShareScreen"] = value;
+            }
+        }
     }
 }
