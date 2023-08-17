@@ -30,6 +30,8 @@ namespace LibraryData
 
         public Dictionary<string, List<Url>> GetAllBrowser() { return AllBrowser; }
 
+        public string[] GetAllBrowserNames() { return AllBrowserName; }
+
         public HistoriqueUrls()
         {
             AllBrowser = new();
