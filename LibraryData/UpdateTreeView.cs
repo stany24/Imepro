@@ -38,7 +38,7 @@ namespace LibraryData
 
         public static void UpdateUrls(DataForTeacher student, TreeNode nodeNavigateurs, TreeView treeNavigateurs)
         {
-            foreach (KeyValuePair<string, List<Historique>> browser in student.Urls.GetAllBrowser())
+            foreach (KeyValuePair<string, List<Url>> browser in student.Urls.GetAllBrowser())
             {
                 if (browser.Value.Count > 0)
                 {

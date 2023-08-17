@@ -182,7 +182,7 @@ namespace LibraryData
                         _ = GetWindowText(hWnd, text, text.Capacity);
                         if (text.ToString() != "")
                         {
-                            Urls.AddUrl(new Historique(DateTime.Now, text.ToString()), singleBrowser);
+                            Urls.AddUrl(new Url(DateTime.Now, text.ToString()), singleBrowser);
                         }
                     }
                 }

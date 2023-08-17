@@ -14,28 +14,28 @@ namespace LibraryData
     {
         readonly private string[] AllBrowserName = { "chrome", "firefox", "seleniumchrome", "seleniumfirefox", "opera", "msedge", "safari", "iexplorer", "custom" };
         [JsonInclude]
-        public Dictionary<string, List<Historique>> AllBrowser { get; set; }
+        public Dictionary<string, List<Url>> AllBrowser { get; set; }
 
         /// <summary>
         /// Function to add a new url
         /// </summary>
         /// <param name="url">the url</param>
         /// <param name="browser">the browser the url comes from</param>
-        public void AddUrl(Historique url,string browser)
+        public void AddUrl(Url url,string browser)
         {
             if (AllBrowser[browser].Count == 0 ) { AllBrowser[browser].Add(url); return; }
             if (AllBrowser[browser].Last().Name == url.Name) { return; }
             AllBrowser[browser].Add(url);
         }
 
-        public Dictionary<string, List<Historique>> GetAllBrowser() { return AllBrowser; }
+        public Dictionary<string, List<Url>> GetAllBrowser() { return AllBrowser; }
 
         public string[] GetAllBrowserNames() { return AllBrowserName; }
 
         public Historique()
         {
             AllBrowser = new();
-            for (int i = 0;i < AllBrowserName.Count(); i++) { AllBrowser.Add(AllBrowserName[i], new List<Historique>()); }
+            for (int i = 0;i < AllBrowserName.Count(); i++) { AllBrowser.Add(AllBrowserName[i], new List<Url>()); }
         }
     }
 
@@ -43,14 +43,14 @@ namespace LibraryData
     /// Class representing an url
     /// </summary>
     [Serializable]
-    public class Historique
+    public class Url
     {
         [JsonInclude]
         readonly public DateTime CaptureTime;
         [JsonInclude]
         readonly public string Name;
 
-        public Historique(DateTime capturetime, string name)
+        public Url(DateTime capturetime, string name)
         {
             CaptureTime = capturetime;
             Name = name;

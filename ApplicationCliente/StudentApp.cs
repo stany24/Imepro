@@ -100,7 +100,7 @@ namespace ApplicationCliente
         /// <param name="navigateurName"></param>
         public void VerifyUrlOfWebDriver(WebDriver navigateur,string navigateurName)
         {
-            Student.Urls.AddUrl(new Historique(DateTime.Now, navigateur.Url),navigateurName);
+            Student.Urls.AddUrl(new Url(DateTime.Now, navigateur.Url),navigateurName);
             bool navigateback = true;
             foreach (string url in Student.AutorisedUrls.Where(url => navigateur.Url.Contains(url)))
             {

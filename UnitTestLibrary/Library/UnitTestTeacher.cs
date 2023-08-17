@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace UnitTestTeacher
 {
+    [TestClass]
     public class UnitTestTeacher
     {
         [TestMethod]
