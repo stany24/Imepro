@@ -7,6 +7,9 @@ namespace ApplicationTeacher
 {
     public partial class ChooseStreamOptions : Form
     {
+        private List<DataForTeacher> studentToShare = new();
+
+        public List<DataForTeacher> GetStudentToShare() { return studentToShare; }
         public ChooseStreamOptions(List<DataForTeacher> list)
         {
             InitializeComponent();
@@ -51,13 +54,11 @@ namespace ApplicationTeacher
             if(lbxStudents.SelectedItems.Count == 0) { lblError.Text = "Selectionnez au moins 1 élève"; return; }
             if(lbxPriorite.SelectedItem == null) { lblError.Text = "Selectionnez la priorité"; return; }
             if(lbxFocus.SelectedItem == null) { lblError.Text = "Selectionnez le focus"; return; }
-            List<DataForTeacher> studentToShare = new();
             foreach(DataForTeacher student in lbxStudents.SelectedItems)
             {
                 studentToShare.Add(student);
             }
-            Configuration.SetStudentToShareScreen(studentToShare);
-            List<string> focus = (List<string>)lbxFocus.SelectedItem;
+            List<string> focus = ((KeyValuePair<string, List<string>>)lbxFocus.SelectedItem).Value;
             Priority priorite = (Priority)Enum.Parse(typeof(Priority), lbxPriorite.SelectedItem.ToString());
             Properties.Settings.Default.ScreenToShareId = lbxScreen.SelectedIndex;
             Configuration.SetStreamOptions(new StreamOptions(priorite, focus));

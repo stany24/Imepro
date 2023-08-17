@@ -11,9 +11,9 @@ namespace LibraryData
     public class StreamOptions
     {
         [JsonInclude]
-        readonly private Priority Priority;
+        readonly public Priority Priority;
         [JsonInclude]
-        readonly private List<string> Focus;
+        readonly public List<string> Focus;
 
         public Priority GetPriority() { return Priority; }
         public List<string> GetFocus() { return Focus; }

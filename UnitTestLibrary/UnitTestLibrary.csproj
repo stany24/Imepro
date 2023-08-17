@@ -51,9 +51,8 @@
   <ItemGroup>
     <Compile Include="Library\BlocageTest.cs" />
     <Compile Include="Library\CustomMessageTest.cs" />
+    <Compile Include="Library\DataTest.cs" />
     <Compile Include="Library\StreamOptionsTest.cs" />
-    <Compile Include="Library\UnitTestStudent.cs" />
-    <Compile Include="Library\UnitTestTeacher.cs" />
     <Compile Include="Library\HistoriqueTest.cs" />
     <Compile Include="Library\UpdateTreeViewTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -61,6 +60,7 @@
     <Compile Include="Teacher\ConfigurationTest.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

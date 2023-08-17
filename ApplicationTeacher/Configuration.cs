@@ -7,12 +7,6 @@ namespace ApplicationTeacher
 {
     public static class Configuration
     {
-        public static List<DataForTeacher> GetStudentToShareScreen()
-        { return JsonSerializer.Deserialize<List<DataForTeacher>>(Properties.Settings.Default.StudentToShareScreen); }
-
-        public static void SetStudentToShareScreen(List<DataForTeacher> studentToShare)
-        {Properties.Settings.Default.StudentToShareScreen = JsonSerializer.Serialize(studentToShare);}
-
         public static StreamOptions GetStreamOptions()
         { return JsonSerializer.Deserialize<StreamOptions>(Properties.Settings.Default.StreamOptions); }
 

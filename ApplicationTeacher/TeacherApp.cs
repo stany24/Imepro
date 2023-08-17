@@ -21,6 +21,7 @@ namespace ApplicationTeacher
 
         readonly MiniatureDisplayer Displayer;
         readonly List<DataForTeacher> AllStudents = new();
+        private List<DataForTeacher> StudentToShareScreen = new();
         readonly List<DisplayStudent> AllStudentsDisplay = new();
         Task ScreenSharer;
         bool isSharing = false;
@@ -360,7 +361,7 @@ namespace ApplicationTeacher
         /// </summary>
         public void RecordAndStreamScreen()
         {
-            foreach (DataForTeacher student in Configuration.GetStudentToShareScreen()) { student.SocketToStudent.Send(Encoding.ASCII.GetBytes("receive")); }
+            foreach (DataForTeacher student in StudentToShareScreen) { student.SocketToStudent.Send(Encoding.ASCII.GetBytes("receive")); }
 
             Socket s = new(AddressFamily.InterNetwork,SocketType.Dgram, ProtocolType.Udp);
             IPAddress ip = IPAddress.Parse("232.1.2.3");
@@ -398,7 +399,8 @@ namespace ApplicationTeacher
             {
                 ChooseStreamOptions prompt = new(AllStudents);
                 if (prompt.ShowDialog(this) != DialogResult.OK){return;}
-                if (Configuration.GetStudentToShareScreen().Count == 0){return;}
+                if (StudentToShareScreen.Count == 0){return;}
+                StudentToShareScreen = prompt.GetStudentToShare();
                 isSharing= true;
                 SendStreamConfiguration();
                 ScreenSharer = Task.Run(RecordAndStreamScreen);
@@ -407,10 +409,9 @@ namespace ApplicationTeacher
             else
             {
                 isSharing = false;
-                List<DataForTeacher> allSharedStudent = Configuration.GetStudentToShareScreen();
-                Configuration.SetStudentToShareScreen(null);
-                for (int i = 0; i < allSharedStudent.Count; i++)
-                {allSharedStudent[i].SocketToStudent.Send(Encoding.Default.GetBytes("stops"));}
+                for (int i = 0; i < StudentToShareScreen.Count; i++)
+                { StudentToShareScreen[i].SocketToStudent.Send(Encoding.Default.GetBytes("stops"));}
+                StudentToShareScreen = new();
                 btnShare.Text = "Share screen";
                 ScreenSharer.Wait();
                 ScreenSharer.Dispose();
@@ -423,12 +424,12 @@ namespace ApplicationTeacher
         private void SendStreamConfiguration()
         {
             byte[] bytes = Encoding.Default.GetBytes(JsonSerializer.Serialize(Configuration.GetStreamOptions()));
-            foreach(DataForTeacher student in Configuration.GetStudentToShareScreen())
+            foreach(DataForTeacher student in StudentToShareScreen)
             {
                 student.SocketToStudent.Send(Encoding.Default.GetBytes("apply"));
             }
             Thread.Sleep(100);
-            foreach (DataForTeacher student in Configuration.GetStudentToShareScreen())
+            foreach (DataForTeacher student in StudentToShareScreen)
             {
                 student.SocketToStudent.Send(bytes);
             }
