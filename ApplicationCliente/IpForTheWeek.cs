@@ -6,15 +6,15 @@ using System.Text.Json;
 namespace ApplicationCliente
 {
     /// <summary>
-    /// Class containing all ip for a week
+    /// Class containing all ip for a week.
     /// </summary>
     [Serializable]
     public static class IpForTheWeek
     {
         /// <summary>
-        /// Function that save the given ip at the right place given the day and hour
+        /// Function that save the given ip at the right place given the day and hour.
         /// </summary>
-        /// <param name="ip">the ip you want to save</param>
+        /// <param name="ip">The ip you want to save.</param>
         public static void SetIp(string ip)
         {
             Dictionary<string, string[]> Days;
@@ -36,9 +36,9 @@ namespace ApplicationCliente
         }
 
         /// <summary>
-        /// Function that returns the ip for the day and hour
+        /// Function that returns the ip for the day and hour.
         /// </summary>
-        /// <returns>the ip addresse for the teacher</returns>
+        /// <returns>The ip addresse for the teacher.</returns>
         public static IPAddress GetIp()
         {
             Dictionary<string, string[]> Days = JsonSerializer.Deserialize<Dictionary<string, string[]>>(Properties.Settings.Default.IpForTheWeek);

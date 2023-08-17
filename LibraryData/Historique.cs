@@ -7,7 +7,7 @@ namespace LibraryData
 {
 
     /// <summary>
-    /// Class that holds the history of all browser
+    /// Class that holds the history of all browser.
     /// </summary>
     [Serializable]
     public class Historique
@@ -17,18 +17,16 @@ namespace LibraryData
         public Dictionary<string, List<Url>> AllBrowser { get; set; }
 
         /// <summary>
-        /// Function to add a new url
+        /// Function to add a new url.
         /// </summary>
-        /// <param name="url">the url</param>
-        /// <param name="browser">the browser the url comes from</param>
+        /// <param name="url">The new url.</param>
+        /// <param name="browser">The browser the url comes from.</param>
         public void AddUrl(Url url,string browser)
         {
             if (AllBrowser[browser].Count == 0 ) { AllBrowser[browser].Add(url); return; }
             if (AllBrowser[browser].Last().Name == url.Name) { return; }
             AllBrowser[browser].Add(url);
         }
-
-        public Dictionary<string, List<Url>> GetAllBrowser() { return AllBrowser; }
 
         public string[] GetAllBrowserNames() { return AllBrowserName; }
 
@@ -40,7 +38,7 @@ namespace LibraryData
     }
 
     /// <summary>
-    /// Class representing an url
+    /// Class representing an url.
     /// </summary>
     [Serializable]
     public class Url

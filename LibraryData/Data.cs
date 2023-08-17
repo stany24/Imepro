@@ -19,7 +19,7 @@ using System.Windows.Forms;
 namespace LibraryData
 {
     /// <summary>
-    /// Class  that represent a basic student
+    /// Class  that represent a basic student.
     /// </summary>
     [Serializable]
     public class Data
@@ -58,7 +58,7 @@ namespace LibraryData
     }
 
     /// <summary>
-    /// Class that represent a student in the teacher application
+    /// Class that represent a student in the teacher application.
     /// </summary>
     public class DataForTeacher : Data
     {
@@ -91,7 +91,7 @@ namespace LibraryData
     }
 
     /// <summary>
-    /// Class qui contient toute la logique pour faire fonctionner l'application cliente
+    /// Class containing all logic for the student application.
     /// </summary>
     public class DataForStudent : Data, IMessageFilter
     {
@@ -154,7 +154,7 @@ namespace LibraryData
         #region Récupération Url/Processus/Image
 
         /// <summary>
-        /// Function to get the tab name in all browser
+        /// Function to get the tab name in all browser.
         /// </summary>
         private void GetCurrentWebTabsName()
         {
@@ -190,10 +190,10 @@ namespace LibraryData
         }
 
         /// <summary>
-        /// Function to get the parent of a process
+        /// Function to get the parent of a process.
         /// </summary>
-        /// <param name="process"></param>
-        /// <returns></returns>
+        /// <param name="process">The process you want to parent.</param>
+        /// <returns>The parent of the given process.</returns>
         public Process GetParent(Process process)
         {
             try
@@ -215,7 +215,7 @@ namespace LibraryData
         }
 
         /// <summary>
-        /// Function to get the default processes when launching the application
+        /// Function to get the default processes when launching the application.
         /// </summary>
         private void GetDefaultProcesses()
         {
@@ -223,7 +223,7 @@ namespace LibraryData
         }
 
         /// <summary>
-        /// Function to update the processes launched by the user
+        /// Function to update the processes launched by the user.
         /// </summary>
         private void GetUserProcesses()
         {
@@ -236,7 +236,7 @@ namespace LibraryData
         }
 
         /// <summary>
-        /// Function to get a screenshot of all screen in one image
+        /// Function to get a screenshot of all screen in one image.
         /// </summary>
         private Bitmap TakeAllScreenShot()
         {
@@ -268,9 +268,9 @@ namespace LibraryData
         }
 
         /// <summary>
-        /// Function to take a screenshot of the given screen
+        /// Function to take a screenshot of the given screen.
         /// </summary>
-        /// <param name="screen">the screen we want the screenshot</param>
+        /// <param name="screen">The screen we want the screenshot.</param>
         /// <returns></returns>
         private Bitmap TakeSreenShot(Screen screen)
         {
@@ -285,7 +285,7 @@ namespace LibraryData
         #region Envoi de données
 
         /// <summary>
-        /// Function send the data to the teacher
+        /// Function send the data to the teacher.
         /// </summary>
         private void SendData()
         {
@@ -298,7 +298,7 @@ namespace LibraryData
         }
 
         /// <summary>
-        /// Function to send the screenshot to the teacher
+        /// Function to send the screenshot to the teacher.
         /// </summary>
         private void SendImage(Bitmap image, Socket socket)
         {
@@ -313,7 +313,7 @@ namespace LibraryData
         #region Connexion/Reception
 
         /// <summary>
-        /// Function used to connect to the teacher application
+        /// Function used to connect to the teacher application.
         /// </summary>
         public Socket ConnectToTeacher(int port)
         {
@@ -380,7 +380,7 @@ namespace LibraryData
         }
 
         /// <summary>
-        /// Function waiting for teacher demand and responding correctly
+        /// Function waiting for teacher demand and responding correctly.
         /// </summary>
         private void WaitForDemand()
         {
@@ -415,7 +415,7 @@ namespace LibraryData
         }
 
         /// <summary>
-        /// Function to stop a process
+        /// Function to stop a process.
         /// </summary>
         /// <param name="id">the id of the process</param>
         private void KillSelectedProcess(int id)
@@ -424,7 +424,7 @@ namespace LibraryData
         }
 
         /// <summary>
-        /// Function to reconnect to the teacher
+        /// Function to reconnect to the teacher.
         /// </summary>
         private void Disconnect()
         {
@@ -436,7 +436,7 @@ namespace LibraryData
         }
 
         /// <summary>
-        /// Function to stop the application
+        /// Function to stop the application.
         /// </summary>
         private void ShutDown()
         {
@@ -446,7 +446,7 @@ namespace LibraryData
         }
 
         /// <summary>
-        /// Function to go back to normal after a stream
+        /// Function to go back to normal after a stream.
         /// </summary>
         private void Stop()
         {
@@ -458,7 +458,7 @@ namespace LibraryData
         }
 
         /// <summary>
-        /// Function to send the stream to the teacher
+        /// Function to send the stream to the teacher.
         /// </summary>
         private void SendStream()
         {
@@ -471,7 +471,7 @@ namespace LibraryData
         }
 
         /// <summary>
-        /// Function to receive the autorised urls
+        /// Function to receive the autorised urls.
         /// </summary>
         private void ReceiveAuthorisedUrls()
         {
@@ -482,7 +482,7 @@ namespace LibraryData
         }
 
         /// <summary>
-        /// Function to receive a message from the teacher
+        /// Function to receive a message from the teacher.
         /// </summary>
         private void ReceiveMessage()
         {
@@ -497,7 +497,7 @@ namespace LibraryData
         #region Stream
 
         /// <summary>
-        /// Function that receive the multicast stream form the teacher
+        /// Function that receive the multicast stream form the teacher.
         /// </summary>
         private void ReceiveMulticastStream()
         {
@@ -515,7 +515,7 @@ namespace LibraryData
         }
 
         /// <summary>
-        /// Function to start receiving the multicast stream
+        /// Function to start receiving the multicast stream.
         /// </summary>
         /// <param name="args"></param>
         private void BeginReceive(SocketAsyncEventArgs args)
@@ -527,7 +527,7 @@ namespace LibraryData
         }
 
         /// <summary>
-        /// Function to end the multicast stream
+        /// Function to end the multicast stream.
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="args"></param>
@@ -537,7 +537,7 @@ namespace LibraryData
         }
 
         /// <summary>
-        /// Function to receive the multicast stream
+        /// Function to receive the multicast stream.
         /// </summary>
         /// <param name="args"></param>
         private void ProcessReceive(SocketAsyncEventArgs args)
@@ -566,7 +566,7 @@ namespace LibraryData
         }
 
         /// <summary>
-        /// Function that receive the multicast stream settings and apply them
+        /// Function that receive the multicast stream settings and apply them.
         /// </summary>
         private void ApplyMulticastSettings()
         {
@@ -610,7 +610,7 @@ namespace LibraryData
         #region Blocage
 
         /// <summary>
-        /// Function to block all keyboard inputs
+        /// Function to block all keyboard inputs.
         /// </summary>
         private void DisableKeyboard()
         {
@@ -624,7 +624,7 @@ namespace LibraryData
         }
 
         /// <summary>
-        /// Function to ignore pressed key
+        /// Function to ignore pressed key.
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -634,7 +634,7 @@ namespace LibraryData
         }
 
         /// <summary>
-        /// Function to minimized unauthorised application every second
+        /// Function to minimized unauthorised application every second.
         /// </summary>
         private void MinimizeUnAutorisedEverySecond()
         {
@@ -647,7 +647,7 @@ namespace LibraryData
         }
 
         /// <summary>
-        /// Function that disables the mouse every second
+        /// Function that disables the mouse every second.
         /// </summary>
         private void DisableMouseEverySecond()
         {
@@ -662,7 +662,7 @@ namespace LibraryData
 
 
         /// <summary>
-        /// Function to block the mouse
+        /// Function to block the mouse.
         /// </summary>
         private void DisableMouse()
         {
@@ -676,7 +676,7 @@ namespace LibraryData
         }
 
         /// <summary>
-        /// Function to enable the mouse
+        /// Function to enable the mouse.
         /// </summary>
         private void EnableMouse()
         {

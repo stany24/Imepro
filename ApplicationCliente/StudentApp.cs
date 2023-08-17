@@ -43,7 +43,7 @@ namespace ApplicationCliente
         }
 
         /// <summary>
-        /// Function waiting for the form to be fully created before launching background tasks
+        /// Function waiting for the form to be fully created before launching background tasks.
         /// </summary>
         public void LaunchTasks()
         {
@@ -57,7 +57,7 @@ namespace ApplicationCliente
         #region selenium
 
         /// <summary>
-        /// Function to start a new instance for chrome controled with selenium
+        /// Function to start a new instance for chrome controled with selenium.
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -69,7 +69,7 @@ namespace ApplicationCliente
         }
 
         /// <summary>
-        /// Function to start a new instance for firefox controled with selenium
+        /// Function to start a new instance for firefox controled with selenium.
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -83,7 +83,7 @@ namespace ApplicationCliente
         }
 
         /// <summary>
-        /// Function that verify the urls of browser launched with selenium
+        /// Function that verify the urls of browser launched with selenium.
         /// </summary>
         public void AutomaticChecker()
         {
@@ -96,7 +96,7 @@ namespace ApplicationCliente
         }
 
         /// <summary>
-        /// Function that verify if the url is autorised and adds it to the history
+        /// Function that verify if the url is autorised and adds it to the history.
         /// </summary>
         /// <param name="navigateur"></param>
         /// <param name="navigateurName"></param>
@@ -121,7 +121,7 @@ namespace ApplicationCliente
         #region teacher ip
 
         /// <summary>
-        /// Function that asks to the student the new teacher ip
+        /// Function that asks to the student the new teacher ip.
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -135,9 +135,9 @@ namespace ApplicationCliente
         }
 
         /// <summary>
-        /// Function that verify the interfaces, if they are incorrect it returns a script
+        /// Function that verify the interfaces, if they are incorrect it returns a script.
         /// </summary>
-        /// <returns> La commande à executer en powershell pour modifier les interfaces</returns>
+        /// <returns> The command to excecute in powershell</returns>
         public string CheckInterfaces()
         {
             NetworkInterface[] netInterface = NetworkInterface.GetAllNetworkInterfaces();
@@ -160,32 +160,27 @@ namespace ApplicationCliente
         }
 
         /// <summary>
-        /// Function to know if two adresses are on the same network
+        /// Function to know if two adresses are on the same network.
         /// </summary>
-        /// <param name="ipAddress1">La première adresse ip</param>
-        /// <param name="ipAddress2">La deuxième adresse ip</param>
-        /// <param name="subnetMask">Le mask de sous réseau d'une des adresse</param>
-        /// <returns></returns>
+        /// <param name="ipAddress1">The first ip.</param>
+        /// <param name="ipAddress2">The second ip.</param>
+        /// <param name="subnetMask">The adress mask.</param>
+        /// <returns>If the addresses are on the same network.</returns>
         public static bool IsOnSameNetwork(IPAddress ipAddress1, IPAddress ipAddress2, IPAddress subnetMask)
         {
-            // Convert the IP addresses and subnet mask to byte arrays
             byte[] ipBytes1 = ipAddress1.GetAddressBytes();
             byte[] ipBytes2 = ipAddress2.GetAddressBytes();
             byte[] subnetMaskBytes = subnetMask.GetAddressBytes();
 
-            // Compare the network portions of the IP addresses using the subnet mask
             for (int i = 0; i < ipBytes1.Length; i++)
             {
-                if ((ipBytes1[i] & subnetMaskBytes[i]) != (ipBytes2[i] & subnetMaskBytes[i]))
-                {
-                    return false;
-                }
+                if ((ipBytes1[i] & subnetMaskBytes[i]) != (ipBytes2[i] & subnetMaskBytes[i])){return false;}
             }
             return true;
         }
 
         /// <summary>
-        /// Function to help the user configure its interfaces
+        /// Function to help the user configure its interfaces.
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -209,7 +204,7 @@ namespace ApplicationCliente
         #region interaction
 
         /// <summary>
-        /// Function that communicate to the teacher the closure of the application
+        /// Function that communicate to the teacher the closure of the application.
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -231,7 +226,7 @@ namespace ApplicationCliente
         }
 
         /// <summary>
-        /// Function that displays the trayicon if the application is minimized
+        /// Function that displays the trayicon if the application is minimized.
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -252,7 +247,7 @@ namespace ApplicationCliente
         }
 
         /// <summary>
-        /// Function to show the application when the trayicon is clicked
+        /// Function to show the application when the trayicon is clicked.
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>

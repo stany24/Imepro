@@ -8,10 +8,19 @@ namespace LibraryData
 {
     public static class UpdateTreeView
     {
-        public static void UpdateProcess(DataForTeacher student, TreeNode nodeProcess, TreeView treeProcess, bool filterEnabled, StringCollection alertedProcesses, StringCollection ignoredProcesses)
+        /// <summary>
+        /// Function to update a treeview with the processes a student is running.
+        /// </summary>
+        /// <param name="processes">A dictionary of process with the id as key and the name as value.</param>
+        /// <param name="nodeProcess">The parent node of all the processes.</param>
+        /// <param name="treeProcess">The treeview you want to update.</param>
+        /// <param name="filterEnabled">If the filters are enabled or not.</param>
+        /// <param name="alertedProcesses">List of alerted processes.</param>
+        /// <param name="ignoredProcesses">List of ignored processes.</param>
+        public static void UpdateProcess(Dictionary<int, string> processes, TreeNode nodeProcess, TreeView treeProcess, bool filterEnabled, StringCollection alertedProcesses, StringCollection ignoredProcesses)
         {
 
-            foreach (string process in student.Processes.Select(process => process.Value))
+            foreach (string process in processes.Select(process => process.Value))
             {
                 TreeNode current;
                 if (nodeProcess != null) { current = nodeProcess.Nodes.Add(process); }
@@ -36,9 +45,15 @@ namespace LibraryData
             }
         }
 
-        public static void UpdateUrls(DataForTeacher student, TreeNode nodeNavigateurs, TreeView treeNavigateurs)
+        /// <summary>
+        /// Function to Update a treeview with the historique of urls.
+        /// </summary>
+        /// <param name="browsers">A dictionnary with the name of the browser a key and list of url as values</param>
+        /// <param name="nodeNavigateurs">The treenode containing all browser.</param>
+        /// <param name="treeNavigateurs">The treeview you want to update.</param>
+        public static void UpdateUrls(Dictionary<string, List<Url>> browsers, TreeNode nodeNavigateurs, TreeView treeNavigateurs)
         {
-            foreach (KeyValuePair<string, List<Url>> browser in student.Urls.GetAllBrowser())
+            foreach (KeyValuePair<string, List<Url>> browser in browsers)
             {
                 if (browser.Value.Count > 0)
                 {
@@ -62,7 +77,7 @@ namespace LibraryData
         }
 
         /// <summary>
-        /// Fonction qui active les filtre dans les TreeViews
+        /// Fonction to enable filters for urls
         /// </summary>
         /// <param name="NodeBrowsers"></param>
         public static void ApplyUrlFilter(TreeNode NodeBrowsers, StringCollection alertedUrls)

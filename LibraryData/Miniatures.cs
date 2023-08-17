@@ -10,7 +10,7 @@ using System.Linq;
 namespace LibraryData
 {
     /// <summary>
-    /// Class pour les miniatures: une capture d'écran avec en desous le nom du poste
+    /// Class for miniatures: a screenshot with the name of the student.
     /// </summary>
     public class Miniature : UserControl
     {
@@ -32,18 +32,16 @@ namespace LibraryData
         #region Constructor
 
         /// <summary>
-        /// Consctucteur pour créer et positionner un miniature
+        /// Constructor to create and place the miniature.
         /// </summary>
-        /// <param name="image">L'image à afficher</param>
-        /// <param name="name">Le nom de l'ordinateur</param>
-        /// <param name="studentID">L'id de l'élève</param>
-        /// <param name="savepath">Le chemin de sauvegarde des images</param>
+        /// <param name="image">The screenshot of the student.</param>
+        /// <param name="name">The computer name.</param>
+        /// <param name="studentID">The student ID.</param>
+        /// <param name="savepath">The save path for images.</param>
         public Miniature(Bitmap image, string name, int studentID, string savepath)
         {
             TimeSinceUpdate = 0;
             PbxImage = new();
-
-            //valeurs pour la fenêtre de control
             Size = PbxImage.Size;
             StudentID = studentID;
             ComputerName = name;
@@ -84,7 +82,7 @@ namespace LibraryData
         #region Teacher Action
 
         /// <summary>
-        /// Function pour sauvegarder la capture d'écran actuel
+        /// Function to save the current screenshot.
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -98,7 +96,7 @@ namespace LibraryData
         #region Update
 
         /// <summary>
-        /// Function qui ajoute une seconde au temps depuis la mise à jour de l'image et change le texte du label.
+        /// Function to update the time under a miniature.
         /// </summary>
         public void UpdateTime()
         {
@@ -107,18 +105,15 @@ namespace LibraryData
         }
 
         /// <summary>
-        /// Function qui positionne le label par rapport à la picturebox
+        /// Function to move the label relative to the picturebox.
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void UpdatePositionsRelativeToImage(object sender, EventArgs e)
         {
-            //taille de la picturebox
             Size = new Size(PbxImage.Width, PbxImage.Height + 3 * MargeBetweenText + lblComputerInformations.Height);
-            //postion du bouton
             btnSaveScreenShot.Left = PbxImage.Location.X + PbxImage.Width / 2 + MargeBetweenText / 2;
             btnSaveScreenShot.Top = PbxImage.Location.Y + PbxImage.Height + MargeBetweenText;
-            //position du label
             lblComputerInformations.Left = PbxImage.Location.X + PbxImage.Width / 2 - lblComputerInformations.Width - MargeBetweenText / 2;
             lblComputerInformations.Top = btnSaveScreenShot.Location.Y + (btnSaveScreenShot.Height - lblComputerInformations.Height);
         }
@@ -127,7 +122,7 @@ namespace LibraryData
     }
 
     /// <summary>
-    /// Class pour Afficher plusieurs miniatures dans un panel
+    /// Class to display multiple miniatures in a panel.
     /// </summary>
     public class MiniatureDisplayer
     {
@@ -155,7 +150,7 @@ namespace LibraryData
         #region Teacher Action
 
         /// <summary>
-        /// Function qui permet de zoomer dans les miniatures en changant leur taille
+        /// Function to zoom in and out of the panel.
         /// </summary>
         public void ChangeZoom()
         {
@@ -176,7 +171,7 @@ namespace LibraryData
         #region Update
 
         /// <summary>
-        /// Function qui toutes les seconde lance une mise à jour du temps
+        /// Function to update all miniature time.
         /// </summary>
         private void LaunchTimeUpdate()
         {
@@ -184,23 +179,15 @@ namespace LibraryData
             while (true)
             {
                 Thread.Sleep(1000);
-                Task.Run(UpdateAllTimes);
+                foreach (Miniature miniature in MiniatureList)
+                {
+                    miniature.UpdateTime();
+                }
             }
         }
 
         /// <summary>
-        /// Function qui lance la mise à jour du temps dans toutes les miniatures
-        /// </summary>
-        private void UpdateAllTimes()
-        {
-            foreach (Miniature miniature in MiniatureList)
-            {
-                miniature.UpdateTime();
-            }
-        }
-
-        /// <summary>
-        /// Function qui place toutes les miniatures au bon endroit
+        /// Function to place all miniatures at the right place.
         /// </summary>
         public void UpdateAllLocations(int maxwidth)
         {
@@ -224,11 +211,11 @@ namespace LibraryData
         }
 
         /// <summary>
-        /// Function pour mettre à jour l'image d'une miniature
+        /// Function to update the miniature image.
         /// </summary>
-        /// <param name="id">Id de l'élève</param>
-        /// <param name="computername"> Nom de l'ordinateur</param>
-        /// <param name="image">La nouvelle image que l'on veux mettre</param>
+        /// <param name="id">The student ID.</param>
+        /// <param name="computername">The computer name.</param>
+        /// <param name="image">The new image.</param>
         public void UpdateMiniature(int id, string computername, Bitmap image)
         {
             foreach (Miniature miniature in MiniatureList)
@@ -247,7 +234,7 @@ namespace LibraryData
         #region Getter / Setter
 
         /// <summary>
-        /// Function pour ajouter une miniature que le miniatureDisplayer doit gérer
+        /// Function to add a new miniature to the panel.
         /// </summary>
         /// <param name="miniature"></param>
         public void AddMiniature(Miniature miniature)
@@ -257,10 +244,10 @@ namespace LibraryData
         }
 
         /// <summary>
-        /// Function pour enlever un miniature de la liste que le miniatureDisplayer doit gérer
+        /// Function to remove a miniature of the panel.
         /// </summary>
-        /// <param name="id">Id de l'éléve</param>
-        /// <param name="computername">Le nom de l'ordinateur</param>
+        /// <param name="id">The student ID.</param>
+        /// <param name="computername">The computer name.</param>
         public void RemoveMiniature(int id)
         {
             foreach (Miniature miniature in MiniatureList)

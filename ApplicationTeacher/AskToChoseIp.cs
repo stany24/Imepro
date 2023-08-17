@@ -18,7 +18,7 @@ namespace ApplicationTeacher
         }
 
         /// <summary>
-        /// Function that confirms the selected ip
+        /// Function that confirms the selected ip.
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -28,7 +28,7 @@ namespace ApplicationTeacher
         }
 
         /// <summary>
-        /// Function that enables the confirm button after selecting an ip
+        /// Function that enables the confirm button after selecting an ip.
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -38,7 +38,7 @@ namespace ApplicationTeacher
         }
 
         /// <summary>
-        /// Function calling Confirmer_Click()
+        /// Function calling Confirmer_Click().
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>

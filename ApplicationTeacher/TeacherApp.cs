@@ -42,7 +42,7 @@ namespace ApplicationTeacher
         }
 
         /// <summary>
-        /// Function that starts all tasks running in backgrouds
+        /// Function that starts all tasks running in backgrouds.
         /// </summary>
         public void StartTasks()
         {
@@ -52,7 +52,7 @@ namespace ApplicationTeacher
         }
 
         /// <summary>
-        /// Function that find the teacher ip
+        /// Function that find the teacher ip.
         /// </summary>
         public void FindIp()
         {
@@ -88,7 +88,7 @@ namespace ApplicationTeacher
         #region New Student
 
         /// <summary>
-        /// Function that connect the students
+        /// Function that connect the students.
         /// </summary>
         public void LogClients()
         {
@@ -117,7 +117,7 @@ namespace ApplicationTeacher
         }
 
         /// <summary>
-        /// Function that sends the autorised urls to a student
+        /// Function that sends the autorised urls to a student.
         /// </summary>
         /// <param name="socket"></param>
         public void SendAutorisedUrl(Socket socket)
@@ -138,7 +138,7 @@ namespace ApplicationTeacher
         #region Transfert
 
         /// <summary>
-        /// Function that updates all students
+        /// Function that updates all students.
         /// </summary>
         private void AskingData()
         {
@@ -172,7 +172,7 @@ namespace ApplicationTeacher
         }
 
         /// <summary>
-        /// Function that asks a studen for their data and screenshots
+        /// Function that asks a studen for their data and screenshots.
         /// </summary>
         /// <param name="ClientToRemove"></param>
         public void UpdateEleves(List<DataForTeacher> ClientToRemove)
@@ -203,9 +203,9 @@ namespace ApplicationTeacher
         }
 
         /// <summary>
-        /// Fonction qui permet de recevoir les données envoiées par un élève
+        /// Fonction that is used to receive the student data.
         /// </summary>
-        /// <param name="student">the student that sent the data</param>
+        /// <param name="student">The student that sent the data.</param>
         /// <returns></returns>
         private DataForTeacher ReceiveData(DataForTeacher student)
         {
@@ -237,9 +237,9 @@ namespace ApplicationTeacher
         }
 
         /// <summary>
-        /// Function that receives the screenshot sent by the student
+        /// Function that receives the screenshot sent by the student.
         /// </summary>
-        /// <param name="student">The student that sent the image</param>
+        /// <param name="student">The student that sent the image.</param>
         private void ReceiveImage(DataForTeacher student)
         {
             try
@@ -266,9 +266,9 @@ namespace ApplicationTeacher
         #region TreeView update
 
         /// <summary>
-        /// Function that updates the treeviews
+        /// Function that updates the treeviews.
         /// </summary>
-        /// <param name="student">the student that is updated</param>
+        /// <param name="student">The student that is updated.</param>
         public void UpdateTreeViews(DataForTeacher student)
         {
             TreeViewDetails.Invoke(new MethodInvoker(delegate
@@ -283,8 +283,8 @@ namespace ApplicationTeacher
                 try { nodeNavigateurs = nodeStudent.Nodes[1]; }
                 catch { nodeNavigateurs = nodeStudent.Nodes.Add("Navigateurs:"); }
                 nodeProcess.Nodes.Clear();
-                UpdateTreeView.UpdateProcess(student, nodeProcess, null, Configuration.GetFilterEnabled(), Properties.Settings.Default.AlertedProcesses, Properties.Settings.Default.IgnoredProcesses);
-                UpdateTreeView.UpdateUrls(student, nodeNavigateurs, null);
+                UpdateTreeView.UpdateProcess(student.Processes, nodeProcess, null, Configuration.GetFilterEnabled(), Properties.Settings.Default.AlertedProcesses, Properties.Settings.Default.IgnoredProcesses);
+                UpdateTreeView.UpdateUrls(student.Urls.AllBrowser, nodeNavigateurs, null);
                 UpdateTreeView.ApplyUrlFilter(nodeNavigateurs, Properties.Settings.Default.AlertedUrls);
             }));
             TreeViewSelect.Invoke(new MethodInvoker(delegate
@@ -298,9 +298,9 @@ namespace ApplicationTeacher
         #endregion
 
         /// <summary>
-        /// Function that applys the filters in the treeview
+        /// Function that applys the filters in the treeview.
         /// </summary>
-        /// <param name="student">L'élève à enlever</param>
+        /// <param name="student">The student to remove.</param>
         public void RemoveStudent(DataForTeacher student)
         {
             AllStudents.Remove(student);
@@ -320,7 +320,7 @@ namespace ApplicationTeacher
         #region Miniatures
 
         /// <summary>
-        /// Function that creates or remove the screenshots when a checkbox is clicked
+        /// Function that creates or remove the screenshots when a checkbox is clicked.
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -348,7 +348,7 @@ namespace ApplicationTeacher
         }
 
         /// <summary>
-        /// Fonction qui met à jour les miniatures lorsque le panel est redimensionné
+        /// Fonction that updates all miniatures when the panel is resized.
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -394,7 +394,7 @@ namespace ApplicationTeacher
         }
 
         /// <summary>
-        /// Function starts or stops the stream
+        /// Function starts or stops the stream.
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -424,7 +424,7 @@ namespace ApplicationTeacher
         }
 
         /// <summary>
-        /// Function that send the stream configuration to all relevent students
+        /// Function that send the stream configuration to all relevent students.
         /// </summary>
         private void SendStreamConfiguration()
         {
@@ -445,7 +445,7 @@ namespace ApplicationTeacher
         #region Teacher actions
 
         /// <summary>
-        /// Function that shows the trayicon if the application is minimized
+        /// Function that shows the trayicon if the application is minimized.
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -460,7 +460,7 @@ namespace ApplicationTeacher
         }
 
         /// <summary>
-        /// Function that reopens the application when the trayicon is clicked
+        /// Function that reopens the application when the trayicon is clicked.
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -471,7 +471,7 @@ namespace ApplicationTeacher
         }
 
         /// <summary>
-        /// Function that signal to the student the closure of the teacher application
+        /// Function that signal to the student the closure of the teacher application.
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -493,7 +493,7 @@ namespace ApplicationTeacher
         }
 
         /// <summary>
-        /// Function that resizes the screenshot when the slider is moved
+        /// Function that resizes the screenshot when the slider is moved.
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -504,13 +504,12 @@ namespace ApplicationTeacher
         }
 
         /// <summary>
-        /// Function that verifies the node click before opening a new display
+        /// Function that verifies the node click before opening a new display.
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void TreeViewDoubleClick(object sender, TreeNodeMouseClickEventArgs e)
         {
-            //vérification que la node est un ordinateur
             if (e.Node == null) return;
             foreach (DataForTeacher student in AllStudents)
             {
@@ -523,7 +522,7 @@ namespace ApplicationTeacher
         #region Individual display
 
         /// <summary>
-        /// Fonction qui met à jour tous les affichage individuels
+        /// Fonction that updates all individual displays.
         /// </summary>
         public void UpdateAllIndividualDisplay()
         {
@@ -540,9 +539,9 @@ namespace ApplicationTeacher
         }
 
         /// <summary>
-        /// Function that creates a new individual display
+        /// Function that creates a new individual display.
         /// </summary>
-        /// <param name="student"></param>
+        /// <param name="student">The student for which you want a private display.</param>
         public void OpenPrivateDisplay(DataForTeacher student)
         {
             foreach (DisplayStudent display in AllStudentsDisplay)
@@ -557,7 +556,7 @@ namespace ApplicationTeacher
         }
 
         /// <summary>
-        /// Function that removes the individual display when it is closed
+        /// Function that removes the individual display when it is closed.
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -572,7 +571,7 @@ namespace ApplicationTeacher
         #region Filter
 
         /// <summary>
-        /// Function that enable or disable the filters in the treeviews
+        /// Function that enable or disable the filters in the treeviews.
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -598,7 +597,7 @@ namespace ApplicationTeacher
         }
 
         /// <summary>
-        /// Function that removes the background color in all nodes
+        /// Function that removes the background color in all nodes.
         /// </summary>
         /// <param name="node"></param>
         void RemoveFilter(TreeNode node)
@@ -615,7 +614,7 @@ namespace ApplicationTeacher
         #region TreeView display
 
         /// <summary>
-        /// Function that closes all treenode in the treeviews
+        /// Function that closes all treenode in the treeviews.
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -634,7 +633,7 @@ namespace ApplicationTeacher
         }
 
         /// <summary>
-        /// Function that opens all treenode in the treeviews
+        /// Function that opens all treenode in the treeviews.
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>

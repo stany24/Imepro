@@ -22,7 +22,7 @@ namespace ApplicationTeacher
         }
 
         /// <summary>
-        /// Function that selects all students
+        /// Function that selects all students.
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -35,7 +35,7 @@ namespace ApplicationTeacher
         }
 
         /// <summary>
-        /// Function that unselects all students
+        /// Function that unselects all students.
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -45,7 +45,7 @@ namespace ApplicationTeacher
         }
 
         /// <summary>
-        /// Function that starts the stream
+        /// Function that starts the stream.
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>

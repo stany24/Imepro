@@ -34,7 +34,7 @@ namespace ApplicationTeacher
         #region List
 
         /// <summary>
-        /// Function to load the strings in the new parameter
+        /// Function to load the strings of the newly selected parameter.
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -62,7 +62,7 @@ namespace ApplicationTeacher
         }
 
         /// <summary>
-        /// Function that removes the selected string from the selected parameter
+        /// Function that removes the selected string from the selected parameter.
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -102,7 +102,7 @@ namespace ApplicationTeacher
         }
 
         /// <summary>
-        /// Function that add the string to the selected parameter
+        /// Function that add the string to the selected parameter.
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -145,7 +145,7 @@ namespace ApplicationTeacher
         #region Focus
 
         /// <summary>
-        /// Function to add a new focus
+        /// Function to add a new focus.
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -162,6 +162,11 @@ namespace ApplicationTeacher
             catch (Exception) {/* new focus is already created, the user needs to change it's name before creating another one.*/ }
         }
 
+        /// <summary>
+        /// Function to load the strings of the newly selected focus.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void SelectedFocusChanged(object sender, EventArgs e)
         {
             Dictionary<string, List<string>> Focus = Configuration.GetAllFocus();
@@ -171,6 +176,11 @@ namespace ApplicationTeacher
             lbxStringsFocus.Items.AddRange(Focus[key].ToArray());
         }
 
+        /// <summary>
+        /// Fonction to handle the name change of a focus.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void FocusNameChanged(object sender, EventArgs e)
         {
             Dictionary<string, List<string>> Focus = Configuration.GetAllFocus();
@@ -187,6 +197,11 @@ namespace ApplicationTeacher
             }
         }
 
+        /// <summary>
+        /// Function to add a string to the selected focus.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void AddStringToFocus(object sender, EventArgs e)
         {
             if (tbxAddStringFocus.Text == string.Empty) { return; }
@@ -198,6 +213,12 @@ namespace ApplicationTeacher
             Configuration.SetAllFocus(Focus);
         }
 
+
+        /// <summary>
+        /// Function to remove all selected strings to the selected focus.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void RemoveStringToFocus(object sender, EventArgs e)
         {
             Dictionary<string, List<string>> Focus = Configuration.GetAllFocus();
@@ -215,7 +236,7 @@ namespace ApplicationTeacher
         #region Other Parameters
 
         /// <summary>
-        /// Function to change the location of the save folder
+        /// Function to change the location of the save folder.
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -231,8 +252,11 @@ namespace ApplicationTeacher
             }
         }
 
-
-
+        /// <summary>
+        /// Function to update the time between asking update to the student.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void ChangeTimeBetweenAsking(object sender, EventArgs e)
         {
             Properties.Settings.Default.TimeBetweenDemand = (int)nudTimeBetweenAsking.Value;

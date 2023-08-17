@@ -36,9 +36,9 @@ namespace ApplicationTeacher
         #region Display update
 
         /// <summary>
-        /// Function that updates the display with the new data
+        /// Function that updates the display with the new data.
         /// </summary>
-        /// <param name="student">Les nouvelles données</param>
+        /// <param name="student">The new datas.</param>
         public void UpdateAffichage(DataForTeacher student)
         {
             if (Student != null && Student.SocketControl != null) { student.SocketControl = Student.SocketControl; }
@@ -51,11 +51,11 @@ namespace ApplicationTeacher
                 TreeViewProcesses.Invoke(new MethodInvoker(delegate
                 {
                     TreeViewProcesses.Nodes.Clear();
-                    UpdateTreeView.UpdateProcess(student, null, TreeViewProcesses, Configuration.GetFilterEnabled(), Properties.Settings.Default.AlertedProcesses, Properties.Settings.Default.IgnoredProcesses);
+                    UpdateTreeView.UpdateProcess(student.Processes, null, TreeViewProcesses, Configuration.GetFilterEnabled(), Properties.Settings.Default.AlertedProcesses, Properties.Settings.Default.IgnoredProcesses);
                 }));
                 TreeViewUrls.Invoke(new MethodInvoker(delegate
                 {
-                    UpdateTreeView.UpdateUrls(student, null, TreeViewUrls);
+                    UpdateTreeView.UpdateUrls(student.Urls.AllBrowser, null, TreeViewUrls);
                 }));
 
             }
@@ -64,8 +64,8 @@ namespace ApplicationTeacher
                 Text = student.UserName;
                 lblPoste.Text = "Poste: " + student.ComputerName;
                 lblUserName.Text = "Nom: " + student.UserName;
-                UpdateTreeView.UpdateProcess(student, null, TreeViewProcesses, Configuration.GetFilterEnabled(), Properties.Settings.Default.AlertedProcesses, Properties.Settings.Default.IgnoredProcesses);
-                UpdateTreeView.UpdateUrls(student, null, TreeViewUrls);
+                UpdateTreeView.UpdateProcess(student.Processes, null, TreeViewProcesses, Configuration.GetFilterEnabled(), Properties.Settings.Default.AlertedProcesses, Properties.Settings.Default.IgnoredProcesses);
+                UpdateTreeView.UpdateUrls(student.Urls.AllBrowser, null, TreeViewUrls);
             }
         }
 
@@ -74,7 +74,7 @@ namespace ApplicationTeacher
         #region Teacher action
 
         /// <summary>
-        /// Function that saves the current screenshot
+        /// Function that saves the current screenshot.
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -84,7 +84,7 @@ namespace ApplicationTeacher
         }
 
         /// <summary>
-        /// Function that sends a message to the student
+        /// Function that sends a message to the student.
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -95,7 +95,7 @@ namespace ApplicationTeacher
         }
 
         /// <summary>
-        /// Function that allow the teacher to take controle of the student computer
+        /// Function that allow the teacher to take controle of the student computer.
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -114,7 +114,7 @@ namespace ApplicationTeacher
         }
 
         /// <summary>
-        /// Fonction qui permet d'arreter une application élève
+        /// Fonction that allow the teacher to stop a student application.
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -126,7 +126,7 @@ namespace ApplicationTeacher
         }
 
         /// <summary>
-        /// Fonction qui arrete le processus séléctionné chez l'élève
+        /// Fonction that sends a process kill command to a student.
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -142,7 +142,7 @@ namespace ApplicationTeacher
         #region Remote control
 
         /// <summary>
-        /// Fonction qui permet de recevoir le stream de l'élève
+        /// Fonction that allow to receive a student stream.
         /// </summary>
         private void ReceiveStream()
         {
@@ -163,7 +163,7 @@ namespace ApplicationTeacher
         }
 
         /// <summary>
-        /// Function to connect the student to take control
+        /// Function to connect the student to take control.
         /// </summary>
         public void ConnectStudentForControl()
         {
