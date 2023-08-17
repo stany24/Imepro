@@ -14,7 +14,7 @@ namespace UnitTestClassLibrary
         {
             string TestStringUrl = "https://this.url";
             DateTime TestDateTime = DateTime.Now;
-            Url TestUrl = new Url(TestDateTime,TestStringUrl);
+            Historique TestUrl = new Historique(TestDateTime,TestStringUrl);
             Assert.AreEqual(TestUrl.CaptureTime, TestDateTime);
             Assert.AreEqual(TestUrl.Name, TestStringUrl);
         }
@@ -25,19 +25,19 @@ namespace UnitTestClassLibrary
         [TestMethod]
         public void HistoriqueUrlConstructor()
         {
-            HistoriqueUrls TestHistory= new HistoriqueUrls();
+            Historique TestHistory= new Historique();
             Assert.AreEqual(TestHistory.AllBrowser.Count,TestHistory.GetAllBrowserNames().Count());
         }
 
         [TestMethod]
         public void HistoriqueUrlAdding()
         {
-            HistoriqueUrls TestHistory = new HistoriqueUrls();
-            foreach (KeyValuePair<string, List<Url>> browser in TestHistory.AllBrowser)
+            Historique TestHistory = new Historique();
+            foreach (KeyValuePair<string, List<Historique>> browser in TestHistory.AllBrowser)
             {
-                TestHistory.AddUrl(new Url(DateTime.Now, "testurl"),browser.Key);
+                TestHistory.AddUrl(new Historique(DateTime.Now, "testurl"),browser.Key);
                 Assert.AreEqual(1,TestHistory.AllBrowser[browser.Key].Count);
-                TestHistory.AddUrl(new Url(DateTime.Now, "testurl"),browser.Key);
+                TestHistory.AddUrl(new Historique(DateTime.Now, "testurl"),browser.Key);
                 Assert.AreEqual(1,TestHistory.AllBrowser[browser.Key].Count);
             }
         }

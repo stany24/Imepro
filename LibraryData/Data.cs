@@ -31,7 +31,7 @@ namespace LibraryData
         [JsonInclude]
         public string ComputerName { get; set; }
         [JsonInclude]
-        public HistoriqueUrls Urls { get; set; }
+        public Historique Urls { get; set; }
         [JsonInclude]
         public Dictionary<int, string> Processes { get; set; }
         [JsonIgnore]
@@ -41,7 +41,7 @@ namespace LibraryData
 
         #region Constructor
 
-        public Data(string userName, string computerName, HistoriqueUrls urls, Dictionary<int, string> processes)
+        public Data(string userName, string computerName, Historique urls, Dictionary<int, string> processes)
         {
             UserName = userName;
             ComputerName = computerName;
@@ -182,7 +182,7 @@ namespace LibraryData
                         _ = GetWindowText(hWnd, text, text.Capacity);
                         if (text.ToString() != "")
                         {
-                            Urls.AddUrl(new Url(DateTime.Now, text.ToString()), singleBrowser);
+                            Urls.AddUrl(new Historique(DateTime.Now, text.ToString()), singleBrowser);
                         }
                     }
                 }
