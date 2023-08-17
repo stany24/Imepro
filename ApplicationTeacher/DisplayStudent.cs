@@ -40,7 +40,7 @@ namespace ApplicationTeacher
         /// Function that updates the display with the new data
         /// </summary>
         /// <param name="student">Les nouvelles données</param>
-        public void UpdateAffichage(DataForTeacher student,bool filterEnabled)
+        public void UpdateAffichage(DataForTeacher student)
         {
             if(Student != null && Student.SocketControl != null) { student.SocketControl = Student.SocketControl; }
             Student= student;
@@ -51,16 +51,18 @@ namespace ApplicationTeacher
                 lblUserName.Invoke(new MethodInvoker(delegate { lblUserName.Text = "Nom: " + student.UserName; }));
                 TreeViewProcesses.Invoke(new MethodInvoker(delegate {
                     TreeViewProcesses.Nodes.Clear();
-                    UpdateTreeView.UpdateProcess(student, null, TreeViewProcesses, filterEnabled, Properties.Settings.Default.AlertedProcesses, Properties.Settings.Default.IgnoredProcesses); }));
+                    UpdateTreeView.UpdateProcess(student, null, TreeViewProcesses, Configuration.GetFilterEnabled(), Properties.Settings.Default.AlertedProcesses, Properties.Settings.Default.IgnoredProcesses); }));
                 TreeViewUrls.Invoke(new MethodInvoker(delegate {
-                    UpdateTreeView.UpdateUrls(student, null, TreeViewUrls);}));
+                    UpdateTreeView.UpdateUrls(student, null, TreeViewUrls);
+                }));
+
             }
             else
             {
                 Text = student.UserName;
                 lblPoste.Text = "Poste: " + student.ComputerName;
                 lblUserName.Text = "Nom: " + student.UserName;
-                UpdateTreeView.UpdateProcess(student,null, TreeViewProcesses, filterEnabled, Properties.Settings.Default.AlertedProcesses, Properties.Settings.Default.IgnoredProcesses);
+                UpdateTreeView.UpdateProcess(student,null, TreeViewProcesses, Configuration.GetFilterEnabled(), Properties.Settings.Default.AlertedProcesses, Properties.Settings.Default.IgnoredProcesses);
                 UpdateTreeView.UpdateUrls(student,null ,TreeViewUrls);
             }
         }

@@ -166,5 +166,28 @@ namespace ApplicationTeacher.Properties {
                 this["StudentToShareScreen"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool FilterEnabled {
+            get {
+                return ((bool)(this["FilterEnabled"]));
+            }
+            set {
+                this["FilterEnabled"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        public global::System.Collections.Specialized.StringCollection IgnoredUrls {
+            get {
+                return ((global::System.Collections.Specialized.StringCollection)(this["IgnoredUrls"]));
+            }
+            set {
+                this["IgnoredUrls"] = value;
+            }
+        }
     }
 }

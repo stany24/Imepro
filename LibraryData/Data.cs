@@ -47,8 +47,6 @@ namespace LibraryData
             ComputerName = computerName;
             Urls = urls;
             Processes = processes;
-            Urls = new();
-            Processes = new();
         }
 
         public Data() {
@@ -98,6 +96,7 @@ namespace LibraryData
     public class DataForStudent : Data, IMessageFilter
     {
         #region Variables/Constructeur
+
         readonly private List<string> DefaultProcess = new();
         readonly private ListBox lbxConnexion;
         readonly private PictureBox pbxScreenShot;
@@ -130,7 +129,6 @@ namespace LibraryData
             SeleniumProcessesID = new();
             GetDefaultProcesses();
             GetNames();
-            Task.Run(GetAllTabNameEvery5Seconds);
         }
 
         /// <summary>
@@ -154,18 +152,6 @@ namespace LibraryData
         #endregion
 
         #region Récupération Url/Processus/Image
-
-        /// <summary>
-        /// Function to get all url every second
-        /// </summary>
-        private void GetAllTabNameEvery5Seconds()
-        {
-            while (true)
-            {
-                GetCurrentWebTabsName();
-                Thread.Sleep(5000);
-            }
-        }
 
         /// <summary>
         /// Function to get the tab name in all browser
@@ -307,7 +293,6 @@ namespace LibraryData
             GetUserProcesses();
             //serialization
             string jsonString = JsonSerializer.Serialize(ToData(), new JsonSerializerOptions { IncludeFields = true, });
-            lbxConnexion.Invoke(new MethodInvoker(delegate { lbxConnexion.Items.Add(jsonString); }));
             //envoi
             SocketToTeacher.Send(Encoding.ASCII.GetBytes(jsonString), Encoding.ASCII.GetBytes(jsonString).Length, SocketFlags.None);
         }

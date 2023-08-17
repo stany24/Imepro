@@ -19,7 +19,6 @@ namespace ApplicationTeacher
     {
         #region Variables
 
-        bool FilterEnabled = true;
         readonly MiniatureDisplayer Displayer;
         readonly List<DataForTeacher> AllStudents = new();
         readonly List<DisplayStudent> AllStudentsDisplay = new();
@@ -281,7 +280,7 @@ namespace ApplicationTeacher
                 try { nodeNavigateurs = nodeStudent.Nodes[1]; }
                 catch { nodeNavigateurs = nodeStudent.Nodes.Add("Navigateurs:"); }
                 nodeProcess.Nodes.Clear();
-                UpdateTreeView.UpdateProcess(student,nodeProcess,null,FilterEnabled, Properties.Settings.Default.AlertedProcesses, Properties.Settings.Default.IgnoredProcesses);
+                UpdateTreeView.UpdateProcess(student,nodeProcess,null,Configuration.GetFilterEnabled(), Properties.Settings.Default.AlertedProcesses, Properties.Settings.Default.IgnoredProcesses);
                 UpdateTreeView.UpdateUrls(student,nodeNavigateurs,null);
                 UpdateTreeView.ApplyUrlFilter(nodeNavigateurs, Properties.Settings.Default.AlertedUrls);
             }));
@@ -526,7 +525,7 @@ namespace ApplicationTeacher
                 {
                     if (display.GetStudentId() == student.ID)
                     {
-                        display.UpdateAffichage(student, FilterEnabled);
+                        display.UpdateAffichage(student);
                     }
                 }
             }
@@ -544,7 +543,7 @@ namespace ApplicationTeacher
             }
             DisplayStudent newDisplay = new(ipAddr);
             AllStudentsDisplay.Add(newDisplay);
-            newDisplay.UpdateAffichage(student,FilterEnabled);
+            newDisplay.UpdateAffichage(student);
             newDisplay.FormClosing += new FormClosingEventHandler(RemovePrivateDisplay);
             newDisplay.Show();
         }
@@ -571,8 +570,8 @@ namespace ApplicationTeacher
         /// <param name="e"></param>
         private void ButtonFilter_Click(object sender, EventArgs e)
         {
-            FilterEnabled = !FilterEnabled;
-            if(FilterEnabled)
+            Configuration.SetFilterEnabled(!Configuration.GetFilterEnabled());
+            if(Configuration.GetFilterEnabled())
             {
                 btnFilter.Text = "Désactiver";
                 foreach(DataForTeacher student in AllStudents)
