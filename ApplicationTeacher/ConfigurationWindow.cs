@@ -8,9 +8,21 @@ namespace ApplicationTeacher
     {
         #region At start
 
+        private const string IgnoredUrls = "IgnoredUrls";
+        private const string AlertedUrls = "AlertedUrls";
+        private const string IgnoredProcesses = "IgnoredProcesses";
+        private const string AlertedProcesses = "AlertedProcesses";
+        private const string AutorisedUrls = "AutorisedUrls";
+
+
         public ConfigurationWindow()
         {
             InitializeComponent();
+            cbxSelectList.Items.Add(IgnoredUrls);
+            cbxSelectList.Items.Add(AlertedUrls);
+            cbxSelectList.Items.Add(IgnoredProcesses);
+            cbxSelectList.Items.Add(AlertedProcesses);
+            cbxSelectList.Items.Add(AutorisedUrls);
             nudTimeBetweenAsking.Value = Properties.Settings.Default.TimeBetweenDemand;
             tbxSaveFolder.Text = Properties.Settings.Default.PathToSaveFolder;
             foreach (KeyValuePair<string,List<string>> entry in Configuration.GetAllFocus()) { cbxSelectFocus.Items.Add(entry); }
@@ -31,16 +43,19 @@ namespace ApplicationTeacher
             lbxStringsList.Items.Clear();
             switch (cbxSelectList.SelectedItem.ToString())
             {
-                case "AlertedProcesses":
+                case AlertedProcesses:
                     foreach (string str in Configuration.GetAlertedProcesses()){lbxStringsList.Items.Add(str);}
                     break;
-                case "AlertedUrls":
+                case AlertedUrls:
                     foreach (string str in Configuration.GetAlertedUrls()) { lbxStringsList.Items.Add(str); }
                     break;
-                case "IgnoredProcesses":
+                case IgnoredUrls:
+                    foreach (string str in Configuration.GetIgnoredUrls()) { lbxStringsList.Items.Add(str); }
+                    break;
+                case IgnoredProcesses:
                     foreach (string str in Configuration.GetIgnoredProcesses()) { lbxStringsList.Items.Add(str); }
                     break;
-                case "AutorisedWebsite":
+                case AutorisedUrls:
                     foreach (string str in Configuration.GetAutorisedWebsite()) { lbxStringsList.Items.Add(str); }
                     break;
             }
@@ -57,22 +72,27 @@ namespace ApplicationTeacher
             { lbxStringsList.Items.Remove(lbxStringsList.SelectedItems[0]); }
             switch (cbxSelectList.SelectedItem.ToString())
             {
-                case "AlertedProcesses":
+                case AlertedProcesses:
                     List<string> alertedProcesses = new();
                     foreach (string str in lbxStringsList.Items) { alertedProcesses.Add(str); }
                     Configuration.SetAlertedProcesses(alertedProcesses);
                     break;
-                case "AlertedUrls":
+                case AlertedUrls:
                     List<string> alertedUrls = new();
                     foreach (string str in lbxStringsList.Items) { alertedUrls.Add(str); }
                     Configuration.SetAlertedUrls(alertedUrls);
                     break;
-                case "IgnoredProcesses":
+                case IgnoredUrls:
+                    List<string> ignoredUrls = new();
+                    foreach (string str in lbxStringsList.Items) { ignoredUrls.Add(str); }
+                    Configuration.SetIgnoredUrls(ignoredUrls);
+                    break;
+                case IgnoredProcesses:
                     List<string> ignoredProcesses = new();
                     foreach (string str in lbxStringsList.Items) { ignoredProcesses.Add(str); }
                     Configuration.SetIgnoredProcesses(ignoredProcesses);
                     break;
-                case "AutorisedWebsite":
+                case AutorisedUrls:
                     List<string> autorisedWebsite = new();
                     foreach (string str in lbxStringsList.Items) { autorisedWebsite.Add(str); }
                     Configuration.SetAutorisedWebsite(autorisedWebsite);
@@ -90,22 +110,27 @@ namespace ApplicationTeacher
         {
             switch (cbxSelectList.SelectedItem.ToString())
             {
-                case "AlertedProcesses":
+                case AlertedProcesses:
                     List<string> alertedProcesses = Configuration.GetAlertedProcesses();
                     alertedProcesses.Add(tbxAddStringList.Text);
                     Configuration.SetAlertedProcesses(alertedProcesses);
                     break;
-                case "AlertedUrls":
+                case AlertedUrls:
                     List<string> alertedUrls = Configuration.GetAlertedUrls();
                     alertedUrls.Add(tbxAddStringList.Text);
                     Configuration.SetAlertedUrls(alertedUrls);
                     break;
-                case "IgnoredProcesses":
+                case IgnoredUrls:
+                    List<string> ignoredUrls = Configuration.GetIgnoredUrls();
+                    ignoredUrls.Add(tbxAddStringList.Text);
+                    Configuration.SetIgnoredUrls(ignoredUrls);
+                    break;
+                case IgnoredProcesses:
                     List<string> ignoredProcesses = Configuration.GetIgnoredProcesses();
                     ignoredProcesses.Add(tbxAddStringList.Text);
                     Configuration.SetIgnoredProcesses(ignoredProcesses);
                     break;
-                case "AutorisedWebsite":
+                case AutorisedUrls:
                     List<string> autorisedWebsite = Configuration.GetAutorisedWebsite();
                     autorisedWebsite.Add(tbxAddStringList.Text);
                     Configuration.SetAutorisedWebsite(autorisedWebsite);

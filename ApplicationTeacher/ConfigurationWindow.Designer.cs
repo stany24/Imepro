@@ -145,11 +145,6 @@
             // cbxSelectList
             // 
             this.cbxSelectList.FormattingEnabled = true;
-            this.cbxSelectList.Items.AddRange(new object[] {
-            "IgnoredProcesses",
-            "AlertedProcesses",
-            "AlertedUrls",
-            "AutorisedWebsite"});
             this.cbxSelectList.Location = new System.Drawing.Point(12, 43);
             this.cbxSelectList.Name = "cbxSelectList";
             this.cbxSelectList.Size = new System.Drawing.Size(199, 21);
