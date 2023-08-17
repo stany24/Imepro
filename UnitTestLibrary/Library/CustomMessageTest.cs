@@ -11,4 +11,14 @@ namespace UnitTestLibrary.Library
     public class CustomMessageTest
     {
     }
+
+    [TestClass]
+    public class CustomMessageSenderTest
+    {
+    }
+
+    [TestClass]
+    public class CustomMessageReceiverTest
+    {
+    }
 }

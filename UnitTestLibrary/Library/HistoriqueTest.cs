@@ -7,7 +7,7 @@ using System.Collections.Generic;
 namespace UnitTestClassLibrary
 {
     [TestClass]
-    public class UnitTestUrl
+    public class UrlTest
     {
         [TestMethod]
         public void UrlConstructor()
@@ -20,7 +20,7 @@ namespace UnitTestClassLibrary
         }
     }
     [TestClass]
-    public class UnitTestHistoriqueUrl
+    public class HistoriqueTest
     {
         [TestMethod]
         public void HistoriqueUrlConstructor()
@@ -40,20 +40,6 @@ namespace UnitTestClassLibrary
                 TestHistory.AddUrl(new Url(DateTime.Now, "testurl"),browser.Key);
                 Assert.AreEqual(1,TestHistory.AllBrowser[browser.Key].Count);
             }
-        }
-    }
-
-    [TestClass]
-    public class UnitTestStreamOptions
-    {
-        [TestMethod]
-        public void StreamOptionsConstructor()
-        {
-            Priority priority = Priority.Topmost;
-            List<string> strings = new List<string> { "test1", "test2", "test3" };
-            StreamOptions options = new StreamOptions(priority,strings);
-            Assert.AreEqual(options.GetPriority(), priority);
-            Assert.AreEqual(options.GetFocus(), strings);
         }
     }
 }

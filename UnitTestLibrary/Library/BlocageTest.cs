@@ -8,7 +8,12 @@ using System.Threading.Tasks;
 namespace UnitTestLibrary.Library
 {
     [TestClass]
-    public class BlocageTest
+    public class GlobalKeyboardHookTest
+    {
+    }
+
+    [TestClass]
+    public class WindowMinimizeTest
     {
     }
 }

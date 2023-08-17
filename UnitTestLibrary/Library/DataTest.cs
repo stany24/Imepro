@@ -5,15 +5,20 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace UnitTestTeacher
+namespace UnitTestLibrary.Library
 {
     [TestClass]
-    public class UnitTestTeacher
+    public class DataTest
     {
-        [TestMethod]
-        public void Test()
-        {
-            //
-        }
+    }
+
+    [TestClass]
+    public class DataForTeacherTest
+    {
+    }
+
+    [TestClass]
+    public class DataForStudentTest
+    {
     }
 }
