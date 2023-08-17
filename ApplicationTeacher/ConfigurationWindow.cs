@@ -25,7 +25,7 @@ namespace ApplicationTeacher
             cbxSelectList.Items.Add(AutorisedUrls);
             nudTimeBetweenAsking.Value = Properties.Settings.Default.TimeBetweenDemand;
             tbxSaveFolder.Text = Properties.Settings.Default.PathToSaveFolder;
-            foreach (KeyValuePair<string,List<string>> entry in Configuration.GetAllFocus()) { cbxSelectFocus.Items.Add(entry); }
+            foreach (KeyValuePair<string, List<string>> entry in Configuration.GetAllFocus()) { cbxSelectFocus.Items.Add(entry); }
             cbxSelectFocus.DisplayMember = "Key";
         }
 
@@ -44,7 +44,7 @@ namespace ApplicationTeacher
             switch (cbxSelectList.SelectedItem.ToString())
             {
                 case AlertedProcesses:
-                    foreach (string str in Configuration.GetAlertedProcesses()){lbxStringsList.Items.Add(str);}
+                    foreach (string str in Configuration.GetAlertedProcesses()) { lbxStringsList.Items.Add(str); }
                     break;
                 case AlertedUrls:
                     foreach (string str in Configuration.GetAlertedUrls()) { lbxStringsList.Items.Add(str); }
@@ -98,7 +98,7 @@ namespace ApplicationTeacher
                     Configuration.SetAutorisedWebsite(autorisedWebsite);
                     break;
             }
-            
+
         }
 
         /// <summary>
@@ -164,7 +164,7 @@ namespace ApplicationTeacher
 
         private void SelectedFocusChanged(object sender, EventArgs e)
         {
-            Dictionary<string,List <string>> Focus = Configuration.GetAllFocus();
+            Dictionary<string, List<string>> Focus = Configuration.GetAllFocus();
             string key = ((KeyValuePair<string, List<string>>)cbxSelectFocus.SelectedItem).Key;
             tbxFocusName.Text = key;
             lbxStringsFocus.Items.Clear();
@@ -183,13 +183,13 @@ namespace ApplicationTeacher
             foreach (KeyValuePair<string, List<string>> entry in Configuration.GetAllFocus())
             {
                 cbxSelectFocus.Items.Add(entry);
-                if(entry.Key == tbxFocusName.Text) { cbxSelectFocus.SelectedItem = entry; }
+                if (entry.Key == tbxFocusName.Text) { cbxSelectFocus.SelectedItem = entry; }
             }
         }
 
         private void AddStringToFocus(object sender, EventArgs e)
         {
-            if(tbxAddStringFocus.Text == string.Empty) { return; }
+            if (tbxAddStringFocus.Text == string.Empty) { return; }
             Dictionary<string, List<string>> Focus = Configuration.GetAllFocus();
             string key = ((KeyValuePair<string, List<string>>)cbxSelectFocus.SelectedItem).Key;
             Focus[key].Add(tbxAddStringFocus.Text);
@@ -202,7 +202,7 @@ namespace ApplicationTeacher
         {
             Dictionary<string, List<string>> Focus = Configuration.GetAllFocus();
             string key = ((KeyValuePair<string, List<string>>)cbxSelectFocus.SelectedItem).Key;
-            while(lbxStringsFocus.SelectedItems.Count>0)
+            while (lbxStringsFocus.SelectedItems.Count > 0)
             {
                 Focus[key].Remove((string)lbxStringsFocus.SelectedItems[0]);
                 lbxStringsFocus.Items.Remove(lbxStringsFocus.SelectedItems[0]);
@@ -231,7 +231,7 @@ namespace ApplicationTeacher
             }
         }
 
-       
+
 
         private void ChangeTimeBetweenAsking(object sender, EventArgs e)
         {

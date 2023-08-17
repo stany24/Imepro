@@ -13,7 +13,7 @@ namespace ApplicationTeacher
         public static void SetStreamOptions(StreamOptions streamOptions)
         { Properties.Settings.Default.StreamOptions = JsonSerializer.Serialize(streamOptions); }
 
-        public static Dictionary<string,List<string>> GetAllFocus()
+        public static Dictionary<string, List<string>> GetAllFocus()
         {
             try { return JsonSerializer.Deserialize<Dictionary<string, List<string>>>(Properties.Settings.Default.AllFocus); }
             catch { return new Dictionary<string, List<string>>(); }
@@ -33,7 +33,7 @@ namespace ApplicationTeacher
 
         public static void SetIgnoredProcesses(List<string> ignoredProcesses)
         {
-            if(Properties.Settings.Default.IgnoredProcesses == null) { Properties.Settings.Default.IgnoredProcesses = new System.Collections.Specialized.StringCollection(); }
+            if (Properties.Settings.Default.IgnoredProcesses == null) { Properties.Settings.Default.IgnoredProcesses = new System.Collections.Specialized.StringCollection(); }
             Properties.Settings.Default.IgnoredProcesses.Clear();
             Properties.Settings.Default.IgnoredProcesses.AddRange(ignoredProcesses.ToArray());
             Properties.Settings.Default.Save();
@@ -67,7 +67,7 @@ namespace ApplicationTeacher
             Properties.Settings.Default.Save();
         }
         public static List<string> GetAlertedProcesses()
-        { 
+        {
             try { return Properties.Settings.Default.AlertedProcesses.Cast<string>().ToList(); }
             catch { return new List<string>(); }
         }
@@ -82,7 +82,7 @@ namespace ApplicationTeacher
 
         public static List<string> GetAutorisedWebsite()
         {
-            try{return Properties.Settings.Default.AutorisedWebsite.Cast<string>().ToList();}
+            try { return Properties.Settings.Default.AutorisedWebsite.Cast<string>().ToList(); }
             catch { return new List<string>(); }
         }
 
@@ -99,7 +99,7 @@ namespace ApplicationTeacher
 
         public static void SetFilterEnabled(bool isEnabled)
         {
-            Properties.Settings.Default.FilterEnabled= isEnabled;
+            Properties.Settings.Default.FilterEnabled = isEnabled;
             Properties.Settings.Default.Save();
         }
     }

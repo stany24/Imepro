@@ -30,12 +30,14 @@ namespace ApplicationCliente
         public StudentApp()
         {
             InitializeComponent();
-            Student = new(lbxConnexion,pbxScreeShot,lbxMessages, this);
+            Student = new(lbxConnexion, pbxScreeShot, lbxMessages, this);
             try
             {
                 Student.IpToTeacher = IpForTheWeek.GetIp();
-            }catch(Exception){
-                NewTeacherIP(new object(),new EventArgs());
+            }
+            catch (Exception)
+            {
+                NewTeacherIP(new object(), new EventArgs());
             }
             Task.Run(LaunchTasks);
         }
@@ -45,7 +47,7 @@ namespace ApplicationCliente
         /// </summary>
         public void LaunchTasks()
         {
-            while (!IsHandleCreated) {Thread.Sleep(100);}
+            while (!IsHandleCreated) { Thread.Sleep(100); }
             Task.Run(AutomaticChecker);
             Student.SocketToTeacher = Task.Run(() => Student.ConnectToTeacher(11111)).Result;
         }
@@ -85,10 +87,10 @@ namespace ApplicationCliente
         /// </summary>
         public void AutomaticChecker()
         {
-            while(true)
+            while (true)
             {
-                if(FirefoxDriver != null){VerifyUrlOfWebDriver((WebDriver)FirefoxDriver, "seleniumfirefox");}
-                if(ChromeDriver != null){ VerifyUrlOfWebDriver((WebDriver)ChromeDriver, "seleniumchorme"); }
+                if (FirefoxDriver != null) { VerifyUrlOfWebDriver((WebDriver)FirefoxDriver, "seleniumfirefox"); }
+                if (ChromeDriver != null) { VerifyUrlOfWebDriver((WebDriver)ChromeDriver, "seleniumchorme"); }
                 Thread.Sleep(2000);
             }
         }
@@ -98,16 +100,17 @@ namespace ApplicationCliente
         /// </summary>
         /// <param name="navigateur"></param>
         /// <param name="navigateurName"></param>
-        public void VerifyUrlOfWebDriver(WebDriver navigateur,string navigateurName)
+        public void VerifyUrlOfWebDriver(WebDriver navigateur, string navigateurName)
         {
-            Student.Urls.AddUrl(new Url(DateTime.Now, navigateur.Url),navigateurName);
+            Student.Urls.AddUrl(new Url(DateTime.Now, navigateur.Url), navigateurName);
             bool navigateback = true;
             foreach (string url in Student.AutorisedUrls.Where(url => navigateur.Url.Contains(url)))
             {
                 navigateback = false;
             }
-            if(navigateur.Url == "about:blank") { navigateback= false; }
-            if (navigateback){
+            if (navigateur.Url == "about:blank") { navigateback = false; }
+            if (navigateback)
+            {
                 ((IJavaScriptExecutor)navigateur).ExecuteScript("window.close();");
                 ((IJavaScriptExecutor)navigateur).ExecuteScript("window.open();");
             }
@@ -143,11 +146,11 @@ namespace ApplicationCliente
             {
                 bool isCorrect = false;
                 IPInterfaceProperties properities = current.GetIPProperties();
-                foreach(UnicastIPAddressInformation ip in properities.UnicastAddresses.Where(ip => ip.Address.AddressFamily == AddressFamily.InterNetwork))
+                foreach (UnicastIPAddressInformation ip in properities.UnicastAddresses.Where(ip => ip.Address.AddressFamily == AddressFamily.InterNetwork))
                 {
-                    if (IsOnSameNetwork(Student.IpToTeacher,ip.Address,ip.IPv4Mask)){isCorrect = true;}
+                    if (IsOnSameNetwork(Student.IpToTeacher, ip.Address, ip.IPv4Mask)) { isCorrect = true; }
                 }
-                
+
                 commandBuilder.Append("netsh interface ipv4 set interface \"");
                 commandBuilder.Append(current.Name);
                 if (!isCorrect) { commandBuilder.Append("\" forwarding=disable\r\n"); }
@@ -212,7 +215,7 @@ namespace ApplicationCliente
         /// <param name="e"></param>
         public void OnClosing(object sender, FormClosedEventArgs e)
         {
-            if (Student.SocketToTeacher == null){return;}
+            if (Student.SocketToTeacher == null) { return; }
             try
             {
                 Student.SocketToTeacher.Send(Encoding.ASCII.GetBytes("stop"));
@@ -221,7 +224,8 @@ namespace ApplicationCliente
                 FirefoxDriver?.Dispose();
                 ChromeDriver?.Dispose();
             }
-            catch {
+            catch
+            {
                 // Should not happend
             }
         }
@@ -233,13 +237,16 @@ namespace ApplicationCliente
         /// <param name="e"></param>
         public void StudentAppResized(object sender, EventArgs e)
         {
-            switch(WindowState)
+            switch (WindowState)
             {
-                case FormWindowState.Minimized:TrayIconStudent.Visible = true;Hide();
+                case FormWindowState.Minimized:
+                    TrayIconStudent.Visible = true; Hide();
                     break;
-                case FormWindowState.Normal: TrayIconStudent.Visible = false;
+                case FormWindowState.Normal:
+                    TrayIconStudent.Visible = false;
                     break;
-                case FormWindowState.Maximized: TrayIconStudent.Visible = false;
+                case FormWindowState.Maximized:
+                    TrayIconStudent.Visible = false;
                     break;
             }
         }

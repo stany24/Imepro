@@ -14,7 +14,7 @@ namespace ApplicationTeacher
         public AskToChoseIp(List<IPAddress> adresses)
         {
             InitializeComponent();
-            foreach(IPAddress address in adresses){lbxAdresses.Items.Add(address);}
+            foreach (IPAddress address in adresses) { lbxAdresses.Items.Add(address); }
         }
 
         /// <summary>

@@ -1,19 +1,11 @@
 ﻿using ApplicationCliente;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace UnitTestLibrary.Student
 {
     [TestClass]
     public class IpForTheWeekTest
     {
-        /// <summary>
-        /// Test fails because settings.settings cannot be loaded by another project.
-        /// </summary>
         [TestMethod]
         public void UnitTestGetSet()
         {

@@ -62,20 +62,20 @@ namespace ApplicationTeacher
             List<IPAddress> PossiblesIp = new();
             foreach (IPAddress address in ipHost.AddressList)
             {
-                if (address.AddressFamily == AddressFamily.InterNetwork) { PossiblesIp.Add(address);}
+                if (address.AddressFamily == AddressFamily.InterNetwork) { PossiblesIp.Add(address); }
             }
             switch (PossiblesIp.Count)
             {
                 case 0:
                     MessageBox.Show("Aucune addresse ip conforme n'a étée trouvée.\r\n" +
                         "Vérifiez vos connexion aux réseaux.\r\n" +
-                        "L'application va ce fermer.","Attention",MessageBoxButtons.OK,MessageBoxIcon.Warning);
+                        "L'application va ce fermer.", "Attention", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     Application.Exit();
                     break;
-                case 1:ipAddr = PossiblesIp[0]; break;
+                case 1: ipAddr = PossiblesIp[0]; break;
                 default:
                     AskToChoseIp prompt = new(PossiblesIp);
-                    if (prompt.ShowDialog(this) == DialogResult.OK){ipAddr = prompt.GetChoosenIp();}
+                    if (prompt.ShowDialog(this) == DialogResult.OK) { ipAddr = prompt.GetChoosenIp(); }
                     else { ipAddr = PossiblesIp[0]; }
                     prompt.Dispose();
                     break;
@@ -92,7 +92,7 @@ namespace ApplicationTeacher
         /// </summary>
         public void LogClients()
         {
-            while (!IsHandleCreated){Thread.Sleep(100);}
+            while (!IsHandleCreated) { Thread.Sleep(100); }
             IPEndPoint localEndPoint = new(ipAddr, 11111);
             // Creation TCP/IP Socket using Socket Class Constructor
             Socket listener = new(ipAddr.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
@@ -107,8 +107,8 @@ namespace ApplicationTeacher
                 {
                     // Suspend while waiting for incoming connection Using Accept() method the server will accept connection of client
                     Socket clientSocket = listener.Accept();
-                    lbxRequetes.Invoke(new MethodInvoker(delegate { lbxRequetes.Items.Add(DateTime.Now.ToString("HH:mm:ss")+" Nouvelle connexion de: " + clientSocket.RemoteEndPoint); }));
-                    AllStudents.Add(new DataForTeacher(clientSocket,NextId));
+                    lbxRequetes.Invoke(new MethodInvoker(delegate { lbxRequetes.Items.Add(DateTime.Now.ToString("HH:mm:ss") + " Nouvelle connexion de: " + clientSocket.RemoteEndPoint); }));
+                    AllStudents.Add(new DataForTeacher(clientSocket, NextId));
                     Task.Run(() => SendAutorisedUrl(clientSocket));
                     NextId++;
                 }
@@ -122,7 +122,7 @@ namespace ApplicationTeacher
         /// <param name="socket"></param>
         public void SendAutorisedUrl(Socket socket)
         {
-            while (isAsking) {Thread.Sleep(100);}
+            while (isAsking) { Thread.Sleep(100); }
             isAsking = true;
             socket.Send(Encoding.Default.GetBytes("url"));
             //serialization
@@ -223,14 +223,14 @@ namespace ApplicationTeacher
                     SocketToStudent = socket,
                     ID = id
                 };
-                lbxRequetes.Invoke(new MethodInvoker(delegate { lbxRequetes.Items.Add(DateTime.Now.ToString("HH:mm:ss") +  " Données recue de " + student.UserName); }));
+                lbxRequetes.Invoke(new MethodInvoker(delegate { lbxRequetes.Items.Add(DateTime.Now.ToString("HH:mm:ss") + " Données recue de " + student.UserName); }));
                 Task.Run(() => UpdateTreeViews(student));
                 student.NumberOfFailure = 0;
                 return student;
             }
             catch
             {
-                lbxRequetes.Invoke(new MethodInvoker(delegate { lbxRequetes.Items.Add(DateTime.Now.ToString("HH:mm:ss") + " " +student.UserName + "n'a pas envoyé de donnée"); }));
+                lbxRequetes.Invoke(new MethodInvoker(delegate { lbxRequetes.Items.Add(DateTime.Now.ToString("HH:mm:ss") + " " + student.UserName + "n'a pas envoyé de donnée"); }));
                 student.NumberOfFailure++;
                 return student;
             }
@@ -252,10 +252,11 @@ namespace ApplicationTeacher
                 student.ScreenShot = new Bitmap(new MemoryStream(imageBuffer));
                 lbxRequetes.Invoke(new MethodInvoker(delegate { lbxRequetes.Items.Add(DateTime.Now.ToString("HH:mm:ss") + " Image recue de " + student.UserName); }));
                 student.NumberOfFailure = 0;
-                Displayer.UpdateMiniature(student.ID,student.ComputerName ,student.ScreenShot);
+                Displayer.UpdateMiniature(student.ID, student.ComputerName, student.ScreenShot);
             }
-            catch {
-                lbxRequetes.Invoke(new MethodInvoker(delegate { lbxRequetes.Items.Add(DateTime.Now.ToString("HH:mm:ss") + " "+ student.UserName + "n'a pas envoyé d'image"); }));
+            catch
+            {
+                lbxRequetes.Invoke(new MethodInvoker(delegate { lbxRequetes.Items.Add(DateTime.Now.ToString("HH:mm:ss") + " " + student.UserName + "n'a pas envoyé d'image"); }));
                 student.NumberOfFailure++;
             }
         }
@@ -270,22 +271,24 @@ namespace ApplicationTeacher
         /// <param name="student">the student that is updated</param>
         public void UpdateTreeViews(DataForTeacher student)
         {
-            TreeViewDetails.Invoke(new MethodInvoker(delegate {
+            TreeViewDetails.Invoke(new MethodInvoker(delegate
+            {
                 TreeNode nodeStudent;
                 try { nodeStudent = TreeViewDetails.Nodes.Find(Convert.ToString(student.ID), false)[0]; }
-                catch { nodeStudent = TreeViewDetails.Nodes.Add(Convert.ToString(student.ID),student.UserName+" : "+student.ComputerName); }
+                catch { nodeStudent = TreeViewDetails.Nodes.Add(Convert.ToString(student.ID), student.UserName + " : " + student.ComputerName); }
                 TreeNode nodeProcess;
-                try{ nodeProcess = nodeStudent.Nodes[0]; }
+                try { nodeProcess = nodeStudent.Nodes[0]; }
                 catch { nodeProcess = nodeStudent.Nodes.Add("Processus:"); }
                 TreeNode nodeNavigateurs;
                 try { nodeNavigateurs = nodeStudent.Nodes[1]; }
                 catch { nodeNavigateurs = nodeStudent.Nodes.Add("Navigateurs:"); }
                 nodeProcess.Nodes.Clear();
-                UpdateTreeView.UpdateProcess(student,nodeProcess,null,Configuration.GetFilterEnabled(), Properties.Settings.Default.AlertedProcesses, Properties.Settings.Default.IgnoredProcesses);
-                UpdateTreeView.UpdateUrls(student,nodeNavigateurs,null);
+                UpdateTreeView.UpdateProcess(student, nodeProcess, null, Configuration.GetFilterEnabled(), Properties.Settings.Default.AlertedProcesses, Properties.Settings.Default.IgnoredProcesses);
+                UpdateTreeView.UpdateUrls(student, nodeNavigateurs, null);
                 UpdateTreeView.ApplyUrlFilter(nodeNavigateurs, Properties.Settings.Default.AlertedUrls);
             }));
-            TreeViewSelect.Invoke(new MethodInvoker(delegate {
+            TreeViewSelect.Invoke(new MethodInvoker(delegate
+            {
                 TreeNode nodeStudent;
                 try { nodeStudent = TreeViewSelect.Nodes.Find(Convert.ToString(student.ID), false)[0]; }
                 catch { nodeStudent = TreeViewSelect.Nodes.Add(Convert.ToString(student.ID), student.UserName + " : " + student.ComputerName); }
@@ -302,11 +305,13 @@ namespace ApplicationTeacher
         {
             AllStudents.Remove(student);
             lbxRequetes.Invoke(new MethodInvoker(delegate { lbxRequetes.Items.Add(DateTime.Now.ToString("HH:mm:ss") + " L'élève " + student.UserName + " est déconnecté"); }));
-            TreeViewDetails.Invoke(new MethodInvoker(delegate {
+            TreeViewDetails.Invoke(new MethodInvoker(delegate
+            {
                 TreeNode[] nodes = TreeViewDetails.Nodes.Find(Convert.ToString(student.ID), false);
                 if (nodes.Any()) { nodes[0].Remove(); }
             }));
-            TreeViewSelect.Invoke(new MethodInvoker(delegate {
+            TreeViewSelect.Invoke(new MethodInvoker(delegate
+            {
                 TreeNode[] nodes = TreeViewDetails.Nodes.Find(Convert.ToString(student.ID), false);
                 if (nodes.Any()) { nodes[0].Remove(); }
             }));
@@ -330,7 +335,7 @@ namespace ApplicationTeacher
                     if (Convert.ToString(students.ID) == e.Node.Name) { student = students; }
                 }
                 if (student == null) { return; }
-                foreach(Miniature mini in Displayer.MiniatureList) { if (mini.GetComputerName() == student.ComputerName && mini.StudentID == student.ID) { return; } }
+                foreach (Miniature mini in Displayer.MiniatureList) { if (mini.GetComputerName() == student.ComputerName && mini.StudentID == student.ID) { return; } }
                 Miniature miniature = new(student.ScreenShot, student.ComputerName, student.ID, Properties.Settings.Default.PathToSaveFolder);
                 Displayer.AddMiniature(miniature);
                 panelMiniatures.Controls.Add(miniature);
@@ -363,11 +368,11 @@ namespace ApplicationTeacher
         {
             foreach (DataForTeacher student in StudentToShareScreen) { student.SocketToStudent.Send(Encoding.ASCII.GetBytes("receive")); }
 
-            Socket s = new(AddressFamily.InterNetwork,SocketType.Dgram, ProtocolType.Udp);
+            Socket s = new(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
             IPAddress ip = IPAddress.Parse("232.1.2.3");
-            s.SetSocketOption(SocketOptionLevel.IP,SocketOptionName.AddMembership, new MulticastOption(ip));
+            s.SetSocketOption(SocketOptionLevel.IP, SocketOptionName.AddMembership, new MulticastOption(ip));
             s.SetSocketOption(SocketOptionLevel.IP, SocketOptionName.MulticastInterface, IPAddress.Parse("232.1.2.3").GetAddressBytes());
-            s.SetSocketOption(SocketOptionLevel.IP,SocketOptionName.MulticastTimeToLive, 10);
+            s.SetSocketOption(SocketOptionLevel.IP, SocketOptionName.MulticastTimeToLive, 10);
             IPEndPoint ipep = new(ip, 45678);
             s.Connect(ipep);
             Thread.Sleep(1000);
@@ -381,7 +386,7 @@ namespace ApplicationTeacher
                 ImageConverter converter = new();
                 byte[] imageArray = (byte[])converter.ConvertTo(bitmap, typeof(byte[]));
                 CustomMessageSender Sender = new(imageArray);
-                foreach(CustomMessage message in Sender.GetMessages())
+                foreach (CustomMessage message in Sender.GetMessages())
                 {
                     s.Send(message.GetContent().ToArray());
                 }
@@ -395,13 +400,13 @@ namespace ApplicationTeacher
         /// <param name="e"></param>
         private void ShareScreen(object sender, EventArgs e)
         {
-            if(!isSharing)
+            if (!isSharing)
             {
                 ChooseStreamOptions prompt = new(AllStudents);
-                if (prompt.ShowDialog(this) != DialogResult.OK){return;}
-                if (StudentToShareScreen.Count == 0){return;}
+                if (prompt.ShowDialog(this) != DialogResult.OK) { return; }
+                if (StudentToShareScreen.Count == 0) { return; }
                 StudentToShareScreen = prompt.GetStudentToShare();
-                isSharing= true;
+                isSharing = true;
                 SendStreamConfiguration();
                 ScreenSharer = Task.Run(RecordAndStreamScreen);
                 btnShare.Text = "Stop Sharing";
@@ -410,7 +415,7 @@ namespace ApplicationTeacher
             {
                 isSharing = false;
                 for (int i = 0; i < StudentToShareScreen.Count; i++)
-                { StudentToShareScreen[i].SocketToStudent.Send(Encoding.Default.GetBytes("stops"));}
+                { StudentToShareScreen[i].SocketToStudent.Send(Encoding.Default.GetBytes("stops")); }
                 StudentToShareScreen = new();
                 btnShare.Text = "Share screen";
                 ScreenSharer.Wait();
@@ -424,7 +429,7 @@ namespace ApplicationTeacher
         private void SendStreamConfiguration()
         {
             byte[] bytes = Encoding.Default.GetBytes(JsonSerializer.Serialize(Configuration.GetStreamOptions()));
-            foreach(DataForTeacher student in StudentToShareScreen)
+            foreach (DataForTeacher student in StudentToShareScreen)
             {
                 student.SocketToStudent.Send(Encoding.Default.GetBytes("apply"));
             }
@@ -475,10 +480,12 @@ namespace ApplicationTeacher
             for (int i = 0; i < AllStudents.Count; i++)
             {
                 DataForTeacher student = AllStudents[i];
-                try {
+                try
+                {
                     student.SocketToStudent.Send(Encoding.Default.GetBytes("stops"));
                     student.SocketToStudent.Send(Encoding.ASCII.GetBytes("disconnect"));
-                }catch {/*Student has already closed the application.*/ }
+                }
+                catch {/*Student has already closed the application.*/ }
                 student.SocketToStudent.Dispose();
             }
             TrayIconTeacher.Visible = false;
@@ -504,10 +511,10 @@ namespace ApplicationTeacher
         private void TreeViewDoubleClick(object sender, TreeNodeMouseClickEventArgs e)
         {
             //vérification que la node est un ordinateur
-            if(e.Node== null) return;
-            foreach(DataForTeacher student in AllStudents)
+            if (e.Node == null) return;
+            foreach (DataForTeacher student in AllStudents)
             {
-                if(student.ID == Convert.ToInt32(e.Node.Name)) { OpenPrivateDisplay(student);return; }
+                if (student.ID == Convert.ToInt32(e.Node.Name)) { OpenPrivateDisplay(student); return; }
             }
         }
 
@@ -572,15 +579,16 @@ namespace ApplicationTeacher
         private void ButtonFilter_Click(object sender, EventArgs e)
         {
             Configuration.SetFilterEnabled(!Configuration.GetFilterEnabled());
-            if(Configuration.GetFilterEnabled())
+            if (Configuration.GetFilterEnabled())
             {
                 btnFilter.Text = "Désactiver";
-                foreach(DataForTeacher student in AllStudents)
+                foreach (DataForTeacher student in AllStudents)
                 {
                     UpdateTreeViews(student);
                 }
             }
-            else {
+            else
+            {
                 btnFilter.Text = "Activer";
                 foreach (TreeNode node in TreeViewDetails.Nodes)
                 {
@@ -595,7 +603,7 @@ namespace ApplicationTeacher
         /// <param name="node"></param>
         void RemoveFilter(TreeNode node)
         {
-            node.BackColor= Color.White;
+            node.BackColor = Color.White;
             foreach (TreeNode subnode in node.Nodes)
             {
                 RemoveFilter(subnode);
@@ -614,7 +622,7 @@ namespace ApplicationTeacher
         private void HideTreeView_Click(object sender, EventArgs e)
         {
             TreeNodeCollection nodes = TreeViewDetails.Nodes;
-            foreach(TreeNode node in nodes)
+            foreach (TreeNode node in nodes)
             {
                 node.Collapse(false);
             }

@@ -29,7 +29,7 @@ namespace ApplicationTeacher
 
         public DisplayStudent(IPAddress ip)
         {
-            ipAddr= ip;
+            ipAddr = ip;
             InitializeComponent();
         }
 
@@ -41,17 +41,20 @@ namespace ApplicationTeacher
         /// <param name="student">Les nouvelles données</param>
         public void UpdateAffichage(DataForTeacher student)
         {
-            if(Student != null && Student.SocketControl != null) { student.SocketControl = Student.SocketControl; }
-            Student= student;
+            if (Student != null && Student.SocketControl != null) { student.SocketControl = Student.SocketControl; }
+            Student = student;
             if (InvokeRequired)
             {
                 Invoke(new MethodInvoker(delegate { this.Text = student.UserName; }));
                 lblPoste.Invoke(new MethodInvoker(delegate { lblPoste.Text = "Poste: " + student.ComputerName; }));
                 lblUserName.Invoke(new MethodInvoker(delegate { lblUserName.Text = "Nom: " + student.UserName; }));
-                TreeViewProcesses.Invoke(new MethodInvoker(delegate {
+                TreeViewProcesses.Invoke(new MethodInvoker(delegate
+                {
                     TreeViewProcesses.Nodes.Clear();
-                    UpdateTreeView.UpdateProcess(student, null, TreeViewProcesses, Configuration.GetFilterEnabled(), Properties.Settings.Default.AlertedProcesses, Properties.Settings.Default.IgnoredProcesses); }));
-                TreeViewUrls.Invoke(new MethodInvoker(delegate {
+                    UpdateTreeView.UpdateProcess(student, null, TreeViewProcesses, Configuration.GetFilterEnabled(), Properties.Settings.Default.AlertedProcesses, Properties.Settings.Default.IgnoredProcesses);
+                }));
+                TreeViewUrls.Invoke(new MethodInvoker(delegate
+                {
                     UpdateTreeView.UpdateUrls(student, null, TreeViewUrls);
                 }));
 
@@ -61,8 +64,8 @@ namespace ApplicationTeacher
                 Text = student.UserName;
                 lblPoste.Text = "Poste: " + student.ComputerName;
                 lblUserName.Text = "Nom: " + student.UserName;
-                UpdateTreeView.UpdateProcess(student,null, TreeViewProcesses, Configuration.GetFilterEnabled(), Properties.Settings.Default.AlertedProcesses, Properties.Settings.Default.IgnoredProcesses);
-                UpdateTreeView.UpdateUrls(student,null ,TreeViewUrls);
+                UpdateTreeView.UpdateProcess(student, null, TreeViewProcesses, Configuration.GetFilterEnabled(), Properties.Settings.Default.AlertedProcesses, Properties.Settings.Default.IgnoredProcesses);
+                UpdateTreeView.UpdateUrls(student, null, TreeViewUrls);
             }
         }
 
@@ -77,7 +80,7 @@ namespace ApplicationTeacher
         /// <param name="e"></param>
         public void SaveScreenShot(object sender, EventArgs e)
         {
-            pbxScreenShot.Image.Save(Properties.Settings.Default.PathToSaveFolder +Student.ComputerName+ DateTime.Now.ToString("_yyyy-MM-dd_HH-mm-ss") + ".jpg", ImageFormat.Jpeg);
+            pbxScreenShot.Image.Save(Properties.Settings.Default.PathToSaveFolder + Student.ComputerName + DateTime.Now.ToString("_yyyy-MM-dd_HH-mm-ss") + ".jpg", ImageFormat.Jpeg);
         }
 
         /// <summary>
@@ -100,7 +103,8 @@ namespace ApplicationTeacher
         {
             Student.SocketToStudent.Send(Encoding.ASCII.GetBytes("control 0"));
             ConnectStudentForControl();
-            pbxStream = new(){
+            pbxStream = new()
+            {
                 Dock = DockStyle.Fill,
                 SizeMode = PictureBoxSizeMode.Zoom
             };
@@ -151,7 +155,8 @@ namespace ApplicationTeacher
                     Array.Resize(ref imageBuffer, nbData);
                     pbxStream.Image = new Bitmap(new MemoryStream(imageBuffer));
                 }
-                catch {
+                catch
+                {
                     //lost an image it can happend
                 }
             }
@@ -180,7 +185,8 @@ namespace ApplicationTeacher
                     Student.SocketControl.ReceiveTimeout = Properties.Settings.Default.TimeBetweenDemand;
                     return;
                 }
-                catch{
+                catch
+                {
                     listener.Close();
                     Student.SocketControl = null;
                 }

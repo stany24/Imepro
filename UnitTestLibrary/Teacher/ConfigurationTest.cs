@@ -2,20 +2,19 @@
 using LibraryData;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.Generic;
-using System.Net.Sockets;
 
 namespace UnitTestLibrary.Teacher
 {
     [TestClass]
     public class ConfigurationTest
     {
-        private readonly List<string> list = new List<string>() {"test","nope","more","csgo" };
+        private readonly List<string> list = new List<string>() { "test", "nope", "more", "csgo" };
         [TestMethod]
         public void SetGetAutorisedUrl()
         {
             Configuration.SetAutorisedWebsite(list);
             Assert.AreEqual(list.Count, Configuration.GetAutorisedWebsite().Count);
-            for(int i = 0; i < list.Count; i++){Assert.AreEqual(list[i], Configuration.GetAutorisedWebsite()[i]);}
+            for (int i = 0; i < list.Count; i++) { Assert.AreEqual(list[i], Configuration.GetAutorisedWebsite()[i]); }
         }
 
         [TestMethod]
@@ -23,7 +22,7 @@ namespace UnitTestLibrary.Teacher
         {
             Configuration.SetAlertedProcesses(list);
             Assert.AreEqual(list.Count, Configuration.GetAlertedProcesses().Count);
-            for (int i = 0; i < list.Count; i++){Assert.AreEqual(list[i], Configuration.GetAlertedProcesses()[i]);}
+            for (int i = 0; i < list.Count; i++) { Assert.AreEqual(list[i], Configuration.GetAlertedProcesses()[i]); }
         }
 
         [TestMethod]
@@ -31,7 +30,7 @@ namespace UnitTestLibrary.Teacher
         {
             Configuration.SetAlertedUrls(list);
             Assert.AreEqual(list.Count, Configuration.GetAlertedUrls().Count);
-            for (int i = 0; i < list.Count; i++){Assert.AreEqual(list[i], Configuration.GetAlertedUrls()[i]);}
+            for (int i = 0; i < list.Count; i++) { Assert.AreEqual(list[i], Configuration.GetAlertedUrls()[i]); }
         }
 
         [TestMethod]
@@ -39,7 +38,7 @@ namespace UnitTestLibrary.Teacher
         {
             Configuration.SetIgnoredUrls(list);
             Assert.AreEqual(list.Count, Configuration.GetIgnoredUrls().Count);
-            for (int i = 0; i < list.Count; i++){Assert.AreEqual(list[i], Configuration.GetIgnoredUrls()[i]);}
+            for (int i = 0; i < list.Count; i++) { Assert.AreEqual(list[i], Configuration.GetIgnoredUrls()[i]); }
         }
 
         [TestMethod]
@@ -47,14 +46,14 @@ namespace UnitTestLibrary.Teacher
         {
             Configuration.SetIgnoredProcesses(list);
             Assert.AreEqual(list.Count, Configuration.GetIgnoredProcesses().Count);
-            for (int i = 0; i < list.Count; i++){Assert.AreEqual(list[i], Configuration.GetIgnoredProcesses()[i]);}
+            for (int i = 0; i < list.Count; i++) { Assert.AreEqual(list[i], Configuration.GetIgnoredProcesses()[i]); }
         }
 
         [TestMethod]
         public void SetGetFilterEnabled()
         {
             Configuration.SetFilterEnabled(false);
-            Assert.AreEqual(false,Configuration.GetFilterEnabled());
+            Assert.AreEqual(false, Configuration.GetFilterEnabled());
             Configuration.SetFilterEnabled(true);
             Assert.AreEqual(true, Configuration.GetFilterEnabled());
         }
@@ -64,9 +63,9 @@ namespace UnitTestLibrary.Teacher
         {
             Priority priority = Priority.Widowed;
             List<string> focus = new List<string>() { "test1", "test2", "test3" };
-            Configuration.SetStreamOptions(new StreamOptions(priority,focus));
-            Assert.AreEqual(priority,Configuration.GetStreamOptions().GetPriority());
-            for(int i = 0; i < focus.Count; i++){Assert.AreEqual(focus[i], Configuration.GetStreamOptions().GetFocus()[i]);}
+            Configuration.SetStreamOptions(new StreamOptions(priority, focus));
+            Assert.AreEqual(priority, Configuration.GetStreamOptions().GetPriority());
+            for (int i = 0; i < focus.Count; i++) { Assert.AreEqual(focus[i], Configuration.GetStreamOptions().GetFocus()[i]); }
         }
 
         [TestMethod]
@@ -79,8 +78,8 @@ namespace UnitTestLibrary.Teacher
             Assert.AreEqual(Focus.Count, Configuration.GetAllFocus().Count);
             Assert.AreEqual(Focus["test"].Count, Configuration.GetAllFocus()["test"].Count);
             Assert.AreEqual(Focus["test2"].Count, Configuration.GetAllFocus()["test2"].Count);
-            for(int i = 0; i < Focus["test"].Count; i++){Assert.AreEqual(Focus["test"][i], Configuration.GetAllFocus()["test"][i]);}
-            for (int i = 0; i < Focus["test2"].Count; i++){Assert.AreEqual(Focus["test2"][i], Configuration.GetAllFocus()["test2"][i]);}
+            for (int i = 0; i < Focus["test"].Count; i++) { Assert.AreEqual(Focus["test"][i], Configuration.GetAllFocus()["test"][i]); }
+            for (int i = 0; i < Focus["test2"].Count; i++) { Assert.AreEqual(Focus["test2"][i], Configuration.GetAllFocus()["test2"][i]); }
         }
     }
 }

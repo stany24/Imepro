@@ -15,8 +15,8 @@ namespace ApplicationTeacher
             InitializeComponent();
             lbxStudents.SelectionMode = SelectionMode.MultiExtended;
             lbxStudents.DataSource = list;
-            foreach(KeyValuePair<string,List<string>> focus in Configuration.GetAllFocus()) { lbxFocus.Items.Add(focus); }
-            lbxFocus.DisplayMember= "Key";
+            foreach (KeyValuePair<string, List<string>> focus in Configuration.GetAllFocus()) { lbxFocus.Items.Add(focus); }
+            lbxFocus.DisplayMember = "Key";
             lbxPriorite.DataSource = Enum.GetNames(typeof(Priority));
             lbxScreen.DataSource = Screen.AllScreens;
         }
@@ -51,10 +51,10 @@ namespace ApplicationTeacher
         /// <param name="e"></param>
         private void BeginSharing_Click(object sender, EventArgs e)
         {
-            if(lbxStudents.SelectedItems.Count == 0) { lblError.Text = "Selectionnez au moins 1 élève"; return; }
-            if(lbxPriorite.SelectedItem == null) { lblError.Text = "Selectionnez la priorité"; return; }
-            if(lbxFocus.SelectedItem == null) { lblError.Text = "Selectionnez le focus"; return; }
-            foreach(DataForTeacher student in lbxStudents.SelectedItems)
+            if (lbxStudents.SelectedItems.Count == 0) { lblError.Text = "Selectionnez au moins 1 élève"; return; }
+            if (lbxPriorite.SelectedItem == null) { lblError.Text = "Selectionnez la priorité"; return; }
+            if (lbxFocus.SelectedItem == null) { lblError.Text = "Selectionnez le focus"; return; }
+            foreach (DataForTeacher student in lbxStudents.SelectedItems)
             {
                 studentToShare.Add(student);
             }

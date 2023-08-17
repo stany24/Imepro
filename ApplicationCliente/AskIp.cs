@@ -15,14 +15,15 @@ namespace ApplicationCliente
         private void BtnConfirmer_Click(object sender, EventArgs e)
         {
             IpForTheWeek.SetIp(tbxIp.Text);
-            canClose= true;
+            canClose = true;
         }
 
         private void BtnHidden_Click(object sender, EventArgs e)
         {
-            try {
+            try
+            {
                 IPAddress.Parse(tbxIp.Text);
-                btnConfirmer.Enabled= true;
+                btnConfirmer.Enabled = true;
                 lblErreur.Text = "";
             }
             catch { lblErreur.Text = "Veuillez entrer un adresse correcte"; }
@@ -30,12 +31,12 @@ namespace ApplicationCliente
 
         private void Ip_Changed(object sender, EventArgs e)
         {
-            btnConfirmer.Enabled= false;
+            btnConfirmer.Enabled = false;
         }
 
         private void AskIp_FormClosing(object sender, FormClosingEventArgs e)
         {
-            if(!canClose) { e.Cancel = true; }
+            if (!canClose) { e.Cancel = true; }
         }
     }
 }
