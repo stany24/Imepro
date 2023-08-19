@@ -387,29 +387,27 @@ namespace LibraryData
             while (SocketToTeacher == null) { Thread.Sleep(100); }
             while (true)
             {
-                byte[] info = new byte[12];
+                byte[] info = new byte[128];
                 int lenght;
                 try { lenght = SocketToTeacher.Receive(info); }
                 catch (SocketException) { return; }
                 Array.Resize(ref info, lenght);
                 lbxConnexion.Invoke(new MethodInvoker(delegate { lbxConnexion.Items.Add(Encoding.Default.GetString(info)); }));
-                string text = Encoding.Default.GetString(info);
-                switch (Encoding.Default.GetString(info).Split(' ')[0])
+                Command command = JsonSerializer.Deserialize<Command>(Encoding.Default.GetString(info));
+                switch (command.GetCommandType())
                 {
-                    case "data":SendData(); break;
-                    case "image":SendImage(TakeAllScreenShot(), SocketToTeacher); break;
-                    case "kill": KillSelectedProcess(Convert.ToInt32(text.Split(' ')[1])); break;
-                    case "receive": Task.Run(ReceiveMulticastStream); break;
-                    case "apply": ApplyMulticastSettings(); break;
-                    case "stops": Stop(); break;
-                    case "message": ReceiveMessage(); break;
-                    case "url": ReceiveAuthorisedUrls(); break;
-                    case "control": screenToStream = Convert.ToInt32(text.Split(' ')[1]); Task.Run(() => SendStream()); break;
-                    case "stopc": isControled = false; break;
-                    case "mouse": break;
-                    case "key": break;
-                    case "disconnect": Disconnect(); return;
-                    case "shutdown": ShutDown(); return;
+                    case CommandType.DemandData:SendData(); break;
+                    case CommandType.DemandImage: SendImage(TakeAllScreenShot(), SocketToTeacher); break;
+                    case CommandType.KillProcess: KillSelectedProcess(Convert.ToInt32(command.GetArgs()[1])); break;
+                    case CommandType.ReceiveMulticast: Task.Run(ReceiveMulticastStream); break;
+                    case CommandType.ApplyMulticastSettings: ApplyMulticastSettings(); break;
+                    case CommandType.StopReceiveMulticast: Stop(); break;
+                    case CommandType.ReceiveMessage: ReceiveMessage(); break;
+                    case CommandType.ReceiveAutorisedUrls: ReceiveAuthorisedUrls(); break;
+                    case CommandType.GiveControl: screenToStream = Convert.ToInt32(command.GetArgs()[1]); Task.Run(() => SendStream()); break;
+                    case CommandType.StopControl: isControled = false; break;
+                    case CommandType.DisconnectOfTeacher: Disconnect(); return;
+                    case CommandType.StopApplication: ShutDown(); return;
                 }
             }
         }
