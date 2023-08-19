@@ -50,6 +50,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Library\BlocageTest.cs" />
+    <Compile Include="Library\CommandTest.cs" />
     <Compile Include="Library\CustomMessageTest.cs" />
     <Compile Include="Library\DataTest.cs" />
     <Compile Include="Library\StreamOptionsTest.cs" />

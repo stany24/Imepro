@@ -14,7 +14,6 @@ namespace LibraryData
         readonly public Priority Priority;
         [JsonInclude]
         readonly public List<string> Focus;
-
         public Priority GetPriority() { return Priority; }
         public List<string> GetFocus() { return Focus; }
         public StreamOptions(Priority priority, List<string> focus)

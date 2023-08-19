@@ -124,7 +124,7 @@ namespace ApplicationTeacher
         {
             while (isAsking) { Thread.Sleep(100); }
             isAsking = true;
-            socket.Send(new Command(CommandType.ReceiveAutorisedUrls).toByteArray());
+            socket.Send(new Command(CommandType.ReceiveAutorisedUrls).ToByteArray());
             //serialization
             string jsonString = JsonSerializer.Serialize(Properties.Settings.Default.AutorisedWebsite);
             //envoi
@@ -185,11 +185,11 @@ namespace ApplicationTeacher
                 try
                 {
                     //demande les données
-                    socket.Send(new Command(CommandType.DemandData).toByteArray());
+                    socket.Send(new Command(CommandType.DemandData).ToByteArray());
                     lbxRequetes.Invoke(new MethodInvoker(delegate { lbxRequetes.Items.Add(DateTime.Now.ToString("HH:mm:ss") + " Demande des données à " + AllStudents[i].UserName); }));
                     Task.Run(() => AllStudents[i] = ReceiveData(AllStudents[i])).Wait();
                     //demande le screenshot
-                    socket.Send(new Command(CommandType.DemandImage).toByteArray());
+                    socket.Send(new Command(CommandType.DemandImage).ToByteArray());
                     lbxRequetes.Invoke(new MethodInvoker(delegate { lbxRequetes.Items.Add(DateTime.Now.ToString("HH:mm:ss") + " Demande de l'image à " + AllStudents[i].UserName); }));
                     Task.Run(() => ReceiveImage(AllStudents[i])).Wait();
                 }
@@ -366,7 +366,7 @@ namespace ApplicationTeacher
         /// </summary>
         public void RecordAndStreamScreen()
         {
-            foreach (DataForTeacher student in StudentToShareScreen) { student.SocketToStudent.Send(new Command(CommandType.ReceiveMulticast).toByteArray()); }
+            foreach (DataForTeacher student in StudentToShareScreen) { student.SocketToStudent.Send(new Command(CommandType.ReceiveMulticast).ToByteArray()); }
 
             Socket s = new(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
             IPAddress ip = IPAddress.Parse("232.1.2.3");
@@ -415,7 +415,7 @@ namespace ApplicationTeacher
             {
                 isSharing = false;
                 for (int i = 0; i < StudentToShareScreen.Count; i++)
-                { StudentToShareScreen[i].SocketToStudent.Send(new Command(CommandType.StopReceiveMulticast).toByteArray()); }
+                { StudentToShareScreen[i].SocketToStudent.Send(new Command(CommandType.StopReceiveMulticast).ToByteArray()); }
                 StudentToShareScreen = new();
                 btnShare.Text = "Share screen";
                 ScreenSharer.Wait();
@@ -431,7 +431,7 @@ namespace ApplicationTeacher
             byte[] bytes = Encoding.Default.GetBytes(JsonSerializer.Serialize(Configuration.GetStreamOptions()));
             foreach (DataForTeacher student in StudentToShareScreen)
             {
-                student.SocketToStudent.Send(new Command(CommandType.ApplyMulticastSettings).toByteArray());
+                student.SocketToStudent.Send(new Command(CommandType.ApplyMulticastSettings).ToByteArray());
             }
             Thread.Sleep(100);
             foreach (DataForTeacher student in StudentToShareScreen)
@@ -482,8 +482,8 @@ namespace ApplicationTeacher
                 DataForTeacher student = AllStudents[i];
                 try
                 {
-                    student.SocketToStudent.Send(new Command(CommandType.StopReceiveMulticast).toByteArray());
-                    student.SocketToStudent.Send(new Command(CommandType.DisconnectOfTeacher).toByteArray());
+                    student.SocketToStudent.Send(new Command(CommandType.StopReceiveMulticast).ToByteArray());
+                    student.SocketToStudent.Send(new Command(CommandType.DisconnectOfTeacher).ToByteArray());
                 }
                 catch {/*Student has already closed the application.*/ }
                 student.SocketToStudent.Dispose();
