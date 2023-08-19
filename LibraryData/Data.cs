@@ -245,7 +245,6 @@ namespace LibraryData
             List<Bitmap> images = new();
             foreach (Screen screen in Screen.AllScreens)
             {
-                TakeSreenShot(screen);
                 images.Add(TakeSreenShot(screen));
                 TotalWidth += screen.Bounds.Width;
                 if (screen.Bounds.Height > MaxHeight) { MaxHeight = screen.Bounds.Height; }
