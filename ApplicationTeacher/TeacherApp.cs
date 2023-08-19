@@ -404,8 +404,8 @@ namespace ApplicationTeacher
             {
                 ChooseStreamOptions prompt = new(AllStudents);
                 if (prompt.ShowDialog(this) != DialogResult.OK) { return; }
-                if (StudentToShareScreen.Count == 0) { return; }
                 StudentToShareScreen = prompt.GetStudentToShare();
+                if (StudentToShareScreen.Count == 0) { return; }
                 isSharing = true;
                 SendStreamConfiguration();
                 ScreenSharer = Task.Run(RecordAndStreamScreen);

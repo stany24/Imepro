@@ -7,7 +7,7 @@ namespace ApplicationTeacher
 {
     public partial class ChooseStreamOptions : Form
     {
-        private List<DataForTeacher> studentToShare = new();
+        private readonly List<DataForTeacher> studentToShare = new();
 
         public List<DataForTeacher> GetStudentToShare() { return studentToShare; }
         public ChooseStreamOptions(List<DataForTeacher> list)
