@@ -14,7 +14,7 @@ namespace UnitTestLibrary.Student
             IpForTheWeek.SetIp(Ip);
             Assert.AreEqual(IpForTheWeek.GetIp().ToString(), Ip);
             IpForTheWeek.SetIp(NotIp);
-            Assert.AreEqual(IpForTheWeek.GetIp().ToString(), NotIp);
+            Assert.AreEqual(IpForTheWeek.GetIp().ToString(), Ip);
         }
     }
 }

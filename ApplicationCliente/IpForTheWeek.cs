@@ -18,19 +18,18 @@ namespace ApplicationCliente
         /// <param name="ip">The ip you want to save.</param>
         public static void SetIp(string ip)
         {
+            try { IPAddress.Parse(ip); }
+            catch { return; }
             Dictionary<string, string[]> Days;
             try
             {
                 Days = JsonSerializer.Deserialize<Dictionary<string, string[]>>(Properties.Settings.Default.IpForTheWeek);
             }
             catch (Exception) { Days = new(); }
-            try { IPAddress.Parse(ip); }
-            catch { return; }
-            int BeforeAfterNoon = 0;
-            if (DateTime.Now.TimeOfDay > new TimeSpan(12, 35, 0)) { BeforeAfterNoon = 1; }
+            int IsBeforeNoon = 0;
+            if (DateTime.Now.TimeOfDay > new TimeSpan(12, 35, 0)) { IsBeforeNoon = 1; }
             if (!Days.ContainsKey(DateTime.Now.DayOfWeek.ToString())) { Days.Add(DateTime.Now.DayOfWeek.ToString(), new string[2]); }
-            else { Days[DateTime.Now.DayOfWeek.ToString()] = new string[2]; }
-            Days[DateTime.Now.DayOfWeek.ToString()][BeforeAfterNoon] = ip;
+            Days[DateTime.Now.DayOfWeek.ToString()][IsBeforeNoon] = ip;
             Properties.Settings.Default.IpForTheWeek = JsonSerializer.Serialize(Days);
             Properties.Settings.Default.Save();
             Properties.Settings.Default.Reload();
@@ -43,9 +42,9 @@ namespace ApplicationCliente
         public static IPAddress GetIp()
         {
             Dictionary<string, string[]> Days = JsonSerializer.Deserialize<Dictionary<string, string[]>>(Properties.Settings.Default.IpForTheWeek);
-            int BeforeAfterNoon = 0;
-            if (DateTime.Now.TimeOfDay > new TimeSpan(12, 35, 0)) { BeforeAfterNoon = 1; }
-            return IPAddress.Parse(Days[DateTime.Now.DayOfWeek.ToString()][BeforeAfterNoon]);
+            int IsBeforeNoon = 0;
+            if (DateTime.Now.TimeOfDay > new TimeSpan(12, 35, 0)) { IsBeforeNoon = 1; }
+            return IPAddress.Parse(Days[DateTime.Now.DayOfWeek.ToString()][IsBeforeNoon]);
         }
     }
 }

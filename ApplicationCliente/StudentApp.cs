@@ -111,8 +111,8 @@ namespace ApplicationCliente
             if (navigateur.Url == "about:blank") { navigateback = false; }
             if (navigateback)
             {
-                ((IJavaScriptExecutor)navigateur).ExecuteScript("window.close();");
                 ((IJavaScriptExecutor)navigateur).ExecuteScript("window.open();");
+                ((IJavaScriptExecutor)navigateur).ExecuteScript("window.close();");
             }
         }
 
