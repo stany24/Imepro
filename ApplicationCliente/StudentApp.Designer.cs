@@ -41,6 +41,7 @@
             this.btnFirefox = new System.Windows.Forms.Button();
             this.btnChrome = new System.Windows.Forms.Button();
             this.btnResetAllIP = new System.Windows.Forms.Button();
+            this.btnWebView2 = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.pbxScreeShot)).BeginInit();
             this.SuspendLayout();
             // 
@@ -141,11 +142,22 @@
             this.btnResetAllIP.Text = "Réinitialiser les IPs";
             this.btnResetAllIP.UseVisualStyleBackColor = true;
             // 
+            // btnWebView2
+            // 
+            this.btnWebView2.Location = new System.Drawing.Point(1368, 511);
+            this.btnWebView2.Name = "btnWebView2";
+            this.btnWebView2.Size = new System.Drawing.Size(75, 23);
+            this.btnWebView2.TabIndex = 8;
+            this.btnWebView2.Text = "WebView2";
+            this.btnWebView2.UseVisualStyleBackColor = true;
+            this.btnWebView2.Click += new System.EventHandler(this.btnWebView2_Click);
+            // 
             // StudentApp
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1474, 711);
+            this.Controls.Add(this.btnWebView2);
             this.Controls.Add(this.btnResetAllIP);
             this.Controls.Add(this.btnChrome);
             this.Controls.Add(this.btnFirefox);
@@ -177,6 +189,7 @@
         private System.Windows.Forms.Button btnFirefox;
         private System.Windows.Forms.Button btnChrome;
         private System.Windows.Forms.Button btnResetAllIP;
+        private System.Windows.Forms.Button btnWebView2;
     }
 }
 
