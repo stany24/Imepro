@@ -11,12 +11,7 @@ namespace WebBrowser
             InitializeComponent();
             AutorisedWebsites = autorisedWebsites;
             visitedUrls.Add(new Uri("https://duckduckgo.com/"));
-        }
-
-        public Browser()
-        {
-            InitializeComponent();
-            visitedUrls.Add(new Uri("https://duckduckgo.com/"));
+            webView.Source = visitedUrls[0];
         }
 
         private List<string> AutorisedWebsites = new List<string>();
@@ -25,27 +20,20 @@ namespace WebBrowser
 
         private void btnSearch_Click(object sender, EventArgs e)
         {
-
-            while (currentUrlId < visitedUrls.Count)
-            {
-                visitedUrls.RemoveAt(visitedUrls.Count - 1);
-            }
-            try
-            {
-                webView.Source = new Uri(tbxUrl.Text);
-                visitedUrls.Add(new Uri(tbxUrl.Text));
-
-            }
-            catch
-            {
-                webView.Source = new Uri("https://duckduckgo.com/?t=ffab&q="+tbxUrl.Text+"&atb=v320-1&ia=web");
-                visitedUrls.Add(new Uri("https://duckduckgo.com/?t=ffab&q=" + tbxUrl.Text + "&atb=v320-1&ia=web"));
-            }
-            currentUrlId++;
+            try{webView.Source = new Uri(tbxUrl.Text);}
+            catch{webView.Source = new Uri("https://duckduckgo.com/?t=ffab&q="+tbxUrl.Text+"&atb=v320-1&ia=web");}
         }
 
         private void webView_SourceChanged(object sender, Microsoft.Web.WebView2.Core.CoreWebView2SourceChangedEventArgs e)
         {
+            while (currentUrlId < visitedUrls.Count - 1)
+            {
+                visitedUrls.RemoveAt(visitedUrls.Count - 1);
+            }
+            visitedUrls.Add(webView.Source);
+            currentUrlId++;
+            btnMoveBack.Enabled = true;
+            btnMoveForward.Enabled = false;
             tbxUrl.Text = webView.Source.ToString();
         }
 
@@ -54,13 +42,17 @@ namespace WebBrowser
             if(currentUrlId== 0) { return; }
             currentUrlId--;
             webView.Source = visitedUrls[currentUrlId];
+            btnMoveForward.Enabled = true;
+            if (currentUrlId == 0) { btnMoveBack.Enabled = false; }
         }
 
         private void btnMoveForward_Click(object sender, EventArgs e)
         {
-            if(currentUrlId == visitedUrls.Count) { return; }
+            if(currentUrlId == visitedUrls.Count-1) { return; }
             currentUrlId++;
             webView.Source = visitedUrls[currentUrlId];
+            btnMoveBack.Enabled = true;
+            if(currentUrlId == visitedUrls.Count-1) { btnMoveForward.Enabled = false; }
         }
     }
 }

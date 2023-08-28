@@ -68,6 +68,7 @@
             // 
             // btnMoveBack
             // 
+            this.btnMoveBack.Enabled = false;
             this.btnMoveBack.Location = new System.Drawing.Point(12, 10);
             this.btnMoveBack.Name = "btnMoveBack";
             this.btnMoveBack.Size = new System.Drawing.Size(24, 23);
@@ -78,6 +79,7 @@
             // 
             // btnMoveForward
             // 
+            this.btnMoveForward.Enabled = false;
             this.btnMoveForward.Location = new System.Drawing.Point(42, 9);
             this.btnMoveForward.Name = "btnMoveForward";
             this.btnMoveForward.Size = new System.Drawing.Size(24, 23);
