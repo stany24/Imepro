@@ -144,6 +144,10 @@
       <Project>{3c15d5e3-049b-4b63-b3f8-668f9d3e6f9d}</Project>
       <Name>ClassLibrary</Name>
     </ProjectReference>
+    <ProjectReference Include="..\WebBrowser\WebBrowser.csproj">
+      <Project>{9138619c-c2b1-4721-bbcb-46787cd6f712}</Project>
+      <Name>WebBrowser</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

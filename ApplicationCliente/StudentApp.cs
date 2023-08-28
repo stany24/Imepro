@@ -12,6 +12,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using WebBrowser;
 
 namespace ApplicationCliente
 {
@@ -258,5 +259,11 @@ namespace ApplicationCliente
         }
 
         #endregion
+
+        private void btnWebView2_Click(object sender, EventArgs e)
+        {
+            Browser browser = new Browser(Student.AutorisedUrls);
+            browser.Show();
+        }
     }
 }
