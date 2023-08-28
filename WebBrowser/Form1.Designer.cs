@@ -45,6 +45,7 @@
             this.webView.Location = new System.Drawing.Point(0, 54);
             this.webView.Name = "webView";
             this.webView.Size = new System.Drawing.Size(800, 396);
+            this.webView.Source = new System.Uri("https://duckduckgo.com/", System.UriKind.Absolute);
             this.webView.TabIndex = 0;
             this.webView.ZoomFactor = 1D;
             this.webView.SourceChanged += new System.EventHandler<Microsoft.Web.WebView2.Core.CoreWebView2SourceChangedEventArgs>(this.webView_SourceChanged);
@@ -68,7 +69,6 @@
             // 
             // btnMoveBack
             // 
-            this.btnMoveBack.Enabled = false;
             this.btnMoveBack.Location = new System.Drawing.Point(12, 10);
             this.btnMoveBack.Name = "btnMoveBack";
             this.btnMoveBack.Size = new System.Drawing.Size(24, 23);
@@ -79,7 +79,6 @@
             // 
             // btnMoveForward
             // 
-            this.btnMoveForward.Enabled = false;
             this.btnMoveForward.Location = new System.Drawing.Point(42, 9);
             this.btnMoveForward.Name = "btnMoveForward";
             this.btnMoveForward.Size = new System.Drawing.Size(24, 23);
@@ -96,6 +95,7 @@
             this.btnReload.TabIndex = 5;
             this.btnReload.Text = "O";
             this.btnReload.UseVisualStyleBackColor = true;
+            this.btnReload.Click += new System.EventHandler(this.btnReload_Click);
             // 
             // Browser
             // 

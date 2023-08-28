@@ -10,13 +10,11 @@ namespace WebBrowser
         {
             InitializeComponent();
             AutorisedWebsites = autorisedWebsites;
-            visitedUrls.Add(new Uri("https://duckduckgo.com/"));
-            webView.Source = visitedUrls[0];
+            webView.Source = new Uri("https://duckduckgo.com/");
         }
 
         private List<string> AutorisedWebsites = new List<string>();
-        private List<Uri> visitedUrls = new List<Uri>();
-        private int currentUrlId = 0;
+        private List<Uri> History = new List<Uri>();
 
         private void btnSearch_Click(object sender, EventArgs e)
         {
@@ -26,33 +24,23 @@ namespace WebBrowser
 
         private void webView_SourceChanged(object sender, Microsoft.Web.WebView2.Core.CoreWebView2SourceChangedEventArgs e)
         {
-            while (currentUrlId < visitedUrls.Count - 1)
-            {
-                visitedUrls.RemoveAt(visitedUrls.Count - 1);
-            }
-            visitedUrls.Add(webView.Source);
-            currentUrlId++;
-            btnMoveBack.Enabled = true;
-            btnMoveForward.Enabled = false;
+            History.Add(webView.Source);
             tbxUrl.Text = webView.Source.ToString();
         }
 
         private void btnMoveBack_Click(object sender, EventArgs e)
         {
-            if(currentUrlId== 0) { return; }
-            currentUrlId--;
-            webView.Source = visitedUrls[currentUrlId];
-            btnMoveForward.Enabled = true;
-            if (currentUrlId == 0) { btnMoveBack.Enabled = false; }
+            webView.CoreWebView2.GoBack();
         }
 
         private void btnMoveForward_Click(object sender, EventArgs e)
         {
-            if(currentUrlId == visitedUrls.Count-1) { return; }
-            currentUrlId++;
-            webView.Source = visitedUrls[currentUrlId];
-            btnMoveBack.Enabled = true;
-            if(currentUrlId == visitedUrls.Count-1) { btnMoveForward.Enabled = false; }
+            webView.CoreWebView2.GoForward();
+        }
+
+        private void btnReload_Click(object sender, EventArgs e)
+        {
+            webView.CoreWebView2.Reload();
         }
     }
 }
