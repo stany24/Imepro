@@ -48,8 +48,8 @@
             this.webView.Source = new System.Uri("https://duckduckgo.com/", System.UriKind.Absolute);
             this.webView.TabIndex = 0;
             this.webView.ZoomFactor = 1D;
-            this.webView.NavigationStarting += new System.EventHandler<Microsoft.Web.WebView2.Core.CoreWebView2NavigationStartingEventArgs>(this.webView_NavigationStarting);
-            this.webView.SourceChanged += new System.EventHandler<Microsoft.Web.WebView2.Core.CoreWebView2SourceChangedEventArgs>(this.webView_SourceChanged);
+            this.webView.NavigationStarting += new System.EventHandler<Microsoft.Web.WebView2.Core.CoreWebView2NavigationStartingEventArgs>(this.NavigationStarting);
+            this.webView.SourceChanged += new System.EventHandler<Microsoft.Web.WebView2.Core.CoreWebView2SourceChangedEventArgs>(this.UrlChanged);
             // 
             // tbxUrl
             // 
@@ -66,7 +66,7 @@
             this.btnSearch.TabIndex = 2;
             this.btnSearch.Text = "button1";
             this.btnSearch.UseVisualStyleBackColor = true;
-            this.btnSearch.Click += new System.EventHandler(this.btnSearch_Click);
+            this.btnSearch.Click += new System.EventHandler(this.Search_Click);
             // 
             // btnMoveBack
             // 
@@ -76,7 +76,7 @@
             this.btnMoveBack.TabIndex = 3;
             this.btnMoveBack.Text = "<-";
             this.btnMoveBack.UseVisualStyleBackColor = true;
-            this.btnMoveBack.Click += new System.EventHandler(this.btnMoveBack_Click);
+            this.btnMoveBack.Click += new System.EventHandler(this.MoveBack_Click);
             // 
             // btnMoveForward
             // 
@@ -86,7 +86,7 @@
             this.btnMoveForward.TabIndex = 4;
             this.btnMoveForward.Text = "->";
             this.btnMoveForward.UseVisualStyleBackColor = true;
-            this.btnMoveForward.Click += new System.EventHandler(this.btnMoveForward_Click);
+            this.btnMoveForward.Click += new System.EventHandler(this.MoveForward_Click);
             // 
             // btnReload
             // 
@@ -96,7 +96,7 @@
             this.btnReload.TabIndex = 5;
             this.btnReload.Text = "O";
             this.btnReload.UseVisualStyleBackColor = true;
-            this.btnReload.Click += new System.EventHandler(this.btnReload_Click);
+            this.btnReload.Click += new System.EventHandler(this.Reload_Click);
             // 
             // Browser
             // 
