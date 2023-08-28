@@ -10,10 +10,9 @@ namespace WebBrowser
         {
             InitializeComponent();
             AutorisedWebsites = autorisedWebsites;
-            webView.Source = new Uri("https://duckduckgo.com/");
         }
 
-        private List<string> AutorisedWebsites = new List<string>();
+        private List<string> AutorisedWebsites;
         private List<Uri> History = new List<Uri>();
 
         private void btnSearch_Click(object sender, EventArgs e)
@@ -41,6 +40,15 @@ namespace WebBrowser
         private void btnReload_Click(object sender, EventArgs e)
         {
             webView.CoreWebView2.Reload();
+        }
+
+        private void webView_NavigationStarting(object sender, Microsoft.Web.WebView2.Core.CoreWebView2NavigationStartingEventArgs e)
+        {
+            e.Cancel = true;
+            foreach (string uri in AutorisedWebsites)
+            {
+                if (e.Uri.StartsWith(uri)) { e.Cancel = false; }
+            }
         }
     }
 }
