@@ -262,7 +262,7 @@ namespace ApplicationCliente
         private void WebView2_Click(object sender, EventArgs e)
         {
             Form form = new();
-            form.Controls.Add(new Browser(new System.Collections.Generic.List<string>()));
+            form.Controls.Add(new Browser(new System.Collections.Generic.List<string>() { "https://duckduckgo.com" }));
             form.Show();
         }
     }

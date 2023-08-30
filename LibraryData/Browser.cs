@@ -8,7 +8,7 @@ using Microsoft.Web.WebView2.Core;
 
 namespace LibraryData
 {
-    public class Browser:Control
+    public class Browser:Panel
     {
         private WebView2 webView;
         private Button btnBack;
@@ -24,25 +24,30 @@ namespace LibraryData
 
         private void InitializeComponent()
         {
-            webView = new();
+            Dock = DockStyle.Fill;
+            webView = new() {
+                Source = new Uri("https://duckduckgo.com")
+            };
+            UpdateWebViewLocation(new object(), new EventArgs());
             btnBack = new() {
                 Size = new Size(ButtonHeightPixel, ButtonHeightPixel),
-                Location = new Point(0, 0)};
+                Location = new Point(0+OffsetPixel, 0+OffsetPixel),
+                Text = "<-"};
             btnForward = new() {
                 Size = new Size(ButtonHeightPixel, ButtonHeightPixel),
-                Location = new Point(btnBack.Size.Width + OffsetPixel, 0)};
+                Location = new Point(btnBack.Location.X+ btnBack.Size.Width + OffsetPixel, btnBack.Location.Y),
+                Text = "->"};
             btnRefresh = new() {
                 Size = new Size(ButtonHeightPixel, ButtonHeightPixel),
-                Location = new Point(btnForward.Location.X + btnForward.Size.Width + OffsetPixel)};
+                Location = new Point(btnForward.Location.X + btnForward.Size.Width + OffsetPixel, btnBack.Location.Y),
+                Text = "O"};
             tbxUrl = new() {
-                Size = new Size(ButtonHeightPixel, 4 * ButtonHeightPixel),
-                Location = new Point(btnRefresh.Location.X + btnRefresh.Width + OffsetPixel, 0)};
+                Size = new Size(8 * ButtonHeightPixel, ButtonHeightPixel),
+                Location = new Point(btnRefresh.Location.X + btnRefresh.Width + OffsetPixel, btnBack.Location.Y)};
             btnEnter = new() {
                 Size = new Size(ButtonHeightPixel, ButtonHeightPixel),
-                Location = new Point(tbxUrl.Location.X + tbxUrl.Size.Width + OffsetPixel, 0)};
+                Location = new Point(tbxUrl.Location.X + tbxUrl.Size.Width + OffsetPixel, btnBack.Location.Y)};
 
-            Show();
-            Dock = DockStyle.Fill;
             Controls.Add(webView);
             Controls.Add(btnBack);
             Controls.Add(btnForward);
@@ -55,10 +60,17 @@ namespace LibraryData
             btnEnter.MouseClick += new MouseEventHandler(Search_Click);
             webView.SourceChanged += new EventHandler<CoreWebView2SourceChangedEventArgs>(UrlChanged);
             webView.NavigationStarting += new EventHandler<CoreWebView2NavigationStartingEventArgs>(NavigationStarting);
+            Resize += new EventHandler(UpdateWebViewLocation);
         }
 
-        readonly private int ButtonHeightPixel;
-        readonly private int OffsetPixel = 20;
+        private void UpdateWebViewLocation(object sender, EventArgs e)
+        {
+            webView.Location = new Point(0, ButtonHeightPixel + 2 * OffsetPixel);
+            webView.Size = new Size(Width, Height - ButtonHeightPixel - 2 * OffsetPixel);
+        }
+
+        readonly private int ButtonHeightPixel = 21; //to fit the button size to the textbox height
+        readonly private int OffsetPixel = 10;
         readonly private List<string> AutorisedWebsites;
         readonly private List<Url> History = new();
 
