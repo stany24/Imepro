@@ -259,9 +259,9 @@ namespace ApplicationCliente
 
         #endregion
 
-        private void btnWebView2_Click(object sender, EventArgs e)
+        private void WebView2_Click(object sender, EventArgs e)
         {
-            Form form = new Form();
+            Form form = new();
             form.Controls.Add(new Browser(new System.Collections.Generic.List<string>()));
             form.Show();
         }

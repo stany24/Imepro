@@ -150,7 +150,7 @@
             this.btnWebView2.TabIndex = 8;
             this.btnWebView2.Text = "WebView2";
             this.btnWebView2.UseVisualStyleBackColor = true;
-            this.btnWebView2.Click += new System.EventHandler(this.btnWebView2_Click);
+            this.btnWebView2.Click += new System.EventHandler(this.WebView2_Click);
             // 
             // StudentApp
             // 
