@@ -16,6 +16,7 @@ namespace LibraryData
         private Button btnRefresh;
         private TextBox tbxUrl;
         private Button btnEnter;
+        private TabManager tabManager;
         public Browser(List<string> autorisedWebsites)
         {
             InitializeComponent();
@@ -67,6 +68,7 @@ namespace LibraryData
         {
             webView.Location = new Point(0, ButtonHeightPixel + 2 * OffsetPixel);
             webView.Size = new Size(Width, Height - ButtonHeightPixel - 2 * OffsetPixel);
+            tabManager.Size = new Size(30,Size.Width);
         }
 
         readonly private int ButtonHeightPixel = 21; //to fit the button size to the textbox height
@@ -108,6 +110,50 @@ namespace LibraryData
             {
                 e.Cancel = false;
             }
+        }
+    }
+
+    public class TabManager : Panel
+    {
+        List<Tab> tabs;
+        Button btnNewTab;
+
+        public TabManager()
+        {
+            Size = new Size();
+        }
+    }
+
+    public class Tab:Panel
+    {
+        Label lblWebsiteName;
+        Button btnClose;
+        WebView2 webview;
+
+        public Tab(bool isMaximized)
+        {
+            lblWebsiteName = new Label();
+            btnClose = new Button();
+            if(isMaximized) { Maximize(); }
+            else { Minimize(); }
+        }
+
+        public void Minimize()
+        {
+            Size = new Size(30, 50);
+            lblWebsiteName.Size = new Size(30, 20);
+            lblWebsiteName.Location = new Point(0, 0);
+            btnClose.Size = new Size(30, 30);
+            btnClose.Location = new Point(20, 0);
+        }
+
+        public void Maximize()
+        {
+            Size = new Size(30, 100);
+            lblWebsiteName.Size = new Size(30, 70);
+            lblWebsiteName.Location = new Point(0, 0);
+            btnClose.Size = new Size(30, 30);
+            btnClose.Location = new Point(80, 0);
         }
     }
 }
