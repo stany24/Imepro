@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
 
-namespace WebBrowser
+public namespace WebBrowser
 {
     public partial class Browser : Form
     {
@@ -14,7 +14,7 @@ namespace WebBrowser
         }
 
         readonly private List<string> AutorisedWebsites;
-        readonly private List<Uri> History = new List<Uri>();
+        readonly private List<Url> History = new List<Url>();
 
         private void Search_Click(object sender, EventArgs e)
         {

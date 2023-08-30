@@ -14,8 +14,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTestLibrary", "UnitTest
 		{3C15D5E3-049B-4B63-B3F8-668F9D3E6F9D} = {3C15D5E3-049B-4B63-B3F8-668F9D3E6F9D}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebBrowser", "WebBrowser\WebBrowser.csproj", "{9138619C-C2B1-4721-BBCB-46787CD6F712}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -38,10 +36,6 @@ Global
 		{DB64D607-5324-48F5-B66D-598E0E427753}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DB64D607-5324-48F5-B66D-598E0E427753}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DB64D607-5324-48F5-B66D-598E0E427753}.Release|Any CPU.Build.0 = Release|Any CPU
-		{9138619C-C2B1-4721-BBCB-46787CD6F712}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9138619C-C2B1-4721-BBCB-46787CD6F712}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9138619C-C2B1-4721-BBCB-46787CD6F712}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9138619C-C2B1-4721-BBCB-46787CD6F712}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

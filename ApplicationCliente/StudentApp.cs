@@ -12,7 +12,6 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using WebBrowser;
 
 namespace ApplicationCliente
 {
@@ -262,8 +261,9 @@ namespace ApplicationCliente
 
         private void btnWebView2_Click(object sender, EventArgs e)
         {
-            Browser browser = new Browser(Student.AutorisedUrls);
-            browser.Show();
+            Form form = new Form();
+            form.Controls.Add(new Browser(new System.Collections.Generic.List<string>()));
+            form.Show();
         }
     }
 }

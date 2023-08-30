@@ -111,6 +111,7 @@ namespace LibraryData
         private bool mouseDisabled = false;
         private bool isReceiving = false;
         private bool isControled = false;
+        public Browser browser;
 
         public Socket SocketToTeacher { get; set; }
         public IPAddress IpToTeacher { get; set; }
@@ -153,6 +154,11 @@ namespace LibraryData
 
         #region Récupération Url/Processus/Image
 
+        private void GetWebViewUrls()
+        {
+
+        }
+
         /// <summary>
         /// Function to get the tab name in all browser.
         /// </summary>
@@ -188,6 +194,7 @@ namespace LibraryData
                 }
             }
         }
+
 
         /// <summary>
         /// Function to get the parent of a process.
@@ -289,6 +296,7 @@ namespace LibraryData
         private void SendData()
         {
             GetCurrentWebTabsName();
+            GetWebViewUrls();
             GetUserProcesses();
             //serialization
             string jsonString = JsonSerializer.Serialize(ToData(), new JsonSerializerOptions { IncludeFields = true, });

@@ -27,7 +27,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <IntermediateOutputPath>C:\Users\ADMINI~1\AppData\Local\Temp\vs6614.tmp\Debug\</IntermediateOutputPath>
+    <IntermediateOutputPath>C:\Users\Stan\AppData\Local\Temp\vs2C35.tmp\Debug\</IntermediateOutputPath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -37,7 +37,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <IntermediateOutputPath>C:\Users\ADMINI~1\AppData\Local\Temp\vs6614.tmp\Release\</IntermediateOutputPath>
+    <IntermediateOutputPath>C:\Users\Stan\AppData\Local\Temp\vs2C35.tmp\Release\</IntermediateOutputPath>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.Bcl.AsyncInterfaces, Version=7.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
@@ -143,10 +143,6 @@
     <ProjectReference Include="..\LibraryData\ClassLibrary.csproj">
       <Project>{3c15d5e3-049b-4b63-b3f8-668f9d3e6f9d}</Project>
       <Name>ClassLibrary</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\WebBrowser\WebBrowser.csproj">
-      <Project>{9138619c-c2b1-4721-bbcb-46787cd6f712}</Project>
-      <Name>WebBrowser</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
