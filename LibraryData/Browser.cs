@@ -5,12 +5,13 @@ using System.Linq;
 using System.Windows.Forms;
 using System.Drawing;
 using Microsoft.Web.WebView2.Core;
+using System.Management;
 
 namespace LibraryData
 {
     public class Browser:Panel
     {
-        private WebView2 webView;
+        private WebView2 OpenedTab;
         private Button btnBack;
         private Button btnForward;
         private Button btnRefresh;
@@ -26,9 +27,10 @@ namespace LibraryData
         private void InitializeComponent()
         {
             Dock = DockStyle.Fill;
-            webView = new() {
+            OpenedTab = new() {
                 Source = new Uri("https://duckduckgo.com")
             };
+            tabManager = new TabManager();
             UpdateWebViewLocation(new object(), new EventArgs());
             btnBack = new() {
                 Size = new Size(ButtonHeightPixel, ButtonHeightPixel),
@@ -49,7 +51,7 @@ namespace LibraryData
                 Size = new Size(ButtonHeightPixel, ButtonHeightPixel),
                 Location = new Point(tbxUrl.Location.X + tbxUrl.Size.Width + OffsetPixel, btnBack.Location.Y)};
 
-            Controls.Add(webView);
+            Controls.Add(OpenedTab);
             Controls.Add(btnBack);
             Controls.Add(btnForward);
             Controls.Add(btnRefresh);
@@ -59,16 +61,17 @@ namespace LibraryData
             btnForward.MouseClick += new MouseEventHandler(MoveForward_Click);
             btnRefresh.MouseClick += new MouseEventHandler(Reload_Click);
             btnEnter.MouseClick += new MouseEventHandler(Search_Click);
-            webView.SourceChanged += new EventHandler<CoreWebView2SourceChangedEventArgs>(UrlChanged);
-            webView.NavigationStarting += new EventHandler<CoreWebView2NavigationStartingEventArgs>(NavigationStarting);
+            OpenedTab.SourceChanged += new EventHandler<CoreWebView2SourceChangedEventArgs>(UrlChanged);
+            OpenedTab.NavigationStarting += new EventHandler<CoreWebView2NavigationStartingEventArgs>(NavigationStarting);
             Resize += new EventHandler(UpdateWebViewLocation);
         }
 
         private void UpdateWebViewLocation(object sender, EventArgs e)
         {
-            webView.Location = new Point(0, ButtonHeightPixel + 2 * OffsetPixel);
-            webView.Size = new Size(Width, Height - ButtonHeightPixel - 2 * OffsetPixel);
-            tabManager.Size = new Size(30,Size.Width);
+            tabManager.Size = new Size(30,Width);
+            tabManager.Location = new Point(0, ButtonHeightPixel + 2*OffsetPixel);
+            OpenedTab.Location = new Point(0, ButtonHeightPixel+ tabManager.Height + 3 * OffsetPixel);
+            OpenedTab.Size = new Size(Width, Height - ButtonHeightPixel - 2 * OffsetPixel);
         }
 
         readonly private int ButtonHeightPixel = 21; //to fit the button size to the textbox height
@@ -78,29 +81,29 @@ namespace LibraryData
 
         private void Search_Click(object sender, EventArgs e)
         {
-            try { webView.Source = new Uri(tbxUrl.Text); }
-            catch { webView.Source = new Uri("https://duckduckgo.com/?t=ffab&q=" + tbxUrl.Text + "&atb=v320-1&ia=web"); }
+            try { OpenedTab.Source = new Uri(tbxUrl.Text); }
+            catch { OpenedTab.Source = new Uri("https://duckduckgo.com/?t=ffab&q=" + tbxUrl.Text + "&atb=v320-1&ia=web"); }
         }
 
         private void UrlChanged(object sender, CoreWebView2SourceChangedEventArgs e)
         {
-            History.Add(new Url(DateTime.Now,webView.Source.ToString()));
-            tbxUrl.Text = webView.Source.ToString();
+            History.Add(new Url(DateTime.Now,OpenedTab.Source.ToString()));
+            tbxUrl.Text = OpenedTab.Source.ToString();
         }
 
         private void MoveBack_Click(object sender, EventArgs e)
         {
-            webView.CoreWebView2.GoBack();
+            OpenedTab.CoreWebView2.GoBack();
         }
 
         private void MoveForward_Click(object sender, EventArgs e)
         {
-            webView.CoreWebView2.GoForward();
+            OpenedTab.CoreWebView2.GoForward();
         }
 
         private void Reload_Click(object sender, EventArgs e)
         {
-            webView.CoreWebView2.Reload();
+            OpenedTab.CoreWebView2.Reload();
         }
 
         private void NavigationStarting(object sender, CoreWebView2NavigationStartingEventArgs e)
@@ -121,6 +124,19 @@ namespace LibraryData
         public TabManager()
         {
             Size = new Size();
+            tabs = new List<Tab>{
+                new Tab(true)};
+        }
+
+        private void UpdateLocations()
+        {
+            int CurrentOffset = 0;
+            for (int i = 0; i < tabs.Count; i++)
+            {
+                tabs[i].Location = new Point(0, CurrentOffset);
+                CurrentOffset += tabs[i].Width;
+            }
+            btnNewTab.Location = new Point(0, CurrentOffset);
         }
     }
 
