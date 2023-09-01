@@ -5,7 +5,6 @@ using System.Linq;
 using System.Windows.Forms;
 using System.Drawing;
 using Microsoft.Web.WebView2.Core;
-using System.Management;
 
 namespace LibraryData
 {
@@ -18,6 +17,11 @@ namespace LibraryData
         private TextBox tbxUrl;
         private Button btnEnter;
         private TabManager tabManager;
+        readonly private int ButtonHeightPixel = 21; //to fit the button size to the textbox height
+        readonly private int OffsetPixel = 10;
+        readonly private List<string> AutorisedWebsites;
+        readonly private List<Url> History = new();
+
         public Browser(List<string> autorisedWebsites)
         {
             InitializeComponent();
@@ -30,7 +34,7 @@ namespace LibraryData
             OpenedTab = new() {
                 Source = new Uri("https://duckduckgo.com")
             };
-            tabManager = new TabManager();
+            tabManager = new TabManager(Width);
             UpdateWebViewLocation(new object(), new EventArgs());
             btnBack = new() {
                 Size = new Size(ButtonHeightPixel, ButtonHeightPixel),
@@ -68,16 +72,12 @@ namespace LibraryData
 
         private void UpdateWebViewLocation(object sender, EventArgs e)
         {
-            tabManager.Size = new Size(30,Width);
+            tabManager.Size = new Size(Width,30);
             tabManager.Location = new Point(0, ButtonHeightPixel + 2*OffsetPixel);
+            tabManager.Show();
             OpenedTab.Location = new Point(0, ButtonHeightPixel+ tabManager.Height + 3 * OffsetPixel);
             OpenedTab.Size = new Size(Width, Height - ButtonHeightPixel - 2 * OffsetPixel);
         }
-
-        readonly private int ButtonHeightPixel = 21; //to fit the button size to the textbox height
-        readonly private int OffsetPixel = 10;
-        readonly private List<string> AutorisedWebsites;
-        readonly private List<Url> History = new();
 
         private void Search_Click(object sender, EventArgs e)
         {
@@ -109,7 +109,7 @@ namespace LibraryData
         private void NavigationStarting(object sender, CoreWebView2NavigationStartingEventArgs e)
         {
             e.Cancel = true;
-            foreach (string uri in AutorisedWebsites.Where(uri => e.Uri.StartsWith(uri)))
+            foreach (string uri in AutorisedWebsites.Where(e.Uri.StartsWith))
             {
                 e.Cancel = false;
             }
@@ -119,13 +119,15 @@ namespace LibraryData
     public class TabManager : Panel
     {
         List<Tab> tabs;
-        Button btnNewTab;
+        private readonly Button btnNewTab;
 
-        public TabManager()
+        public TabManager(int width)
         {
-            Size = new Size();
+            Size = new Size(width,30);
             tabs = new List<Tab>{
                 new Tab(true)};
+            Controls.Add(btnNewTab);
+            Controls.Add(tabs[0]);
         }
 
         private void UpdateLocations()
@@ -142,9 +144,9 @@ namespace LibraryData
 
     public class Tab:Panel
     {
-        Label lblWebsiteName;
-        Button btnClose;
-        WebView2 webview;
+        private readonly Label lblWebsiteName;
+        private readonly Button btnClose;
+        private readonly WebView2 webview;
 
         public Tab(bool isMaximized)
         {
@@ -152,24 +154,26 @@ namespace LibraryData
             btnClose = new Button();
             if(isMaximized) { Maximize(); }
             else { Minimize(); }
+            Controls.Add(lblWebsiteName);
+            Controls.Add(btnClose);
         }
 
         public void Minimize()
         {
-            Size = new Size(30, 50);
-            lblWebsiteName.Size = new Size(30, 20);
+            Size = new Size(50, 30);
+            lblWebsiteName.Size = new Size(20, 30);
             lblWebsiteName.Location = new Point(0, 0);
             btnClose.Size = new Size(30, 30);
-            btnClose.Location = new Point(20, 0);
+            btnClose.Location = new Point(0, 20);
         }
 
         public void Maximize()
         {
-            Size = new Size(30, 100);
-            lblWebsiteName.Size = new Size(30, 70);
+            Size = new Size(100, 30);
+            lblWebsiteName.Size = new Size(70, 30);
             lblWebsiteName.Location = new Point(0, 0);
             btnClose.Size = new Size(30, 30);
-            btnClose.Location = new Point(80, 0);
+            btnClose.Location = new Point(0, 80);
         }
     }
 }
