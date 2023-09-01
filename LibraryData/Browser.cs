@@ -61,6 +61,7 @@ namespace LibraryData
             Controls.Add(btnRefresh);
             Controls.Add(tbxUrl);
             Controls.Add(btnEnter);
+            Controls.Add(tabManager);
             btnBack.MouseClick += new MouseEventHandler(MoveBack_Click);
             btnForward.MouseClick += new MouseEventHandler(MoveForward_Click);
             btnRefresh.MouseClick += new MouseEventHandler(Reload_Click);
@@ -74,7 +75,6 @@ namespace LibraryData
         {
             tabManager.Size = new Size(Width,30);
             tabManager.Location = new Point(0, ButtonHeightPixel + 2*OffsetPixel);
-            tabManager.Show();
             OpenedTab.Location = new Point(0, ButtonHeightPixel+ tabManager.Height + 3 * OffsetPixel);
             OpenedTab.Size = new Size(Width, Height - ButtonHeightPixel - 2 * OffsetPixel);
         }
@@ -123,22 +123,27 @@ namespace LibraryData
 
         public TabManager(int width)
         {
-            Size = new Size(width,30);
+            
             tabs = new List<Tab>{
-                new Tab(true)};
+                new Tab(true) };
+            btnNewTab = new Button() {
+                Text = "new"};
             Controls.Add(btnNewTab);
             Controls.Add(tabs[0]);
+            UpdateLocations(width);
+            Show();
         }
 
-        private void UpdateLocations()
+        private void UpdateLocations(int width)
         {
+            Size = new Size(width, 30);
             int CurrentOffset = 0;
             for (int i = 0; i < tabs.Count; i++)
             {
-                tabs[i].Location = new Point(0, CurrentOffset);
+                tabs[i].Location = new Point(CurrentOffset,0);
                 CurrentOffset += tabs[i].Width;
             }
-            btnNewTab.Location = new Point(0, CurrentOffset);
+            btnNewTab.Location = new Point(CurrentOffset,0);
         }
     }
 
@@ -150,8 +155,10 @@ namespace LibraryData
 
         public Tab(bool isMaximized)
         {
-            lblWebsiteName = new Label();
-            btnClose = new Button();
+            lblWebsiteName = new Label() {
+                Text = "new tab"};
+            btnClose = new Button() {
+                Text = "X"};
             if(isMaximized) { Maximize(); }
             else { Minimize(); }
             Controls.Add(lblWebsiteName);
@@ -164,7 +171,7 @@ namespace LibraryData
             lblWebsiteName.Size = new Size(20, 30);
             lblWebsiteName.Location = new Point(0, 0);
             btnClose.Size = new Size(30, 30);
-            btnClose.Location = new Point(0, 20);
+            btnClose.Location = new Point(20, 0);
         }
 
         public void Maximize()
@@ -173,7 +180,7 @@ namespace LibraryData
             lblWebsiteName.Size = new Size(70, 30);
             lblWebsiteName.Location = new Point(0, 0);
             btnClose.Size = new Size(30, 30);
-            btnClose.Location = new Point(0, 80);
+            btnClose.Location = new Point(70, 0);
         }
     }
 }
