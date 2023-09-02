@@ -128,6 +128,7 @@ namespace LibraryData
                 new Tab(true) };
             btnNewTab = new Button() {
                 Text = "new"};
+            btnNewTab.Click += new EventHandler(NewTab);
             Controls.Add(btnNewTab);
             Controls.Add(tabs[0]);
             UpdateLocations(width);
@@ -144,6 +145,13 @@ namespace LibraryData
                 CurrentOffset += tabs[i].Width;
             }
             btnNewTab.Location = new Point(CurrentOffset,0);
+        }
+
+        private void NewTab(object sender, EventArgs e)
+        {
+            tabs.Add(new Tab(true));
+            Controls.Add(tabs[tabs.Count-1]);
+            UpdateLocations(Width);
         }
     }
 
