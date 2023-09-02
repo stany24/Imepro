@@ -123,14 +123,13 @@ namespace LibraryData
 
         public TabManager(int width)
         {
+            tabs = new List<Tab>();
             
-            tabs = new List<Tab>{
-                new Tab(true) };
             btnNewTab = new Button() {
                 Text = "new"};
             btnNewTab.Click += new EventHandler(NewTab);
             Controls.Add(btnNewTab);
-            Controls.Add(tabs[0]);
+            NewTab(new object(), new EventArgs());
             UpdateLocations(width);
             Show();
         }
@@ -149,8 +148,16 @@ namespace LibraryData
 
         private void NewTab(object sender, EventArgs e)
         {
-            tabs.Add(new Tab(true));
+            Tab tab = new Tab(true);
+            tab.Disposed += new EventHandler(RemoveTabFromList);
+            tabs.Add(tab);
             Controls.Add(tabs[tabs.Count-1]);
+            UpdateLocations(Width);
+        }
+
+        private void RemoveTabFromList(object sender, EventArgs e)
+        {
+            tabs.Remove(sender as Tab);
             UpdateLocations(Width);
         }
     }
@@ -169,8 +176,14 @@ namespace LibraryData
                 Text = "X"};
             if(isMaximized) { Maximize(); }
             else { Minimize(); }
+            btnClose.Click += new EventHandler(CloseTab);
             Controls.Add(lblWebsiteName);
             Controls.Add(btnClose);
+        }
+
+        private void CloseTab(object sender, EventArgs e)
+        {
+            this.Dispose();
         }
 
         public void Minimize()
