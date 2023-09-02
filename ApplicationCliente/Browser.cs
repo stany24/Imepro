@@ -1,12 +1,12 @@
 ﻿using Microsoft.Web.WebView2.WinForms;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Windows.Forms;
 using System.Drawing;
 using Microsoft.Web.WebView2.Core;
+using System.Text.Json;
 
-namespace LibraryData
+namespace ApplicationCliente
 {
     public class Browser:Panel
     {
@@ -19,12 +19,10 @@ namespace LibraryData
         private TabManager tabManager;
         readonly private int ButtonHeightPixel = 21; //to fit the button size to the textbox height
         readonly private int OffsetPixel = 10;
-        readonly private List<string> AutorisedWebsites;
 
-        public Browser(List<string> autorisedWebsites)
+        public Browser()
         {
             InitializeComponent();
-            AutorisedWebsites = autorisedWebsites;
         }
 
         private void InitializeComponent()
@@ -231,6 +229,11 @@ namespace LibraryData
             {
                 e.Cancel = false;
             }*/
+        }
+
+        private List<string> GetAutorisedWebsites()
+        {
+            return JsonSerializer.Deserialize<List<string>>(Properties.Settings.Default.AutorisedWebsites);
         }
     }
 }

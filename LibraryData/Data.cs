@@ -111,7 +111,6 @@ namespace LibraryData
         private bool mouseDisabled = false;
         private bool isReceiving = false;
         private bool isControled = false;
-        public Browser browser;
 
         public Socket SocketToTeacher { get; set; }
         public IPAddress IpToTeacher { get; set; }
