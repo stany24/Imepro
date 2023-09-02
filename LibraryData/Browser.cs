@@ -120,6 +120,7 @@ namespace LibraryData
     {
         List<Tab> tabs;
         private readonly Button btnNewTab;
+        private const int TABMANAGER_HEIGHT_PX = 30;
 
         public TabManager(int width)
         {
@@ -136,7 +137,7 @@ namespace LibraryData
 
         private void UpdateLocations(int width)
         {
-            Size = new Size(width, 30);
+            Size = new Size(width, TABMANAGER_HEIGHT_PX);
             int CurrentOffset = 0;
             for (int i = 0; i < tabs.Count; i++)
             {
@@ -148,7 +149,7 @@ namespace LibraryData
 
         private void NewTab(object sender, EventArgs e)
         {
-            Tab tab = new Tab(true);
+            Tab tab = new();
             tab.Disposed += new EventHandler(RemoveTabFromList);
             tabs.Add(tab);
             Controls.Add(tabs[tabs.Count-1]);
@@ -164,20 +165,26 @@ namespace LibraryData
 
     public class Tab:Panel
     {
-        private readonly Label lblWebsiteName;
+        private readonly Button btnWebsiteName;
         private readonly Button btnClose;
         private readonly WebView2 webview;
 
-        public Tab(bool isMaximized)
+        private const int BTN_TAB_NAME_MAXIMIZED_WIDTH_PX = 100;
+        private const int BTN_TAB_NAME_MINIMIZED_WIDTH_PX = 40;
+        private const int TAB_HEIGHT_PX = 30;
+        private const int TAB_MAXIMIZED_WIDTH_PX = BTN_TAB_NAME_MAXIMIZED_WIDTH_PX + BTN_CLOSE_TAB_WIDTH_PX;
+        private const int TAB_MINIMIZED_WIDTH_PX = BTN_TAB_NAME_MINIMIZED_WIDTH_PX + BTN_CLOSE_TAB_WIDTH_PX;
+        private const int BTN_CLOSE_TAB_WIDTH_PX = 30;
+
+        public Tab()
         {
-            lblWebsiteName = new Label() {
+            btnWebsiteName = new Button() {
                 Text = "new tab"};
             btnClose = new Button() {
                 Text = "X"};
-            if(isMaximized) { Maximize(); }
-            else { Minimize(); }
+            Maximize();
             btnClose.Click += new EventHandler(CloseTab);
-            Controls.Add(lblWebsiteName);
+            Controls.Add(btnWebsiteName);
             Controls.Add(btnClose);
         }
 
@@ -188,20 +195,20 @@ namespace LibraryData
 
         public void Minimize()
         {
-            Size = new Size(50, 30);
-            lblWebsiteName.Size = new Size(20, 30);
-            lblWebsiteName.Location = new Point(0, 0);
-            btnClose.Size = new Size(30, 30);
-            btnClose.Location = new Point(20, 0);
+            Size = new Size(TAB_MINIMIZED_WIDTH_PX,TAB_HEIGHT_PX);
+            btnWebsiteName.Size = new Size(BTN_TAB_NAME_MINIMIZED_WIDTH_PX, TAB_HEIGHT_PX);
+            btnWebsiteName.Location = new Point(0, 0);
+            btnClose.Size = new Size(BTN_CLOSE_TAB_WIDTH_PX, TAB_HEIGHT_PX);
+            btnClose.Location = new Point(BTN_TAB_NAME_MINIMIZED_WIDTH_PX, 0);
         }
 
         public void Maximize()
         {
-            Size = new Size(100, 30);
-            lblWebsiteName.Size = new Size(70, 30);
-            lblWebsiteName.Location = new Point(0, 0);
-            btnClose.Size = new Size(30, 30);
-            btnClose.Location = new Point(70, 0);
+            Size = new Size(TAB_MAXIMIZED_WIDTH_PX, TAB_HEIGHT_PX);
+            btnWebsiteName.Size = new Size(BTN_TAB_NAME_MAXIMIZED_WIDTH_PX, TAB_HEIGHT_PX);
+            btnWebsiteName.Location = new Point(0, 0);
+            btnClose.Size = new Size(BTN_CLOSE_TAB_WIDTH_PX, TAB_HEIGHT_PX);
+            btnClose.Location = new Point(BTN_TAB_NAME_MAXIMIZED_WIDTH_PX, 0);
         }
     }
 }
