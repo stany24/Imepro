@@ -20,7 +20,6 @@ namespace LibraryData
         readonly private int ButtonHeightPixel = 21; //to fit the button size to the textbox height
         readonly private int OffsetPixel = 10;
         readonly private List<string> AutorisedWebsites;
-        readonly private List<Url> History = new();
 
         public Browser(List<string> autorisedWebsites)
         {
@@ -31,10 +30,8 @@ namespace LibraryData
         private void InitializeComponent()
         {
             Dock = DockStyle.Fill;
-            OpenedTab = new() {
-                Source = new Uri("https://duckduckgo.com")
-            };
             tabManager = new TabManager(Width);
+            OpenedTab = tabManager.tabs[0].webview;
             UpdateWebViewLocation(new object(), new EventArgs());
             btnBack = new() {
                 Size = new Size(ButtonHeightPixel, ButtonHeightPixel),
@@ -62,13 +59,19 @@ namespace LibraryData
             Controls.Add(tbxUrl);
             Controls.Add(btnEnter);
             Controls.Add(tabManager);
-            btnBack.MouseClick += new MouseEventHandler(MoveBack_Click);
-            btnForward.MouseClick += new MouseEventHandler(MoveForward_Click);
-            btnRefresh.MouseClick += new MouseEventHandler(Reload_Click);
-            btnEnter.MouseClick += new MouseEventHandler(Search_Click);
-            OpenedTab.SourceChanged += new EventHandler<CoreWebView2SourceChangedEventArgs>(UrlChanged);
-            OpenedTab.NavigationStarting += new EventHandler<CoreWebView2NavigationStartingEventArgs>(NavigationStarting);
+            tabManager.NewFocusedTab += new EventHandler(ChangeTab);
             Resize += new EventHandler(UpdateWebViewLocation);
+        }
+
+        private void ChangeTab(object sender,EventArgs e)
+        {
+            OpenedTab = tabManager.FocusedTab.webview;
+            btnBack.MouseClick += new MouseEventHandler(tabManager.FocusedTab.MoveBack_Click);
+            btnForward.MouseClick += new MouseEventHandler(tabManager.FocusedTab.MoveForward_Click);
+            btnRefresh.MouseClick += new MouseEventHandler(tabManager.FocusedTab.Reload_Click);
+            btnEnter.MouseClick += new MouseEventHandler(tabManager.FocusedTab.Search_Click);
+            OpenedTab.SourceChanged += new EventHandler<CoreWebView2SourceChangedEventArgs>(tabManager.FocusedTab.UrlChanged);
+            OpenedTab.NavigationStarting += new EventHandler<CoreWebView2NavigationStartingEventArgs>(tabManager.FocusedTab.NavigationStarting);
         }
 
         private void UpdateWebViewLocation(object sender, EventArgs e)
@@ -78,49 +81,15 @@ namespace LibraryData
             OpenedTab.Location = new Point(0, ButtonHeightPixel+ tabManager.Height + 3 * OffsetPixel);
             OpenedTab.Size = new Size(Width, Height - ButtonHeightPixel - 2 * OffsetPixel);
         }
-
-        private void Search_Click(object sender, EventArgs e)
-        {
-            try { OpenedTab.Source = new Uri(tbxUrl.Text); }
-            catch { OpenedTab.Source = new Uri("https://duckduckgo.com/?t=ffab&q=" + tbxUrl.Text + "&atb=v320-1&ia=web"); }
-        }
-
-        private void UrlChanged(object sender, CoreWebView2SourceChangedEventArgs e)
-        {
-            History.Add(new Url(DateTime.Now,OpenedTab.Source.ToString()));
-            tbxUrl.Text = OpenedTab.Source.ToString();
-        }
-
-        private void MoveBack_Click(object sender, EventArgs e)
-        {
-            OpenedTab.CoreWebView2.GoBack();
-        }
-
-        private void MoveForward_Click(object sender, EventArgs e)
-        {
-            OpenedTab.CoreWebView2.GoForward();
-        }
-
-        private void Reload_Click(object sender, EventArgs e)
-        {
-            OpenedTab.CoreWebView2.Reload();
-        }
-
-        private void NavigationStarting(object sender, CoreWebView2NavigationStartingEventArgs e)
-        {
-            e.Cancel = true;
-            foreach (string uri in AutorisedWebsites.Where(e.Uri.StartsWith))
-            {
-                e.Cancel = false;
-            }
-        }
     }
 
     public class TabManager : Panel
     {
-        List<Tab> tabs;
+        public List<Tab> tabs;
+        public Tab FocusedTab;
         private readonly Button btnNewTab;
         private const int TABMANAGER_HEIGHT_PX = 30;
+        public event EventHandler NewFocusedTab;
 
         public TabManager(int width)
         {
@@ -151,9 +120,16 @@ namespace LibraryData
         {
             Tab tab = new();
             tab.Disposed += new EventHandler(RemoveTabFromList);
+            tab.DemandFocus += new EventHandler(ChangeFocus);
             tabs.Add(tab);
             Controls.Add(tabs[tabs.Count-1]);
             UpdateLocations(Width);
+        }
+
+        public void ChangeFocus(object sender,EventArgs e)
+        {
+            FocusedTab = sender as Tab;
+            NewFocusedTab?.Invoke(this, EventArgs.Empty);
         }
 
         private void RemoveTabFromList(object sender, EventArgs e)
@@ -167,7 +143,7 @@ namespace LibraryData
     {
         private readonly Button btnWebsiteName;
         private readonly Button btnClose;
-        private readonly WebView2 webview;
+        public readonly WebView2 webview;
 
         private const int BTN_TAB_NAME_MAXIMIZED_WIDTH_PX = 100;
         private const int BTN_TAB_NAME_MINIMIZED_WIDTH_PX = 40;
@@ -176,14 +152,19 @@ namespace LibraryData
         private const int TAB_MINIMIZED_WIDTH_PX = BTN_TAB_NAME_MINIMIZED_WIDTH_PX + BTN_CLOSE_TAB_WIDTH_PX;
         private const int BTN_CLOSE_TAB_WIDTH_PX = 30;
 
+        public event EventHandler DemandFocus;
+
         public Tab()
         {
             btnWebsiteName = new Button() {
                 Text = "new tab"};
             btnClose = new Button() {
                 Text = "X"};
+            webview = new() {
+            Source = new Uri("https://duckduckgo.com/")};
             Maximize();
             btnClose.Click += new EventHandler(CloseTab);
+            btnWebsiteName.Click += new EventHandler(ShowTab);
             Controls.Add(btnWebsiteName);
             Controls.Add(btnClose);
         }
@@ -191,6 +172,11 @@ namespace LibraryData
         private void CloseTab(object sender, EventArgs e)
         {
             this.Dispose();
+        }
+
+        public void ShowTab(object sender,EventArgs e)
+        {
+            DemandFocus?.Invoke(this, EventArgs.Empty);
         }
 
         public void Minimize()
@@ -209,6 +195,42 @@ namespace LibraryData
             btnWebsiteName.Location = new Point(0, 0);
             btnClose.Size = new Size(BTN_CLOSE_TAB_WIDTH_PX, TAB_HEIGHT_PX);
             btnClose.Location = new Point(BTN_TAB_NAME_MAXIMIZED_WIDTH_PX, 0);
+        }
+
+        public void Search_Click(object sender, EventArgs e)
+        {
+            try { webview.Source = new Uri(btnWebsiteName.Text); }
+            catch { webview.Source = new Uri("https://duckduckgo.com/?t=ffab&q=" + btnWebsiteName.Text + "&atb=v320-1&ia=web"); }
+        }
+
+        public void UrlChanged(object sender, CoreWebView2SourceChangedEventArgs e)
+        {
+            btnWebsiteName.Text = webview.Source.ToString();
+        }
+
+        public void MoveBack_Click(object sender, EventArgs e)
+        {
+            webview.CoreWebView2.GoBack();
+        }
+
+        public void MoveForward_Click(object sender, EventArgs e)
+        {
+            webview.CoreWebView2.GoForward();
+        }
+
+        public void Reload_Click(object sender, EventArgs e)
+        {
+            webview.CoreWebView2.Reload();
+        }
+
+        public void NavigationStarting(object sender, CoreWebView2NavigationStartingEventArgs e)
+        {
+            /*
+            e.Cancel = true;
+            foreach (string uri in AutorisedWebsites.Where(e.Uri.StartsWith))
+            {
+                e.Cancel = false;
+            }*/
         }
     }
 }
