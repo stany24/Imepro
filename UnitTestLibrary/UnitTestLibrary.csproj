@@ -57,6 +57,7 @@
     <Compile Include="Library\HistoriqueTest.cs" />
     <Compile Include="Library\UpdateTreeViewTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Student\BrowserTest.cs" />
     <Compile Include="Student\IpForTheWeekTest.cs" />
     <Compile Include="Teacher\ConfigurationTest.cs" />
   </ItemGroup>
