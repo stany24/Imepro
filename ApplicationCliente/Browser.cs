@@ -11,13 +11,6 @@ namespace ApplicationCliente
 {
     public class Browser : Panel
     {
-        private int nextId = -1;
-
-        private int getNextId()
-        {
-            nextId++;
-            return nextId;
-        }
         private List<Tab> tabs;
         private readonly Button btnNewTab;
 
@@ -53,7 +46,7 @@ namespace ApplicationCliente
 
         private void NewTab(object sender, EventArgs e)
         {
-            Tab tab = new(getNextId());
+            Tab tab = new();
             tab.webview.Disposed += new EventHandler(RemoveTabFromList);
             tab.webview.VisibleChanged += new EventHandler(HideOtherTabs);
             this.Resize += new EventHandler(ResizeAllWebview);
@@ -88,7 +81,7 @@ namespace ApplicationCliente
             CustomWebView2 closedTab = sender as CustomWebView2;
             for(int i=0;i<tabs.Count;i++)
             {
-                if (tabs[i].preview.Id == closedTab.Id) { tabs.Remove(tabs[i]);break; }
+                if (tabs[i].webview == closedTab) { tabs.Remove(tabs[i]);break; }
             }
             UpdateLocations();
         }
@@ -96,20 +89,18 @@ namespace ApplicationCliente
 
     public class Tab
     {
-        public int Id;
         public CustomWebView2 webview;
         public TabPreview preview;
         public ControlBar controlBar;
 
-        public Tab(int id)
+        public Tab()
         {
-            Id = id;
-            webview = new CustomWebView2(Id){
+            webview = new CustomWebView2(){
                 Location = new Point(0,100),
                 Size = new Size(300,300)
             };
-            preview = new TabPreview(Id);
-            controlBar = new ControlBar(Id) {
+            preview = new TabPreview();
+            controlBar = new ControlBar() {
                 Location = new Point(0,50)};
 
             controlBar.btnBack.Click += new EventHandler(webview.MoveBack_Click);
@@ -177,13 +168,11 @@ namespace ApplicationCliente
         readonly public TextBox tbxUrl;
         readonly public Button btnEnter;
 
-        public int Id;
         readonly private int ButtonHeightPixel = 21; //to fit the button size to the textbox height
         readonly private int OffsetPixel = 10;
 
-        public ControlBar(int id)
+        public ControlBar()
         {
-            Id = id;
             Size = new Size(400, 40);
 
             btnBack = new()
@@ -227,15 +216,13 @@ namespace ApplicationCliente
         public readonly Button btnWebsiteName;
         public readonly Button btnClose;
 
-        public int Id;
         private const int BTN_TAB_NAME_MAXIMIZED_WIDTH_PX = 100;
         private const int TAB_HEIGHT_PX = 30;
         private const int TAB_MAXIMIZED_WIDTH_PX = BTN_TAB_NAME_MAXIMIZED_WIDTH_PX + BTN_CLOSE_TAB_WIDTH_PX;
         private const int BTN_CLOSE_TAB_WIDTH_PX = 30;
 
-        public TabPreview(int id)
+        public TabPreview()
         {
-            Id = id;
             btnWebsiteName = new Button()
             {
                 Text = "new tab"
@@ -261,10 +248,8 @@ namespace ApplicationCliente
 
     public class CustomWebView2 : WebView2
     {
-        public int Id;
-        public CustomWebView2(int id)
+        public CustomWebView2()
         {
-            Id = id;
             CoreWebView2InitializationCompleted += new EventHandler<CoreWebView2InitializationCompletedEventArgs>(NavigateToDefaultBrowser);
             EnsureCoreWebView2Async();
             NavigationStarting += new EventHandler<CoreWebView2NavigationStartingEventArgs>(VerifyNavigation);
