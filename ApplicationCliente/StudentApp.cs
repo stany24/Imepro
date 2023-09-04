@@ -1,7 +1,4 @@
 ﻿using LibraryData;
-using OpenQA.Selenium;
-using OpenQA.Selenium.Chrome;
-using OpenQA.Selenium.Firefox;
 using System;
 using System.IO;
 using System.Linq;
@@ -21,8 +18,6 @@ namespace ApplicationCliente
         #region Variables
 
         readonly DataForStudent Student;
-        IWebDriver FirefoxDriver;
-        IWebDriver ChromeDriver;
 
         #endregion
 
@@ -48,72 +43,7 @@ namespace ApplicationCliente
         public void LaunchTasks()
         {
             while (!IsHandleCreated) { Thread.Sleep(100); }
-            Task.Run(AutomaticChecker);
             Student.SocketToTeacher = Task.Run(() => Student.ConnectToTeacher(11111)).Result;
-        }
-
-        #endregion
-
-        #region selenium
-
-        /// <summary>
-        /// Function to start a new instance for chrome controled with selenium.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        public void NewChrome(object sender, EventArgs e)
-        {
-            ChromeDriverService service = ChromeDriverService.CreateDefaultService();
-            ChromeDriver = new ChromeDriver(service);
-            Student.SeleniumProcessesID.Add(service.ProcessId);
-        }
-
-        /// <summary>
-        /// Function to start a new instance for firefox controled with selenium.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        public void NewFirefox(object sender, EventArgs e)
-        {
-            FirefoxOptions options = new();
-            FirefoxDriverService service = FirefoxDriverService.CreateDefaultService(".", "geckodriver.exe");
-            options.BrowserExecutableLocation = "C:\\Program Files\\Mozilla Firefox\\firefox.exe";
-            FirefoxDriver = new FirefoxDriver(service, options);
-            Student.SeleniumProcessesID.Add(service.ProcessId);
-        }
-
-        /// <summary>
-        /// Function that verify the urls of browser launched with selenium.
-        /// </summary>
-        public void AutomaticChecker()
-        {
-            while (true)
-            {
-                if (FirefoxDriver != null) { VerifyUrlOfWebDriver((WebDriver)FirefoxDriver, "seleniumfirefox"); }
-                if (ChromeDriver != null) { VerifyUrlOfWebDriver((WebDriver)ChromeDriver, "seleniumchorme"); }
-                Thread.Sleep(2000);
-            }
-        }
-
-        /// <summary>
-        /// Function that verify if the url is autorised and adds it to the history.
-        /// </summary>
-        /// <param name="navigateur"></param>
-        /// <param name="navigateurName"></param>
-        public void VerifyUrlOfWebDriver(WebDriver navigateur, string navigateurName)
-        {
-            Student.Urls.AddUrl(new Url(DateTime.Now, navigateur.Url), navigateurName);
-            bool navigateback = true;
-            foreach (string url in Student.AutorisedUrls.Where(url => navigateur.Url.Contains(url)))
-            {
-                navigateback = false;
-            }
-            if (navigateur.Url == "about:blank") { navigateback = false; }
-            if (navigateback)
-            {
-                ((IJavaScriptExecutor)navigateur).ExecuteScript("window.open();");
-                ((IJavaScriptExecutor)navigateur).ExecuteScript("window.close();");
-            }
         }
 
         #endregion
@@ -216,8 +146,6 @@ namespace ApplicationCliente
                 Student.SocketToTeacher.Send(Encoding.ASCII.GetBytes("stop"));
                 Student.SocketToTeacher.Disconnect(false);
                 Student.SocketToTeacher = null;
-                FirefoxDriver?.Dispose();
-                ChromeDriver?.Dispose();
             }
             catch
             {

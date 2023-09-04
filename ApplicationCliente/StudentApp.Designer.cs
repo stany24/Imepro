@@ -38,8 +38,6 @@
             this.notifyIcon1 = new System.Windows.Forms.NotifyIcon(this.components);
             this.lblMessage = new System.Windows.Forms.Label();
             this.lbxMessages = new System.Windows.Forms.ListBox();
-            this.btnFirefox = new System.Windows.Forms.Button();
-            this.btnChrome = new System.Windows.Forms.Button();
             this.btnResetAllIP = new System.Windows.Forms.Button();
             this.btnWebView2 = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.pbxScreeShot)).BeginInit();
@@ -47,9 +45,10 @@
             // 
             // pbxScreeShot
             // 
-            this.pbxScreeShot.Location = new System.Drawing.Point(12, 152);
+            this.pbxScreeShot.Location = new System.Drawing.Point(16, 187);
+            this.pbxScreeShot.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.pbxScreeShot.Name = "pbxScreeShot";
-            this.pbxScreeShot.Size = new System.Drawing.Size(1185, 547);
+            this.pbxScreeShot.Size = new System.Drawing.Size(1580, 673);
             this.pbxScreeShot.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.pbxScreeShot.TabIndex = 4;
             this.pbxScreeShot.TabStop = false;
@@ -57,17 +56,20 @@
             // lbxConnexion
             // 
             this.lbxConnexion.FormattingEnabled = true;
-            this.lbxConnexion.Location = new System.Drawing.Point(12, 12);
+            this.lbxConnexion.ItemHeight = 16;
+            this.lbxConnexion.Location = new System.Drawing.Point(16, 15);
+            this.lbxConnexion.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.lbxConnexion.Name = "lbxConnexion";
-            this.lbxConnexion.Size = new System.Drawing.Size(1454, 134);
+            this.lbxConnexion.Size = new System.Drawing.Size(1937, 164);
             this.lbxConnexion.TabIndex = 7;
             this.lbxConnexion.TabStop = false;
             // 
             // btnHelp
             // 
-            this.btnHelp.Location = new System.Drawing.Point(1213, 158);
+            this.btnHelp.Location = new System.Drawing.Point(1617, 194);
+            this.btnHelp.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.btnHelp.Name = "btnHelp";
-            this.btnHelp.Size = new System.Drawing.Size(75, 23);
+            this.btnHelp.Size = new System.Drawing.Size(100, 28);
             this.btnHelp.TabIndex = 0;
             this.btnHelp.Text = "Aide";
             this.btnHelp.UseVisualStyleBackColor = true;
@@ -75,9 +77,10 @@
             // 
             // btnChangeIP
             // 
-            this.btnChangeIP.Location = new System.Drawing.Point(1294, 158);
+            this.btnChangeIP.Location = new System.Drawing.Point(1725, 194);
+            this.btnChangeIP.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.btnChangeIP.Name = "btnChangeIP";
-            this.btnChangeIP.Size = new System.Drawing.Size(75, 23);
+            this.btnChangeIP.Size = new System.Drawing.Size(100, 28);
             this.btnChangeIP.TabIndex = 1;
             this.btnChangeIP.Text = "Changer l\'IP";
             this.btnChangeIP.UseVisualStyleBackColor = true;
@@ -98,55 +101,40 @@
             // lblMessage
             // 
             this.lblMessage.AutoSize = true;
-            this.lblMessage.Location = new System.Drawing.Point(1203, 225);
+            this.lblMessage.Location = new System.Drawing.Point(1604, 277);
+            this.lblMessage.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lblMessage.Name = "lblMessage";
-            this.lblMessage.Size = new System.Drawing.Size(50, 13);
+            this.lblMessage.Size = new System.Drawing.Size(64, 16);
             this.lblMessage.TabIndex = 3;
             this.lblMessage.Text = "Message";
             // 
             // lbxMessages
             // 
             this.lbxMessages.FormattingEnabled = true;
-            this.lbxMessages.Location = new System.Drawing.Point(1206, 241);
+            this.lbxMessages.ItemHeight = 16;
+            this.lbxMessages.Location = new System.Drawing.Point(1608, 297);
+            this.lbxMessages.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.lbxMessages.Name = "lbxMessages";
-            this.lbxMessages.Size = new System.Drawing.Size(260, 264);
+            this.lbxMessages.Size = new System.Drawing.Size(345, 324);
             this.lbxMessages.TabIndex = 4;
             this.lbxMessages.TabStop = false;
             // 
-            // btnFirefox
-            // 
-            this.btnFirefox.Location = new System.Drawing.Point(1206, 511);
-            this.btnFirefox.Name = "btnFirefox";
-            this.btnFirefox.Size = new System.Drawing.Size(75, 23);
-            this.btnFirefox.TabIndex = 5;
-            this.btnFirefox.Text = "Firefox";
-            this.btnFirefox.UseVisualStyleBackColor = true;
-            this.btnFirefox.Click += new System.EventHandler(this.NewFirefox);
-            // 
-            // btnChrome
-            // 
-            this.btnChrome.Location = new System.Drawing.Point(1287, 511);
-            this.btnChrome.Name = "btnChrome";
-            this.btnChrome.Size = new System.Drawing.Size(75, 23);
-            this.btnChrome.TabIndex = 6;
-            this.btnChrome.Text = "Chrome";
-            this.btnChrome.UseVisualStyleBackColor = true;
-            this.btnChrome.Click += new System.EventHandler(this.NewChrome);
-            // 
             // btnResetAllIP
             // 
-            this.btnResetAllIP.Location = new System.Drawing.Point(1213, 187);
+            this.btnResetAllIP.Location = new System.Drawing.Point(1617, 230);
+            this.btnResetAllIP.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.btnResetAllIP.Name = "btnResetAllIP";
-            this.btnResetAllIP.Size = new System.Drawing.Size(156, 23);
+            this.btnResetAllIP.Size = new System.Drawing.Size(208, 28);
             this.btnResetAllIP.TabIndex = 2;
             this.btnResetAllIP.Text = "Réinitialiser les IPs";
             this.btnResetAllIP.UseVisualStyleBackColor = true;
             // 
             // btnWebView2
             // 
-            this.btnWebView2.Location = new System.Drawing.Point(1368, 511);
+            this.btnWebView2.Location = new System.Drawing.Point(1824, 629);
+            this.btnWebView2.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.btnWebView2.Name = "btnWebView2";
-            this.btnWebView2.Size = new System.Drawing.Size(75, 23);
+            this.btnWebView2.Size = new System.Drawing.Size(100, 28);
             this.btnWebView2.TabIndex = 8;
             this.btnWebView2.Text = "WebView2";
             this.btnWebView2.UseVisualStyleBackColor = true;
@@ -154,19 +142,18 @@
             // 
             // StudentApp
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1474, 711);
+            this.ClientSize = new System.Drawing.Size(1924, 875);
             this.Controls.Add(this.btnWebView2);
             this.Controls.Add(this.btnResetAllIP);
-            this.Controls.Add(this.btnChrome);
-            this.Controls.Add(this.btnFirefox);
             this.Controls.Add(this.lbxMessages);
             this.Controls.Add(this.lblMessage);
             this.Controls.Add(this.btnChangeIP);
             this.Controls.Add(this.btnHelp);
             this.Controls.Add(this.pbxScreeShot);
             this.Controls.Add(this.lbxConnexion);
+            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.Name = "StudentApp";
             this.Text = "Imepro";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.OnClosing);
@@ -186,8 +173,6 @@
         private System.Windows.Forms.NotifyIcon notifyIcon1;
         private System.Windows.Forms.Label lblMessage;
         private System.Windows.Forms.ListBox lbxMessages;
-        private System.Windows.Forms.Button btnFirefox;
-        private System.Windows.Forms.Button btnChrome;
         private System.Windows.Forms.Button btnResetAllIP;
         private System.Windows.Forms.Button btnWebView2;
     }
