@@ -30,8 +30,14 @@ namespace ApplicationCliente
             btnNewTab.Click += new EventHandler(NewTab);
             Controls.Add(btnNewTab);
             NewTab(new object(), new EventArgs());
+            tabs[0].preview.BackColor = Color.Blue;
+            tabs[0].controlBar.BackColor = Color.Blue;
             NewTab(new object(), new EventArgs());
+            tabs[1].preview.BackColor = Color.Red;
+            tabs[1].controlBar.BackColor = Color.Red;
             NewTab(new object(), new EventArgs());
+            tabs[2].preview.BackColor = Color.Yellow;
+            tabs[2].controlBar.BackColor = Color.Yellow;
         }
 
         private void UpdateLocations()
@@ -59,13 +65,13 @@ namespace ApplicationCliente
 
         private void HideOtherTabs(object sender, EventArgs e)
         {
-            /*if ((sender as Tab).webview.Visible)
+            if ((sender as CustomWebView2).Visible)
             {
                 foreach (Tab tab in tabs)
                 {
-                    if (tab != (sender as Tab)) { tab.HideTab(); }
+                    if (tab.webview != (sender as CustomWebView2)) { tab.HideTab(); }
                 }
-            }*/
+            }
         }
 
         private void RemoveTabFromList(object sender, EventArgs e)
@@ -111,21 +117,13 @@ namespace ApplicationCliente
         private void ShowTab(object sender, EventArgs e)
         {
             webview.Show();
-            controlBar.btnBack.Show();
-            controlBar.btnForward.Show();
-            controlBar.btnRefresh.Show();
-            controlBar.btnEnter.Show();
-            controlBar.tbxUrl.Show();
+            controlBar.Show();
         }
 
         public void HideTab()
         {
             webview.Hide();
-            controlBar.btnBack.Hide();
-            controlBar.btnForward.Hide();
-            controlBar.btnRefresh.Hide();
-            controlBar.btnEnter.Hide();
-            controlBar.tbxUrl.Hide();
+            controlBar.Hide();
         }
 
         public void Search_Click(object sender, EventArgs e)
@@ -229,10 +227,11 @@ namespace ApplicationCliente
 
         public void Maximize(int OffsetToTheRight)
         {
+            Location = new Point(OffsetToTheRight, 0);
             btnWebsiteName.Size = new Size(BTN_TAB_NAME_MAXIMIZED_WIDTH_PX, TAB_HEIGHT_PX);
-            btnWebsiteName.Location = new Point(OffsetToTheRight, 0);
+            btnWebsiteName.Location = new Point(0, 0);
             btnClose.Size = new Size(BTN_CLOSE_TAB_WIDTH_PX, TAB_HEIGHT_PX);
-            btnClose.Location = new Point(BTN_TAB_NAME_MAXIMIZED_WIDTH_PX + OffsetToTheRight, 0);
+            btnClose.Location = new Point(btnWebsiteName.Width, 0);
         }
     }
 
