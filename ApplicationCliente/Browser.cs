@@ -73,7 +73,11 @@ namespace ApplicationCliente
             CustomWebView2 closedTab = sender as CustomWebView2;
             for(int i=0;i<tabs.Count;i++)
             {
-                if (tabs[i].webview == closedTab) { tabs.Remove(tabs[i]);break; }
+                if (tabs[i].webview == closedTab) {
+                    tabs.Remove(tabs[i]);
+                    if (i < tabs.Count){tabs[i].ShowTab(new object(), new EventArgs());break;}
+                    if( i > 0 ) {tabs[i-1].ShowTab(new object(), new EventArgs());break;}
+                }
             }
             UpdateLocations();
         }
@@ -85,15 +89,17 @@ namespace ApplicationCliente
         public TabPreview preview;
         public ControlBar controlBar;
 
+        private const int GAP_BETWEEN_PREVIEW_AND_CONTROL_BAR_PX = 10;
+        private const int GAP_BETWEEN_CONTROL_BAR_AND_WEBVIEW_PX = 10;
+
         public Tab(int width,int height)
         {
-            webview = new CustomWebView2(){
-                Location = new Point(0,100),
-                Size = new Size(300,300)};
-            ResizeWebview(width, height);
             preview = new TabPreview();
             controlBar = new ControlBar() {
-                Location = new Point(0,50)};
+                Location = new Point(0, preview.Height + GAP_BETWEEN_PREVIEW_AND_CONTROL_BAR_PX)};
+            webview = new CustomWebView2(){
+                Location = new Point(0, controlBar.Location.Y + controlBar.Height + GAP_BETWEEN_CONTROL_BAR_AND_WEBVIEW_PX)};
+            ResizeWebview(width, height);
 
             controlBar.btnBack.Click += new EventHandler(webview.MoveBack_Click);
             controlBar.btnForward.Click += new EventHandler(webview.MoveForward_Click);
@@ -111,7 +117,7 @@ namespace ApplicationCliente
             webview.Size = new Size(width, height-webview.Location.Y);
         }
 
-        private void ShowTab(object sender, EventArgs e)
+        public void ShowTab(object sender, EventArgs e)
         {
             webview.Show();
             controlBar.Show();
@@ -158,30 +164,33 @@ namespace ApplicationCliente
         readonly public TextBox tbxUrl;
         readonly public Button btnEnter;
 
-        readonly private int ButtonHeightPixel = 21; //to fit the button size to the textbox height
-        readonly private int OffsetPixel = 10;
+        private const int CONTROL_BAR_HEIGHT_PX = 25;
+        private const int CONTROL_BAR_WIDTH_PX = 400;
+        private const int BUTTON_HEIGHT_PX = 21; //to fit the button size to the textbox height
+        private const int GAP_OF_BUTTON_FROM_CONTROL_BAR_TOP_PX = (CONTROL_BAR_HEIGHT_PX-BUTTON_HEIGHT_PX)/2;
+        private const int GAP_BETWEEN_BUTTON_PX = 10;
 
         public ControlBar()
         {
-            Size = new Size(400, 40);
+            Size = new Size(CONTROL_BAR_WIDTH_PX,CONTROL_BAR_HEIGHT_PX);
             btnBack = new(){
-                Size = new Size(ButtonHeightPixel, ButtonHeightPixel),
-                Location = new Point(0 + OffsetPixel, OffsetPixel),
+                Size = new Size(BUTTON_HEIGHT_PX, BUTTON_HEIGHT_PX),
+                Location = new Point(0 + GAP_BETWEEN_BUTTON_PX, GAP_OF_BUTTON_FROM_CONTROL_BAR_TOP_PX),
                 Text = "<-"};
             btnForward = new(){
-                Size = new Size(ButtonHeightPixel, ButtonHeightPixel),
-                Location = new Point(btnBack.Location.X + btnBack.Size.Width + OffsetPixel, btnBack.Location.Y),
+                Size = new Size(BUTTON_HEIGHT_PX, BUTTON_HEIGHT_PX),
+                Location = new Point(btnBack.Location.X + btnBack.Size.Width + GAP_BETWEEN_BUTTON_PX, btnBack.Location.Y),
                 Text = "->"};
             btnRefresh = new(){
-                Size = new Size(ButtonHeightPixel, ButtonHeightPixel),
-                Location = new Point(btnForward.Location.X + btnForward.Size.Width + OffsetPixel, btnBack.Location.Y),
+                Size = new Size(BUTTON_HEIGHT_PX, BUTTON_HEIGHT_PX),
+                Location = new Point(btnForward.Location.X + btnForward.Size.Width + GAP_BETWEEN_BUTTON_PX, btnBack.Location.Y),
                 Text = "O"};
             tbxUrl = new(){
-                Size = new Size(8 * ButtonHeightPixel, ButtonHeightPixel),
-                Location = new Point(btnRefresh.Location.X + btnRefresh.Width + OffsetPixel, btnBack.Location.Y)};
+                Size = new Size(8 * BUTTON_HEIGHT_PX, BUTTON_HEIGHT_PX),
+                Location = new Point(btnRefresh.Location.X + btnRefresh.Width + GAP_BETWEEN_BUTTON_PX, btnBack.Location.Y)};
             btnEnter = new(){
-                Size = new Size(ButtonHeightPixel, ButtonHeightPixel),
-                Location = new Point(tbxUrl.Location.X + tbxUrl.Size.Width + OffsetPixel, btnBack.Location.Y)};
+                Size = new Size(BUTTON_HEIGHT_PX, BUTTON_HEIGHT_PX),
+                Location = new Point(tbxUrl.Location.X + tbxUrl.Size.Width + GAP_BETWEEN_BUTTON_PX, btnBack.Location.Y)};
             Controls.Add(btnBack);
             Controls.Add(btnForward);
             Controls.Add(btnRefresh);
@@ -210,7 +219,7 @@ namespace ApplicationCliente
             {
                 Text = "X"
             };
-            Size = new Size(TAB_MAXIMIZED_WIDTH_PX, 30);
+            Size = new Size(TAB_MAXIMIZED_WIDTH_PX, TAB_HEIGHT_PX);
             Controls.Add(btnWebsiteName);
             Controls.Add(btnClose);
         }
