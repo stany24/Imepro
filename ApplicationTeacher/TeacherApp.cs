@@ -19,7 +19,7 @@ namespace ApplicationTeacher
     {
         #region Variables
 
-        readonly MiniatureDisplayer Displayer;
+        readonly PreviewDisplayer Displayer;
         readonly List<DataForTeacher> AllStudents = new();
         private List<DataForTeacher> StudentToShareScreen = new();
         readonly List<DisplayStudent> AllStudentsDisplay = new();
@@ -36,7 +36,7 @@ namespace ApplicationTeacher
         public TeacherApp()
         {
             InitializeComponent();
-            Displayer = new(panelMiniatures.Width);
+            Displayer = new(panelPreviews.Width);
             FindIp();
             Task.Run(StartTasks);
         }
@@ -94,18 +94,13 @@ namespace ApplicationTeacher
         {
             while (!IsHandleCreated) { Thread.Sleep(100); }
             IPEndPoint localEndPoint = new(ipAddr, 11111);
-            // Creation TCP/IP Socket using Socket Class Constructor
             Socket listener = new(ipAddr.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
-            // Using Bind() method we associate a network address to the Server Socket
-            // All client that will connect to this Server Socket must know this network Address
             listener.Bind(localEndPoint);
-            // Using Listen() method we create the Client list that will want to connect to Server
             listener.Listen(-1);
             while (true)
             {
                 try
                 {
-                    // Suspend while waiting for incoming connection Using Accept() method the server will accept connection of client
                     Socket clientSocket = listener.Accept();
                     lbxRequetes.Invoke(new MethodInvoker(delegate { lbxRequetes.Items.Add(DateTime.Now.ToString("HH:mm:ss") + " Nouvelle connexion de: " + clientSocket.RemoteEndPoint); }));
                     AllStudents.Add(new DataForTeacher(clientSocket, NextId));
@@ -184,11 +179,9 @@ namespace ApplicationTeacher
                 socket.SendTimeout = Properties.Settings.Default.DefaultTimeout;
                 try
                 {
-                    //demande les données
                     socket.Send(new Command(CommandType.DemandData).ToByteArray());
                     lbxRequetes.Invoke(new MethodInvoker(delegate { lbxRequetes.Items.Add(DateTime.Now.ToString("HH:mm:ss") + " Demande des données à " + AllStudents[i].UserName); }));
                     Task.Run(() => AllStudents[i] = ReceiveData(AllStudents[i])).Wait();
-                    //demande le screenshot
                     socket.Send(new Command(CommandType.DemandImage).ToByteArray());
                     lbxRequetes.Invoke(new MethodInvoker(delegate { lbxRequetes.Items.Add(DateTime.Now.ToString("HH:mm:ss") + " Demande de l'image à " + AllStudents[i].UserName); }));
                     Task.Run(() => ReceiveImage(AllStudents[i])).Wait();
@@ -252,7 +245,7 @@ namespace ApplicationTeacher
                 student.ScreenShot = new Bitmap(new MemoryStream(imageBuffer));
                 lbxRequetes.Invoke(new MethodInvoker(delegate { lbxRequetes.Items.Add(DateTime.Now.ToString("HH:mm:ss") + " Image recue de " + student.UserName); }));
                 student.NumberOfFailure = 0;
-                Displayer.UpdateMiniature(student.ID, student.ComputerName, student.ScreenShot);
+                Displayer.UpdatePreview(student.ID, student.ComputerName, student.ScreenShot);
             }
             catch
             {
@@ -317,7 +310,7 @@ namespace ApplicationTeacher
             }));
         }
 
-        #region Miniatures
+        #region Previews
 
         /// <summary>
         /// Function that creates or remove the screenshots when a checkbox is clicked.
@@ -335,26 +328,26 @@ namespace ApplicationTeacher
                     if (Convert.ToString(students.ID) == e.Node.Name) { student = students; }
                 }
                 if (student == null) { return; }
-                foreach (Miniature mini in Displayer.MiniatureList) { if (mini.GetComputerName() == student.ComputerName && mini.StudentID == student.ID) { return; } }
-                Miniature miniature = new(student.ScreenShot, student.ComputerName, student.ID, Properties.Settings.Default.PathToSaveFolder);
-                Displayer.AddMiniature(miniature);
-                panelMiniatures.Controls.Add(miniature);
-                panelMiniatures.Controls.SetChildIndex(miniature, 0);
+                foreach (Preview mini in Displayer.CustomPreviewList) { if (mini.GetComputerName() == student.ComputerName && mini.StudentID == student.ID) { return; } }
+                Preview preview = new(student.ScreenShot, student.ComputerName, student.ID, Properties.Settings.Default.PathToSaveFolder);
+                Displayer.AddPreview(preview);
+                panelPreviews.Controls.Add(preview);
+                panelPreviews.Controls.SetChildIndex(preview, 0);
             }
             else
             {
-                Displayer.RemoveMiniature(Convert.ToInt32(e.Node.Name));
+                Displayer.RemovePreview(Convert.ToInt32(e.Node.Name));
             }
         }
 
         /// <summary>
-        /// Fonction that updates all miniatures when the panel is resized.
+        /// Fonction that updates all previews when the panel is resized.
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void PanelMiniatures_Resize(object sender, EventArgs e)
+        private void PanelPreviews_Resize(object sender, EventArgs e)
         {
-            Displayer.UpdateAllLocations(panelMiniatures.Width);
+            Displayer.UpdateAllLocations(panelPreviews.Width);
         }
 
         #endregion

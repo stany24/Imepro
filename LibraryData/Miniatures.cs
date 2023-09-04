@@ -10,9 +10,9 @@ using System.Linq;
 namespace LibraryData
 {
     /// <summary>
-    /// Class for miniatures: a screenshot with the name of the student.
+    /// Class for preview: a screenshot with the name of the student.
     /// </summary>
-    public class Miniature : UserControl
+    public class Preview : UserControl
     {
         #region Variables
 
@@ -20,7 +20,7 @@ namespace LibraryData
         internal PictureBox PbxImage { get; set; }
         private readonly Label lblComputerInformations = new();
         private readonly Button btnSaveScreenShot = new();
-        readonly int MargeBetweenText = 5;
+        readonly int MarginBetweenText = 5;
         public int TimeSinceUpdate { get; set; }
         readonly private string ComputerName;
         private readonly string SavePath;
@@ -32,13 +32,13 @@ namespace LibraryData
         #region Constructor
 
         /// <summary>
-        /// Constructor to create and place the miniature.
+        /// Constructor to create and place the preview.
         /// </summary>
         /// <param name="image">The screenshot of the student.</param>
         /// <param name="name">The computer name.</param>
         /// <param name="studentID">The student ID.</param>
         /// <param name="savepath">The save path for images.</param>
-        public Miniature(Bitmap image, string name, int studentID, string savepath)
+        public Preview(Bitmap image, string name, int studentID, string savepath)
         {
             TimeSinceUpdate = 0;
             PbxImage = new();
@@ -96,7 +96,7 @@ namespace LibraryData
         #region Update
 
         /// <summary>
-        /// Function to update the time under a miniature.
+        /// Function to update the time under a preview.
         /// </summary>
         public void UpdateTime()
         {
@@ -111,10 +111,10 @@ namespace LibraryData
         /// <param name="e"></param>
         private void UpdatePositionsRelativeToImage(object sender, EventArgs e)
         {
-            Size = new Size(PbxImage.Width, PbxImage.Height + 3 * MargeBetweenText + lblComputerInformations.Height);
-            btnSaveScreenShot.Left = PbxImage.Location.X + PbxImage.Width / 2 + MargeBetweenText / 2;
-            btnSaveScreenShot.Top = PbxImage.Location.Y + PbxImage.Height + MargeBetweenText;
-            lblComputerInformations.Left = PbxImage.Location.X + PbxImage.Width / 2 - lblComputerInformations.Width - MargeBetweenText / 2;
+            Size = new Size(PbxImage.Width, PbxImage.Height + 3 * MarginBetweenText + lblComputerInformations.Height);
+            btnSaveScreenShot.Left = PbxImage.Location.X + PbxImage.Width / 2 + MarginBetweenText / 2;
+            btnSaveScreenShot.Top = PbxImage.Location.Y + PbxImage.Height + MarginBetweenText;
+            lblComputerInformations.Left = PbxImage.Location.X + PbxImage.Width / 2 - lblComputerInformations.Width - MarginBetweenText / 2;
             lblComputerInformations.Top = btnSaveScreenShot.Location.Y + (btnSaveScreenShot.Height - lblComputerInformations.Height);
         }
 
@@ -122,25 +122,25 @@ namespace LibraryData
     }
 
     /// <summary>
-    /// Class to display multiple miniatures in a panel.
+    /// Class to display multiple preview in a panel.
     /// </summary>
-    public class MiniatureDisplayer
+    public class PreviewDisplayer
     {
         #region Variables
 
-        public List<Miniature> MiniatureList { get; set; }
+        public List<Preview> CustomPreviewList { get; set; }
         private int MaxWidth;
-        private readonly int Marge = 10;
+        private readonly int Margin = 10;
         public double Zoom { get; set; }
 
         #endregion
 
         #region Constructor
 
-        public MiniatureDisplayer(int maxwidth)
+        public PreviewDisplayer(int maxwidth)
         {
             Zoom = 0.1;
-            MiniatureList = new();
+            CustomPreviewList = new();
             MaxWidth = maxwidth;
             Task.Run(LaunchTimeUpdate);
         }
@@ -154,13 +154,13 @@ namespace LibraryData
         /// </summary>
         public void ChangeZoom()
         {
-            foreach (var (miniature, NewHeight, NewWidth) in from Miniature miniature in MiniatureList
-                                                             let NewHeight = miniature.PbxImage.Image.Height * Zoom
-                                                             let NewWidth = miniature.PbxImage.Image.Width * Zoom
-                                                             select (miniature, NewHeight, NewWidth))
+            foreach (var (preview, NewHeight, NewWidth) in from Preview preview in CustomPreviewList
+                                                             let NewHeight = preview.PbxImage.Image.Height * Zoom
+                                                             let NewWidth = preview.PbxImage.Image.Width * Zoom
+                                                             select (preview, NewHeight, NewWidth))
             {
-                miniature.PbxImage.Height = Convert.ToInt32(NewHeight);
-                miniature.PbxImage.Width = Convert.ToInt32(NewWidth);
+                preview.PbxImage.Height = Convert.ToInt32(NewHeight);
+                preview.PbxImage.Width = Convert.ToInt32(NewWidth);
             }
 
             UpdateAllLocations(MaxWidth);
@@ -171,7 +171,7 @@ namespace LibraryData
         #region Update
 
         /// <summary>
-        /// Function to update all miniature time.
+        /// Function to update all preview time.
         /// </summary>
         private void LaunchTimeUpdate()
         {
@@ -179,15 +179,15 @@ namespace LibraryData
             while (true)
             {
                 Thread.Sleep(1000);
-                foreach (Miniature miniature in MiniatureList)
+                foreach (Preview preview in CustomPreviewList)
                 {
-                    miniature.UpdateTime();
+                    preview.UpdateTime();
                 }
             }
         }
 
         /// <summary>
-        /// Function to place all miniatures at the right place.
+        /// Function to place all previews at the right place.
         /// </summary>
         public void UpdateAllLocations(int maxwidth)
         {
@@ -195,35 +195,35 @@ namespace LibraryData
             int OffsetTop = 0;
             int OffsetRight = 0;
             int MaxHeightInRow = 0;
-            for (int i = 0; i < MiniatureList.Count; i++)
+            for (int i = 0; i < CustomPreviewList.Count; i++)
             {
-                if (OffsetRight + MiniatureList[i].Width > MaxWidth)
+                if (OffsetRight + CustomPreviewList[i].Width > MaxWidth)
                 {
                     OffsetTop += MaxHeightInRow;
                     MaxHeightInRow = 0;
                     OffsetRight = 0;
                 }
-                MiniatureList[i].Top = OffsetTop;
-                MiniatureList[i].Left = OffsetRight + Marge;
-                OffsetRight += MiniatureList[i].Width + Marge;
-                if (MiniatureList[i].Height > MaxHeightInRow) { MaxHeightInRow = MiniatureList[i].Height; }
+                CustomPreviewList[i].Top = OffsetTop;
+                CustomPreviewList[i].Left = OffsetRight + Margin;
+                OffsetRight += CustomPreviewList[i].Width + Margin;
+                if (CustomPreviewList[i].Height > MaxHeightInRow) { MaxHeightInRow = CustomPreviewList[i].Height; }
             }
         }
 
         /// <summary>
-        /// Function to update the miniature image.
+        /// Function to update the preview image.
         /// </summary>
         /// <param name="id">The student ID.</param>
         /// <param name="computername">The computer name.</param>
         /// <param name="image">The new image.</param>
-        public void UpdateMiniature(int id, string computername, Bitmap image)
+        public void UpdatePreview(int id, string computername, Bitmap image)
         {
-            foreach (Miniature miniature in MiniatureList)
+            foreach (Preview preview in CustomPreviewList)
             {
-                if (miniature.StudentID == id && miniature.GetComputerName() == computername)
+                if (preview.StudentID == id && preview.GetComputerName() == computername)
                 {
-                    miniature.PbxImage.Image = image;
-                    miniature.TimeSinceUpdate = 0;
+                    preview.PbxImage.Image = image;
+                    preview.TimeSinceUpdate = 0;
                     return;
                 }
             }
@@ -234,28 +234,28 @@ namespace LibraryData
         #region Getter / Setter
 
         /// <summary>
-        /// Function to add a new miniature to the panel.
+        /// Function to add a new preview to the panel.
         /// </summary>
-        /// <param name="miniature"></param>
-        public void AddMiniature(Miniature miniature)
+        /// <param name="preview"></param>
+        public void AddPreview(Preview preview)
         {
-            MiniatureList.Add(miniature);
+            CustomPreviewList.Add(preview);
             ChangeZoom();
         }
 
         /// <summary>
-        /// Function to remove a miniature of the panel.
+        /// Function to remove a preview of the panel.
         /// </summary>
         /// <param name="id">The student ID.</param>
         /// <param name="computername">The computer name.</param>
-        public void RemoveMiniature(int id)
+        public void RemovePreview(int id)
         {
-            foreach (Miniature miniature in MiniatureList)
+            foreach (Preview preview in CustomPreviewList)
             {
-                if (miniature.StudentID == id)
+                if (preview.StudentID == id)
                 {
-                    MiniatureList.Remove(miniature);
-                    miniature.Dispose();
+                    CustomPreviewList.Remove(preview);
+                    preview.Dispose();
                     UpdateAllLocations(MaxWidth);
                     break;
                 }

@@ -17,7 +17,7 @@ namespace UnitTestLibrary.Library
             Assert.IsNotNull(data1.Processes);
             const string username = "username";
             const string computername = "computername";
-            Historique historique = new Historique();
+            History historique = new History();
             historique.AddUrl(new Url(DateTime.Now,"test"), "firefox");
             Dictionary<int, string> processes = new Dictionary<int, string>{{ 1, "firefox" }};
             Data data2 = new Data(username,computername,historique,processes);
@@ -41,7 +41,7 @@ namespace UnitTestLibrary.Library
             Assert.AreEqual(socket, dataForTeacher1.SocketToStudent);
             const string username = "username";
             const string computername = "computername";
-            Historique historique = new Historique();
+            History historique = new History();
             historique.AddUrl(new Url(DateTime.Now, "test"), "firefox");
             Dictionary<int, string> processes = new Dictionary<int, string> { { 1, "firefox" } };
             Data data = new Data(username, computername, historique, processes);

@@ -38,7 +38,7 @@
             this.Slider = new System.Windows.Forms.TrackBar();
             this.TreeViewDetails = new System.Windows.Forms.TreeView();
             this.TreeViewSelect = new System.Windows.Forms.TreeView();
-            this.panelMiniatures = new System.Windows.Forms.Panel();
+            this.panelPreviews = new System.Windows.Forms.Panel();
             this.SplitterPrincipal = new System.Windows.Forms.SplitContainer();
             this.SplitterInfoTree = new System.Windows.Forms.SplitContainer();
             this.btnOpenConfigWindow = new System.Windows.Forms.Button();
@@ -145,15 +145,15 @@
             this.TreeViewSelect.AfterCheck += new System.Windows.Forms.TreeViewEventHandler(this.TreeNodeChecked);
             this.TreeViewSelect.NodeMouseDoubleClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.TreeViewDoubleClick);
             // 
-            // panelMiniatures
+            // panelPreviews
             // 
-            this.panelMiniatures.AutoScroll = true;
-            this.panelMiniatures.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panelMiniatures.Location = new System.Drawing.Point(0, 0);
-            this.panelMiniatures.Name = "panelMiniatures";
-            this.panelMiniatures.Size = new System.Drawing.Size(1500, 900);
-            this.panelMiniatures.TabIndex = 0;
-            this.panelMiniatures.Resize += new System.EventHandler(this.PanelMiniatures_Resize);
+            this.panelPreviews.AutoScroll = true;
+            this.panelPreviews.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.panelPreviews.Location = new System.Drawing.Point(0, 0);
+            this.panelPreviews.Name = "panelPreviews";
+            this.panelPreviews.Size = new System.Drawing.Size(1500, 900);
+            this.panelPreviews.TabIndex = 0;
+            this.panelPreviews.Resize += new System.EventHandler(this.PanelPreviews_Resize);
             // 
             // SplitterPrincipal
             // 
@@ -263,7 +263,7 @@
             // 
             // SplitterImageLog.Panel1
             // 
-            this.SplitterImageLog.Panel1.Controls.Add(this.panelMiniatures);
+            this.SplitterImageLog.Panel1.Controls.Add(this.panelPreviews);
             // 
             // SplitterImageLog.Panel2
             // 
@@ -335,7 +335,7 @@
         private System.Windows.Forms.TrackBar Slider;
         private System.Windows.Forms.TreeView TreeViewDetails;
         private System.Windows.Forms.TreeView TreeViewSelect;
-        private System.Windows.Forms.Panel panelMiniatures;
+        private System.Windows.Forms.Panel panelPreviews;
         private System.Windows.Forms.SplitContainer SplitterPrincipal;
         private System.Windows.Forms.SplitContainer SplitterImageLog;
         private System.Windows.Forms.SplitContainer SplitterConnexionRequetes;

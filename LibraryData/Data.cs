@@ -31,7 +31,7 @@ namespace LibraryData
         [JsonInclude]
         public string ComputerName { get; set; }
         [JsonInclude]
-        public Historique Urls { get; set; }
+        public History Urls { get; set; }
         [JsonInclude]
         public Dictionary<int, string> Processes { get; set; }
         [JsonIgnore]
@@ -41,7 +41,7 @@ namespace LibraryData
 
         #region Constructor
 
-        public Data(string userName, string computerName, Historique urls, Dictionary<int, string> processes)
+        public Data(string userName, string computerName, History urls, Dictionary<int, string> processes)
         {
             UserName = userName;
             ComputerName = computerName;

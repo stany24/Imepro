@@ -7,9 +7,9 @@ namespace ApplicationTeacher
 {
     public partial class ChooseStreamOptions : Form
     {
-        private readonly List<DataForTeacher> studentToShare = new();
+        private readonly List<DataForTeacher> StudentsToShare = new();
 
-        public List<DataForTeacher> GetStudentToShare() { return studentToShare; }
+        public List<DataForTeacher> GetStudentToShare() { return StudentsToShare; }
         public ChooseStreamOptions(List<DataForTeacher> list)
         {
             InitializeComponent();
@@ -56,7 +56,7 @@ namespace ApplicationTeacher
             if (lbxFocus.SelectedItem == null) { lblError.Text = "Selectionnez le focus"; return; }
             foreach (DataForTeacher student in lbxStudents.SelectedItems)
             {
-                studentToShare.Add(student);
+                StudentsToShare.Add(student);
             }
             List<string> focus = ((KeyValuePair<string, List<string>>)lbxFocus.SelectedItem).Value;
             Priority priorite = (Priority)Enum.Parse(typeof(Priority), lbxPriorite.SelectedItem.ToString());

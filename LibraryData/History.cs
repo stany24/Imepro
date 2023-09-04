@@ -10,7 +10,7 @@ namespace LibraryData
     /// Class that holds the history of all browser.
     /// </summary>
     [Serializable]
-    public class Historique
+    public class History
     {
         readonly private string[] AllBrowserName = { "chrome", "firefox", "seleniumchrome", "seleniumfirefox", "opera", "msedge", "safari", "iexplorer", "custom" };
         [JsonInclude]
@@ -30,7 +30,7 @@ namespace LibraryData
 
         public string[] GetAllBrowserNames() { return AllBrowserName; }
 
-        public Historique()
+        public History()
         {
             AllBrowser = new();
             for (int i = 0;i < AllBrowserName.Count(); i++) { AllBrowser.Add(AllBrowserName[i], new List<Url>()); }
@@ -44,19 +44,19 @@ namespace LibraryData
     public class Url
     {
         [JsonInclude]
-        readonly public DateTime CaptureTime;
+        readonly public DateTime ScreenShotTime;
         [JsonInclude]
         readonly public string Name;
 
         public Url(DateTime capturetime, string name)
         {
-            CaptureTime = capturetime;
+            ScreenShotTime = capturetime;
             Name = name;
         }
 
         public override string ToString()
         {
-            return CaptureTime.ToString("HH:mm:ss") + " " + Name;
+            return ScreenShotTime.ToString("HH:mm:ss") + " " + Name;
         }
     }
 }
