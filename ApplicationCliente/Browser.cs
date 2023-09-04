@@ -11,7 +11,7 @@ namespace ApplicationCliente
 {
     public class Browser : Panel
     {
-        private List<Tab> tabs;
+        private readonly List<Tab> tabs;
         private readonly Button btnNewTab;
 
         public Browser()
@@ -23,14 +23,6 @@ namespace ApplicationCliente
             btnNewTab.Click += new EventHandler(NewTab);
             Controls.Add(btnNewTab);
             NewTab(new object(), new EventArgs());
-            tabs[0].preview.BackColor = Color.Blue;
-            tabs[0].controlBar.BackColor = Color.Blue;
-            NewTab(new object(), new EventArgs());
-            tabs[1].preview.BackColor = Color.Red;
-            tabs[1].controlBar.BackColor = Color.Red;
-            NewTab(new object(), new EventArgs());
-            tabs[2].preview.BackColor = Color.Yellow;
-            tabs[2].controlBar.BackColor = Color.Yellow;
         }
 
         private void UpdateLocations()
@@ -46,10 +38,10 @@ namespace ApplicationCliente
 
         private void NewTab(object sender, EventArgs e)
         {
-            Tab tab = new();
+            Tab tab = new(Width,Height);
             tab.webview.Disposed += new EventHandler(RemoveTabFromList);
             tab.webview.VisibleChanged += new EventHandler(HideOtherTabs);
-            this.Resize += new EventHandler(ResizeAllWebview);
+            Resize += new EventHandler(ResizeAllWebview);
             Controls.Add(tab.webview);
             Controls.Add(tab.preview);
             Controls.Add(tab.controlBar);
@@ -93,12 +85,12 @@ namespace ApplicationCliente
         public TabPreview preview;
         public ControlBar controlBar;
 
-        public Tab()
+        public Tab(int width,int height)
         {
             webview = new CustomWebView2(){
                 Location = new Point(0,100),
-                Size = new Size(300,300)
-            };
+                Size = new Size(300,300)};
+            ResizeWebview(width, height);
             preview = new TabPreview();
             controlBar = new ControlBar() {
                 Location = new Point(0,50)};
@@ -140,9 +132,7 @@ namespace ApplicationCliente
             }
             else
             {
-                string urlPart = controlBar.tbxUrl.Text;
-                urlPart = "https://" + urlPart;
-                try{webview.CoreWebView2.Navigate(urlPart);}
+                try{webview.CoreWebView2.Navigate("https://" + controlBar.tbxUrl.Text);}
                 catch{ webview.CoreWebView2.Navigate("https://duckduckgo.com/?t=ffab&q=" + controlBar.tbxUrl.Text + "&atb=v320-1&ia=web"); }
             }
         }
@@ -174,35 +164,24 @@ namespace ApplicationCliente
         public ControlBar()
         {
             Size = new Size(400, 40);
-
-            btnBack = new()
-            {
+            btnBack = new(){
                 Size = new Size(ButtonHeightPixel, ButtonHeightPixel),
                 Location = new Point(0 + OffsetPixel, OffsetPixel),
-                Text = "<-"
-            };
-            btnForward = new()
-            {
+                Text = "<-"};
+            btnForward = new(){
                 Size = new Size(ButtonHeightPixel, ButtonHeightPixel),
                 Location = new Point(btnBack.Location.X + btnBack.Size.Width + OffsetPixel, btnBack.Location.Y),
-                Text = "->"
-            };
-            btnRefresh = new()
-            {
+                Text = "->"};
+            btnRefresh = new(){
                 Size = new Size(ButtonHeightPixel, ButtonHeightPixel),
                 Location = new Point(btnForward.Location.X + btnForward.Size.Width + OffsetPixel, btnBack.Location.Y),
-                Text = "O"
-            };
-            tbxUrl = new()
-            {
+                Text = "O"};
+            tbxUrl = new(){
                 Size = new Size(8 * ButtonHeightPixel, ButtonHeightPixel),
-                Location = new Point(btnRefresh.Location.X + btnRefresh.Width + OffsetPixel, btnBack.Location.Y)
-            };
-            btnEnter = new()
-            {
+                Location = new Point(btnRefresh.Location.X + btnRefresh.Width + OffsetPixel, btnBack.Location.Y)};
+            btnEnter = new(){
                 Size = new Size(ButtonHeightPixel, ButtonHeightPixel),
-                Location = new Point(tbxUrl.Location.X + tbxUrl.Size.Width + OffsetPixel, btnBack.Location.Y)
-            };
+                Location = new Point(tbxUrl.Location.X + tbxUrl.Size.Width + OffsetPixel, btnBack.Location.Y)};
             Controls.Add(btnBack);
             Controls.Add(btnForward);
             Controls.Add(btnRefresh);
