@@ -56,11 +56,20 @@ namespace ApplicationCliente
             Tab tab = new(getNextId());
             tab.webview.Disposed += new EventHandler(RemoveTabFromList);
             tab.webview.VisibleChanged += new EventHandler(HideOtherTabs);
+            this.Resize += new EventHandler(ResizeAllWebview);
             Controls.Add(tab.webview);
             Controls.Add(tab.preview);
             Controls.Add(tab.controlBar);
             tabs.Add(tab);
             UpdateLocations();
+        }
+
+        private void ResizeAllWebview(object sender, EventArgs e)
+        {
+            foreach (Tab tab in tabs)
+            {
+                tab.ResizeWebview(Width, Height);
+            }
         }
 
         private void HideOtherTabs(object sender, EventArgs e)
@@ -114,6 +123,11 @@ namespace ApplicationCliente
             webview.SourceChanged += new EventHandler<CoreWebView2SourceChangedEventArgs>(UrlChanged);
         }
 
+        public void ResizeWebview(int width, int height)
+        {
+            webview.Size = new Size(width, height-webview.Location.Y);
+        }
+
         private void ShowTab(object sender, EventArgs e)
         {
             webview.Show();
@@ -128,8 +142,18 @@ namespace ApplicationCliente
 
         public void Search_Click(object sender, EventArgs e)
         {
-            try { webview.CoreWebView2.Navigate(preview.btnWebsiteName.Text); }
-            catch { webview.CoreWebView2.Navigate("https://duckduckgo.com/?t=ffab&q=" + preview.btnWebsiteName.Text + "&atb=v320-1&ia=web"); }
+            if(controlBar.tbxUrl.Text.ToLower().StartsWith("https://") || controlBar.tbxUrl.Text.ToLower().StartsWith("http://"))
+            {
+                try { webview.CoreWebView2.Navigate(controlBar.tbxUrl.Text); }
+                catch { webview.CoreWebView2.Navigate("https://duckduckgo.com/?t=ffab&q=" + controlBar.tbxUrl.Text + "&atb=v320-1&ia=web"); }
+            }
+            else
+            {
+                string urlPart = controlBar.tbxUrl.Text;
+                urlPart = "https://" + urlPart;
+                try{webview.CoreWebView2.Navigate(urlPart);}
+                catch{ webview.CoreWebView2.Navigate("https://duckduckgo.com/?t=ffab&q=" + controlBar.tbxUrl.Text + "&atb=v320-1&ia=web"); }
+            }
         }
 
         public void UrlChanged(object sender, CoreWebView2SourceChangedEventArgs e)
@@ -278,7 +302,7 @@ namespace ApplicationCliente
         private List<string> GetAutorisedWebsites()
         {
             try { return JsonSerializer.Deserialize<List<string>>(Properties.Settings.Default.AutorisedWebsites); }
-            catch { return new List<string>() { "https://duckduckgo.com/" }; }
+            catch { return new List<string>() { "https://duckduckgo.com/","https://github.com" }; }
         }
     }
 }
