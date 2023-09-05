@@ -23,17 +23,10 @@ namespace UnitTestClassLibrary
     public class HistoriqueTest
     {
         [TestMethod]
-        public void HistoriqueUrlConstructor()
-        {
-            History TestHistory = new History();
-            Assert.AreEqual(TestHistory.AllBrowser.Count, TestHistory.GetAllBrowserNames().Count());
-        }
-
-        [TestMethod]
         public void HistoriqueUrlAdding()
         {
             History TestHistory = new History();
-            foreach (KeyValuePair<string, List<Url>> browser in TestHistory.AllBrowser)
+            foreach (KeyValuePair<BrowserName, List<Url>> browser in TestHistory.AllBrowser)
             {
                 TestHistory.AddUrl(new Url(DateTime.Now, "testurl"), browser.Key);
                 Assert.AreEqual(1, TestHistory.AllBrowser[browser.Key].Count);

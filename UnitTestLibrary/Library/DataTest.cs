@@ -18,7 +18,7 @@ namespace UnitTestLibrary.Library
             const string username = "username";
             const string computername = "computername";
             History historique = new History();
-            historique.AddUrl(new Url(DateTime.Now,"test"), "firefox");
+            historique.AddUrl(new Url(DateTime.Now,"test"), BrowserName.Firefox);
             Dictionary<int, string> processes = new Dictionary<int, string>{{ 1, "firefox" }};
             Data data2 = new Data(username,computername,historique,processes);
             Assert.AreEqual(username, data2.UserName);
@@ -42,7 +42,7 @@ namespace UnitTestLibrary.Library
             const string username = "username";
             const string computername = "computername";
             History historique = new History();
-            historique.AddUrl(new Url(DateTime.Now, "test"), "firefox");
+            historique.AddUrl(new Url(DateTime.Now, "test"), BrowserName.Firefox);
             Dictionary<int, string> processes = new Dictionary<int, string> { { 1, "firefox" } };
             Data data = new Data(username, computername, historique, processes);
             DataForTeacher dataForTeacher2 = new DataForTeacher(data);
