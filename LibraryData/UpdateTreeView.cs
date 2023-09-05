@@ -51,22 +51,22 @@ namespace LibraryData
         /// <param name="browsers">A dictionnary with the name of the browser a key and list of url as values</param>
         /// <param name="nodeBrowser">The treenode containing all browser.</param>
         /// <param name="treeBrowser">The treeview you want to update.</param>
-        public static void UpdateUrls(Dictionary<string, List<Url>> browsers, TreeNode nodeBrowser, TreeView treeBrowser)
+        public static void UpdateUrls(Dictionary<BrowserName, List<Url>> browsers, TreeNode nodeBrowser, TreeView treeBrowser)
         {
-            foreach (KeyValuePair<string, List<Url>> browser in browsers)
+            foreach (KeyValuePair<BrowserName, List<Url>> browser in browsers)
             {
                 if (browser.Value.Count > 0)
                 {
                     TreeNode Browser;
                     if (nodeBrowser != null)
                     {
-                        if (!nodeBrowser.Nodes.Find(browser.Key, false).Any()) { nodeBrowser.Nodes.Add(browser.Key, browser.Key); }
-                        Browser = nodeBrowser.Nodes.Find(browser.Key, false)[0];
+                        if (!nodeBrowser.Nodes.Find(browser.Key.ToString(), false).Any()) { nodeBrowser.Nodes.Add(browser.Key.ToString(), browser.Key.ToString()); }
+                        Browser = nodeBrowser.Nodes.Find(browser.Key.ToString(), false)[0];
                     }
                     else
                     {
-                        if (!treeBrowser.Nodes.Find(browser.Key, false).Any()) { treeBrowser.Nodes.Add(browser.Key, browser.Key); }
-                        Browser = treeBrowser.Nodes.Find(browser.Key, false)[0];
+                        if (!treeBrowser.Nodes.Find(browser.Key.ToString(), false).Any()) { treeBrowser.Nodes.Add(browser.Key.ToString(), browser.Key.ToString()); }
+                        Browser = treeBrowser.Nodes.Find(browser.Key.ToString(), false)[0];
                     }
                     for (int i = Browser.Nodes.Count; i < browser.Value.Count; i++)
                     {

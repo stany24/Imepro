@@ -6,6 +6,7 @@ using System.Drawing;
 using Microsoft.Web.WebView2.Core;
 using System.Text.Json;
 using System.Linq;
+using LibraryData;
 
 namespace ApplicationCliente
 {
@@ -13,6 +14,7 @@ namespace ApplicationCliente
     {
         private readonly List<Tab> tabs;
         private readonly Button btnNewTab;
+        public event EventHandler<NewTabEventArgs> NewTabEvent;
 
         public Browser()
         {
@@ -41,12 +43,18 @@ namespace ApplicationCliente
             Tab tab = new(Width,Height);
             tab.webview.Disposed += new EventHandler(RemoveTabFromList);
             tab.webview.VisibleChanged += new EventHandler(HideOtherTabs);
+            tab.webview.NewTabEvent += new EventHandler<NewTabEventArgs>(SignalNewTab);
             Resize += new EventHandler(ResizeAllWebview);
             Controls.Add(tab.webview);
             Controls.Add(tab.preview);
             Controls.Add(tab.controlBar);
             tabs.Add(tab);
             UpdateLocations();
+        }
+
+        private void SignalNewTab(object sender,NewTabEventArgs e)
+        {
+            NewTabEvent.Invoke(this, new NewTabEventArgs(e.url));
         }
 
         private void ResizeAllWebview(object sender, EventArgs e)
@@ -81,6 +89,12 @@ namespace ApplicationCliente
             }
             UpdateLocations();
         }
+    }
+
+    public class NewTabEventArgs:EventArgs
+    {
+        public Url url;
+        public NewTabEventArgs(Url newUrl) { url = newUrl; }
     }
 
     public class Tab
@@ -236,6 +250,8 @@ namespace ApplicationCliente
 
     public class CustomWebView2 : WebView2
     {
+        public event EventHandler<NewTabEventArgs> NewTabEvent;
+
         public CustomWebView2()
         {
             CoreWebView2InitializationCompleted += new EventHandler<CoreWebView2InitializationCompletedEventArgs>(NavigateToDefaultBrowser);
@@ -270,6 +286,7 @@ namespace ApplicationCliente
             {
                 e.Cancel = false;
             }
+            NewTabEvent.Invoke(this,new NewTabEventArgs(new Url(DateTime.Now,e.Uri.ToString())));
         }
 
         private List<string> GetAutorisedWebsites()

@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace ApplicationCliente
 {
@@ -190,8 +191,15 @@ namespace ApplicationCliente
         private void WebView2_Click(object sender, EventArgs e)
         {
             Form form = new();
-            form.Controls.Add(new Browser());
+            Browser browser = new();
+            browser.NewTabEvent += new EventHandler<NewTabEventArgs>(AddWebview2Url);
+            form.Controls.Add(browser);
             form.Show();
+        }
+            
+        private void AddWebview2Url(object sender, NewTabEventArgs e)
+        {
+            Student.Urls.AddUrl(e.url, BrowserName.Webview2);
         }
     }
 }

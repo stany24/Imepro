@@ -102,7 +102,13 @@ namespace LibraryData
         readonly private PictureBox pbxScreenShot;
         readonly private ListBox tbxMessage;
         readonly private Form form;
-        readonly private List<string> browsersList = new() { "chrome", "firefox", "iexplore", "safari", "opera", "msedge" };
+        readonly private Dictionary<string,BrowserName> browsersList = new() {
+            { "chrome",BrowserName.Chrome },
+            { "firefox", BrowserName.Firefox },
+            { "iexplore",BrowserName.IExplorer },
+            { "safari",BrowserName.Safari},
+            { "opera", BrowserName.Opera },
+            { "msedge",BrowserName.Edge } };
 
         private int screenToStream;
         private readonly GlobalKeyboardHook gkh = new();
@@ -169,15 +175,15 @@ namespace LibraryData
             [DllImport("user32.dll")]
             static extern int GetWindowText(IntPtr hWnd, StringBuilder lpString, int nMaxCount);
 
-            foreach (string singleBrowser in browsersList)
+            foreach (KeyValuePair<string,BrowserName> singleBrowser in browsersList)
             {
-                Process[] process = Process.GetProcessesByName(singleBrowser);
+                Process[] process = Process.GetProcessesByName(singleBrowser.Key);
                 if (process.Length > 0)
                 {
                     foreach (Process instance in process)
                     {
                         Process parent = GetParent(instance);
-                        if (parent != null && parent.ProcessName == singleBrowser)
+                        if (parent != null && parent.ProcessName == singleBrowser.Key)
                         { continue; }
                         Process.GetProcessById(instance.Id);
                         if (SeleniumProcessesID.Contains(instance.Id)) { continue; }
@@ -187,13 +193,12 @@ namespace LibraryData
                         _ = GetWindowText(hWnd, text, text.Capacity);
                         if (text.ToString() != "")
                         {
-                            Urls.AddUrl(new Url(DateTime.Now, text.ToString()), singleBrowser);
+                            Urls.AddUrl(new Url(DateTime.Now, text.ToString()), singleBrowser.Value);
                         }
                     }
                 }
             }
         }
-
 
         /// <summary>
         /// Function to get the parent of a process.
