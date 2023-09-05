@@ -12,6 +12,7 @@ namespace LibraryData
     [Serializable]
     public class History
     {
+        [JsonIgnore]
         readonly private string[] AllBrowserName = { "chrome", "firefox", "seleniumchrome", "seleniumfirefox", "opera", "msedge", "safari", "iexplorer", "custom" };
         [JsonInclude]
         public Dictionary<string, List<Url>> AllBrowser { get; set; }
@@ -48,9 +49,9 @@ namespace LibraryData
         [JsonInclude]
         readonly public string Name;
 
-        public Url(DateTime capturetime, string name)
+        public Url(DateTime screenShotTime, string name)
         {
-            ScreenShotTime = capturetime;
+            ScreenShotTime = screenShotTime;
             Name = name;
         }
 

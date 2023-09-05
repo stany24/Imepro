@@ -83,6 +83,7 @@
     <Compile Include="Blocage.cs" />
     <Compile Include="Command.cs" />
     <Compile Include="CustomMessage.cs" />
+    <Compile Include="History.cs" />
     <Compile Include="StreamOptions.cs" />
     <Compile Include="Data.cs" />
     <Compile Include="Miniatures.cs">
@@ -90,7 +91,6 @@
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UpdateTreeView.cs" />
-    <Compile Include="Historique.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
