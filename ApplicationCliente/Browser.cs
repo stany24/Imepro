@@ -1,12 +1,12 @@
-﻿using Microsoft.Web.WebView2.WinForms;
+﻿using LibraryData;
+using Microsoft.Web.WebView2.Core;
+using Microsoft.Web.WebView2.WinForms;
 using System;
 using System.Collections.Generic;
-using System.Windows.Forms;
 using System.Drawing;
-using Microsoft.Web.WebView2.Core;
-using System.Text.Json;
 using System.Linq;
-using LibraryData;
+using System.Text.Json;
+using System.Windows.Forms;
 
 namespace ApplicationCliente
 {
@@ -20,8 +20,10 @@ namespace ApplicationCliente
         {
             Dock = DockStyle.Fill;
             tabs = new List<Tab>();
-            btnNewTab = new Button() {
-                Text = "new"};
+            btnNewTab = new Button()
+            {
+                Text = "new"
+            };
             btnNewTab.Click += new EventHandler(NewTab);
             Controls.Add(btnNewTab);
             NewTab(new object(), new EventArgs());
@@ -35,12 +37,12 @@ namespace ApplicationCliente
                 tabs[i].preview.Maximize(CurrentOffset);
                 CurrentOffset += tabs[i].preview.Width;
             }
-            btnNewTab.Location = new Point(CurrentOffset,0);
+            btnNewTab.Location = new Point(CurrentOffset, 0);
         }
 
         private void NewTab(object sender, EventArgs e)
         {
-            Tab tab = new(Width,Height);
+            Tab tab = new(Width, Height);
             tab.webview.Disposed += new EventHandler(RemoveTabFromList);
             tab.webview.VisibleChanged += new EventHandler(HideOtherTabs);
             tab.webview.NewTabEvent += new EventHandler<NewTabEventArgs>(SignalNewTab);
@@ -52,7 +54,7 @@ namespace ApplicationCliente
             UpdateLocations();
         }
 
-        private void SignalNewTab(object sender,NewTabEventArgs e)
+        private void SignalNewTab(object sender, NewTabEventArgs e)
         {
             NewTabEvent.Invoke(this, new NewTabEventArgs(e.url));
         }
@@ -79,19 +81,20 @@ namespace ApplicationCliente
         private void RemoveTabFromList(object sender, EventArgs e)
         {
             CustomWebView2 closedTab = sender as CustomWebView2;
-            for(int i=0;i<tabs.Count;i++)
+            for (int i = 0; i < tabs.Count; i++)
             {
-                if (tabs[i].webview == closedTab) {
+                if (tabs[i].webview == closedTab)
+                {
                     tabs.Remove(tabs[i]);
-                    if (i < tabs.Count){tabs[i].ShowTab(new object(), new EventArgs());break;}
-                    if( i > 0 ) {tabs[i-1].ShowTab(new object(), new EventArgs());break;}
+                    if (i < tabs.Count) { tabs[i].ShowTab(new object(), new EventArgs()); break; }
+                    if (i > 0) { tabs[i - 1].ShowTab(new object(), new EventArgs()); break; }
                 }
             }
             UpdateLocations();
         }
     }
 
-    public class NewTabEventArgs:EventArgs
+    public class NewTabEventArgs : EventArgs
     {
         public Url url;
         public NewTabEventArgs(Url newUrl) { url = newUrl; }
@@ -106,13 +109,17 @@ namespace ApplicationCliente
         private const int GAP_BETWEEN_PREVIEW_AND_CONTROL_BAR_PX = 10;
         private const int GAP_BETWEEN_CONTROL_BAR_AND_WEBVIEW_PX = 10;
 
-        public Tab(int width,int height)
+        public Tab(int width, int height)
         {
             preview = new TabPreview();
-            controlBar = new ControlBar() {
-                Location = new Point(0, preview.Height + GAP_BETWEEN_PREVIEW_AND_CONTROL_BAR_PX)};
-            webview = new CustomWebView2(){
-                Location = new Point(0, controlBar.Location.Y + controlBar.Height + GAP_BETWEEN_CONTROL_BAR_AND_WEBVIEW_PX)};
+            controlBar = new ControlBar()
+            {
+                Location = new Point(0, preview.Height + GAP_BETWEEN_PREVIEW_AND_CONTROL_BAR_PX)
+            };
+            webview = new CustomWebView2()
+            {
+                Location = new Point(0, controlBar.Location.Y + controlBar.Height + GAP_BETWEEN_CONTROL_BAR_AND_WEBVIEW_PX)
+            };
             ResizeWebview(width, height);
 
             controlBar.btnBack.Click += new EventHandler(webview.MoveBack_Click);
@@ -122,13 +129,13 @@ namespace ApplicationCliente
 
             preview.btnClose.Click += new EventHandler(CloseTab);
             preview.btnWebsiteName.Click += new EventHandler(ShowTab);
-            
+
             webview.SourceChanged += new EventHandler<CoreWebView2SourceChangedEventArgs>(UrlChanged);
         }
 
         public void ResizeWebview(int width, int height)
         {
-            webview.Size = new Size(width, height-webview.Location.Y);
+            webview.Size = new Size(width, height - webview.Location.Y);
         }
 
         public void ShowTab(object sender, EventArgs e)
@@ -145,15 +152,15 @@ namespace ApplicationCliente
 
         public void Search_Click(object sender, EventArgs e)
         {
-            if(controlBar.tbxUrl.Text.ToLower().StartsWith("https://") || controlBar.tbxUrl.Text.ToLower().StartsWith("http://"))
+            if (controlBar.tbxUrl.Text.ToLower().StartsWith("https://") || controlBar.tbxUrl.Text.ToLower().StartsWith("http://"))
             {
                 try { webview.CoreWebView2.Navigate(controlBar.tbxUrl.Text); }
                 catch { webview.CoreWebView2.Navigate("https://duckduckgo.com/?t=ffab&q=" + controlBar.tbxUrl.Text + "&atb=v320-1&ia=web"); }
             }
             else
             {
-                try{webview.CoreWebView2.Navigate("https://" + controlBar.tbxUrl.Text);}
-                catch{ webview.CoreWebView2.Navigate("https://duckduckgo.com/?t=ffab&q=" + controlBar.tbxUrl.Text + "&atb=v320-1&ia=web"); }
+                try { webview.CoreWebView2.Navigate("https://" + controlBar.tbxUrl.Text); }
+                catch { webview.CoreWebView2.Navigate("https://duckduckgo.com/?t=ffab&q=" + controlBar.tbxUrl.Text + "&atb=v320-1&ia=web"); }
             }
         }
 
@@ -170,7 +177,7 @@ namespace ApplicationCliente
         }
     }
 
-    public class ControlBar:Panel
+    public class ControlBar : Panel
     {
         readonly public Button btnBack;
         readonly public Button btnForward;
@@ -181,30 +188,40 @@ namespace ApplicationCliente
         private const int CONTROL_BAR_HEIGHT_PX = 25;
         private const int CONTROL_BAR_WIDTH_PX = 400;
         private const int BUTTON_HEIGHT_PX = 21; //to fit the button size to the textbox height
-        private const int GAP_OF_BUTTON_FROM_CONTROL_BAR_TOP_PX = (CONTROL_BAR_HEIGHT_PX-BUTTON_HEIGHT_PX)/2;
+        private const int GAP_OF_BUTTON_FROM_CONTROL_BAR_TOP_PX = (CONTROL_BAR_HEIGHT_PX - BUTTON_HEIGHT_PX) / 2;
         private const int GAP_BETWEEN_BUTTON_PX = 10;
 
         public ControlBar()
         {
-            Size = new Size(CONTROL_BAR_WIDTH_PX,CONTROL_BAR_HEIGHT_PX);
-            btnBack = new(){
+            Size = new Size(CONTROL_BAR_WIDTH_PX, CONTROL_BAR_HEIGHT_PX);
+            btnBack = new()
+            {
                 Size = new Size(BUTTON_HEIGHT_PX, BUTTON_HEIGHT_PX),
                 Location = new Point(0 + GAP_BETWEEN_BUTTON_PX, GAP_OF_BUTTON_FROM_CONTROL_BAR_TOP_PX),
-                Text = "<-"};
-            btnForward = new(){
+                Text = "<-"
+            };
+            btnForward = new()
+            {
                 Size = new Size(BUTTON_HEIGHT_PX, BUTTON_HEIGHT_PX),
                 Location = new Point(btnBack.Location.X + btnBack.Size.Width + GAP_BETWEEN_BUTTON_PX, btnBack.Location.Y),
-                Text = "->"};
-            btnRefresh = new(){
+                Text = "->"
+            };
+            btnRefresh = new()
+            {
                 Size = new Size(BUTTON_HEIGHT_PX, BUTTON_HEIGHT_PX),
                 Location = new Point(btnForward.Location.X + btnForward.Size.Width + GAP_BETWEEN_BUTTON_PX, btnBack.Location.Y),
-                Text = "O"};
-            tbxUrl = new(){
+                Text = "O"
+            };
+            tbxUrl = new()
+            {
                 Size = new Size(8 * BUTTON_HEIGHT_PX, BUTTON_HEIGHT_PX),
-                Location = new Point(btnRefresh.Location.X + btnRefresh.Width + GAP_BETWEEN_BUTTON_PX, btnBack.Location.Y)};
-            btnEnter = new(){
+                Location = new Point(btnRefresh.Location.X + btnRefresh.Width + GAP_BETWEEN_BUTTON_PX, btnBack.Location.Y)
+            };
+            btnEnter = new()
+            {
                 Size = new Size(BUTTON_HEIGHT_PX, BUTTON_HEIGHT_PX),
-                Location = new Point(tbxUrl.Location.X + tbxUrl.Size.Width + GAP_BETWEEN_BUTTON_PX, btnBack.Location.Y)};
+                Location = new Point(tbxUrl.Location.X + tbxUrl.Size.Width + GAP_BETWEEN_BUTTON_PX, btnBack.Location.Y)
+            };
             Controls.Add(btnBack);
             Controls.Add(btnForward);
             Controls.Add(btnRefresh);
@@ -286,13 +303,13 @@ namespace ApplicationCliente
             {
                 e.Cancel = false;
             }
-            NewTabEvent.Invoke(this,new NewTabEventArgs(new Url(DateTime.Now,e.Uri.ToString())));
+            NewTabEvent.Invoke(this, new NewTabEventArgs(new Url(DateTime.Now, e.Uri.ToString())));
         }
 
         private List<string> GetAutorisedWebsites()
         {
             try { return JsonSerializer.Deserialize<List<string>>(Properties.Settings.Default.AutorisedWebsites); }
-            catch { return new List<string>() { "https://duckduckgo.com/","https://github.com" }; }
+            catch { return new List<string>() { "https://duckduckgo.com/", "https://github.com" }; }
         }
     }
 }

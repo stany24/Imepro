@@ -1,7 +1,7 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using LibraryData;
-using System.Collections.Generic;
+﻿using LibraryData;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
+using System.Collections.Generic;
 using System.Net.Sockets;
 
 namespace UnitTestLibrary.Library
@@ -18,9 +18,9 @@ namespace UnitTestLibrary.Library
             const string username = "username";
             const string computername = "computername";
             History historique = new History();
-            historique.AddUrl(new Url(DateTime.Now,"test"), BrowserName.Firefox);
-            Dictionary<int, string> processes = new Dictionary<int, string>{{ 1, "firefox" }};
-            Data data2 = new Data(username,computername,historique,processes);
+            historique.AddUrl(new Url(DateTime.Now, "test"), BrowserName.Firefox);
+            Dictionary<int, string> processes = new Dictionary<int, string> { { 1, "firefox" } };
+            Data data2 = new Data(username, computername, historique, processes);
             Assert.AreEqual(username, data2.UserName);
             Assert.AreEqual(computername, data2.ComputerName);
             Assert.AreEqual(historique, data2.Urls);
@@ -36,7 +36,7 @@ namespace UnitTestLibrary.Library
         {
             const int id = 3;
             Socket socket = new Socket(SocketType.Stream, ProtocolType.Tcp);
-            DataForTeacher dataForTeacher1 = new DataForTeacher(socket , id);
+            DataForTeacher dataForTeacher1 = new DataForTeacher(socket, id);
             Assert.AreEqual(id, dataForTeacher1.ID);
             Assert.AreEqual(socket, dataForTeacher1.SocketToStudent);
             const string username = "username";

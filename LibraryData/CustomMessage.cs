@@ -19,9 +19,9 @@ namespace LibraryData
 
         #region Constructor
 
-        public CustomMessage(byte[] newdata,int size)
+        public CustomMessage(byte[] newdata, int size)
         {
-            byte[] header = Encoding.Default.GetBytes(size.ToString().PadLeft(5,'0'));
+            byte[] header = Encoding.Default.GetBytes(size.ToString().PadLeft(5, '0'));
             data.AddRange(header);
             data.AddRange(newdata);
         }
@@ -37,7 +37,7 @@ namespace LibraryData
 
         public int GetSize()
         {
-            return Convert.ToInt32(Encoding.Default.GetString(data.GetRange(0, 5).ToArray()))+5;
+            return Convert.ToInt32(Encoding.Default.GetString(data.GetRange(0, 5).ToArray())) + 5;
         }
 
         public byte[] GetData() { return data.ToArray(); }
@@ -64,11 +64,12 @@ namespace LibraryData
 
         public CustomMessageSender(byte[] message)
         {
-            for (int i = 0; i < message.Length/65000+1; i++)
+            for (int i = 0; i < message.Length / 65000 + 1; i++)
             {
                 byte[] single = new byte[65000];
                 int size = 65000;
-                try {
+                try
+                {
                     Array.Copy(message, i * 65000, single, 0, 65000);
                 }
                 catch
@@ -77,7 +78,7 @@ namespace LibraryData
                     Array.Resize(ref single, message.Length % 65000);
                     size = message.Length % 65000;
                 }
-                messages.Add(new CustomMessage(single,size));
+                messages.Add(new CustomMessage(single, size));
             }
         }
 
@@ -85,7 +86,7 @@ namespace LibraryData
 
         #region Getter
 
-        public List<CustomMessage> GetMessages(){ return messages; }
+        public List<CustomMessage> GetMessages() { return messages; }
 
         #endregion
     }
@@ -95,7 +96,7 @@ namespace LibraryData
         #region Variables
 
         readonly List<byte> remainder = new();
-        readonly List<CustomMessage> messages= new();
+        readonly List<CustomMessage> messages = new();
         readonly Socket socket;
 
         #endregion

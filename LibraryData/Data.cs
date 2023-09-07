@@ -49,7 +49,8 @@ namespace LibraryData
             Processes = processes;
         }
 
-        public Data() {
+        public Data()
+        {
             Urls = new();
             Processes = new();
         }
@@ -102,7 +103,7 @@ namespace LibraryData
         readonly private PictureBox pbxScreenShot;
         readonly private ListBox tbxMessage;
         readonly private Form form;
-        readonly private Dictionary<string,BrowserName> browsersList = new() {
+        readonly private Dictionary<string, BrowserName> browsersList = new() {
             { "chrome",BrowserName.Chrome },
             { "firefox", BrowserName.Firefox },
             { "iexplore",BrowserName.IExplorer },
@@ -175,7 +176,7 @@ namespace LibraryData
             [DllImport("user32.dll")]
             static extern int GetWindowText(IntPtr hWnd, StringBuilder lpString, int nMaxCount);
 
-            foreach (KeyValuePair<string,BrowserName> singleBrowser in browsersList)
+            foreach (KeyValuePair<string, BrowserName> singleBrowser in browsersList)
             {
                 Process[] process = Process.GetProcessesByName(singleBrowser.Key);
                 if (process.Length > 0)
@@ -334,7 +335,7 @@ namespace LibraryData
                 // Establish the remote endpoint for the socket. This example uses port 11111 on the local computer.
                 IPEndPoint localEndPoint = new(IpToTeacher, port);
 
-                
+
                 while (true)
                 {
                     // Creation TCP/IP Socket using Socket Class Constructor
@@ -359,9 +360,10 @@ namespace LibraryData
                             lbxConnexion.Invoke(new MethodInvoker(delegate { lbxConnexion.Items.Add("Connected"); }));
                             return sender;
                         }
-                        else {
+                        else
+                        {
                             sender.Close();
-                            lbxConnexion.Invoke(new MethodInvoker(delegate { lbxConnexion.Items.Add("Connexion failed to " +IpToTeacher + " Error: "+result); }));
+                            lbxConnexion.Invoke(new MethodInvoker(delegate { lbxConnexion.Items.Add("Connexion failed to " + IpToTeacher + " Error: " + result); }));
                         }
                     }
                     // Manage of Socket's Exceptions
@@ -407,7 +409,7 @@ namespace LibraryData
                 lbxConnexion.Invoke(new MethodInvoker(delegate { lbxConnexion.Items.Add(command.ToString()); }));
                 switch (command.Type)
                 {
-                    case CommandType.DemandData:SendData(); break;
+                    case CommandType.DemandData: SendData(); break;
                     case CommandType.DemandImage: SendImage(TakeAllScreenShot(), SocketToTeacher); break;
                     case CommandType.KillProcess: KillSelectedProcess(Convert.ToInt32(command.Args[1])); break;
                     case CommandType.ReceiveMulticast: Task.Run(ReceiveMulticastStream); break;
@@ -558,7 +560,8 @@ namespace LibraryData
                 byte[] receivedData = new byte[size];
                 Array.Copy(args.Buffer, args.Offset, receivedData, 0, size);
                 byteImage.AddRange(receivedData);
-                if(size != 65000){
+                if (size != 65000)
+                {
                     Bitmap bitmap = new(new MemoryStream(byteImage.ToArray()));
                     pbxScreenShot.Invoke(new MethodInvoker(delegate { pbxScreenShot.Image = bitmap; }));
                     byteImage.Clear();

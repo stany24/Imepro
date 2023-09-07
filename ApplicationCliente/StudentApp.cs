@@ -9,7 +9,6 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace ApplicationCliente
 {
@@ -105,7 +104,7 @@ namespace ApplicationCliente
 
             for (int i = 0; i < ipBytes1.Length; i++)
             {
-                if ((ipBytes1[i] & subnetMaskBytes[i]) != (ipBytes2[i] & subnetMaskBytes[i])){return false;}
+                if ((ipBytes1[i] & subnetMaskBytes[i]) != (ipBytes2[i] & subnetMaskBytes[i])) { return false; }
             }
             return true;
         }
@@ -196,7 +195,7 @@ namespace ApplicationCliente
             form.Controls.Add(browser);
             form.Show();
         }
-            
+
         private void AddWebview2Url(object sender, NewTabEventArgs e)
         {
             Student.Urls.AddUrl(e.url, BrowserName.Webview2);

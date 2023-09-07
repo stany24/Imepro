@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Linq;
 
 namespace LibraryData
 {
@@ -27,7 +27,7 @@ namespace LibraryData
 
         #endregion
 
-        public string GetComputerName(){ return ComputerName; }
+        public string GetComputerName() { return ComputerName; }
 
         #region Constructor
 
@@ -155,9 +155,9 @@ namespace LibraryData
         public void ChangeZoom()
         {
             foreach (var (preview, NewHeight, NewWidth) in from Preview preview in CustomPreviewList
-                                                             let NewHeight = preview.PbxImage.Image.Height * Zoom
-                                                             let NewWidth = preview.PbxImage.Image.Width * Zoom
-                                                             select (preview, NewHeight, NewWidth))
+                                                           let NewHeight = preview.PbxImage.Image.Height * Zoom
+                                                           let NewWidth = preview.PbxImage.Image.Width * Zoom
+                                                           select (preview, NewHeight, NewWidth))
             {
                 preview.PbxImage.Height = Convert.ToInt32(NewHeight);
                 preview.PbxImage.Width = Convert.ToInt32(NewWidth);
