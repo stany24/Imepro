@@ -198,7 +198,7 @@ namespace ApplicationCliente
 
         private void AddWebview2Url(object sender, NewTabEventArgs e)
         {
-            Student.Urls.AddUrl(e.url, BrowserName.Webview2);
+            Student.Urls.AddUrl(e.Url, BrowserName.Webview2);
         }
     }
 }
