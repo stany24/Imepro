@@ -378,8 +378,8 @@ namespace ApplicationTeacher
                 Graphics.FromImage(bitmap).CopyFromScreen(ScreenSize.Left, ScreenSize.Top, 0, 0, ScreenSize.Size);
                 ImageConverter converter = new();
                 byte[] imageArray = (byte[])converter.ConvertTo(bitmap, typeof(byte[]));
-                CustomMessageSender Sender = new(imageArray);
-                foreach (CustomMessage message in Sender.GetMessages())
+                ReliableMulticastSender Sender = new(imageArray);
+                foreach (ReliableMulticastMessage message in Sender.GetMessages())
                 {
                     s.Send(message.GetContent().ToArray());
                 }

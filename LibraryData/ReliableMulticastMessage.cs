@@ -9,7 +9,7 @@ namespace LibraryData
     /// <summary>
     /// Class that handles sending and receiving a message 
     /// </summary>
-    public class CustomMessage
+    public class ReliableMulticastMessage
     {
         #region Variables
 
@@ -19,14 +19,14 @@ namespace LibraryData
 
         #region Constructor
 
-        public CustomMessage(byte[] newdata, int size)
+        public ReliableMulticastMessage(byte[] newdata, int size)
         {
             byte[] header = Encoding.Default.GetBytes(size.ToString().PadLeft(5, '0'));
             data.AddRange(header);
             data.AddRange(newdata);
         }
 
-        public CustomMessage(byte[] receivedmessage)
+        public ReliableMulticastMessage(byte[] receivedmessage)
         {
             data.AddRange(receivedmessage);
         }
@@ -52,17 +52,17 @@ namespace LibraryData
         #endregion
     }
 
-    public class CustomMessageSender
+    public class ReliableMulticastSender
     {
         #region Variables
 
-        readonly List<CustomMessage> messages = new();
+        readonly List<ReliableMulticastMessage> messages = new();
 
         #endregion
 
         #region Constructor
 
-        public CustomMessageSender(byte[] message)
+        public ReliableMulticastSender(byte[] message)
         {
             for (int i = 0; i < message.Length / 65000 + 1; i++)
             {
@@ -78,7 +78,7 @@ namespace LibraryData
                     Array.Resize(ref single, message.Length % 65000);
                     size = message.Length % 65000;
                 }
-                messages.Add(new CustomMessage(single, size));
+                messages.Add(new ReliableMulticastMessage(single, size));
             }
         }
 
@@ -86,24 +86,24 @@ namespace LibraryData
 
         #region Getter
 
-        public List<CustomMessage> GetMessages() { return messages; }
+        public List<ReliableMulticastMessage> GetMessages() { return messages; }
 
         #endregion
     }
 
-    public class CustomMessageReceiver
+    public class ReliableMulticastReceiver
     {
         #region Variables
 
         readonly List<byte> remainder = new();
-        readonly List<CustomMessage> messages = new();
+        readonly List<ReliableMulticastMessage> messages = new();
         readonly Socket socket;
 
         #endregion
 
         #region Constructor
 
-        public CustomMessageReceiver(Socket socket)
+        public ReliableMulticastReceiver(Socket socket)
         {
             this.socket = socket;
         }
@@ -126,7 +126,7 @@ namespace LibraryData
                 messageSize = Convert.ToInt32(Encoding.Default.GetString(current.ToList().GetRange(0, 5).ToArray())) + 5;
                 if (ReceivedSize >= messageSize)
                 {
-                    messages.Add(new CustomMessage(current.ToList().GetRange(0, messageSize).ToArray()));
+                    messages.Add(new ReliableMulticastMessage(current.ToList().GetRange(0, messageSize).ToArray()));
                     remainder.Clear();
                     remainder.AddRange(current.ToList().GetRange(messageSize, ReceivedSize - messageSize));
                 }
