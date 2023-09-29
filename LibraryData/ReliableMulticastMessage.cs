@@ -19,9 +19,9 @@ namespace LibraryData
     {
         #region Variables
 
-        readonly public byte[] Data;
+        public byte[] Data { get; }
         readonly public int ImageNumber;
-        readonly private int PartNumber;
+        readonly public int PartNumber;
         readonly public int TotalPartNumber;
 
         #endregion
@@ -87,22 +87,15 @@ namespace LibraryData
 
     public class ReliableMulticastReceiver
     {
-        #region Variables
-        private List<ReliableImage> Images = new();
+        readonly private List<ReliableImage> Images = new();
         readonly Socket SocketToReceive;
-
         public bool Receiving { get; set; }
 
-        #endregion
-
-        #region Constructor
 
         public ReliableMulticastReceiver(Socket socket)
         {
             SocketToReceive = socket;
         }
-
-        #endregion
 
         public void Receive()
         {
@@ -120,30 +113,33 @@ namespace LibraryData
         {
             foreach(ReliableImage image in Images)
             {
-                if (image.ImageNumber == message.ImageNumber) { image.AddData(message.Data);return; }
+                if (image.ImageNumber == message.ImageNumber) { image.AddData(message.Data,message.PartNumber);return; }
             }
-            Images.Add(new ReliableImage(message.Data, message.ImageNumber, message.TotalPartNumber));
+            Images.Add(new ReliableImage(message));
         }
     }
 
     public class ReliableImage
     {
-        readonly private List<byte[]> ImageBytes = new();
+        readonly private byte[][] ImageBytes;
         readonly public int ImageNumber;
-        readonly private int TotalImagePart;
         public event EventHandler<ImageCompletedEventArgs> ImgaeCompletedEvent;
 
-        public ReliableImage(byte[] imageBytes, int imageNumber, int totalImagePart)
+        public ReliableImage(ReliableMulticastMessage message)
         {
-            AddData(imageBytes);
-            ImageNumber = imageNumber;
-            TotalImagePart = totalImagePart;
+            ImageBytes = new byte[message.TotalPartNumber][];
+            AddData(message.Data,message.PartNumber);
+            ImageNumber = message.ImageNumber;
         }
 
-        public void AddData(byte[] messagedata)
+        public void AddData(byte[] messagedata,int partnumber)
         {
-            ImageBytes.Add(messagedata);
-            if(ImageBytes.Count == TotalImagePart) { ImageCompleted(); }
+            ImageBytes[partnumber] = messagedata;
+            foreach(byte[] b in ImageBytes)
+            {
+                if(b == null) { return; }
+            }
+            ImageCompleted();
         }
 
         public void ImageCompleted()
