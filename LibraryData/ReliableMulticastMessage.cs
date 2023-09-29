@@ -1,8 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Net.Sockets;
 using System.Text;
+using System.Text.Json;
+using System.Threading.Tasks;
 
 namespace LibraryData
 {
@@ -13,40 +17,21 @@ namespace LibraryData
     {
         #region Variables
 
-        readonly List<byte> data = new();
+        readonly byte[] Data;
+        readonly int ImageNumber;
+        readonly int PartNumber;
+        readonly int TotalPartNumber;
 
         #endregion
 
         #region Constructor
 
-        public ReliableMulticastMessage(byte[] newdata, int size)
+        public ReliableMulticastMessage(byte[] data, int imagenumber, int partnumber,int totalpartnumber)
         {
-            byte[] header = Encoding.Default.GetBytes(size.ToString().PadLeft(5, '0'));
-            data.AddRange(header);
-            data.AddRange(newdata);
-        }
-
-        public ReliableMulticastMessage(byte[] receivedmessage)
-        {
-            data.AddRange(receivedmessage);
-        }
-
-        #endregion
-
-        #region Getter
-
-        public int GetSize()
-        {
-            return Convert.ToInt32(Encoding.Default.GetString(data.GetRange(0, 5).ToArray())) + 5;
-        }
-
-        public byte[] GetData() { return data.ToArray(); }
-
-        public List<byte> GetContent()
-        {
-            List<byte> content = data;
-            content.RemoveRange(0, 5);
-            return content;
+            Data = data;
+            ImageNumber = imagenumber;
+            PartNumber = partnumber;
+            TotalPartNumber = totalpartnumber;
         }
 
         #endregion
@@ -56,39 +41,40 @@ namespace LibraryData
     {
         #region Variables
 
-        readonly List<ReliableMulticastMessage> messages = new();
+        private int ImageNumber = 0;
+        private Socket SocketToSend;
+        public bool sending { get; set; }
 
         #endregion
 
-        #region Constructor
-
-        public ReliableMulticastSender(byte[] message)
+        public ReliableMulticastSender(Socket socket)
         {
-            for (int i = 0; i < message.Length / 65000 + 1; i++)
+            SocketToSend = socket;
+            Task.Run(SendImages);
+        }
+
+        private void SendImages()
+        {
+            while (sending)
             {
-                byte[] single = new byte[65000];
-                int size = 65000;
-                try
+                byte[] ImageBytes = TakeScreenshot();
+                int TotalImagePart = ImageBytes.Count() / 64000 + 1;
+                for(int i = 0; i*64000 < ImageBytes.Count(); i++)
                 {
-                    Array.Copy(message, i * 65000, single, 0, 65000);
+                    byte[] part = new byte[64000];
+                    Array.Copy(ImageBytes, i * 64000, part, 0, 64000);
+                    ReliableMulticastMessage message = new(TakeScreenshot(),ImageNumber,i,TotalImagePart);
+                    string JsonMessage = JsonSerializer.Serialize(message);
+                    SocketToSend.Send(Encoding.ASCII.GetBytes(JsonMessage));
                 }
-                catch
-                {
-                    Array.Copy(message, i * 65000, single, 0, message.Length % 65000);
-                    Array.Resize(ref single, message.Length % 65000);
-                    size = message.Length % 65000;
-                }
-                messages.Add(new ReliableMulticastMessage(single, size));
+                ImageNumber++;
             }
         }
 
-        #endregion
-
-        #region Getter
-
-        public List<ReliableMulticastMessage> GetMessages() { return messages; }
-
-        #endregion
+        private byte[] TakeScreenshot()
+        {
+            return new byte[64000];
+        }
     }
 
     public class ReliableMulticastReceiver
@@ -97,7 +83,9 @@ namespace LibraryData
 
         readonly List<byte> remainder = new();
         readonly List<ReliableMulticastMessage> messages = new();
-        readonly Socket socket;
+        readonly Socket SocketToReceive;
+
+        public bool receiving { get; set; }
 
         #endregion
 
@@ -105,48 +93,65 @@ namespace LibraryData
 
         public ReliableMulticastReceiver(Socket socket)
         {
-            this.socket = socket;
+            SocketToReceive = socket;
         }
 
         #endregion
-
-        #region Receive Data
 
         public void Receive()
         {
-            int messageSize;
-            do
+            while (receiving)
             {
-                byte[] buf = new byte[66000];
-                int ReceivedSize = socket.Receive(buf);
-                Array.Resize(ref buf, ReceivedSize);
-                List<byte> current = new();
-                current.AddRange(remainder);
-                current.AddRange(buf);
-                messageSize = Convert.ToInt32(Encoding.Default.GetString(current.ToList().GetRange(0, 5).ToArray())) + 5;
-                if (ReceivedSize >= messageSize)
-                {
-                    messages.Add(new ReliableMulticastMessage(current.ToList().GetRange(0, messageSize).ToArray()));
-                    remainder.Clear();
-                    remainder.AddRange(current.ToList().GetRange(messageSize, ReceivedSize - messageSize));
-                }
-            } while (messageSize == 65005);
-        }
+                byte[] message = new byte[65000];
+                int size = SocketToReceive.Receive(message);
+                Array.Resize(ref message,size);
+                ReliableMulticastMessage reliable = JsonSerializer.Deserialize<ReliableMulticastMessage>(message);
 
-        #endregion
-
-        #region Getter
-
-        public byte[] GetImageBytes()
-        {
-            List<byte> imageBytes = new();
-            for (int i = 0; i < messages.Count; i++)
-            {
-                imageBytes.AddRange(messages[i].GetContent());
             }
-            return imageBytes.ToArray();
+        }
+    }
+
+    public class ReliableImage
+    {
+        private List<byte[]> ImageBytes = new();
+        private int ImageNumber;
+        private int TotalImagePart;
+        public event EventHandler<ImageCompletedEventArgs> ImgaeCompletedEvent;
+
+        public ReliableImage(byte[] imageBytes, int imageNumber, int totalImagePart)
+        {
+            AddData(imageBytes);
+            ImageNumber = imageNumber;
+            TotalImagePart = totalImagePart;
         }
 
-        #endregion
+        public void AddData(byte[] messagedata)
+        {
+            ImageBytes.Add(messagedata);
+            if(ImageBytes.Count == TotalImagePart) { ImageCompleted(); }
+        }
+
+        public void ImageCompleted()
+        {
+            byte[] imageData = ImageBytes.SelectMany(a => a).ToArray();
+            Bitmap bmp;
+            using (var ms = new MemoryStream(imageData))
+            {
+                bmp = new Bitmap(ms);
+            }
+            ImgaeCompletedEvent.Invoke(this, new ImageCompletedEventArgs(bmp,ImageNumber));
+        }
+    }
+
+    public class ImageCompletedEventArgs : EventArgs
+    {
+        public ImageCompletedEventArgs(Bitmap competedimage, int imageId)
+        {
+            CompletedImage = competedimage;
+            ImageId = imageId;
+        }
+
+        public int ImageId { get; set; }
+        public Bitmap CompletedImage { get; set; }
     }
 }

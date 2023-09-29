@@ -82,7 +82,7 @@
   <ItemGroup>
     <Compile Include="Blocage.cs" />
     <Compile Include="Command.cs" />
-    <Compile Include="CustomMessage.cs" />
+    <Compile Include="ReliableMulticastMessage.cs" />
     <Compile Include="History.cs" />
     <Compile Include="StreamOptions.cs" />
     <Compile Include="Data.cs" />
