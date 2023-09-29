@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Net.Sockets;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace LibraryData
 {
@@ -17,10 +19,10 @@ namespace LibraryData
     {
         #region Variables
 
-        readonly byte[] Data;
-        readonly int ImageNumber;
-        readonly int PartNumber;
-        readonly int TotalPartNumber;
+        readonly public byte[] Data;
+        readonly public int ImageNumber;
+        readonly private int PartNumber;
+        readonly public int TotalPartNumber;
 
         #endregion
 
@@ -40,22 +42,23 @@ namespace LibraryData
     public class ReliableMulticastSender
     {
         #region Variables
-
+        private int ScreenToShareId { get; set; }
         private int ImageNumber = 0;
-        private Socket SocketToSend;
-        public bool sending { get; set; }
+        readonly private Socket SocketToSend;
+        public bool Sending { get; set; }
 
         #endregion
 
-        public ReliableMulticastSender(Socket socket)
+        public ReliableMulticastSender(Socket socket,int screentoshareid)
         {
+            ScreenToShareId = screentoshareid;
             SocketToSend = socket;
             Task.Run(SendImages);
         }
 
         private void SendImages()
         {
-            while (sending)
+            while (Sending)
             {
                 byte[] ImageBytes = TakeScreenshot();
                 int TotalImagePart = ImageBytes.Count() / 64000 + 1;
@@ -73,19 +76,22 @@ namespace LibraryData
 
         private byte[] TakeScreenshot()
         {
-            return new byte[64000];
+            Screen screen = Screen.AllScreens[ScreenToShareId];
+            Bitmap bitmap = new(screen.Bounds.Width, screen.Bounds.Height, PixelFormat.Format16bppRgb565);
+            Rectangle ScreenSize = screen.Bounds;
+            Graphics.FromImage(bitmap).CopyFromScreen(ScreenSize.Left, ScreenSize.Top, 0, 0, ScreenSize.Size);
+            ImageConverter converter = new();
+            return (byte[])converter.ConvertTo(bitmap, typeof(byte[]));
         }
     }
 
     public class ReliableMulticastReceiver
     {
         #region Variables
-
-        readonly List<byte> remainder = new();
-        readonly List<ReliableMulticastMessage> messages = new();
+        private List<ReliableImage> Images = new();
         readonly Socket SocketToReceive;
 
-        public bool receiving { get; set; }
+        public bool Receiving { get; set; }
 
         #endregion
 
@@ -100,22 +106,31 @@ namespace LibraryData
 
         public void Receive()
         {
-            while (receiving)
+            while (Receiving)
             {
                 byte[] message = new byte[65000];
                 int size = SocketToReceive.Receive(message);
                 Array.Resize(ref message,size);
                 ReliableMulticastMessage reliable = JsonSerializer.Deserialize<ReliableMulticastMessage>(message);
-
+                AddMessageToImage(reliable);
             }
+        }
+
+        private void AddMessageToImage(ReliableMulticastMessage message)
+        {
+            foreach(ReliableImage image in Images)
+            {
+                if (image.ImageNumber == message.ImageNumber) { image.AddData(message.Data);return; }
+            }
+            Images.Add(new ReliableImage(message.Data, message.ImageNumber, message.TotalPartNumber));
         }
     }
 
     public class ReliableImage
     {
-        private List<byte[]> ImageBytes = new();
-        private int ImageNumber;
-        private int TotalImagePart;
+        readonly private List<byte[]> ImageBytes = new();
+        readonly public int ImageNumber;
+        readonly private int TotalImagePart;
         public event EventHandler<ImageCompletedEventArgs> ImgaeCompletedEvent;
 
         public ReliableImage(byte[] imageBytes, int imageNumber, int totalImagePart)
