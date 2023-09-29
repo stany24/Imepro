@@ -98,6 +98,7 @@ namespace LibraryData
     {
         #region Variables/Constructeur
 
+        private ReliableMulticastReceiver MulticastReceiver { get; set; }
         readonly private List<string> DefaultProcess = new();
         readonly private ListBox lbxConnexion;
         readonly private PictureBox pbxScreenShot;
@@ -123,8 +124,6 @@ namespace LibraryData
         public IPAddress IpToTeacher { get; set; }
         public List<string> AutorisedUrls { get; set; }
         public List<int> SeleniumProcessesID { get; set; }
-        Socket SocketMulticast;
-        readonly List<byte> byteImage = new();
 
         public DataForStudent(ListBox lbxconnexion, PictureBox pbxscreenshot, ListBox tbxmessage, Form form)
         {
@@ -159,11 +158,6 @@ namespace LibraryData
         #endregion
 
         #region Récupération Url/Processus/Image
-
-        private void GetWebViewUrls()
-        {
-
-        }
 
         /// <summary>
         /// Function to get the tab name in all browser.
@@ -301,7 +295,6 @@ namespace LibraryData
         private void SendData()
         {
             GetCurrentWebTabsName();
-            GetWebViewUrls();
             GetUserProcesses();
             //serialization
             string jsonString = JsonSerializer.Serialize(ToData(), new JsonSerializerOptions { IncludeFields = true, });
@@ -513,69 +506,15 @@ namespace LibraryData
         private void ReceiveMulticastStream()
         {
             Task.Run(MinimizeUnAutorisedEverySecond);
-            SocketMulticast = new(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+            Socket SocketMulticast = new(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
             IPEndPoint ipep = new(IPAddress.Any, 45678);
             SocketMulticast.Bind(ipep);
             IPAddress ip = IPAddress.Parse("232.1.2.3");
             SocketMulticast.SetSocketOption(SocketOptionLevel.IP, SocketOptionName.AddMembership, new MulticastOption(ip, IPAddress.Any));
 
-            SocketAsyncEventArgs receiveArgs = new();
-            receiveArgs.SetBuffer(new byte[65000], 0, 65000);
-            receiveArgs.Completed += ReceiveCompleted;
-            BeginReceive(receiveArgs);
+            MulticastReceiver = new ReliableMulticastReceiver(SocketMulticast,pbxScreenShot);
         }
 
-        /// <summary>
-        /// Function to start receiving the multicast stream.
-        /// </summary>
-        /// <param name="args"></param>
-        private void BeginReceive(SocketAsyncEventArgs args)
-        {
-            isReceiving = true;
-            bool willRaiseEvent = SocketMulticast.ReceiveAsync(args);
-            if (!willRaiseEvent)
-                ProcessReceive(args);
-        }
-
-        /// <summary>
-        /// Function to end the multicast stream.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="args"></param>
-        private void ReceiveCompleted(object sender, SocketAsyncEventArgs args)
-        {
-            ProcessReceive(args);
-        }
-
-        /// <summary>
-        /// Function to receive the multicast stream.
-        /// </summary>
-        /// <param name="args"></param>
-        private void ProcessReceive(SocketAsyncEventArgs args)
-        {
-            if (args.SocketError == SocketError.Success && args.BytesTransferred > 0)
-            {
-
-                int size = args.BytesTransferred;
-                byte[] receivedData = new byte[size];
-                Array.Copy(args.Buffer, args.Offset, receivedData, 0, size);
-                byteImage.AddRange(receivedData);
-                if (size != 65000)
-                {
-                    Bitmap bitmap = new(new MemoryStream(byteImage.ToArray()));
-                    pbxScreenShot.Invoke(new MethodInvoker(delegate { pbxScreenShot.Image = bitmap; }));
-                    byteImage.Clear();
-                }
-
-                // Continue receiving if needed
-                BeginReceive(args);
-            }
-            else
-            {
-                lbxConnexion.Invoke(new MethodInvoker(delegate { lbxConnexion.Items.Add("Erreur de reception"); }));
-                isReceiving = false;
-            }
-        }
 
         /// <summary>
         /// Function that receive the multicast stream settings and apply them.

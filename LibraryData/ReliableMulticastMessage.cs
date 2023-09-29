@@ -17,16 +17,11 @@ namespace LibraryData
     /// </summary>
     public class ReliableMulticastMessage
     {
-        #region Variables
 
         public byte[] Data { get; }
         readonly public int ImageNumber;
         readonly public int PartNumber;
         readonly public int TotalPartNumber;
-
-        #endregion
-
-        #region Constructor
 
         public ReliableMulticastMessage(byte[] data, int imagenumber, int partnumber,int totalpartnumber)
         {
@@ -35,19 +30,14 @@ namespace LibraryData
             PartNumber = partnumber;
             TotalPartNumber = totalpartnumber;
         }
-
-        #endregion
     }
 
     public class ReliableMulticastSender
     {
-        #region Variables
         private int ScreenToShareId { get; set; }
         private int ImageNumber = 0;
         readonly private Socket SocketToSend;
         public bool Sending { get; set; }
-
-        #endregion
 
         public ReliableMulticastSender(Socket socket,int screentoshareid)
         {
@@ -88,13 +78,16 @@ namespace LibraryData
     public class ReliableMulticastReceiver
     {
         readonly private List<ReliableImage> Images = new();
+        readonly private PictureBox pbxImage;
         readonly Socket SocketToReceive;
         public bool Receiving { get; set; }
 
 
-        public ReliableMulticastReceiver(Socket socket)
+        public ReliableMulticastReceiver(Socket socket, PictureBox pbxImage)
         {
             SocketToReceive = socket;
+            Task.Run(Receive);
+            this.pbxImage = pbxImage;
         }
 
         public void Receive()
@@ -115,7 +108,18 @@ namespace LibraryData
             {
                 if (image.ImageNumber == message.ImageNumber) { image.AddData(message.Data,message.PartNumber);return; }
             }
-            Images.Add(new ReliableImage(message));
+            ReliableImage NewImage = new(message);
+            NewImage.ImgaeCompletedEvent += DisplayImage;
+            Images.Add(NewImage);
+        }
+
+        private void DisplayImage(object sender,ImageCompletedEventArgs e)
+        {
+            pbxImage.Image = e.CompletedImage;
+            for(int i = 0;i<Images.Count;i++)
+            {
+                if (Images[i].ImageNumber <= e.ImageId) { Images.Remove(Images[i]); }
+            }
         }
     }
 
