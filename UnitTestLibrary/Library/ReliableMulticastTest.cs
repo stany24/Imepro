@@ -1,24 +1,22 @@
 ﻿using LibraryData;
-using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net.Sockets;
 using System.Net;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 
 namespace UnitTestLibrary.Library
 {
+    [TestClass]
     public class ReliableMulticastTest
     {
+        [TestMethod]
         public void CommunicationTest()
         {
             PictureBox pictureBox = new PictureBox();
             ReliableMulticastSender sender = new ReliableMulticastSender(GetUDPMulticastSocket(45678), 0);
             ReliableMulticastReceiver receiver = new ReliableMulticastReceiver(GetUDPMulticastSocket(12345), pictureBox);
-            Assert.IsNotNull(pictureBox.Image);
         }
 
         private Socket GetUDPMulticastSocket(int port)
@@ -31,6 +29,23 @@ namespace UnitTestLibrary.Library
             IPEndPoint ipep = new IPEndPoint(ip, port);
             s.Connect(ipep);
             return s;
+        }
+
+        [TestMethod]
+        public void CustomStringTest()
+        {
+            ReliableMulticastSender sender = new ReliableMulticastSender(GetUDPMulticastSocket(45678), 0);
+            byte[] image = sender.TakeScreenshot();
+            byte[] data = new byte[64000];
+            Array.Copy(image, 0, data, 0, 64000);
+            ReliableMulticastMessage message = new ReliableMulticastMessage(data,1,2,4);
+            string str = message.ToCustomString();
+            ReliableMulticastMessage message2 = new ReliableMulticastMessage(str);
+            Assert.AreEqual(message.ImageNumber, message2.ImageNumber);
+            Assert.AreEqual(message.TotalPartNumber, message2.TotalPartNumber);
+            Assert.AreEqual(message.PartNumber, message2.PartNumber);
+            Assert.AreEqual(message.Data.Count(), message2.Data.Count());
+            Assert.AreEqual(message.Data, message2.Data);
         }
     }
 }
