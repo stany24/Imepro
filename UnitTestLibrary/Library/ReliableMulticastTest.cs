@@ -45,7 +45,20 @@ namespace UnitTestLibrary.Library
             Assert.AreEqual(message.TotalPartNumber, message2.TotalPartNumber);
             Assert.AreEqual(message.PartNumber, message2.PartNumber);
             Assert.AreEqual(message.Data.Count(), message2.Data.Count());
-            Assert.AreEqual(message.Data, message2.Data);
+            Assert.IsTrue(message.Data.SequenceEqual(message2.Data));
+            Assert.IsTrue(ByteArrayCompare(message.Data,message2.Data));
+        }
+
+        static bool ByteArrayCompare(byte[] a1, byte[] a2)
+        {
+            if (a1.Length != a2.Length)
+                return false;
+
+            for (int i = 0; i < a1.Length; i++)
+                if (a1[i] != a2[i])
+                    return false;
+
+            return true;
         }
     }
 }
