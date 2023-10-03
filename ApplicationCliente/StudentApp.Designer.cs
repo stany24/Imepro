@@ -39,14 +39,14 @@
             this.btnResetAllIP = new System.Windows.Forms.Button();
             this.btnWebView2 = new System.Windows.Forms.Button();
             this.SplitterImageButtons = new System.Windows.Forms.SplitContainer();
-            this.pbxScreeShot = new System.Windows.Forms.PictureBox();
+            this.pbxScreenShot = new System.Windows.Forms.PictureBox();
             this.lbxConnexion = new System.Windows.Forms.ListBox();
             this.SplitterPrincipal = new System.Windows.Forms.SplitContainer();
             ((System.ComponentModel.ISupportInitialize)(this.SplitterImageButtons)).BeginInit();
             this.SplitterImageButtons.Panel1.SuspendLayout();
             this.SplitterImageButtons.Panel2.SuspendLayout();
             this.SplitterImageButtons.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pbxScreeShot)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pbxScreenShot)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.SplitterPrincipal)).BeginInit();
             this.SplitterPrincipal.Panel1.SuspendLayout();
             this.SplitterPrincipal.Panel2.SuspendLayout();
@@ -137,7 +137,7 @@
             // 
             // SplitterImageButtons.Panel1
             // 
-            this.SplitterImageButtons.Panel1.Controls.Add(this.pbxScreeShot);
+            this.SplitterImageButtons.Panel1.Controls.Add(this.pbxScreenShot);
             // 
             // SplitterImageButtons.Panel2
             // 
@@ -153,14 +153,14 @@
             // 
             // pbxScreeShot
             // 
-            this.pbxScreeShot.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.pbxScreeShot.Location = new System.Drawing.Point(0, 0);
-            this.pbxScreeShot.Margin = new System.Windows.Forms.Padding(4);
-            this.pbxScreeShot.Name = "pbxScreeShot";
-            this.pbxScreeShot.Size = new System.Drawing.Size(830, 462);
-            this.pbxScreeShot.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
-            this.pbxScreeShot.TabIndex = 4;
-            this.pbxScreeShot.TabStop = false;
+            this.pbxScreenShot.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.pbxScreenShot.Location = new System.Drawing.Point(0, 0);
+            this.pbxScreenShot.Margin = new System.Windows.Forms.Padding(4);
+            this.pbxScreenShot.Name = "pbxScreeShot";
+            this.pbxScreenShot.Size = new System.Drawing.Size(830, 462);
+            this.pbxScreenShot.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            this.pbxScreenShot.TabIndex = 4;
+            this.pbxScreenShot.TabStop = false;
             // 
             // lbxConnexion
             // 
@@ -208,7 +208,7 @@
             this.SplitterImageButtons.Panel2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.SplitterImageButtons)).EndInit();
             this.SplitterImageButtons.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.pbxScreeShot)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pbxScreenShot)).EndInit();
             this.SplitterPrincipal.Panel1.ResumeLayout(false);
             this.SplitterPrincipal.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.SplitterPrincipal)).EndInit();
@@ -227,7 +227,7 @@
         private System.Windows.Forms.Button btnResetAllIP;
         private System.Windows.Forms.Button btnWebView2;
         private System.Windows.Forms.SplitContainer SplitterImageButtons;
-        private System.Windows.Forms.PictureBox pbxScreeShot;
+        private System.Windows.Forms.PictureBox pbxScreenShot;
         private System.Windows.Forms.ListBox lbxConnexion;
         private System.Windows.Forms.SplitContainer SplitterPrincipal;
     }

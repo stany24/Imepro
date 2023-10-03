@@ -529,7 +529,7 @@ namespace LibraryData
             form.Invoke(new MethodInvoker(delegate
             {
                 form.Show();
-                form.Controls.SetChildIndex(pbxScreenShot, 0);
+                //form.Controls.SetChildIndex(pbxScreenShot, 0);
                 switch (options.GetPriority())
                 {
                     case Priority.Fullscreen:
@@ -550,7 +550,7 @@ namespace LibraryData
                         form.WindowState = FormWindowState.Maximized;
                         break;
                     case Priority.Widowed:
-                        form.Controls.SetChildIndex(pbxScreenShot, 0);
+                        //form.Controls.SetChildIndex(pbxScreenShot, 0);
                         break;
                 }
             }));

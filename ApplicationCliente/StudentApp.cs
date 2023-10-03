@@ -25,7 +25,8 @@ namespace ApplicationCliente
         public StudentApp()
         {
             InitializeComponent();
-            Student = new(lbxConnexion, pbxScreeShot, lbxMessages, this);
+            SplitterImageButtons.Panel1.Controls.SetChildIndex(pbxScreenShot, 0);
+            Student = new(lbxConnexion, pbxScreenShot, lbxMessages, this);
             try
             {
                 Student.IpToTeacher = IpForTheWeek.GetIp();
