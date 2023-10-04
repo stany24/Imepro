@@ -17,6 +17,7 @@ namespace UnitTestLibrary.Library
             PictureBox pictureBox = new PictureBox();
             ReliableMulticastSender sender = new ReliableMulticastSender(GetUDPMulticastSocket(45678), 0);
             ReliableMulticastReceiver receiver = new ReliableMulticastReceiver(GetUDPMulticastSocket(12345), pictureBox);
+
         }
 
         private Socket GetUDPMulticastSocket(int port)
@@ -36,9 +37,10 @@ namespace UnitTestLibrary.Library
         {
             ReliableMulticastSender sender = new ReliableMulticastSender(GetUDPMulticastSocket(45678), 0);
             byte[] image = sender.TakeScreenshot();
+            //first message
             byte[] data = new byte[64000];
             Array.Copy(image, 0, data, 0, 64000);
-            ReliableMulticastMessage message = new ReliableMulticastMessage(data,1,2,4);
+            ReliableMulticastMessage message = new ReliableMulticastMessage(data,1,1,2);
             string str = message.ToCustomString();
             ReliableMulticastMessage message2 = new ReliableMulticastMessage(str);
             Assert.AreEqual(message.ImageNumber, message2.ImageNumber);
@@ -47,6 +49,18 @@ namespace UnitTestLibrary.Library
             Assert.AreEqual(message.Data.Count(), message2.Data.Count());
             Assert.IsTrue(message.Data.SequenceEqual(message2.Data));
             Assert.IsTrue(ByteArrayCompare(message.Data,message2.Data));
+            //second message
+            byte[] data2 = new byte[image.Length - 64000];
+            Array.Copy(image,64000,data2,0, image.Length-64000);
+            ReliableMulticastMessage message3 = new ReliableMulticastMessage(data2,1, 2, 2);
+            string str2 = message3.ToCustomString();
+            ReliableMulticastMessage message4 = new ReliableMulticastMessage(str2);
+            Assert.AreEqual(message3.ImageNumber, message4.ImageNumber);
+            Assert.AreEqual(message3.TotalPartNumber, message4.TotalPartNumber);
+            Assert.AreEqual(message3.PartNumber, message4.PartNumber);
+            Assert.AreEqual(message3.Data.Count(), message4.Data.Count());
+            Assert.IsTrue(message3.Data.SequenceEqual(message4.Data));
+            Assert.IsTrue(ByteArrayCompare(message3.Data, message4.Data));
         }
 
         static bool ByteArrayCompare(byte[] a1, byte[] a2)
