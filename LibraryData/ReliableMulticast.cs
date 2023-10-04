@@ -12,7 +12,7 @@ using System.Windows.Forms;
 namespace LibraryData
 {
     /// <summary>
-    /// Class that handles sending and receiving a message 
+    /// Class representing a UDP multicast message.
     /// </summary>
     public class ReliableMulticastMessage
     {
@@ -25,7 +25,6 @@ namespace LibraryData
         public ReliableMulticastMessage(string customstring)
         {
             string[] split = customstring.Split(separator[0]);
-            int length = customstring.Length;
             ImageNumber = Convert.ToInt32(split[0]);
             PartNumber = Convert.ToInt32(split[1]);
             TotalPartNumber = Convert.ToInt32(split[2]);
@@ -48,6 +47,9 @@ namespace LibraryData
         }
     }
 
+    /// <summary>
+    /// Class used to send UDP multicast messages.
+    /// </summary>
     public class ReliableMulticastSender
     {
         private const int DATA_SIZE = 64000;
@@ -69,12 +71,6 @@ namespace LibraryData
             while (Sending)
             {
                 byte[] ImageBytes = TakeScreenshot();
-                Bitmap bmp;
-                using (var ms = new MemoryStream(ImageBytes))
-                {
-                    bmp = new Bitmap(ms);
-                }
-
                 int TotalImagePart = ImageBytes.Count() / DATA_SIZE + 1;
                 for (int i = 0; i * DATA_SIZE < ImageBytes.Count(); i++)
                 {
@@ -106,6 +102,9 @@ namespace LibraryData
         }
     }
 
+    /// <summary>
+    /// Class used to receive UDP multicast messages.
+    /// </summary>
     public class ReliableMulticastReceiver
     {
         readonly private List<ReliableImage> Images = new();
@@ -154,6 +153,9 @@ namespace LibraryData
         }
     }
 
+    /// <summary>
+    /// Class representing the received image from UDP multicast.
+    /// </summary>
     public class ReliableImage
     {
         readonly private byte[][] ImageBytes;

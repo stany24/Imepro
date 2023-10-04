@@ -394,6 +394,7 @@ namespace ApplicationTeacher
             else
             {
                 isSharing = false;
+                MulticastSender.Sending = false;
                 for (int i = 0; i < StudentToShareScreen.Count; i++)
                 { StudentToShareScreen[i].SocketToStudent.Send(new Command(CommandType.StopReceiveMulticast).ToByteArray()); }
                 StudentToShareScreen = new();

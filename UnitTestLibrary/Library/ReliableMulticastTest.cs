@@ -1,6 +1,7 @@
 ﻿using LibraryData;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
+using System.Drawing;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
@@ -17,7 +18,9 @@ namespace UnitTestLibrary.Library
             PictureBox pictureBox = new PictureBox();
             ReliableMulticastSender sender = new ReliableMulticastSender(GetUDPMulticastSocket(45678), 0);
             ReliableMulticastReceiver receiver = new ReliableMulticastReceiver(GetUDPMulticastSocket(12345), pictureBox);
-
+            
+            Image image = pictureBox.Image;
+            Assert.IsNotNull(image);
         }
 
         private Socket GetUDPMulticastSocket(int port)
