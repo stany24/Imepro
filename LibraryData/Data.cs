@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
-using System.IO;
 using System.Linq;
 using System.Management;
 using System.Net;
@@ -512,7 +511,7 @@ namespace LibraryData
             IPAddress ip = IPAddress.Parse("232.1.2.3");
             SocketMulticast.SetSocketOption(SocketOptionLevel.IP, SocketOptionName.AddMembership, new MulticastOption(ip, IPAddress.Any));
 
-            MulticastReceiver = new ReliableMulticastReceiver(SocketMulticast,pbxScreenShot);
+            MulticastReceiver = new ReliableMulticastReceiver(SocketMulticast, pbxScreenShot);
         }
 
 

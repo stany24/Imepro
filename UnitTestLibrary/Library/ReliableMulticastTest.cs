@@ -1,10 +1,10 @@
 ﻿using LibraryData;
-using System.Linq;
-using System.Net.Sockets;
-using System.Net;
-using System.Windows.Forms;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
+using System.Linq;
+using System.Net;
+using System.Net.Sockets;
+using System.Windows.Forms;
 
 namespace UnitTestLibrary.Library
 {
@@ -40,7 +40,7 @@ namespace UnitTestLibrary.Library
             //first message
             byte[] data = new byte[64000];
             Array.Copy(image, 0, data, 0, 64000);
-            ReliableMulticastMessage message = new ReliableMulticastMessage(data,1,1,2);
+            ReliableMulticastMessage message = new ReliableMulticastMessage(data, 1, 1, 2);
             string str = message.ToCustomString();
             ReliableMulticastMessage message2 = new ReliableMulticastMessage(str);
             Assert.AreEqual(message.ImageNumber, message2.ImageNumber);
@@ -48,11 +48,11 @@ namespace UnitTestLibrary.Library
             Assert.AreEqual(message.PartNumber, message2.PartNumber);
             Assert.AreEqual(message.Data.Count(), message2.Data.Count());
             Assert.IsTrue(message.Data.SequenceEqual(message2.Data));
-            Assert.IsTrue(ByteArrayCompare(message.Data,message2.Data));
+            Assert.IsTrue(ByteArrayCompare(message.Data, message2.Data));
             //second message
             byte[] data2 = new byte[image.Length - 64000];
-            Array.Copy(image,64000,data2,0, image.Length-64000);
-            ReliableMulticastMessage message3 = new ReliableMulticastMessage(data2,1, 2, 2);
+            Array.Copy(image, 64000, data2, 0, image.Length - 64000);
+            ReliableMulticastMessage message3 = new ReliableMulticastMessage(data2, 1, 2, 2);
             string str2 = message3.ToCustomString();
             ReliableMulticastMessage message4 = new ReliableMulticastMessage(str2);
             Assert.AreEqual(message3.ImageNumber, message4.ImageNumber);

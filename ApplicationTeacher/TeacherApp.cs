@@ -370,7 +370,7 @@ namespace ApplicationTeacher
             IPEndPoint ipep = new(ip, 45678);
             s.Connect(ipep);
             Thread.Sleep(1000);
-            MulticastSender = new ReliableMulticastSender(s,Properties.Settings.Default.ScreenToShareId);
+            MulticastSender = new ReliableMulticastSender(s, Properties.Settings.Default.ScreenToShareId);
         }
 
         /// <summary>

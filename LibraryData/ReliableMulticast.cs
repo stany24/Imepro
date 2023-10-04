@@ -30,11 +30,11 @@ namespace LibraryData
             PartNumber = Convert.ToInt32(split[1]);
             TotalPartNumber = Convert.ToInt32(split[2]);
             int HeaderLength = 3 + split[0].Length + split[1].Length + split[2].Length;
-            Data = new byte[customstring.Length-HeaderLength];
-            Array.Copy(Encoding.Default.GetBytes(customstring), HeaderLength, Data, 0, customstring.Length-HeaderLength);
+            Data = new byte[customstring.Length - HeaderLength];
+            Array.Copy(Encoding.Default.GetBytes(customstring), HeaderLength, Data, 0, customstring.Length - HeaderLength);
         }
 
-        public ReliableMulticastMessage(byte[] data, int imagenumber, int partnumber,int totalpartnumber)
+        public ReliableMulticastMessage(byte[] data, int imagenumber, int partnumber, int totalpartnumber)
         {
             Data = data;
             ImageNumber = imagenumber;
@@ -44,7 +44,7 @@ namespace LibraryData
 
         public string ToCustomString()
         {
-            return ImageNumber +separator+PartNumber+separator+TotalPartNumber+separator+Encoding.Default.GetString(Data);
+            return ImageNumber + separator + PartNumber + separator + TotalPartNumber + separator + Encoding.Default.GetString(Data);
         }
     }
 
@@ -56,7 +56,7 @@ namespace LibraryData
         readonly private Socket SocketToSend;
         public bool Sending { get; set; }
 
-        public ReliableMulticastSender(Socket socket,int screentoshareid)
+        public ReliableMulticastSender(Socket socket, int screentoshareid)
         {
             ScreenToShareId = screentoshareid;
             SocketToSend = socket;
@@ -76,15 +76,16 @@ namespace LibraryData
                 }
 
                 int TotalImagePart = ImageBytes.Count() / DATA_SIZE + 1;
-                for(int i = 0; i* DATA_SIZE < ImageBytes.Count(); i++)
+                for (int i = 0; i * DATA_SIZE < ImageBytes.Count(); i++)
                 {
                     byte[] part = new byte[DATA_SIZE];
                     try { Array.Copy(ImageBytes, i * DATA_SIZE, part, 0, DATA_SIZE); }
-                    catch {
-                        Array.Copy(ImageBytes, i * DATA_SIZE, part, 0, ImageBytes.Length - i*DATA_SIZE);
-                        Array.Resize(ref part, ImageBytes.Length - i*DATA_SIZE);
+                    catch
+                    {
+                        Array.Copy(ImageBytes, i * DATA_SIZE, part, 0, ImageBytes.Length - i * DATA_SIZE);
+                        Array.Resize(ref part, ImageBytes.Length - i * DATA_SIZE);
                     }
-                    ReliableMulticastMessage message = new(part,ImageNumber,i,TotalImagePart);
+                    ReliableMulticastMessage message = new(part, ImageNumber, i, TotalImagePart);
                     string custom = message.ToCustomString();
                     byte[] bytes = Encoding.Default.GetBytes(custom);
                     SocketToSend.Send(bytes);
@@ -126,7 +127,7 @@ namespace LibraryData
             {
                 byte[] message = new byte[65000];
                 int size = SocketToReceive.Receive(message);
-                Array.Resize(ref message,size);
+                Array.Resize(ref message, size);
                 ReliableMulticastMessage reliable = new(Encoding.Default.GetString(message));
                 AddMessageToImage(reliable);
             }
@@ -134,19 +135,19 @@ namespace LibraryData
 
         private void AddMessageToImage(ReliableMulticastMessage message)
         {
-            foreach(ReliableImage image in Images)
+            foreach (ReliableImage image in Images)
             {
-                if (image.ImageNumber == message.ImageNumber) { image.AddData(message.Data,message.PartNumber);return; }
+                if (image.ImageNumber == message.ImageNumber) { image.AddData(message.Data, message.PartNumber); return; }
             }
             ReliableImage NewImage = new(message);
             NewImage.ImageCompletedEvent += DisplayImage;
             Images.Add(NewImage);
         }
 
-        private void DisplayImage(object sender,ImageCompletedEventArgs e)
+        private void DisplayImage(object sender, ImageCompletedEventArgs e)
         {
             pbxImage.Image = e.CompletedImage;
-            for(int i = 0;i<Images.Count;i++)
+            for (int i = 0; i < Images.Count; i++)
             {
                 if (Images[i].ImageNumber <= e.ImageId) { Images.Remove(Images[i]); }
             }
@@ -162,16 +163,16 @@ namespace LibraryData
         public ReliableImage(ReliableMulticastMessage message)
         {
             ImageBytes = new byte[message.TotalPartNumber][];
-            AddData(message.Data,message.PartNumber);
+            AddData(message.Data, message.PartNumber);
             ImageNumber = message.ImageNumber;
         }
 
-        public void AddData(byte[] messagedata,int partnumber)
+        public void AddData(byte[] messagedata, int partnumber)
         {
             ImageBytes[partnumber] = messagedata;
-            foreach(byte[] b in ImageBytes)
+            foreach (byte[] b in ImageBytes)
             {
-                if(b == null) { return; }
+                if (b == null) { return; }
             }
             ImageCompleted();
         }
@@ -184,7 +185,7 @@ namespace LibraryData
             {
                 bmp = new Bitmap(ms);
             }
-            ImageCompletedEvent?.Invoke(this, new ImageCompletedEventArgs(bmp,ImageNumber));
+            ImageCompletedEvent?.Invoke(this, new ImageCompletedEventArgs(bmp, ImageNumber));
         }
     }
 
