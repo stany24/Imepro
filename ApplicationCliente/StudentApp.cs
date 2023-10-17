@@ -26,7 +26,8 @@ namespace ApplicationCliente
         public StudentApp()
         {
             InitializeComponent();
-            Student = new(lbxConnexion, this);
+            Student = new();
+            Controls.SetChildIndex(pbxScreeShot, 0);
             Student.ChangePropertyEvent += ChangeProperty;
             Student.NewImageEvent += ChangeImage;
             Student.NewMessageEvent += AddMessage;

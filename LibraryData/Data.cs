@@ -104,7 +104,6 @@ namespace LibraryData
         public event EventHandler<NewMessageEventArgs> NewMessageEvent;
         public event EventHandler<NewMessageEventArgs> NewConnexionMessageEvent;
         public event EventHandler<NewTabEventArgs> NewTabEvent;
-        readonly private Form form;
         readonly private Dictionary<string, BrowserName> browsersList = new() {
             { "chrome",BrowserName.Chrome },
             { "firefox", BrowserName.Firefox },
@@ -128,9 +127,8 @@ namespace LibraryData
         Socket SocketMulticast;
         readonly List<byte> byteImage = new();
 
-        public DataForStudent(Form form)
+        public DataForStudent()
         {
-            this.form = form;
             AutorisedUrls = new();
             SeleniumProcessesID = new();
             GetDefaultProcesses();
@@ -462,7 +460,7 @@ namespace LibraryData
         {
             isReceiving = false;
             mouseDisabled = false;
-            form.Invoke(new MethodInvoker(delegate { form.FormBorderStyle = FormBorderStyle.Sizable; }));
+            ChangePropertyEvent.Invoke(this, new ChangePropertyEventArgs("form", "FormBorderStyle", FormBorderStyle.Sizable));
             ChangePropertyEvent.Invoke(this, new ChangePropertyEventArgs("pbxScreenShot", "Visible", false));
             gkh.Unhook();
         }
@@ -586,34 +584,29 @@ namespace LibraryData
             Array.Resize(ref message, size);
             options = JsonSerializer.Deserialize<StreamOptions>(Encoding.Default.GetString(message));
             ChangePropertyEvent.Invoke(this, new ChangePropertyEventArgs("pbxScreenShot", "Visible", true));
-            form.Invoke(new MethodInvoker(delegate
+
+            switch (options.GetPriority())
             {
-                form.Show();
-                form.Controls.SetChildIndex(pbxScreenShot, 0);
-                switch (options.GetPriority())
-                {
-                    case Priority.Fullscreen:
-                        form.FormBorderStyle = FormBorderStyle.None;
-                        form.WindowState = FormWindowState.Maximized;
-                        break;
-                    case Priority.Blocking:
-                        form.FormBorderStyle = FormBorderStyle.None;
-                        form.WindowState = FormWindowState.Maximized;
-                        form.TopMost = true;
-                        mouseDisabled = true;
-                        Task.Run(DisableMouseEverySecond);
-                        DisableKeyboard();
-                        break;
-                    case Priority.Topmost:
-                        form.TopMost = true;
-                        form.FormBorderStyle = FormBorderStyle.None;
-                        form.WindowState = FormWindowState.Maximized;
-                        break;
-                    case Priority.Widowed:
-                        form.Controls.SetChildIndex(pbxScreenShot, 0);
-                        break;
-                }
-            }));
+                case Priority.Fullscreen:
+                    ChangePropertyEvent.Invoke(this, new ChangePropertyEventArgs("form", "FormBorderStyle", FormBorderStyle.None));
+                    ChangePropertyEvent.Invoke(this, new ChangePropertyEventArgs("form", "WindowState", FormWindowState.Maximized));
+                    break;
+                case Priority.Blocking:
+                    ChangePropertyEvent.Invoke(this, new ChangePropertyEventArgs("form", "FormBorderStyle", FormBorderStyle.None));
+                    ChangePropertyEvent.Invoke(this, new ChangePropertyEventArgs("form", "WindowState", FormWindowState.Maximized));
+                    ChangePropertyEvent.Invoke(this, new ChangePropertyEventArgs("form", "TopMost", true));
+                    mouseDisabled = true;
+                    Task.Run(DisableMouseEverySecond);
+                    DisableKeyboard();
+                    break;
+                case Priority.Topmost:
+                    ChangePropertyEvent.Invoke(this, new ChangePropertyEventArgs("form", "FormBorderStyle", FormBorderStyle.None));
+                    ChangePropertyEvent.Invoke(this, new ChangePropertyEventArgs("form", "WindowState", FormWindowState.Maximized));
+                    ChangePropertyEvent.Invoke(this, new ChangePropertyEventArgs("form", "TopMost", true));
+                    break;
+                case Priority.Widowed:
+                    break;
+            }   
         }
 
         #endregion
