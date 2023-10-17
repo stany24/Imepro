@@ -27,7 +27,7 @@ namespace ApplicationCliente
         {
             InitializeComponent();
             Student = new();
-            Controls.SetChildIndex(pbxScreeShot, 0);
+            Controls.SetChildIndex(pbxScreenShot, 0);
             Student.ChangePropertyEvent += ChangeProperty;
             Student.NewImageEvent += ChangeImage;
             Student.NewMessageEvent += AddMessage;
@@ -45,27 +45,47 @@ namespace ApplicationCliente
 
         private void ChangeImage(object sender, NewImageEventArgs e)
         {
-            pbxScreeShot.Image = e.image;
+            pbxScreenShot.Invoke(new MethodInvoker(delegate { pbxScreenShot.Image = e.image; }));
         }
 
         private void AddMessage(object sender, NewMessageEventArgs e)
         {
-            lbxMessages.Items.Add(e.Message);
+            lbxMessages.Invoke(new MethodInvoker(delegate { lbxConnexion.Items.Add(e.Message); }));
         }
 
         private void AddConnexionMessage(object sender, NewMessageEventArgs e)
         {
-            lbxConnexion.Items.Add(e.Message);
+            lbxConnexion.Invoke(new MethodInvoker(delegate { lbxConnexion.Items.Add(e.Message); }));
         }
 
         private void ChangeProperty(object sender,ChangePropertyEventArgs e)
         {
-            Control control = Controls.Find(e.PropertyName, true)[0];
+            Control control = FindControlRecursive(this,e.ControlName);
+            if (control == null) { return; }
             PropertyInfo propInfo = control.GetType().GetProperty(e.PropertyName);
             if (propInfo.CanWrite)
             {
                 propInfo.SetValue(control, e.PropertyValue);
             }
+        }
+
+        public static Control FindControlRecursive(Control container, string name)
+        {
+            if (container == null)
+                return null;
+
+            Control foundControl = container.Controls[name];
+            if (foundControl != null)
+                return foundControl;
+
+            foreach (Control childControl in container.Controls)
+            {
+                foundControl = FindControlRecursive(childControl, name);
+                if (foundControl != null)
+                    return foundControl;
+            }
+
+            return null;
         }
 
         /// <summary>

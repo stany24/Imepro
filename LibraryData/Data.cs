@@ -585,7 +585,7 @@ namespace LibraryData
             options = JsonSerializer.Deserialize<StreamOptions>(Encoding.Default.GetString(message));
             ChangePropertyEvent.Invoke(this, new ChangePropertyEventArgs("pbxScreenShot", "Visible", true));
 
-            switch (options.GetPriority())
+            switch (options.GetPriority()) 
             {
                 case Priority.Fullscreen:
                     ChangePropertyEvent.Invoke(this, new ChangePropertyEventArgs("form", "FormBorderStyle", FormBorderStyle.None));
