@@ -16,11 +16,17 @@ namespace LibraryData
     /// </summary>
     public class ReliableMulticastMessage
     {
+        #region Variables
+
         public byte[] Data { get; }
         readonly public int ImageNumber;
         readonly public int PartNumber;
         readonly public int TotalPartNumber;
         private const string separator = "[";
+
+        #endregion
+
+        #region Constructor
 
         public ReliableMulticastMessage(string customstring)
         {
@@ -41,6 +47,8 @@ namespace LibraryData
             TotalPartNumber = totalpartnumber;
         }
 
+        #endregion
+
         public string ToCustomString()
         {
             return ImageNumber + separator + PartNumber + separator + TotalPartNumber + separator + Encoding.Default.GetString(Data);
@@ -52,11 +60,17 @@ namespace LibraryData
     /// </summary>
     public class ReliableMulticastSender
     {
+        #region Variables
+
         private const int DATA_SIZE = 64000;
         private int ScreenToShareId { get; set; }
         private int ImageNumber = 0;
         readonly private Socket SocketToSend;
         public bool Sending { get; set; }
+
+        #endregion
+
+        #region Constructor
 
         public ReliableMulticastSender(Socket socket, int screentoshareid)
         {
@@ -65,6 +79,10 @@ namespace LibraryData
             Sending = true;
             Task.Run(SendImages);
         }
+
+        #endregion
+
+        #region Image management
 
         private void SendImages()
         {
@@ -100,6 +118,8 @@ namespace LibraryData
             ImageConverter converter = new();
             return (byte[])converter.ConvertTo(bitmap, typeof(byte[]));
         }
+
+        #endregion
     }
 
     /// <summary>
@@ -107,10 +127,16 @@ namespace LibraryData
     /// </summary>
     public class ReliableMulticastReceiver
     {
+        #region Variables
+
         public event EventHandler<NewImageEventArgs> NewImageEvent;
         readonly private List<ReliableImage> Images = new();
         readonly Socket SocketToReceive;
         public bool Receiving { get; set; }
+
+        #endregion
+
+        #region Constructor
 
         public ReliableMulticastReceiver(Socket socket)
         {
@@ -118,6 +144,10 @@ namespace LibraryData
             Receiving = true;
             Task.Run(Receive);
         }
+
+        #endregion
+
+        #region Image management
 
         public void Receive()
         {
@@ -150,6 +180,8 @@ namespace LibraryData
                 if (Images[i].ImageNumber <= e.ImageId) { Images.Remove(Images[i]); }
             }
         }
+
+        #endregion
     }
 
     /// <summary>
@@ -157,9 +189,15 @@ namespace LibraryData
     /// </summary>
     public class ReliableImage
     {
+        #region Variables
+
         readonly private byte[][] ImageBytes;
         readonly public int ImageNumber;
         public event EventHandler<ImageCompletedEventArgs> ImageCompletedEvent;
+
+        #endregion
+
+        #region Constructor
 
         public ReliableImage(ReliableMulticastMessage message)
         {
@@ -188,6 +226,8 @@ namespace LibraryData
             }
             ImageCompletedEvent?.Invoke(this, new ImageCompletedEventArgs(bmp, ImageNumber));
         }
+
+        #endregion
     }
 
     /// <summary>

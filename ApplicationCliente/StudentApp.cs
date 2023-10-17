@@ -22,7 +22,7 @@ namespace ApplicationCliente
 
         #endregion
 
-        #region At start
+        #region Constructor
         public StudentApp()
         {
             InitializeComponent();
@@ -42,6 +42,19 @@ namespace ApplicationCliente
             }
             Task.Run(LaunchTasks);
         }
+
+        /// <summary>
+        /// Function waiting for the form to be fully created before launching background tasks.
+        /// </summary>
+        public void LaunchTasks()
+        {
+            while (!IsHandleCreated) { Thread.Sleep(100); }
+            Student.SocketToTeacher = Task.Run(() => Student.ConnectToTeacher(11111)).Result;
+        }
+
+        #endregion
+
+        #region Event Handeling
 
         private void DisplayImage(object sender,NewImageEventArgs e)
         {
@@ -86,15 +99,6 @@ namespace ApplicationCliente
             }
 
             return null;
-        }
-
-        /// <summary>
-        /// Function waiting for the form to be fully created before launching background tasks.
-        /// </summary>
-        public void LaunchTasks()
-        {
-            while (!IsHandleCreated) { Thread.Sleep(100); }
-            Student.SocketToTeacher = Task.Run(() => Student.ConnectToTeacher(11111)).Result;
         }
 
         #endregion
@@ -238,6 +242,8 @@ namespace ApplicationCliente
 
         #endregion
 
+        #region Custom browser
+
         private void WebView2_Click(object sender, EventArgs e)
         {
             Form form = new();
@@ -251,5 +257,7 @@ namespace ApplicationCliente
         {
             Student.Urls.AddUrl(e.Url, BrowserName.Webview2);
         }
+
+        #endregion
     }
 }
