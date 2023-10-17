@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
+using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -25,7 +26,8 @@ namespace ApplicationCliente
         public StudentApp()
         {
             InitializeComponent();
-            Student = new(lbxConnexion, pbxScreeShot, lbxMessages, this);
+            Student = new(lbxConnexion, lbxMessages, this);
+            Student.ChangePropertyEvent += ChangeProperty;
             try
             {
                 Student.IpToTeacher = IpForTheWeek.GetIp();
@@ -35,6 +37,16 @@ namespace ApplicationCliente
                 NewTeacherIP(new object(), new EventArgs());
             }
             Task.Run(LaunchTasks);
+        }
+
+        private void ChangeProperty(object sender,ChangePropertyEventArgs e)
+        {
+            Control control = Controls.Find(e.PropertyName, true)[0];
+            PropertyInfo propInfo = control.GetType().GetProperty(e.PropertyName);
+            if (propInfo.CanWrite)
+            {
+                propInfo.SetValue(control, e.PropertyValue);
+            }
         }
 
         /// <summary>

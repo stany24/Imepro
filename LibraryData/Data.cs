@@ -99,8 +99,11 @@ namespace LibraryData
         #region Variables/Constructeur
 
         readonly private List<string> DefaultProcess = new();
+        public event EventHandler<NewImageEventArgs> NewImageEvent;
+        public event EventHandler<ChangePropertyEventArgs> ChangePropertyEvent;
+        public event EventHandler<NewTabEventArgs> NewTabEvent;
+        public event EventHandler<NewTabEventArgs> NewTabEvent;
         readonly private ListBox lbxConnexion;
-        readonly private PictureBox pbxScreenShot;
         readonly private ListBox tbxMessage;
         readonly private Form form;
         readonly private Dictionary<string, BrowserName> browsersList = new() {
@@ -126,10 +129,9 @@ namespace LibraryData
         Socket SocketMulticast;
         readonly List<byte> byteImage = new();
 
-        public DataForStudent(ListBox lbxconnexion, PictureBox pbxscreenshot, ListBox tbxmessage, Form form)
+        public DataForStudent(ListBox lbxconnexion, ListBox tbxmessage, Form form)
         {
             lbxConnexion = lbxconnexion;
-            pbxScreenShot = pbxscreenshot;
             tbxMessage = tbxmessage;
             this.form = form;
             AutorisedUrls = new();
@@ -464,7 +466,7 @@ namespace LibraryData
             isReceiving = false;
             mouseDisabled = false;
             form.Invoke(new MethodInvoker(delegate { form.FormBorderStyle = FormBorderStyle.Sizable; }));
-            pbxScreenShot.Invoke(new MethodInvoker(delegate { pbxScreenShot.Visible = false; }));
+            ChangePropertyEvent.Invoke(this, new ChangePropertyEventArgs("pbxScreenShot", "Visible", false));
             gkh.Unhook();
         }
 
@@ -563,7 +565,7 @@ namespace LibraryData
                 if (size != 65000)
                 {
                     Bitmap bitmap = new(new MemoryStream(byteImage.ToArray()));
-                    pbxScreenShot.Invoke(new MethodInvoker(delegate { pbxScreenShot.Image = bitmap; }));
+                    NewImageEvent.Invoke(this, new NewImageEventArgs(bitmap));
                     byteImage.Clear();
                 }
 
@@ -586,7 +588,7 @@ namespace LibraryData
             int size = SocketToTeacher.Receive(message);
             Array.Resize(ref message, size);
             options = JsonSerializer.Deserialize<StreamOptions>(Encoding.Default.GetString(message));
-            pbxScreenShot.Invoke(new MethodInvoker(delegate { pbxScreenShot.Visible = true; }));
+            ChangePropertyEvent.Invoke(this, new ChangePropertyEventArgs("pbxScreenShot", "Visible", true));
             form.Invoke(new MethodInvoker(delegate
             {
                 form.Show();
@@ -705,5 +707,31 @@ namespace LibraryData
         }
 
         #endregion
+    }
+
+    public class NewTabEventArgs : EventArgs
+    {
+        public Url url;
+        public NewTabEventArgs(Url newUrl) { url = newUrl; }
+    }
+
+    public class NewImageEventArgs : EventArgs
+    {
+        public Bitmap image;
+        public NewImageEventArgs(Bitmap newimage) { image = newimage; }
+    }
+
+    public class ChangePropertyEventArgs : EventArgs
+    {
+        public string ControlName { get; }
+        public string PropertyName { get; }
+        public object PropertyValue { get; }
+
+        public ChangePropertyEventArgs(string controlName, string propertyName, object propertyValue)
+        {
+            ControlName = controlName;
+            PropertyName = propertyName;
+            PropertyValue = propertyValue;
+        }
     }
 }
