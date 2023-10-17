@@ -25,7 +25,8 @@ namespace ApplicationCliente
         public StudentApp()
         {
             InitializeComponent();
-            Student = new(lbxConnexion, pbxScreeShot, lbxMessages, this);
+            SplitterImageButtons.Panel1.Controls.SetChildIndex(pbxScreenShot, 0);
+            Student = new(lbxConnexion, pbxScreenShot, lbxMessages, this);
             try
             {
                 Student.IpToTeacher = IpForTheWeek.GetIp();
@@ -198,7 +199,7 @@ namespace ApplicationCliente
 
         private void AddWebview2Url(object sender, NewTabEventArgs e)
         {
-            Student.Urls.AddUrl(e.url, BrowserName.Webview2);
+            Student.Urls.AddUrl(e.Url, BrowserName.Webview2);
         }
     }
 }

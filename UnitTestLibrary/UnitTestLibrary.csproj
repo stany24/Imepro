@@ -47,12 +47,15 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Library\BlocageTest.cs" />
     <Compile Include="Library\CommandTest.cs" />
     <Compile Include="Library\CustomMessageTest.cs" />
     <Compile Include="Library\DataTest.cs" />
+    <Compile Include="Library\ReliableMulticastTest.cs" />
     <Compile Include="Library\StreamOptionsTest.cs" />
     <Compile Include="Library\HistoriqueTest.cs" />
     <Compile Include="Library\UpdateTreeViewTest.cs" />

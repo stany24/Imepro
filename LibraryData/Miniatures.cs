@@ -88,7 +88,7 @@ namespace LibraryData
         /// <param name="e"></param>
         private void SaveScreenShot(object sender, EventArgs e)
         {
-            PbxImage.Image.Save(SavePath + ComputerName + DateTime.Now.ToString("_yyyy-mm-dd_hh-mm-ss") + ".jpg", ImageFormat.Jpeg);
+            PbxImage.Image.Save(SavePath + "\\" + ComputerName + DateTime.Now.ToString("_yyyy-mm-dd_hh-mm-ss") + ".jpg", ImageFormat.Jpeg);
         }
 
         #endregion

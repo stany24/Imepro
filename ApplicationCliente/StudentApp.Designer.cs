@@ -30,8 +30,6 @@
         {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(StudentApp));
-            this.pbxScreeShot = new System.Windows.Forms.PictureBox();
-            this.lbxConnexion = new System.Windows.Forms.ListBox();
             this.btnHelp = new System.Windows.Forms.Button();
             this.btnChangeIP = new System.Windows.Forms.Button();
             this.TrayIconStudent = new System.Windows.Forms.NotifyIcon(this.components);
@@ -40,34 +38,25 @@
             this.lbxMessages = new System.Windows.Forms.ListBox();
             this.btnResetAllIP = new System.Windows.Forms.Button();
             this.btnWebView2 = new System.Windows.Forms.Button();
-            ((System.ComponentModel.ISupportInitialize)(this.pbxScreeShot)).BeginInit();
+            this.SplitterImageButtons = new System.Windows.Forms.SplitContainer();
+            this.pbxScreenShot = new System.Windows.Forms.PictureBox();
+            this.lbxConnexion = new System.Windows.Forms.ListBox();
+            this.SplitterPrincipal = new System.Windows.Forms.SplitContainer();
+            ((System.ComponentModel.ISupportInitialize)(this.SplitterImageButtons)).BeginInit();
+            this.SplitterImageButtons.Panel1.SuspendLayout();
+            this.SplitterImageButtons.Panel2.SuspendLayout();
+            this.SplitterImageButtons.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pbxScreenShot)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.SplitterPrincipal)).BeginInit();
+            this.SplitterPrincipal.Panel1.SuspendLayout();
+            this.SplitterPrincipal.Panel2.SuspendLayout();
+            this.SplitterPrincipal.SuspendLayout();
             this.SuspendLayout();
-            // 
-            // pbxScreeShot
-            // 
-            this.pbxScreeShot.Location = new System.Drawing.Point(16, 187);
-            this.pbxScreeShot.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
-            this.pbxScreeShot.Name = "pbxScreeShot";
-            this.pbxScreeShot.Size = new System.Drawing.Size(1580, 673);
-            this.pbxScreeShot.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
-            this.pbxScreeShot.TabIndex = 4;
-            this.pbxScreeShot.TabStop = false;
-            // 
-            // lbxConnexion
-            // 
-            this.lbxConnexion.FormattingEnabled = true;
-            this.lbxConnexion.ItemHeight = 16;
-            this.lbxConnexion.Location = new System.Drawing.Point(16, 15);
-            this.lbxConnexion.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
-            this.lbxConnexion.Name = "lbxConnexion";
-            this.lbxConnexion.Size = new System.Drawing.Size(1937, 164);
-            this.lbxConnexion.TabIndex = 7;
-            this.lbxConnexion.TabStop = false;
             // 
             // btnHelp
             // 
-            this.btnHelp.Location = new System.Drawing.Point(1617, 194);
-            this.btnHelp.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.btnHelp.Location = new System.Drawing.Point(16, 17);
+            this.btnHelp.Margin = new System.Windows.Forms.Padding(4);
             this.btnHelp.Name = "btnHelp";
             this.btnHelp.Size = new System.Drawing.Size(100, 28);
             this.btnHelp.TabIndex = 0;
@@ -77,8 +66,8 @@
             // 
             // btnChangeIP
             // 
-            this.btnChangeIP.Location = new System.Drawing.Point(1725, 194);
-            this.btnChangeIP.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.btnChangeIP.Location = new System.Drawing.Point(124, 17);
+            this.btnChangeIP.Margin = new System.Windows.Forms.Padding(4);
             this.btnChangeIP.Name = "btnChangeIP";
             this.btnChangeIP.Size = new System.Drawing.Size(100, 28);
             this.btnChangeIP.TabIndex = 1;
@@ -101,7 +90,7 @@
             // lblMessage
             // 
             this.lblMessage.AutoSize = true;
-            this.lblMessage.Location = new System.Drawing.Point(1604, 277);
+            this.lblMessage.Location = new System.Drawing.Point(12, 94);
             this.lblMessage.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lblMessage.Name = "lblMessage";
             this.lblMessage.Size = new System.Drawing.Size(64, 16);
@@ -112,8 +101,8 @@
             // 
             this.lbxMessages.FormattingEnabled = true;
             this.lbxMessages.ItemHeight = 16;
-            this.lbxMessages.Location = new System.Drawing.Point(1608, 297);
-            this.lbxMessages.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.lbxMessages.Location = new System.Drawing.Point(16, 114);
+            this.lbxMessages.Margin = new System.Windows.Forms.Padding(4);
             this.lbxMessages.Name = "lbxMessages";
             this.lbxMessages.Size = new System.Drawing.Size(345, 324);
             this.lbxMessages.TabIndex = 4;
@@ -121,8 +110,8 @@
             // 
             // btnResetAllIP
             // 
-            this.btnResetAllIP.Location = new System.Drawing.Point(1617, 230);
-            this.btnResetAllIP.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.btnResetAllIP.Location = new System.Drawing.Point(16, 53);
+            this.btnResetAllIP.Margin = new System.Windows.Forms.Padding(4);
             this.btnResetAllIP.Name = "btnResetAllIP";
             this.btnResetAllIP.Size = new System.Drawing.Size(208, 28);
             this.btnResetAllIP.TabIndex = 2;
@@ -131,8 +120,8 @@
             // 
             // btnWebView2
             // 
-            this.btnWebView2.Location = new System.Drawing.Point(1824, 629);
-            this.btnWebView2.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.btnWebView2.Location = new System.Drawing.Point(232, 17);
+            this.btnWebView2.Margin = new System.Windows.Forms.Padding(4);
             this.btnWebView2.Name = "btnWebView2";
             this.btnWebView2.Size = new System.Drawing.Size(100, 28);
             this.btnWebView2.TabIndex = 8;
@@ -140,33 +129,95 @@
             this.btnWebView2.UseVisualStyleBackColor = true;
             this.btnWebView2.Click += new System.EventHandler(this.WebView2_Click);
             // 
+            // SplitterImageButtons
+            // 
+            this.SplitterImageButtons.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.SplitterImageButtons.Location = new System.Drawing.Point(0, 0);
+            this.SplitterImageButtons.Name = "SplitterImageButtons";
+            // 
+            // SplitterImageButtons.Panel1
+            // 
+            this.SplitterImageButtons.Panel1.Controls.Add(this.pbxScreenShot);
+            // 
+            // SplitterImageButtons.Panel2
+            // 
+            this.SplitterImageButtons.Panel2.Controls.Add(this.lbxMessages);
+            this.SplitterImageButtons.Panel2.Controls.Add(this.btnWebView2);
+            this.SplitterImageButtons.Panel2.Controls.Add(this.lblMessage);
+            this.SplitterImageButtons.Panel2.Controls.Add(this.btnResetAllIP);
+            this.SplitterImageButtons.Panel2.Controls.Add(this.btnHelp);
+            this.SplitterImageButtons.Panel2.Controls.Add(this.btnChangeIP);
+            this.SplitterImageButtons.Size = new System.Drawing.Size(1219, 462);
+            this.SplitterImageButtons.SplitterDistance = 830;
+            this.SplitterImageButtons.TabIndex = 10;
+            // 
+            // pbxScreeShot
+            // 
+            this.pbxScreenShot.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.pbxScreenShot.Location = new System.Drawing.Point(0, 0);
+            this.pbxScreenShot.Margin = new System.Windows.Forms.Padding(4);
+            this.pbxScreenShot.Name = "pbxScreeShot";
+            this.pbxScreenShot.Size = new System.Drawing.Size(830, 462);
+            this.pbxScreenShot.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            this.pbxScreenShot.TabIndex = 4;
+            this.pbxScreenShot.TabStop = false;
+            // 
+            // lbxConnexion
+            // 
+            this.lbxConnexion.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.lbxConnexion.FormattingEnabled = true;
+            this.lbxConnexion.ItemHeight = 16;
+            this.lbxConnexion.Location = new System.Drawing.Point(0, 0);
+            this.lbxConnexion.Margin = new System.Windows.Forms.Padding(4);
+            this.lbxConnexion.Name = "lbxConnexion";
+            this.lbxConnexion.Size = new System.Drawing.Size(1219, 147);
+            this.lbxConnexion.TabIndex = 7;
+            this.lbxConnexion.TabStop = false;
+            // 
+            // SplitterPrincipal
+            // 
+            this.SplitterPrincipal.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.SplitterPrincipal.Location = new System.Drawing.Point(0, 0);
+            this.SplitterPrincipal.Name = "SplitterPrincipal";
+            this.SplitterPrincipal.Orientation = System.Windows.Forms.Orientation.Horizontal;
+            // 
+            // SplitterPrincipal.Panel1
+            // 
+            this.SplitterPrincipal.Panel1.Controls.Add(this.lbxConnexion);
+            // 
+            // SplitterPrincipal.Panel2
+            // 
+            this.SplitterPrincipal.Panel2.Controls.Add(this.SplitterImageButtons);
+            this.SplitterPrincipal.Size = new System.Drawing.Size(1219, 613);
+            this.SplitterPrincipal.SplitterDistance = 147;
+            this.SplitterPrincipal.TabIndex = 9;
+            // 
             // StudentApp
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1924, 875);
-            this.Controls.Add(this.btnWebView2);
-            this.Controls.Add(this.btnResetAllIP);
-            this.Controls.Add(this.lbxMessages);
-            this.Controls.Add(this.lblMessage);
-            this.Controls.Add(this.btnChangeIP);
-            this.Controls.Add(this.btnHelp);
-            this.Controls.Add(this.pbxScreeShot);
-            this.Controls.Add(this.lbxConnexion);
-            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.ClientSize = new System.Drawing.Size(1219, 613);
+            this.Controls.Add(this.SplitterPrincipal);
+            this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "StudentApp";
             this.Text = "Imepro";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.OnClosing);
             this.Resize += new System.EventHandler(this.StudentAppResized);
-            ((System.ComponentModel.ISupportInitialize)(this.pbxScreeShot)).EndInit();
+            this.SplitterImageButtons.Panel1.ResumeLayout(false);
+            this.SplitterImageButtons.Panel2.ResumeLayout(false);
+            this.SplitterImageButtons.Panel2.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.SplitterImageButtons)).EndInit();
+            this.SplitterImageButtons.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.pbxScreenShot)).EndInit();
+            this.SplitterPrincipal.Panel1.ResumeLayout(false);
+            this.SplitterPrincipal.Panel2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.SplitterPrincipal)).EndInit();
+            this.SplitterPrincipal.ResumeLayout(false);
             this.ResumeLayout(false);
-            this.PerformLayout();
 
         }
 
         #endregion
-        private System.Windows.Forms.PictureBox pbxScreeShot;
-        private System.Windows.Forms.ListBox lbxConnexion;
         private System.Windows.Forms.Button btnHelp;
         private System.Windows.Forms.Button btnChangeIP;
         private System.Windows.Forms.NotifyIcon TrayIconStudent;
@@ -175,6 +226,10 @@
         private System.Windows.Forms.ListBox lbxMessages;
         private System.Windows.Forms.Button btnResetAllIP;
         private System.Windows.Forms.Button btnWebView2;
+        private System.Windows.Forms.SplitContainer SplitterImageButtons;
+        private System.Windows.Forms.PictureBox pbxScreenShot;
+        private System.Windows.Forms.ListBox lbxConnexion;
+        private System.Windows.Forms.SplitContainer SplitterPrincipal;
     }
 }
 

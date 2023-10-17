@@ -34,8 +34,8 @@ namespace ApplicationCliente
             int CurrentOffset = 0;
             for (int i = 0; i < tabs.Count; i++)
             {
-                tabs[i].preview.Maximize(CurrentOffset);
-                CurrentOffset += tabs[i].preview.Width;
+                tabs[i].Preview.Maximize(CurrentOffset);
+                CurrentOffset += tabs[i].Preview.Width;
             }
             btnNewTab.Location = new Point(CurrentOffset, 0);
         }
@@ -43,20 +43,20 @@ namespace ApplicationCliente
         private void NewTab(object sender, EventArgs e)
         {
             Tab tab = new(Width, Height);
-            tab.webview.Disposed += new EventHandler(RemoveTabFromList);
-            tab.webview.VisibleChanged += new EventHandler(HideOtherTabs);
-            tab.webview.NewTabEvent += new EventHandler<NewTabEventArgs>(SignalNewTab);
+            tab.Webview.Disposed += new EventHandler(RemoveTabFromList);
+            tab.Webview.VisibleChanged += new EventHandler(HideOtherTabs);
+            tab.Webview.NewTabEvent += new EventHandler<NewTabEventArgs>(SignalNewTab);
             Resize += new EventHandler(ResizeAllWebview);
-            Controls.Add(tab.webview);
-            Controls.Add(tab.preview);
-            Controls.Add(tab.controlBar);
+            Controls.Add(tab.Webview);
+            Controls.Add(tab.Preview);
+            Controls.Add(tab.ControlBar);
             tabs.Add(tab);
             UpdateLocations();
         }
 
         private void SignalNewTab(object sender, NewTabEventArgs e)
         {
-            NewTabEvent.Invoke(this, new NewTabEventArgs(e.url));
+            NewTabEvent.Invoke(this, new NewTabEventArgs(e.Url));
         }
 
         private void ResizeAllWebview(object sender, EventArgs e)
@@ -69,12 +69,10 @@ namespace ApplicationCliente
 
         private void HideOtherTabs(object sender, EventArgs e)
         {
-            if ((sender as CustomWebView2).Visible)
+            if (!(sender as CustomWebView2).Visible) { return; }
+            foreach (Tab tab in tabs)
             {
-                foreach (Tab tab in tabs)
-                {
-                    if (tab.webview != (sender as CustomWebView2)) { tab.HideTab(); }
-                }
+                if (tab.Webview != (sender as CustomWebView2)) { tab.HideTab(); }
             }
         }
 
@@ -83,7 +81,7 @@ namespace ApplicationCliente
             CustomWebView2 closedTab = sender as CustomWebView2;
             for (int i = 0; i < tabs.Count; i++)
             {
-                if (tabs[i].webview == closedTab)
+                if (tabs[i].Webview == closedTab)
                 {
                     tabs.Remove(tabs[i]);
                     if (i < tabs.Count) { tabs[i].ShowTab(new object(), new EventArgs()); break; }
@@ -96,84 +94,84 @@ namespace ApplicationCliente
 
     public class NewTabEventArgs : EventArgs
     {
-        public Url url;
-        public NewTabEventArgs(Url newUrl) { url = newUrl; }
+        public Url Url { get; set; }
+        public NewTabEventArgs(Url newUrl) { Url = newUrl; }
     }
 
     public class Tab
     {
-        public CustomWebView2 webview;
-        public TabPreview preview;
-        public ControlBar controlBar;
+        public CustomWebView2 Webview { get; set; }
+        public TabPreview Preview { get; set; }
+        public ControlBar ControlBar { get; set; }
 
         private const int GAP_BETWEEN_PREVIEW_AND_CONTROL_BAR_PX = 10;
         private const int GAP_BETWEEN_CONTROL_BAR_AND_WEBVIEW_PX = 10;
 
         public Tab(int width, int height)
         {
-            preview = new TabPreview();
-            controlBar = new ControlBar()
+            Preview = new TabPreview();
+            ControlBar = new ControlBar()
             {
-                Location = new Point(0, preview.Height + GAP_BETWEEN_PREVIEW_AND_CONTROL_BAR_PX)
+                Location = new Point(0, Preview.Height + GAP_BETWEEN_PREVIEW_AND_CONTROL_BAR_PX)
             };
-            webview = new CustomWebView2()
+            Webview = new CustomWebView2()
             {
-                Location = new Point(0, controlBar.Location.Y + controlBar.Height + GAP_BETWEEN_CONTROL_BAR_AND_WEBVIEW_PX)
+                Location = new Point(0, ControlBar.Location.Y + ControlBar.Height + GAP_BETWEEN_CONTROL_BAR_AND_WEBVIEW_PX)
             };
             ResizeWebview(width, height);
 
-            controlBar.btnBack.Click += new EventHandler(webview.MoveBack_Click);
-            controlBar.btnForward.Click += new EventHandler(webview.MoveForward_Click);
-            controlBar.btnRefresh.Click += new EventHandler(webview.Reload_Click);
-            controlBar.btnEnter.Click += new EventHandler(Search_Click);
+            ControlBar.btnBack.Click += new EventHandler(Webview.MoveBack_Click);
+            ControlBar.btnForward.Click += new EventHandler(Webview.MoveForward_Click);
+            ControlBar.btnRefresh.Click += new EventHandler(Webview.Reload_Click);
+            ControlBar.btnEnter.Click += new EventHandler(Search_Click);
 
-            preview.btnClose.Click += new EventHandler(CloseTab);
-            preview.btnWebsiteName.Click += new EventHandler(ShowTab);
+            Preview.btnClose.Click += new EventHandler(CloseTab);
+            Preview.btnWebsiteName.Click += new EventHandler(ShowTab);
 
-            webview.SourceChanged += new EventHandler<CoreWebView2SourceChangedEventArgs>(UrlChanged);
+            Webview.SourceChanged += new EventHandler<CoreWebView2SourceChangedEventArgs>(UrlChanged);
         }
 
         public void ResizeWebview(int width, int height)
         {
-            webview.Size = new Size(width, height - webview.Location.Y);
+            Webview.Size = new Size(width, height - Webview.Location.Y);
         }
 
         public void ShowTab(object sender, EventArgs e)
         {
-            webview.Show();
-            controlBar.Show();
+            Webview.Show();
+            ControlBar.Show();
         }
 
         public void HideTab()
         {
-            webview.Hide();
-            controlBar.Hide();
+            Webview.Hide();
+            ControlBar.Hide();
         }
 
         public void Search_Click(object sender, EventArgs e)
         {
-            if (controlBar.tbxUrl.Text.ToLower().StartsWith("https://") || controlBar.tbxUrl.Text.ToLower().StartsWith("http://"))
+            if (ControlBar.tbxUrl.Text.ToLower().StartsWith("https://") || ControlBar.tbxUrl.Text.ToLower().StartsWith("http://"))
             {
-                try { webview.CoreWebView2.Navigate(controlBar.tbxUrl.Text); }
-                catch { webview.CoreWebView2.Navigate("https://duckduckgo.com/?t=ffab&q=" + controlBar.tbxUrl.Text + "&atb=v320-1&ia=web"); }
+                try { Webview.CoreWebView2.Navigate(ControlBar.tbxUrl.Text); }
+                catch { Webview.CoreWebView2.Navigate("https://duckduckgo.com/?t=ffab&q=" + ControlBar.tbxUrl.Text + "&atb=v320-1&ia=web"); }
             }
             else
             {
-                try { webview.CoreWebView2.Navigate("https://" + controlBar.tbxUrl.Text); }
-                catch { webview.CoreWebView2.Navigate("https://duckduckgo.com/?t=ffab&q=" + controlBar.tbxUrl.Text + "&atb=v320-1&ia=web"); }
+                try { Webview.CoreWebView2.Navigate("https://" + ControlBar.tbxUrl.Text); }
+                catch { Webview.CoreWebView2.Navigate("https://duckduckgo.com/?t=ffab&q=" + ControlBar.tbxUrl.Text + "&atb=v320-1&ia=web"); }
             }
         }
 
         public void UrlChanged(object sender, CoreWebView2SourceChangedEventArgs e)
         {
-            preview.btnWebsiteName.Text = webview.Source.ToString();
+            Preview.btnWebsiteName.Text = Webview.Source.ToString();
         }
 
         private void CloseTab(object sender, EventArgs e)
         {
-            preview.Dispose();
-            webview.Dispose();
-            controlBar.Dispose();
+            Preview.Dispose();
+            Webview.Dispose();
+            ControlBar.Dispose();
         }
     }
 
@@ -311,5 +309,19 @@ namespace ApplicationCliente
             try { return JsonSerializer.Deserialize<List<string>>(Properties.Settings.Default.AutorisedWebsites); }
             catch { return new List<string>() { "https://duckduckgo.com/", "https://github.com" }; }
         }
+    }
+
+    class DefaultBrowser
+    {
+        public DefaultBrowser(string browserUrl, string searchUrlStart, string searchUrlEnd)
+        {
+            BrowserUrl = browserUrl;
+            SearchUrlStart = searchUrlStart;
+            SearchUrlEnd = searchUrlEnd;
+        }
+
+        public string BrowserUrl { get; set; }
+        public string SearchUrlStart { get; set; }
+        public string SearchUrlEnd { get; set; }
     }
 }

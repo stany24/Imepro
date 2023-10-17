@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -28,6 +27,8 @@ namespace ApplicationTeacher
         bool isAsking = false;
         int NextId = 0;
         IPAddress ipAddr = null;
+
+        private ReliableMulticastSender MulticastSender;
 
         #endregion
 
@@ -369,21 +370,7 @@ namespace ApplicationTeacher
             IPEndPoint ipep = new(ip, 45678);
             s.Connect(ipep);
             Thread.Sleep(1000);
-
-            while (isSharing)
-            {
-                Screen screen = Screen.AllScreens[Properties.Settings.Default.ScreenToShareId];
-                Bitmap bitmap = new(screen.Bounds.Width, screen.Bounds.Height, PixelFormat.Format16bppRgb565);
-                Rectangle ScreenSize = screen.Bounds;
-                Graphics.FromImage(bitmap).CopyFromScreen(ScreenSize.Left, ScreenSize.Top, 0, 0, ScreenSize.Size);
-                ImageConverter converter = new();
-                byte[] imageArray = (byte[])converter.ConvertTo(bitmap, typeof(byte[]));
-                CustomMessageSender Sender = new(imageArray);
-                foreach (CustomMessage message in Sender.GetMessages())
-                {
-                    s.Send(message.GetContent().ToArray());
-                }
-            }
+            MulticastSender = new ReliableMulticastSender(s, Properties.Settings.Default.ScreenToShareId);
         }
 
         /// <summary>
@@ -407,6 +394,7 @@ namespace ApplicationTeacher
             else
             {
                 isSharing = false;
+                MulticastSender.Sending = false;
                 for (int i = 0; i < StudentToShareScreen.Count; i++)
                 { StudentToShareScreen[i].SocketToStudent.Send(new Command(CommandType.StopReceiveMulticast).ToByteArray()); }
                 StudentToShareScreen = new();
