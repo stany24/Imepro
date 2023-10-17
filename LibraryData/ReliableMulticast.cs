@@ -190,6 +190,9 @@ namespace LibraryData
         }
     }
 
+    /// <summary>
+    /// Event used to signal the completion of an image
+    /// </summary>
     public class ImageCompletedEventArgs : EventArgs
     {
         public ImageCompletedEventArgs(Bitmap competedimage, int imageId)
@@ -202,6 +205,9 @@ namespace LibraryData
         public Bitmap CompletedImage { get; set; }
     }
 
+    /// <summary>
+    /// Event used to signal a new image has been received
+    /// </summary>
     public class NewImageEventArgs : EventArgs
     {
         public Bitmap image { get; }
