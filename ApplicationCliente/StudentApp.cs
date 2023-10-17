@@ -26,8 +26,11 @@ namespace ApplicationCliente
         public StudentApp()
         {
             InitializeComponent();
-            Student = new(lbxConnexion, lbxMessages, this);
+            Student = new(lbxConnexion, this);
             Student.ChangePropertyEvent += ChangeProperty;
+            Student.NewImageEvent += ChangeImage;
+            Student.NewMessageEvent += AddMessage;
+            Student.NewConnexionMessageEvent += AddConnexionMessage;
             try
             {
                 Student.IpToTeacher = IpForTheWeek.GetIp();
@@ -37,6 +40,21 @@ namespace ApplicationCliente
                 NewTeacherIP(new object(), new EventArgs());
             }
             Task.Run(LaunchTasks);
+        }
+
+        private void ChangeImage(object sender, NewImageEventArgs e)
+        {
+            pbxScreeShot.Image = e.image;
+        }
+
+        private void AddMessage(object sender, NewMessageEventArgs e)
+        {
+            lbxMessages.Items.Add(e.Message);
+        }
+
+        private void AddConnexionMessage(object sender, NewMessageEventArgs e)
+        {
+            lbxConnexion.Items.Add(e.Message);
         }
 
         private void ChangeProperty(object sender,ChangePropertyEventArgs e)

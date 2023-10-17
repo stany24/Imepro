@@ -101,10 +101,9 @@ namespace LibraryData
         readonly private List<string> DefaultProcess = new();
         public event EventHandler<NewImageEventArgs> NewImageEvent;
         public event EventHandler<ChangePropertyEventArgs> ChangePropertyEvent;
+        public event EventHandler<NewMessageEventArgs> NewMessageEvent;
+        public event EventHandler<NewMessageEventArgs> NewConnexionMessageEvent;
         public event EventHandler<NewTabEventArgs> NewTabEvent;
-        public event EventHandler<NewTabEventArgs> NewTabEvent;
-        readonly private ListBox lbxConnexion;
-        readonly private ListBox tbxMessage;
         readonly private Form form;
         readonly private Dictionary<string, BrowserName> browsersList = new() {
             { "chrome",BrowserName.Chrome },
@@ -129,10 +128,8 @@ namespace LibraryData
         Socket SocketMulticast;
         readonly List<byte> byteImage = new();
 
-        public DataForStudent(ListBox lbxconnexion, ListBox tbxmessage, Form form)
+        public DataForStudent(Form form)
         {
-            lbxConnexion = lbxconnexion;
-            tbxMessage = tbxmessage;
             this.form = form;
             AutorisedUrls = new();
             SeleniumProcessesID = new();
@@ -359,36 +356,36 @@ namespace LibraryData
                         {
                             sender.EndConnect(result);
                             Task.Run(WaitForDemand);
-                            lbxConnexion.Invoke(new MethodInvoker(delegate { lbxConnexion.Items.Add("Connected"); }));
+                            NewConnexionMessageEvent.Invoke(this, new NewMessageEventArgs("Connected"));
                             return sender;
                         }
                         else
                         {
                             sender.Close();
-                            lbxConnexion.Invoke(new MethodInvoker(delegate { lbxConnexion.Items.Add("Connexion failed to " + IpToTeacher + " Error: " + result); }));
+                            NewConnexionMessageEvent.Invoke(this, new NewMessageEventArgs("Connexion failed to " + IpToTeacher + " Error: " + result));
                         }
                     }
                     // Manage of Socket's Exceptions
                     catch (ArgumentNullException ane)
                     {
-                        lbxConnexion.Invoke(new MethodInvoker(delegate { lbxConnexion.Items.Add("ArgumentNullException : " + ane.ToString()); }));
+                        NewConnexionMessageEvent.Invoke(this, new NewMessageEventArgs("ArgumentNullException : " + ane.ToString()));
                         Thread.Sleep(1000);
                     }
                     catch (SocketException se)
                     {
-                        lbxConnexion.Invoke(new MethodInvoker(delegate { lbxConnexion.Items.Add("SocketException : " + se.ToString()); }));
+                        NewConnexionMessageEvent.Invoke(this, new NewMessageEventArgs("SocketException : " + se.ToString()));
                         Thread.Sleep(1000);
                     }
                     catch (Exception e)
                     {
-                        lbxConnexion.Invoke(new MethodInvoker(delegate { lbxConnexion.Items.Add("Unexpected exception : " + e.ToString()); }));
+                        NewConnexionMessageEvent.Invoke(this, new NewMessageEventArgs("Unexpected exception : " + e.ToString()));
                         Thread.Sleep(1000);
                     }
                 }
             }
             catch (Exception e)
             {
-                lbxConnexion.Invoke(new MethodInvoker(delegate { lbxConnexion.Items.Add(e.ToString()); }));
+                NewConnexionMessageEvent.Invoke(this, new NewMessageEventArgs(e.ToString()));
                 Thread.Sleep(1000);
             }
             return null;
@@ -408,7 +405,7 @@ namespace LibraryData
                 catch (SocketException) { return; }
                 Array.Resize(ref info, lenght);
                 Command command = JsonSerializer.Deserialize<Command>(Encoding.Default.GetString(info));
-                lbxConnexion.Invoke(new MethodInvoker(delegate { lbxConnexion.Items.Add(command.ToString()); }));
+                NewConnexionMessageEvent.Invoke(this, new NewMessageEventArgs(command.ToString()));
                 switch (command.Type)
                 {
                     case CommandType.DemandData: SendData(); break;
@@ -443,7 +440,7 @@ namespace LibraryData
         {
             SocketToTeacher.Disconnect(false);
             SocketToTeacher = null;
-            lbxConnexion.Invoke(new MethodInvoker(delegate { lbxConnexion.Items.Add("Le professeur a coupé la connexion"); }));
+            NewConnexionMessageEvent.Invoke(this, new NewMessageEventArgs("Le professeur a coupé la connexion"));
             Thread.Sleep(1000);
             SocketToTeacher = Task.Run(() => ConnectToTeacher(11111)).Result;
         }
@@ -502,7 +499,7 @@ namespace LibraryData
             byte[] bytemessage = new byte[1024];
             int nbData = SocketToTeacher.Receive(bytemessage);
             Array.Resize(ref bytemessage, nbData);
-            tbxMessage.Invoke(new MethodInvoker(delegate { tbxMessage.Items.Add(DateTime.Now.ToString("hh:mm ") + Encoding.Default.GetString(bytemessage)); }));
+            NewMessageEvent.Invoke(this, new NewMessageEventArgs(DateTime.Now.ToString("hh:mm ") + Encoding.Default.GetString(bytemessage)));
         }
 
         #endregion
@@ -574,7 +571,7 @@ namespace LibraryData
             }
             else
             {
-                lbxConnexion.Invoke(new MethodInvoker(delegate { lbxConnexion.Items.Add("Erreur de reception"); }));
+                NewConnexionMessageEvent.Invoke(this, new NewMessageEventArgs("Erreur de reception"));
                 isReceiving = false;
             }
         }
@@ -713,6 +710,12 @@ namespace LibraryData
     {
         public Url url;
         public NewTabEventArgs(Url newUrl) { url = newUrl; }
+    }
+
+    public class NewMessageEventArgs : EventArgs
+    {
+        public string Message;
+        public NewMessageEventArgs(string message) { Message = message; }
     }
 
     public class NewImageEventArgs : EventArgs
