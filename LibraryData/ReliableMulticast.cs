@@ -107,15 +107,14 @@ namespace LibraryData
     /// </summary>
     public class ReliableMulticastReceiver
     {
+        public event EventHandler<NewImageEventArgs> NewImageEvent;
         readonly private List<ReliableImage> Images = new();
-        readonly private PictureBox pbxImage;
         readonly Socket SocketToReceive;
         public bool Receiving { get; set; }
 
-        public ReliableMulticastReceiver(Socket socket, PictureBox pbxImage)
+        public ReliableMulticastReceiver(Socket socket)
         {
             SocketToReceive = socket;
-            this.pbxImage = pbxImage;
             Receiving = true;
             Task.Run(Receive);
         }
@@ -145,7 +144,7 @@ namespace LibraryData
 
         private void DisplayImage(object sender, ImageCompletedEventArgs e)
         {
-            pbxImage.Image = e.CompletedImage;
+            NewImageEvent.Invoke(sender,new NewImageEventArgs(e.CompletedImage));
             for (int i = 0; i < Images.Count; i++)
             {
                 if (Images[i].ImageNumber <= e.ImageId) { Images.Remove(Images[i]); }
@@ -201,5 +200,11 @@ namespace LibraryData
 
         public int ImageId { get; set; }
         public Bitmap CompletedImage { get; set; }
+    }
+
+    public class NewImageEventArgs : EventArgs
+    {
+        public Bitmap image { get; }
+        public NewImageEventArgs(Bitmap newimage) { image = newimage; }
     }
 }

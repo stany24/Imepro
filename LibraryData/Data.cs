@@ -124,6 +124,11 @@ namespace LibraryData
         public List<string> AutorisedUrls { get; set; }
         public List<int> SeleniumProcessesID { get; set; }
 
+        public void DisplayImage(object sender, NewImageEventArgs e)
+        {
+            NewImageEvent.Invoke(this,e);
+        }
+
         public DataForStudent()
         {
             AutorisedUrls = new();
@@ -507,7 +512,8 @@ namespace LibraryData
             IPAddress ip = IPAddress.Parse("232.1.2.3");
             SocketMulticast.SetSocketOption(SocketOptionLevel.IP, SocketOptionName.AddMembership, new MulticastOption(ip, IPAddress.Any));
 
-            MulticastReceiver = new ReliableMulticastReceiver(SocketMulticast, pbxScreenShot);
+            MulticastReceiver = new ReliableMulticastReceiver(SocketMulticast);
+            MulticastReceiver.NewImageEvent += DisplayImage;
         }
 
 
@@ -520,35 +526,30 @@ namespace LibraryData
             int size = SocketToTeacher.Receive(message);
             Array.Resize(ref message, size);
             options = JsonSerializer.Deserialize<StreamOptions>(Encoding.Default.GetString(message));
-            pbxScreenShot.Invoke(new MethodInvoker(delegate { pbxScreenShot.Visible = true; }));
-            form.Invoke(new MethodInvoker(delegate
+            ChangePropertyEvent.Invoke(this, new ChangePropertyEventArgs("pbxScreenShot", "Visible", true));
+
+            switch (options.GetPriority())
             {
-                form.Show();
-                //form.Controls.SetChildIndex(pbxScreenShot, 0);
-                switch (options.GetPriority())
-                {
-                    case Priority.Fullscreen:
-                        form.FormBorderStyle = FormBorderStyle.None;
-                        form.WindowState = FormWindowState.Maximized;
-                        break;
-                    case Priority.Blocking:
-                        form.FormBorderStyle = FormBorderStyle.None;
-                        form.WindowState = FormWindowState.Maximized;
-                        form.TopMost = true;
-                        mouseDisabled = true;
-                        Task.Run(DisableMouseEverySecond);
-                        DisableKeyboard();
-                        break;
-                    case Priority.Topmost:
-                        form.TopMost = true;
-                        form.FormBorderStyle = FormBorderStyle.None;
-                        form.WindowState = FormWindowState.Maximized;
-                        break;
-                    case Priority.Widowed:
-                        //form.Controls.SetChildIndex(pbxScreenShot, 0);
-                        break;
-                }
-            }));
+                case Priority.Fullscreen:
+                    ChangePropertyEvent.Invoke(this, new ChangePropertyEventArgs("form", "FormBorderStyle", FormBorderStyle.None));
+                    ChangePropertyEvent.Invoke(this, new ChangePropertyEventArgs("form", "WindowState", FormWindowState.Maximized));
+                    break;
+                case Priority.Blocking:
+                    ChangePropertyEvent.Invoke(this, new ChangePropertyEventArgs("form", "FormBorderStyle", FormBorderStyle.None));
+                    ChangePropertyEvent.Invoke(this, new ChangePropertyEventArgs("form", "WindowState", FormWindowState.Maximized));
+                    ChangePropertyEvent.Invoke(this, new ChangePropertyEventArgs("form", "TopMost", true));
+                    mouseDisabled = true;
+                    Task.Run(DisableMouseEverySecond);
+                    DisableKeyboard();
+                    break;
+                case Priority.Topmost:
+                    ChangePropertyEvent.Invoke(this, new ChangePropertyEventArgs("form", "FormBorderStyle", FormBorderStyle.None));
+                    ChangePropertyEvent.Invoke(this, new ChangePropertyEventArgs("form", "WindowState", FormWindowState.Maximized));
+                    ChangePropertyEvent.Invoke(this, new ChangePropertyEventArgs("form", "TopMost", true));
+                    break;
+                case Priority.Widowed:
+                    break;
+            }
         }
 
         #endregion
@@ -645,12 +646,6 @@ namespace LibraryData
     {
         public string Message { get; }
         public NewMessageEventArgs(string message) { Message = message; }
-    }
-
-    public class NewImageEventArgs : EventArgs
-    {
-        public Bitmap image { get; }
-        public NewImageEventArgs(Bitmap newimage) { image = newimage; }
     }
 
     public class ChangePropertyEventArgs : EventArgs

@@ -28,11 +28,10 @@ namespace ApplicationCliente
             InitializeComponent();
             SplitterImageButtons.Panel1.Controls.SetChildIndex(pbxScreenShot, 0);
             Student = new();
-            Controls.SetChildIndex(pbxScreenShot, 0);
             Student.ChangePropertyEvent += ChangeProperty;
-            Student.NewImageEvent += ChangeImage;
             Student.NewMessageEvent += AddMessage;
             Student.NewConnexionMessageEvent += AddConnexionMessage;
+            Student.NewImageEvent += DisplayImage;
             try
             {
                 Student.IpToTeacher = IpForTheWeek.GetIp();
@@ -44,9 +43,9 @@ namespace ApplicationCliente
             Task.Run(LaunchTasks);
         }
 
-        private void ChangeImage(object sender, NewImageEventArgs e)
+        private void DisplayImage(object sender,NewImageEventArgs e)
         {
-            pbxScreenShot.Invoke(new MethodInvoker(delegate { pbxScreenShot.Image = e.image; }));
+            pbxScreenShot.Image = e.image;
         }
 
         private void AddMessage(object sender, NewMessageEventArgs e)
