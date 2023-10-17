@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
+using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -26,7 +27,12 @@ namespace ApplicationCliente
         {
             InitializeComponent();
             SplitterImageButtons.Panel1.Controls.SetChildIndex(pbxScreenShot, 0);
-            Student = new(lbxConnexion, pbxScreenShot, lbxMessages, this);
+            Student = new();
+            Controls.SetChildIndex(pbxScreenShot, 0);
+            Student.ChangePropertyEvent += ChangeProperty;
+            Student.NewImageEvent += ChangeImage;
+            Student.NewMessageEvent += AddMessage;
+            Student.NewConnexionMessageEvent += AddConnexionMessage;
             try
             {
                 Student.IpToTeacher = IpForTheWeek.GetIp();
@@ -36,6 +42,51 @@ namespace ApplicationCliente
                 NewTeacherIP(new object(), new EventArgs());
             }
             Task.Run(LaunchTasks);
+        }
+
+        private void ChangeImage(object sender, NewImageEventArgs e)
+        {
+            pbxScreenShot.Invoke(new MethodInvoker(delegate { pbxScreenShot.Image = e.image; }));
+        }
+
+        private void AddMessage(object sender, NewMessageEventArgs e)
+        {
+            lbxMessages.Invoke(new MethodInvoker(delegate { lbxConnexion.Items.Add(e.Message); }));
+        }
+
+        private void AddConnexionMessage(object sender, NewMessageEventArgs e)
+        {
+            lbxConnexion.Invoke(new MethodInvoker(delegate { lbxConnexion.Items.Add(e.Message); }));
+        }
+
+        private void ChangeProperty(object sender,ChangePropertyEventArgs e)
+        {
+            Control control = FindControlRecursive(this,e.ControlName);
+            if (control == null) { return; }
+            PropertyInfo propInfo = control.GetType().GetProperty(e.PropertyName);
+            if (propInfo.CanWrite)
+            {
+                control.Invoke(new MethodInvoker(delegate { propInfo.SetValue(control, e.PropertyValue); }));
+            }
+        }
+
+        public static Control FindControlRecursive(Control container, string name)
+        {
+            if (container == null)
+                return null;
+
+            Control foundControl = container.Controls[name];
+            if (foundControl != null)
+                return foundControl;
+
+            foreach (Control childControl in container.Controls)
+            {
+                foundControl = FindControlRecursive(childControl, name);
+                if (foundControl != null)
+                    return foundControl;
+            }
+
+            return null;
         }
 
         /// <summary>
