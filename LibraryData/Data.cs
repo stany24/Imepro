@@ -99,10 +99,10 @@ namespace LibraryData
         #region Variables/Constructeur
 
         readonly private List<string> DefaultProcess = new();
-        readonly private ListBox lbxConnexion;
-        readonly private PictureBox pbxScreenShot;
-        readonly private ListBox tbxMessage;
-        readonly private Form form;
+        public event EventHandler<NewImageEventArgs> NewImageEvent;
+        public event EventHandler<ChangePropertyEventArgs> ChangePropertyEvent;
+        public event EventHandler<NewMessageEventArgs> NewMessageEvent;
+        public event EventHandler<NewMessageEventArgs> NewConnexionMessageEvent;
         readonly private Dictionary<string, BrowserName> browsersList = new() {
             { "chrome",BrowserName.Chrome },
             { "firefox", BrowserName.Firefox },
@@ -126,12 +126,8 @@ namespace LibraryData
         Socket SocketMulticast;
         readonly List<byte> byteImage = new();
 
-        public DataForStudent(ListBox lbxconnexion, PictureBox pbxscreenshot, ListBox tbxmessage, Form form)
+        public DataForStudent()
         {
-            lbxConnexion = lbxconnexion;
-            pbxScreenShot = pbxscreenshot;
-            tbxMessage = tbxmessage;
-            this.form = form;
             AutorisedUrls = new();
             SeleniumProcessesID = new();
             GetDefaultProcesses();
@@ -357,36 +353,36 @@ namespace LibraryData
                         {
                             sender.EndConnect(result);
                             Task.Run(WaitForDemand);
-                            lbxConnexion.Invoke(new MethodInvoker(delegate { lbxConnexion.Items.Add("Connected"); }));
+                            NewConnexionMessageEvent.Invoke(this, new NewMessageEventArgs("Connected"));
                             return sender;
                         }
                         else
                         {
                             sender.Close();
-                            lbxConnexion.Invoke(new MethodInvoker(delegate { lbxConnexion.Items.Add("Connexion failed to " + IpToTeacher + " Error: " + result); }));
+                            NewConnexionMessageEvent.Invoke(this, new NewMessageEventArgs("Connexion failed to " + IpToTeacher + " Error: " + result));
                         }
                     }
                     // Manage of Socket's Exceptions
                     catch (ArgumentNullException ane)
                     {
-                        lbxConnexion.Invoke(new MethodInvoker(delegate { lbxConnexion.Items.Add("ArgumentNullException : " + ane.ToString()); }));
+                        NewConnexionMessageEvent.Invoke(this, new NewMessageEventArgs("ArgumentNullException : " + ane.ToString()));
                         Thread.Sleep(1000);
                     }
                     catch (SocketException se)
                     {
-                        lbxConnexion.Invoke(new MethodInvoker(delegate { lbxConnexion.Items.Add("SocketException : " + se.ToString()); }));
+                        NewConnexionMessageEvent.Invoke(this, new NewMessageEventArgs("SocketException : " + se.ToString()));
                         Thread.Sleep(1000);
                     }
                     catch (Exception e)
                     {
-                        lbxConnexion.Invoke(new MethodInvoker(delegate { lbxConnexion.Items.Add("Unexpected exception : " + e.ToString()); }));
+                        NewConnexionMessageEvent.Invoke(this, new NewMessageEventArgs("Unexpected exception : " + e.ToString()));
                         Thread.Sleep(1000);
                     }
                 }
             }
             catch (Exception e)
             {
-                lbxConnexion.Invoke(new MethodInvoker(delegate { lbxConnexion.Items.Add(e.ToString()); }));
+                NewConnexionMessageEvent.Invoke(this, new NewMessageEventArgs(e.ToString()));
                 Thread.Sleep(1000);
             }
             return null;
@@ -406,7 +402,7 @@ namespace LibraryData
                 catch (SocketException) { return; }
                 Array.Resize(ref info, lenght);
                 Command command = JsonSerializer.Deserialize<Command>(Encoding.Default.GetString(info));
-                lbxConnexion.Invoke(new MethodInvoker(delegate { lbxConnexion.Items.Add(command.ToString()); }));
+                NewConnexionMessageEvent.Invoke(this, new NewMessageEventArgs(command.ToString()));
                 switch (command.Type)
                 {
                     case CommandType.DemandData: SendData(); break;
@@ -441,7 +437,7 @@ namespace LibraryData
         {
             SocketToTeacher.Disconnect(false);
             SocketToTeacher = null;
-            lbxConnexion.Invoke(new MethodInvoker(delegate { lbxConnexion.Items.Add("Le professeur a coupé la connexion"); }));
+            NewConnexionMessageEvent.Invoke(this, new NewMessageEventArgs("Le professeur a coupé la connexion"));
             Thread.Sleep(1000);
             SocketToTeacher = Task.Run(() => ConnectToTeacher(11111)).Result;
         }
@@ -463,8 +459,8 @@ namespace LibraryData
         {
             isReceiving = false;
             mouseDisabled = false;
-            form.Invoke(new MethodInvoker(delegate { form.FormBorderStyle = FormBorderStyle.Sizable; }));
-            pbxScreenShot.Invoke(new MethodInvoker(delegate { pbxScreenShot.Visible = false; }));
+            ChangePropertyEvent.Invoke(this, new ChangePropertyEventArgs("form", "FormBorderStyle", FormBorderStyle.Sizable));
+            ChangePropertyEvent.Invoke(this, new ChangePropertyEventArgs("pbxScreenShot", "Visible", false));
             gkh.Unhook();
         }
 
@@ -500,7 +496,7 @@ namespace LibraryData
             byte[] bytemessage = new byte[1024];
             int nbData = SocketToTeacher.Receive(bytemessage);
             Array.Resize(ref bytemessage, nbData);
-            tbxMessage.Invoke(new MethodInvoker(delegate { tbxMessage.Items.Add(DateTime.Now.ToString("hh:mm ") + Encoding.Default.GetString(bytemessage)); }));
+            NewMessageEvent.Invoke(this, new NewMessageEventArgs(DateTime.Now.ToString("hh:mm ") + Encoding.Default.GetString(bytemessage)));
         }
 
         #endregion
@@ -563,7 +559,7 @@ namespace LibraryData
                 if (size != 65000)
                 {
                     Bitmap bitmap = new(new MemoryStream(byteImage.ToArray()));
-                    pbxScreenShot.Invoke(new MethodInvoker(delegate { pbxScreenShot.Image = bitmap; }));
+                    NewImageEvent.Invoke(this, new NewImageEventArgs(bitmap));
                     byteImage.Clear();
                 }
 
@@ -572,7 +568,7 @@ namespace LibraryData
             }
             else
             {
-                lbxConnexion.Invoke(new MethodInvoker(delegate { lbxConnexion.Items.Add("Erreur de reception"); }));
+                NewConnexionMessageEvent.Invoke(this, new NewMessageEventArgs("Erreur de reception"));
                 isReceiving = false;
             }
         }
@@ -586,35 +582,30 @@ namespace LibraryData
             int size = SocketToTeacher.Receive(message);
             Array.Resize(ref message, size);
             options = JsonSerializer.Deserialize<StreamOptions>(Encoding.Default.GetString(message));
-            pbxScreenShot.Invoke(new MethodInvoker(delegate { pbxScreenShot.Visible = true; }));
-            form.Invoke(new MethodInvoker(delegate
+            ChangePropertyEvent.Invoke(this, new ChangePropertyEventArgs("pbxScreenShot", "Visible", true));
+
+            switch (options.GetPriority()) 
             {
-                form.Show();
-                form.Controls.SetChildIndex(pbxScreenShot, 0);
-                switch (options.GetPriority())
-                {
-                    case Priority.Fullscreen:
-                        form.FormBorderStyle = FormBorderStyle.None;
-                        form.WindowState = FormWindowState.Maximized;
-                        break;
-                    case Priority.Blocking:
-                        form.FormBorderStyle = FormBorderStyle.None;
-                        form.WindowState = FormWindowState.Maximized;
-                        form.TopMost = true;
-                        mouseDisabled = true;
-                        Task.Run(DisableMouseEverySecond);
-                        DisableKeyboard();
-                        break;
-                    case Priority.Topmost:
-                        form.TopMost = true;
-                        form.FormBorderStyle = FormBorderStyle.None;
-                        form.WindowState = FormWindowState.Maximized;
-                        break;
-                    case Priority.Widowed:
-                        form.Controls.SetChildIndex(pbxScreenShot, 0);
-                        break;
-                }
-            }));
+                case Priority.Fullscreen:
+                    ChangePropertyEvent.Invoke(this, new ChangePropertyEventArgs("form", "FormBorderStyle", FormBorderStyle.None));
+                    ChangePropertyEvent.Invoke(this, new ChangePropertyEventArgs("form", "WindowState", FormWindowState.Maximized));
+                    break;
+                case Priority.Blocking:
+                    ChangePropertyEvent.Invoke(this, new ChangePropertyEventArgs("form", "FormBorderStyle", FormBorderStyle.None));
+                    ChangePropertyEvent.Invoke(this, new ChangePropertyEventArgs("form", "WindowState", FormWindowState.Maximized));
+                    ChangePropertyEvent.Invoke(this, new ChangePropertyEventArgs("form", "TopMost", true));
+                    mouseDisabled = true;
+                    Task.Run(DisableMouseEverySecond);
+                    DisableKeyboard();
+                    break;
+                case Priority.Topmost:
+                    ChangePropertyEvent.Invoke(this, new ChangePropertyEventArgs("form", "FormBorderStyle", FormBorderStyle.None));
+                    ChangePropertyEvent.Invoke(this, new ChangePropertyEventArgs("form", "WindowState", FormWindowState.Maximized));
+                    ChangePropertyEvent.Invoke(this, new ChangePropertyEventArgs("form", "TopMost", true));
+                    break;
+                case Priority.Widowed:
+                    break;
+            }   
         }
 
         #endregion
@@ -705,5 +696,31 @@ namespace LibraryData
         }
 
         #endregion
+    }
+
+    public class NewMessageEventArgs : EventArgs
+    {
+        public string Message { get; }
+        public NewMessageEventArgs(string message) { Message = message; }
+    }
+
+    public class NewImageEventArgs : EventArgs
+    {
+        public Bitmap image { get; }
+        public NewImageEventArgs(Bitmap newimage) { image = newimage; }
+    }
+
+    public class ChangePropertyEventArgs : EventArgs
+    {
+        public string ControlName { get; }
+        public string PropertyName { get; }
+        public object PropertyValue { get; }
+
+        public ChangePropertyEventArgs(string controlName, string propertyName, object propertyValue)
+        {
+            ControlName = controlName;
+            PropertyName = propertyName;
+            PropertyValue = propertyValue;
+        }
     }
 }

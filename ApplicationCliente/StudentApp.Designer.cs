@@ -30,7 +30,7 @@
         {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(StudentApp));
-            this.pbxScreeShot = new System.Windows.Forms.PictureBox();
+            this.pbxScreenShot = new System.Windows.Forms.PictureBox();
             this.lbxConnexion = new System.Windows.Forms.ListBox();
             this.btnHelp = new System.Windows.Forms.Button();
             this.btnChangeIP = new System.Windows.Forms.Button();
@@ -40,18 +40,18 @@
             this.lbxMessages = new System.Windows.Forms.ListBox();
             this.btnResetAllIP = new System.Windows.Forms.Button();
             this.btnWebView2 = new System.Windows.Forms.Button();
-            ((System.ComponentModel.ISupportInitialize)(this.pbxScreeShot)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pbxScreenShot)).BeginInit();
             this.SuspendLayout();
             // 
             // pbxScreeShot
             // 
-            this.pbxScreeShot.Location = new System.Drawing.Point(16, 187);
-            this.pbxScreeShot.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
-            this.pbxScreeShot.Name = "pbxScreeShot";
-            this.pbxScreeShot.Size = new System.Drawing.Size(1580, 673);
-            this.pbxScreeShot.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
-            this.pbxScreeShot.TabIndex = 4;
-            this.pbxScreeShot.TabStop = false;
+            this.pbxScreenShot.Location = new System.Drawing.Point(16, 187);
+            this.pbxScreenShot.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.pbxScreenShot.Name = "pbxScreeShot";
+            this.pbxScreenShot.Size = new System.Drawing.Size(1580, 673);
+            this.pbxScreenShot.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            this.pbxScreenShot.TabIndex = 4;
+            this.pbxScreenShot.TabStop = false;
             // 
             // lbxConnexion
             // 
@@ -151,21 +151,21 @@
             this.Controls.Add(this.lblMessage);
             this.Controls.Add(this.btnChangeIP);
             this.Controls.Add(this.btnHelp);
-            this.Controls.Add(this.pbxScreeShot);
+            this.Controls.Add(this.pbxScreenShot);
             this.Controls.Add(this.lbxConnexion);
             this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.Name = "StudentApp";
             this.Text = "Imepro";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.OnClosing);
             this.Resize += new System.EventHandler(this.StudentAppResized);
-            ((System.ComponentModel.ISupportInitialize)(this.pbxScreeShot)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pbxScreenShot)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
         }
 
         #endregion
-        private System.Windows.Forms.PictureBox pbxScreeShot;
+        private System.Windows.Forms.PictureBox pbxScreenShot;
         private System.Windows.Forms.ListBox lbxConnexion;
         private System.Windows.Forms.Button btnHelp;
         private System.Windows.Forms.Button btnChangeIP;
