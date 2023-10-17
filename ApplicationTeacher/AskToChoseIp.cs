@@ -7,15 +7,25 @@ namespace ApplicationTeacher
 {
     public partial class AskToChoseIp : Form
     {
+        #region
+
         private IPAddress ChoosenIp;
 
         public IPAddress GetChoosenIp() { return ChoosenIp; }
+
+        #endregion
+
+        #region
 
         public AskToChoseIp(List<IPAddress> adresses)
         {
             InitializeComponent();
             foreach (IPAddress address in adresses) { lbxAdresses.Items.Add(address); }
         }
+
+        #endregion
+
+        #region Address
 
         /// <summary>
         /// Function that confirms the selected ip.
@@ -46,5 +56,7 @@ namespace ApplicationTeacher
         {
             Confirmer_Click(sender, e);
         }
+
+        #endregion
     }
 }

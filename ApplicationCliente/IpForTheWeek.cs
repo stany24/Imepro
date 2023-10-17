@@ -20,10 +20,7 @@ namespace ApplicationCliente
             try { IPAddress.Parse(ip); }
             catch { return; }
             Dictionary<string, string[]> Days;
-            try
-            {
-                Days = JsonSerializer.Deserialize<Dictionary<string, string[]>>(Properties.Settings.Default.IpForTheWeek);
-            }
+            try{Days = JsonSerializer.Deserialize<Dictionary<string, string[]>>(Properties.Settings.Default.IpForTheWeek);}
             catch (Exception) { Days = new(); }
             int IsBeforeNoon = 0;
             if (DateTime.Now.TimeOfDay > new TimeSpan(12, 35, 0)) { IsBeforeNoon = 1; }

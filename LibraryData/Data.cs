@@ -95,14 +95,10 @@ namespace LibraryData
     /// </summary>
     public class DataForStudent : Data, IMessageFilter
     {
-        #region Variables/Constructeur
+        #region Variables/Events
 
-        private ReliableMulticastReceiver MulticastReceiver { get; set; }
         readonly private List<string> DefaultProcess = new();
-        public event EventHandler<NewImageEventArgs> NewImageEvent;
-        public event EventHandler<ChangePropertyEventArgs> ChangePropertyEvent;
-        public event EventHandler<NewMessageEventArgs> NewMessageEvent;
-        public event EventHandler<NewMessageEventArgs> NewConnexionMessageEvent;
+        readonly private GlobalKeyboardHook gkh = new();
         readonly private Dictionary<string, BrowserName> browsersList = new() {
             { "chrome",BrowserName.Chrome },
             { "firefox", BrowserName.Firefox },
@@ -111,53 +107,41 @@ namespace LibraryData
             { "opera", BrowserName.Opera },
             { "msedge",BrowserName.Edge } };
 
-        private int screenToStream;
-        private readonly GlobalKeyboardHook gkh = new();
+        private ReliableMulticastReceiver MulticastReceiver { get; set; }
         private Rectangle OldRect = Rectangle.Empty;
         private StreamOptions options;
+        private int screenToStream;
+
         private bool mouseDisabled = false;
         private bool isReceiving = false;
         private bool isControled = false;
+
+        public event EventHandler<NewMessageEventArgs> NewConnexionMessageEvent;
+        public event EventHandler<ChangePropertyEventArgs> ChangePropertyEvent;
+        public event EventHandler<NewMessageEventArgs> NewMessageEvent;
+        public event EventHandler<NewImageEventArgs> NewImageEvent;
 
         public Socket SocketToTeacher { get; set; }
         public IPAddress IpToTeacher { get; set; }
         public List<string> AutorisedUrls { get; set; }
         public List<int> SeleniumProcessesID { get; set; }
 
-        public void DisplayImage(object sender, NewImageEventArgs e)
-        {
-            NewImageEvent.Invoke(this,e);
-        }
+        #endregion
+
+        #region Constructor
 
         public DataForStudent()
         {
             AutorisedUrls = new();
             SeleniumProcessesID = new();
             GetDefaultProcesses();
-            GetNames();
-        }
-
-        /// <summary>
-        /// Function to get the computer name and the user name
-        /// </summary>
-        private void GetNames()
-        {
             ComputerName = Environment.MachineName;
             UserName = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
         }
 
-        /// <summary>
-        /// Function returning an instance of the parent class
-        /// </summary>
-        /// <returns></returns>
-        private Data ToData()
-        {
-            return new Data(UserName, ComputerName, Urls, Processes);
-        }
-
         #endregion
 
-        #region Récupération Url/Processus/Image
+        #region Retrival of Url/Processes/Image
 
         /// <summary>
         /// Function to get the tab name in all browser.
@@ -303,6 +287,15 @@ namespace LibraryData
         }
 
         /// <summary>
+        /// Function returning an instance of the parent class
+        /// </summary>
+        /// <returns></returns>
+        private Data ToData()
+        {
+            return new Data(UserName, ComputerName, Urls, Processes);
+        }
+
+        /// <summary>
         /// Function to send the screenshot to the teacher.
         /// </summary>
         private void SendImage(Bitmap image, Socket socket)
@@ -315,7 +308,7 @@ namespace LibraryData
 
         #endregion
 
-        #region Connexion/Reception
+        #region Connexion
 
         /// <summary>
         /// Function used to connect to the teacher application.
@@ -384,6 +377,10 @@ namespace LibraryData
             }
             return null;
         }
+
+        #endregion
+
+        #region Receving/Applying
 
         /// <summary>
         /// Function waiting for teacher demand and responding correctly.
@@ -516,6 +513,15 @@ namespace LibraryData
             MulticastReceiver.NewImageEvent += DisplayImage;
         }
 
+        /// <summary>
+        /// Function that changes the displayed image by the new one.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        public void DisplayImage(object sender, NewImageEventArgs e)
+        {
+            NewImageEvent.Invoke(this, e);
+        }
 
         /// <summary>
         /// Function that receive the multicast stream settings and apply them.
@@ -554,7 +560,7 @@ namespace LibraryData
 
         #endregion
 
-        #region Blocage
+        #region Blocking user
 
         /// <summary>
         /// Function to block all keyboard inputs.
@@ -642,12 +648,18 @@ namespace LibraryData
         #endregion
     }
 
+    /// <summary>
+    /// Event to signal a new message
+    /// </summary>
     public class NewMessageEventArgs : EventArgs
     {
         public string Message { get; }
         public NewMessageEventArgs(string message) { Message = message; }
     }
 
+    /// <summary>
+    /// Event to signal a change of property is needed
+    /// </summary>
     public class ChangePropertyEventArgs : EventArgs
     {
         public string ControlName { get; }

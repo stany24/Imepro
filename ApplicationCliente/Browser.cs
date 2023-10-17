@@ -12,23 +12,33 @@ namespace ApplicationCliente
 {
     public class Browser : Panel
     {
+        #region Variables
+
         private readonly List<Tab> tabs;
         private readonly Button btnNewTab;
         public event EventHandler<NewTabEventArgs> NewTabEvent;
+
+        #endregion
+
+        #region Constructor
 
         public Browser()
         {
             Dock = DockStyle.Fill;
             tabs = new List<Tab>();
-            btnNewTab = new Button()
-            {
-                Text = "new"
-            };
+            btnNewTab = new Button(){Text = "new"};
             btnNewTab.Click += new EventHandler(NewTab);
             Controls.Add(btnNewTab);
             NewTab(new object(), new EventArgs());
         }
 
+        #endregion
+
+        #region Tabs
+
+        /// <summary>
+        /// Function used to place all tabs at the right location and the right size.
+        /// </summary>
         private void UpdateLocations()
         {
             int CurrentOffset = 0;
@@ -40,6 +50,11 @@ namespace ApplicationCliente
             btnNewTab.Location = new Point(CurrentOffset, 0);
         }
 
+        /// <summary>
+        /// Function used to create a new tab.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void NewTab(object sender, EventArgs e)
         {
             Tab tab = new(Width, Height);
@@ -54,11 +69,11 @@ namespace ApplicationCliente
             UpdateLocations();
         }
 
-        private void SignalNewTab(object sender, NewTabEventArgs e)
-        {
-            NewTabEvent.Invoke(this, new NewTabEventArgs(e.Url));
-        }
-
+        /// <summary>
+        /// Function used to resize all webviews.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void ResizeAllWebview(object sender, EventArgs e)
         {
             foreach (Tab tab in tabs)
@@ -67,6 +82,11 @@ namespace ApplicationCliente
             }
         }
 
+        /// <summary>
+        /// Function used to hide all other tabs.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void HideOtherTabs(object sender, EventArgs e)
         {
             if (!(sender as CustomWebView2).Visible) { return; }
@@ -76,6 +96,11 @@ namespace ApplicationCliente
             }
         }
 
+        /// <summary>
+        /// Function used to remove a tab from the browser.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void RemoveTabFromList(object sender, EventArgs e)
         {
             CustomWebView2 closedTab = sender as CustomWebView2;
@@ -90,27 +115,50 @@ namespace ApplicationCliente
             }
             UpdateLocations();
         }
+
+        #endregion
+
+        #region Event Handeling
+
+        private void SignalNewTab(object sender, NewTabEventArgs e)
+        {
+            NewTabEvent.Invoke(this, new NewTabEventArgs(e.Url));
+        }
+
+        #endregion
     }
 
+    /// <summary>
+    /// Event that signals the creation of a new tab.
+    /// </summary>
     public class NewTabEventArgs : EventArgs
     {
         public Url Url { get; set; }
         public NewTabEventArgs(Url newUrl) { Url = newUrl; }
     }
 
+    /// <summary>
+    /// Class used to represent a web browser tab.
+    /// </summary>
     public class Tab
     {
+        #region Variables
+
         public CustomWebView2 Webview { get; set; }
         public TabPreview Preview { get; set; }
-        public ControlBar ControlBar { get; set; }
+        public NavigationBar ControlBar { get; set; }
 
         private const int GAP_BETWEEN_PREVIEW_AND_CONTROL_BAR_PX = 10;
         private const int GAP_BETWEEN_CONTROL_BAR_AND_WEBVIEW_PX = 10;
 
+        #endregion
+
+        #region Constructor
+
         public Tab(int width, int height)
         {
             Preview = new TabPreview();
-            ControlBar = new ControlBar()
+            ControlBar = new NavigationBar()
             {
                 Location = new Point(0, Preview.Height + GAP_BETWEEN_PREVIEW_AND_CONTROL_BAR_PX)
             };
@@ -131,23 +179,61 @@ namespace ApplicationCliente
             Webview.SourceChanged += new EventHandler<CoreWebView2SourceChangedEventArgs>(UrlChanged);
         }
 
+        #endregion
+
+        #region Tab
+
+        /// <summary>
+        /// Function used to resize the webview.
+        /// </summary>
+        /// <param name="width"></param>
+        /// <param name="height"></param>
         public void ResizeWebview(int width, int height)
         {
             Webview.Size = new Size(width, height - Webview.Location.Y);
         }
 
+        /// <summary>
+        /// Function used to show this tab.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         public void ShowTab(object sender, EventArgs e)
         {
             Webview.Show();
             ControlBar.Show();
         }
 
+        /// <summary>
+        /// Function used to hide this tab.
+        /// </summary>
         public void HideTab()
         {
             Webview.Hide();
             ControlBar.Hide();
         }
 
+        /// <summary>
+        /// Function used to permanantly close this tab.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void CloseTab(object sender, EventArgs e)
+        {
+            Preview.Dispose();
+            Webview.Dispose();
+            ControlBar.Dispose();
+        }
+
+        #endregion
+
+        #region Url
+
+        /// <summary>
+        /// Function used to make a search.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         public void Search_Click(object sender, EventArgs e)
         {
             if (ControlBar.tbxUrl.Text.ToLower().StartsWith("https://") || ControlBar.tbxUrl.Text.ToLower().StartsWith("http://"))
@@ -162,21 +248,26 @@ namespace ApplicationCliente
             }
         }
 
+        /// <summary>
+        /// Event that signals the change of url.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         public void UrlChanged(object sender, CoreWebView2SourceChangedEventArgs e)
         {
             Preview.btnWebsiteName.Text = Webview.Source.ToString();
         }
 
-        private void CloseTab(object sender, EventArgs e)
-        {
-            Preview.Dispose();
-            Webview.Dispose();
-            ControlBar.Dispose();
-        }
+        #endregion
     }
 
-    public class ControlBar : Panel
+    /// <summary>
+    /// Class that represent a navigation bar of a web browser.
+    /// </summary>
+    public class NavigationBar : Panel
     {
+        #region Variables
+
         readonly public Button btnBack;
         readonly public Button btnForward;
         readonly public Button btnRefresh;
@@ -189,7 +280,11 @@ namespace ApplicationCliente
         private const int GAP_OF_BUTTON_FROM_CONTROL_BAR_TOP_PX = (CONTROL_BAR_HEIGHT_PX - BUTTON_HEIGHT_PX) / 2;
         private const int GAP_BETWEEN_BUTTON_PX = 10;
 
-        public ControlBar()
+        #endregion
+
+        #region Constructor
+
+        public NavigationBar()
         {
             Size = new Size(CONTROL_BAR_WIDTH_PX, CONTROL_BAR_HEIGHT_PX);
             btnBack = new()
@@ -226,10 +321,17 @@ namespace ApplicationCliente
             Controls.Add(tbxUrl);
             Controls.Add(btnEnter);
         }
+
+        #endregion
     }
 
+    /// <summary>
+    /// Class that represent a tab preview of a web browser.
+    /// </summary>
     public class TabPreview : Panel
     {
+        #region Variables
+
         public readonly Button btnWebsiteName;
         public readonly Button btnClose;
 
@@ -238,21 +340,25 @@ namespace ApplicationCliente
         private const int TAB_MAXIMIZED_WIDTH_PX = BTN_TAB_NAME_MAXIMIZED_WIDTH_PX + BTN_CLOSE_TAB_WIDTH_PX;
         private const int BTN_CLOSE_TAB_WIDTH_PX = 30;
 
+        #endregion
+
+        #region Constructor
+
         public TabPreview()
         {
-            btnWebsiteName = new Button()
-            {
-                Text = "new tab"
-            };
-            btnClose = new Button()
-            {
-                Text = "X"
-            };
+            btnWebsiteName = new Button(){Text = "new tab"};
+            btnClose = new Button(){Text = "X"};
             Size = new Size(TAB_MAXIMIZED_WIDTH_PX, TAB_HEIGHT_PX);
             Controls.Add(btnWebsiteName);
             Controls.Add(btnClose);
         }
 
+        #endregion
+
+        /// <summary>
+        /// Function used to place the preview at the right place.
+        /// </summary>
+        /// <param name="OffsetToTheRight"></param>
         public void Maximize(int OffsetToTheRight)
         {
             Location = new Point(OffsetToTheRight, 0);
@@ -263,9 +369,14 @@ namespace ApplicationCliente
         }
     }
 
+    /// <summary>
+    /// Class that inherits webview2 and implements 
+    /// </summary>
     public class CustomWebView2 : WebView2
     {
         public event EventHandler<NewTabEventArgs> NewTabEvent;
+
+        #region Constructor
 
         public CustomWebView2()
         {
@@ -274,26 +385,55 @@ namespace ApplicationCliente
             NavigationStarting += new EventHandler<CoreWebView2NavigationStartingEventArgs>(VerifyNavigation);
         }
 
+        #endregion
+
+        #region Navigation
+
+        /// <summary>
+        /// Function used to open the default page of the default browser.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void NavigateToDefaultBrowser(object sender, EventArgs e)
         {
             CoreWebView2.Navigate("https://duckduckgo.com/");
         }
 
+        /// <summary>
+        /// Function used to go back to the last page.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         public void MoveBack_Click(object sender, EventArgs e)
         {
             CoreWebView2.GoBack();
         }
 
+        /// <summary>
+        /// Function used to go to the next page.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         public void MoveForward_Click(object sender, EventArgs e)
         {
             CoreWebView2.GoForward();
         }
 
+        /// <summary>
+        /// Function used to reload the current page.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         public void Reload_Click(object sender, EventArgs e)
         {
             CoreWebView2.Reload();
         }
 
+        /// <summary>
+        /// Function used to verify the url wanted is autorised before starting the navigation.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         public void VerifyNavigation(object sender, CoreWebView2NavigationStartingEventArgs e)
         {
             e.Cancel = true;
@@ -304,6 +444,12 @@ namespace ApplicationCliente
             NewTabEvent.Invoke(this, new NewTabEventArgs(new Url(DateTime.Now, e.Uri.ToString())));
         }
 
+        #endregion
+
+        /// <summary>
+        /// Function used to get the autorised urls.
+        /// </summary>
+        /// <returns></returns>
         private List<string> GetAutorisedWebsites()
         {
             try { return JsonSerializer.Deserialize<List<string>>(Properties.Settings.Default.AutorisedWebsites); }
@@ -311,17 +457,28 @@ namespace ApplicationCliente
         }
     }
 
-    class DefaultBrowser
+    /// <summary>
+    /// Class used to represent a search browser (duckduckgo,google,etc)
+    /// </summary>
+    class SearchBrowser
     {
-        public DefaultBrowser(string browserUrl, string searchUrlStart, string searchUrlEnd)
+        #region Variable
+
+        public string BrowserUrl { get; set; }
+        public string SearchUrlStart { get; set; }
+        public string SearchUrlEnd { get; set; }
+
+        #endregion
+
+        #region Constructor
+
+        public SearchBrowser(string browserUrl, string searchUrlStart, string searchUrlEnd)
         {
             BrowserUrl = browserUrl;
             SearchUrlStart = searchUrlStart;
             SearchUrlEnd = searchUrlEnd;
         }
 
-        public string BrowserUrl { get; set; }
-        public string SearchUrlStart { get; set; }
-        public string SearchUrlEnd { get; set; }
+        #endregion
     }
 }

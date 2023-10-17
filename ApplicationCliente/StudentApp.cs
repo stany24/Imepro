@@ -22,7 +22,7 @@ namespace ApplicationCliente
 
         #endregion
 
-        #region At start
+        #region Constructor
         public StudentApp()
         {
             InitializeComponent();
@@ -32,32 +32,59 @@ namespace ApplicationCliente
             Student.NewMessageEvent += AddMessage;
             Student.NewConnexionMessageEvent += AddConnexionMessage;
             Student.NewImageEvent += DisplayImage;
-            try
-            {
-                Student.IpToTeacher = IpForTheWeek.GetIp();
-            }
-            catch (Exception)
-            {
-                NewTeacherIP(new object(), new EventArgs());
-            }
+            try{Student.IpToTeacher = IpForTheWeek.GetIp();}
+            catch (Exception){NewTeacherIP(new object(), new EventArgs());}
             Task.Run(LaunchTasks);
         }
 
+        /// <summary>
+        /// Function waiting for the form to be fully created before launching background tasks.
+        /// </summary>
+        public void LaunchTasks()
+        {
+            while (!IsHandleCreated) { Thread.Sleep(100); }
+            Student.SocketToTeacher = Task.Run(() => Student.ConnectToTeacher(11111)).Result;
+        }
+
+        #endregion
+
+        #region Event Handeling
+
+        /// <summary>
+        /// Function that shows the new image.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void DisplayImage(object sender,NewImageEventArgs e)
         {
             pbxScreenShot.Image = e.image;
         }
 
+        /// <summary>
+        /// Function that adds a message to the list of message
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void AddMessage(object sender, NewMessageEventArgs e)
         {
             lbxMessages.Invoke(new MethodInvoker(delegate { lbxConnexion.Items.Add(e.Message); }));
         }
 
+        /// <summary>
+        /// Function that adds a connexion message
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void AddConnexionMessage(object sender, NewMessageEventArgs e)
         {
             lbxConnexion.Invoke(new MethodInvoker(delegate { lbxConnexion.Items.Add(e.Message); }));
         }
 
+        /// <summary>
+        /// Function that change a property of a control.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void ChangeProperty(object sender,ChangePropertyEventArgs e)
         {
             Control control = FindControlRecursive(this,e.ControlName);
@@ -69,6 +96,12 @@ namespace ApplicationCliente
             }
         }
 
+        /// <summary>
+        /// Function used to find a control recursively.
+        /// </summary>
+        /// <param name="container">A parent control, to be sure to find the control you want, you can use the form.</param>
+        /// <param name="name">The name of the control you want to find.</param>
+        /// <returns></returns>
         public static Control FindControlRecursive(Control container, string name)
         {
             if (container == null)
@@ -86,15 +119,6 @@ namespace ApplicationCliente
             }
 
             return null;
-        }
-
-        /// <summary>
-        /// Function waiting for the form to be fully created before launching background tasks.
-        /// </summary>
-        public void LaunchTasks()
-        {
-            while (!IsHandleCreated) { Thread.Sleep(100); }
-            Student.SocketToTeacher = Task.Run(() => Student.ConnectToTeacher(11111)).Result;
         }
 
         #endregion
@@ -198,10 +222,7 @@ namespace ApplicationCliente
                 Student.SocketToTeacher.Disconnect(false);
                 Student.SocketToTeacher = null;
             }
-            catch
-            {
-                // Should not happend
-            }
+            catch{/* Should not happend*/}
         }
 
         /// <summary>
@@ -217,8 +238,6 @@ namespace ApplicationCliente
                     TrayIconStudent.Visible = true; Hide();
                     break;
                 case FormWindowState.Normal:
-                    TrayIconStudent.Visible = false;
-                    break;
                 case FormWindowState.Maximized:
                     TrayIconStudent.Visible = false;
                     break;
@@ -238,6 +257,13 @@ namespace ApplicationCliente
 
         #endregion
 
+        #region Custom browser
+
+        /// <summary>
+        /// Function that creates a new custom browser.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void WebView2_Click(object sender, EventArgs e)
         {
             Form form = new();
@@ -247,9 +273,16 @@ namespace ApplicationCliente
             form.Show();
         }
 
+        /// <summary>
+        /// Function
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void AddWebview2Url(object sender, NewTabEventArgs e)
         {
             Student.Urls.AddUrl(e.Url, BrowserName.Webview2);
         }
+
+        #endregion
     }
 }
