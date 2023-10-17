@@ -19,13 +19,9 @@ namespace ApplicationTeacher
         private DataForTeacher Student = null;
         private readonly IPAddress ipAddr = null;
         PictureBox pbxStream;
+        public int GetStudentId(){return Student.ID;}
 
         #endregion
-
-        public int GetStudentId()
-        {
-            return Student.ID;
-        }
 
         public DisplayStudent(IPAddress ip)
         {
@@ -48,13 +44,11 @@ namespace ApplicationTeacher
                 Invoke(new MethodInvoker(delegate { this.Text = student.UserName; }));
                 lblPoste.Invoke(new MethodInvoker(delegate { lblPoste.Text = "Poste: " + student.ComputerName; }));
                 lblUserName.Invoke(new MethodInvoker(delegate { lblUserName.Text = "Nom: " + student.UserName; }));
-                TreeViewProcesses.Invoke(new MethodInvoker(delegate
-                {
+                TreeViewProcesses.Invoke(new MethodInvoker(delegate{
                     TreeViewProcesses.Nodes.Clear();
                     UpdateTreeView.UpdateProcess(student.Processes, null, TreeViewProcesses, Configuration.GetFilterEnabled(), Properties.Settings.Default.AlertedProcesses, Properties.Settings.Default.IgnoredProcesses);
                 }));
-                TreeViewUrls.Invoke(new MethodInvoker(delegate
-                {
+                TreeViewUrls.Invoke(new MethodInvoker(delegate{
                     UpdateTreeView.UpdateUrls(student.Urls.AllBrowser, null, TreeViewUrls);
                 }));
 

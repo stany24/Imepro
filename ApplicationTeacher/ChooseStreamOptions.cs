@@ -21,6 +21,8 @@ namespace ApplicationTeacher
             lbxScreen.DataSource = Screen.AllScreens;
         }
 
+        #region Selection
+
         /// <summary>
         /// Function that selects all students.
         /// </summary>
@@ -63,5 +65,7 @@ namespace ApplicationTeacher
             Properties.Settings.Default.ScreenToShareId = lbxScreen.SelectedIndex;
             Configuration.SetStreamOptions(new StreamOptions(priorite, focus));
         }
+
+        #endregion
     }
 }

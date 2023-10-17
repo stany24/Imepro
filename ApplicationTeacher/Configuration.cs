@@ -5,6 +5,9 @@ using System.Text.Json;
 
 namespace ApplicationTeacher
 {
+    /// <summary>
+    /// Class used to acces and serialize the variables of the config.config file safely.
+    /// </summary>
     public static class Configuration
     {
         /// <summary>

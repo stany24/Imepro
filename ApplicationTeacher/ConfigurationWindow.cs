@@ -6,7 +6,7 @@ namespace ApplicationTeacher
 {
     public partial class ConfigurationWindow : Form
     {
-        #region At start
+        #region Variable
 
         private const string IgnoredUrls = "IgnoredUrls";
         private const string AlertedUrls = "AlertedUrls";
@@ -14,6 +14,9 @@ namespace ApplicationTeacher
         private const string AlertedProcesses = "AlertedProcesses";
         private const string AutorisedUrls = "AutorisedUrls";
 
+        #endregion
+
+        #region Constructor
 
         public ConfigurationWindow()
         {
@@ -263,7 +266,5 @@ namespace ApplicationTeacher
             Properties.Settings.Default.Save();
         }
         #endregion
-
-
     }
 }

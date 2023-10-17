@@ -18,16 +18,16 @@ namespace ApplicationTeacher
     {
         #region Variables
 
-        readonly PreviewDisplayer Displayer;
-        readonly List<DataForTeacher> AllStudents = new();
-        private List<DataForTeacher> StudentToShareScreen = new();
-        readonly List<DisplayStudent> AllStudentsDisplay = new();
-        Task ScreenSharer;
-        bool isSharing = false;
-        bool isAsking = false;
-        int NextId = 0;
-        IPAddress ipAddr = null;
+        readonly private PreviewDisplayer Displayer;
+        readonly private List<DataForTeacher> AllStudents = new();
+        readonly private List<DisplayStudent> AllStudentsDisplay = new();
 
+        private List<DataForTeacher> StudentToShareScreen = new();
+        private Task ScreenSharer;
+        private bool isSharing = false;
+        private bool isAsking = false;
+        private int NextId = 0;
+        private IPAddress ipAddr = null;
         private ReliableMulticastSender MulticastSender;
 
         #endregion
