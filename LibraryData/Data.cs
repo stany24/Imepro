@@ -103,7 +103,6 @@ namespace LibraryData
         public event EventHandler<ChangePropertyEventArgs> ChangePropertyEvent;
         public event EventHandler<NewMessageEventArgs> NewMessageEvent;
         public event EventHandler<NewMessageEventArgs> NewConnexionMessageEvent;
-        public event EventHandler<NewTabEventArgs> NewTabEvent;
         readonly private Dictionary<string, BrowserName> browsersList = new() {
             { "chrome",BrowserName.Chrome },
             { "firefox", BrowserName.Firefox },
@@ -699,21 +698,15 @@ namespace LibraryData
         #endregion
     }
 
-    public class NewTabEventArgs : EventArgs
-    {
-        public Url url;
-        public NewTabEventArgs(Url newUrl) { url = newUrl; }
-    }
-
     public class NewMessageEventArgs : EventArgs
     {
-        public string Message;
+        public string Message { get; }
         public NewMessageEventArgs(string message) { Message = message; }
     }
 
     public class NewImageEventArgs : EventArgs
     {
-        public Bitmap image;
+        public Bitmap image { get; }
         public NewImageEventArgs(Bitmap newimage) { image = newimage; }
     }
 

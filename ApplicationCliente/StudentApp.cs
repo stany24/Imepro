@@ -65,7 +65,7 @@ namespace ApplicationCliente
             PropertyInfo propInfo = control.GetType().GetProperty(e.PropertyName);
             if (propInfo.CanWrite)
             {
-                propInfo.SetValue(control, e.PropertyValue);
+                control.Invoke(new MethodInvoker(delegate { propInfo.SetValue(control, e.PropertyValue); }));
             }
         }
 
