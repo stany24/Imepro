@@ -1,5 +1,4 @@
 ﻿using Avalonia;
-using Avalonia.ReactiveUI;
 using System;
 
 namespace StudentSoftware
@@ -18,7 +17,6 @@ namespace StudentSoftware
             => AppBuilder.Configure<App>()
                 .UsePlatformDetect()
                 .WithInterFont()
-                .LogToTrace()
-                .UseReactiveUI();
+                .LogToTrace();
     }
 }
