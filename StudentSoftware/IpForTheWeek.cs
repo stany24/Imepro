@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Net;
 using System.Text.Json;
 
@@ -19,16 +20,31 @@ namespace StudentSoftware
         {
             try { IPAddress.Parse(ip); }
             catch { return; }
-            Dictionary<string, string[]> Days;
-            try{Days = JsonSerializer.Deserialize<Dictionary<string, string[]>>(Properties.Settings.Default.IpForTheWeek);}
-            catch (Exception) { Days = new(); }
+            Dictionary<string, string[]> Days = GetIpFromFile();
             int IsBeforeNoon = 0;
             if (DateTime.Now.TimeOfDay > new TimeSpan(12, 35, 0)) { IsBeforeNoon = 1; }
             if (!Days.ContainsKey(DateTime.Now.DayOfWeek.ToString())) { Days.Add(DateTime.Now.DayOfWeek.ToString(), new string[2]); }
             Days[DateTime.Now.DayOfWeek.ToString()][IsBeforeNoon] = ip;
-            Properties.Settings.Default.IpForTheWeek = JsonSerializer.Serialize(Days);
-            Properties.Settings.Default.Save();
-            Properties.Settings.Default.Reload();
+            SaveIpToFile(Days);
+        }
+
+        private static Dictionary<string, string[]> GetIpFromFile()
+        {
+            string path = Path.Combine(Directory.GetCurrentDirectory(), "appsettings.json");
+            if (!File.Exists(path)) { return new(); }
+            string text = File.ReadAllText(path);
+            if (text == string.Empty) { return new(); }
+            Dictionary<string, string[]> dic = JsonSerializer.Deserialize<Dictionary<string, string[]>>(text);
+            if(dic == null) { return new(); }
+            return dic;
+        }
+
+        private static void SaveIpToFile(Dictionary<string, string[]> data)
+        {
+            if(data == null) { return; }
+            string path = Path.Combine(Directory.GetCurrentDirectory(), "appsettings.json");
+            JsonSerializer.Serialize(data);
+            File.WriteAllText(path, JsonSerializer.Serialize(data));
         }
 
         /// <summary>
@@ -37,7 +53,7 @@ namespace StudentSoftware
         /// <returns>The ip addresse for the teacher.</returns>
         public static IPAddress GetIp()
         {
-            Dictionary<string, string[]> Days = JsonSerializer.Deserialize<Dictionary<string, string[]>>(Properties.Settings.Default.IpForTheWeek);
+            Dictionary<string, string[]> Days = GetIpFromFile();
             int IsBeforeNoon = 0;
             if (DateTime.Now.TimeOfDay > new TimeSpan(12, 35, 0)) { IsBeforeNoon = 1; }
             return IPAddress.Parse(Days[DateTime.Now.DayOfWeek.ToString()][IsBeforeNoon]);
