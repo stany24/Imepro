@@ -15,7 +15,7 @@ namespace StudentSoftware
         {
             if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             {
-                desktop.MainWindow = new AskIp();
+                desktop.MainWindow = new Main();
             }
 
             base.OnFrameworkInitializationCompleted();

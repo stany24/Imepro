@@ -1,5 +1,6 @@
 ﻿using LibraryData;
 using System;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -19,6 +20,7 @@ namespace ApplicationCliente
         #region Variables
 
         readonly DataForStudent Student;
+        private Bitmap ScreenShot;
 
         #endregion
 
@@ -57,7 +59,7 @@ namespace ApplicationCliente
         /// <param name="e"></param>
         private void DisplayImage(object sender,NewImageEventArgs e)
         {
-            pbxScreenShot.Image = e.image;
+            ScreenShot = e.image;
         }
 
         /// <summary>

@@ -23,4 +23,11 @@
   <ItemGroup>
     <ProjectReference Include="..\LibraryData\ClassLibrary.csproj" />
   </ItemGroup>
+
+
+  <ItemGroup>
+    <Compile Update="Main.axaml.cs">
+      <DependentUpon>Main.axaml</DependentUpon>
+    </Compile>
+  </ItemGroup>
 </Project>
