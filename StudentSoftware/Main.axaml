@@ -16,7 +16,7 @@
 				Grid.Column="0"
 				Grid.ColumnSpan="5"></ListBox>
 		<Image HorizontalAlignment="Stretch"
-			   ZIndex="100"
+				ZIndex="100"
 				VerticalAlignment="Stretch"
 				Name="pbxScreenShot"
 				Grid.Row="2"
@@ -43,7 +43,7 @@
 		<Button HorizontalAlignment="Stretch"
 				HorizontalContentAlignment="Center"
 				VerticalAlignment="Stretch"
-				Name="btnResetIp"
+				Name="btnResetStoredIp"
 				Grid.Row="4"
 				Grid.Column="4">Reset Ip</Button>
 		<TextBlock HorizontalAlignment="Stretch"

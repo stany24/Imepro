@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using IronSoftware.Drawing;
 
 namespace LibraryData
 {
@@ -112,11 +112,14 @@ namespace LibraryData
         public byte[] TakeScreenshot()
         {
             Screen screen = Screen.AllScreens[ScreenToShareId];
-            Bitmap bitmap = new(screen.Bounds.Width, screen.Bounds.Height, PixelFormat.Format16bppRgb565);
             Rectangle ScreenSize = screen.Bounds;
+            Bitmap bitmap = new(ScreenSize.Width, ScreenSize.Height);
             Graphics.FromImage(bitmap).CopyFromScreen(ScreenSize.Left, ScreenSize.Top, 0, 0, ScreenSize.Size);
             ImageConverter converter = new();
-            return (byte[])converter.ConvertTo(bitmap, typeof(byte[]));
+            MemoryStream ms = new();
+            bitmap.Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg);
+            AnyBitmap anybitmap = new(ms);
+            return (byte[])converter.ConvertTo(anybitmap, typeof(byte[]));
         }
 
         #endregion
@@ -219,10 +222,10 @@ namespace LibraryData
         public void ImageCompleted()
         {
             byte[] imageData = ImageBytes.SelectMany(a => a).ToArray();
-            Bitmap bmp;
+            AnyBitmap bmp;
             using (var ms = new MemoryStream(imageData))
             {
-                bmp = new Bitmap(ms);
+                bmp = new AnyBitmap(ms);
             }
             ImageCompletedEvent?.Invoke(this, new ImageCompletedEventArgs(bmp, ImageNumber));
         }
@@ -235,14 +238,14 @@ namespace LibraryData
     /// </summary>
     public class ImageCompletedEventArgs : EventArgs
     {
-        public ImageCompletedEventArgs(Bitmap competedimage, int imageId)
+        public ImageCompletedEventArgs(AnyBitmap competedimage, int imageId)
         {
             CompletedImage = competedimage;
             ImageId = imageId;
         }
 
         public int ImageId { get; set; }
-        public Bitmap CompletedImage { get; set; }
+        public AnyBitmap CompletedImage { get; set; }
     }
 
     /// <summary>
@@ -250,7 +253,7 @@ namespace LibraryData
     /// </summary>
     public class NewImageEventArgs : EventArgs
     {
-        public Bitmap image { get; }
-        public NewImageEventArgs(Bitmap newimage) { image = newimage; }
+        public AnyBitmap image { get; }
+        public NewImageEventArgs(AnyBitmap newimage) { image = newimage; }
     }
 }

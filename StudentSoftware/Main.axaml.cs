@@ -9,14 +9,18 @@ using System.IO;
 using System.Net;
 using System.Linq;
 using System.Net.Sockets;
+using MsBox.Avalonia.Enums;
+using MsBox.Avalonia;
+using Avalonia.Interactivity;
+using IronSoftware.Drawing;
 
 namespace StudentSoftware;
 
 public partial class Main : Window
 {
     #region Variables
-
-    readonly DataForStudent Student;
+    readonly private TrayIcon TrayIconStudent;
+    readonly private DataForStudent Student;
 
     #endregion
 
@@ -25,6 +29,7 @@ public partial class Main : Window
     public Main()
     {
         InitializeComponent();
+        TrayIconStudent = new();
         Student = new();
         Initialized += LaunchTasks;
         Closing += OnClosing;
@@ -32,8 +37,8 @@ public partial class Main : Window
 
         btnHelp.Click += HelpReceive;
         btnWebView.Click += WebView2_Click;
-        btnChangeIp.Click +=;
-        btnResetIp.Click +=;
+        btnChangeIp.Click +=NewTeacherIP;
+        btnResetStoredIp.Click +=ResetStoredIp;
         Student.ChangePropertyEvent += ChangeProperty;
         Student.NewMessageEvent += AddMessage;
         Student.NewConnexionMessageEvent += AddConnexionMessage;
@@ -45,7 +50,7 @@ public partial class Main : Window
     /// <summary>
     /// Function waiting for the form to be fully created before launching background tasks.
     /// </summary>
-    public void LaunchTasks(object sender,EventArgs e)
+    public void LaunchTasks(object ?sender,EventArgs e)
     {
         Student.SocketToTeacher = Task.Run(() => Student.ConnectToTeacher(11111)).Result;
     }
@@ -59,9 +64,12 @@ public partial class Main : Window
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
-    private void DisplayImage(object sender, NewImageEventArgs e)
+    private void DisplayImage(object ?sender, NewImageEventArgs e)
     {
-        pbxScreenShot.Source = e.image;
+        using var ms = e.image.GetStream();
+        ms.Position = 0;
+        var bitmap = new Avalonia.Media.Imaging.Bitmap(ms);
+        pbxScreenShot.Source = bitmap;
     }
 
     /// <summary>
@@ -69,7 +77,7 @@ public partial class Main : Window
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
-    private void AddMessage(object sender, NewMessageEventArgs e)
+    private void AddMessage(object ?sender, NewMessageEventArgs e)
     {
         lbxInfo.Items.Add(e.Message);
     }
@@ -79,7 +87,7 @@ public partial class Main : Window
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
-    private void AddConnexionMessage(object sender, NewMessageEventArgs e)
+    private void AddConnexionMessage(object ?sender, NewMessageEventArgs e)
     {
         lbxInfo.Items.Add(e.Message);
     }
@@ -89,42 +97,21 @@ public partial class Main : Window
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
-    private void ChangeProperty(object sender, ChangePropertyEventArgs e)
+    private void ChangeProperty(object ?sender, ChangePropertyEventArgs e)
     {
-        Type type = e.ControlType;
-        Control control = this.FindControl<type>(e.ControlName);
-        //Control control = FindControlRecursive(this, e.ControlName);
+        Control control = null;
+        switch (e.ControlType)
+        {
+            case ControlType.Image: control = this.FindControl<Image>(e.ControlName);break;
+            case ControlType.Window: control = this;break;
+        }
         if (control == null) { return; }
         PropertyInfo propInfo = control.GetType().GetProperty(e.PropertyName);
+        if (propInfo == null) { return; }
         if (propInfo.CanWrite)
         {
             propInfo.SetValue(control, e.PropertyValue);
         }
-    }
-
-    /// <summary>
-    /// Function used to find a control recursively.
-    /// </summary>
-    /// <param name="container">A parent control, to be sure to find the control you want, you can use the form.</param>
-    /// <param name="name">The name of the control you want to find.</param>
-    /// <returns></returns>
-    public static Control FindControlRecursive(Control container, string name)
-    {
-        if (container == null)
-            return null;
-
-        Control foundControl = container.Controls[name];
-        if (foundControl != null)
-            return foundControl;
-
-        foreach (Control childControl in container.Controls)
-        {
-            foundControl = FindControlRecursive(childControl, name);
-            if (foundControl != null)
-                return foundControl;
-        }
-
-        return null;
     }
 
     #endregion
@@ -136,7 +123,7 @@ public partial class Main : Window
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
-    public void NewTeacherIP(object sender, EventArgs e)
+    public void NewTeacherIP(object ?sender, EventArgs e)
     {
         AskIp prompt = new();
         prompt.Activate();
@@ -190,12 +177,17 @@ public partial class Main : Window
         return true;
     }
 
+    private void ResetStoredIp(object ?sender,RoutedEventArgs e)
+    {
+        IpForTheWeek.Reset();
+    }
+
     /// <summary>
     /// Function to help the user configure its interfaces.
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
-    public void HelpReceive(object sender, EventArgs e)
+    public void HelpReceive(object ?sender, EventArgs e)
     {
         string commande = CheckInterfaces();
         string path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads\\ActiverInterface.ps1");
@@ -204,10 +196,14 @@ public partial class Main : Window
             fichier.WriteLine(commande);
             fichier.Close();
         }
-        MessageBox.Show("Vos interfaces réseau ne sont pas configurés correctement.\r\n" +
+
+        MessageBoxManager.GetMessageBoxStandard(
+            "Attention",
+            "Vos interfaces réseau ne sont pas configurés correctement.\r\n" +
             "1) Lancez une fenêtre windows powershell en administrateur.\r\n" +
             "2) Copiez tout le contenu du fichier " + path + ".\r\n" +
-            "3) Collez le tout dans le terminal et executez.\r\n", "Attention", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            "3) Collez le tout dans le terminal et executez.\r\n",
+            ButtonEnum.YesNo);
     }
 
     #endregion
@@ -219,7 +215,7 @@ public partial class Main : Window
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
-    public void OnClosing(object sender, WindowClosingEventArgs e)
+    public void OnClosing(object ?sender, WindowClosingEventArgs e)
     {
         if (Student.SocketToTeacher == null) { return; }
         try
@@ -236,16 +232,16 @@ public partial class Main : Window
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
-    public void StudentAppResized(object sender, EventArgs e)
+    public void StudentAppResized(object ?sender, EventArgs e)
     {
         switch (WindowState)
         {
             case WindowState.Minimized:
-                TrayIconStudent.Visible = true; Hide();
+                TrayIconStudent.IsVisible = true; Hide();
                 break;
             case WindowState.Normal:
             case WindowState.Maximized:
-                TrayIconStudent.Visible = false;
+                TrayIconStudent.IsVisible = false;
                 break;
         }
     }
@@ -270,7 +266,7 @@ public partial class Main : Window
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
-    private void WebView2_Click(object sender, EventArgs e)
+    private void WebView2_Click(object ?sender, EventArgs e)
     {
         Form form = new();
         Browser browser = new();

@@ -20,6 +20,7 @@ public partial class AskIp : Window
 
     private void Verify(object ?sender,RoutedEventArgs e)
     {
+        if (tbxIp.Text == null) { return; }
         try
         {
             IPAddress.Parse(tbxIp.Text);
@@ -31,6 +32,7 @@ public partial class AskIp : Window
 
     private void Confirm(object? sender, RoutedEventArgs e)
     {
+        if (tbxIp.Text == null) { return; }
         IpForTheWeek.SetIp(tbxIp.Text);
         canClose = true;
     }
