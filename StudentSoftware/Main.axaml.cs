@@ -7,6 +7,8 @@ using System.Reflection;
 using System.Text;
 using System.IO;
 using System.Net;
+using System.Linq;
+using System.Net.Sockets;
 
 namespace StudentSoftware;
 
@@ -23,23 +25,28 @@ public partial class Main : Window
     public Main()
     {
         InitializeComponent();
-        SplitterImageButtons.Panel1.Controls.SetChildIndex(pbxScreenShot, 0);
         Student = new();
+        Initialized += LaunchTasks;
+        Closing += OnClosing;
+        Resized += StudentAppResized;
+
+        btnHelp.Click += HelpReceive;
+        btnWebView.Click += WebView2_Click;
+        btnChangeIp.Click +=;
+        btnResetIp.Click +=;
         Student.ChangePropertyEvent += ChangeProperty;
         Student.NewMessageEvent += AddMessage;
         Student.NewConnexionMessageEvent += AddConnexionMessage;
         Student.NewImageEvent += DisplayImage;
         try { Student.IpToTeacher = IpForTheWeek.GetIp(); }
         catch (Exception) { NewTeacherIP(new object(), new EventArgs()); }
-        Task.Run(LaunchTasks);
     }
 
     /// <summary>
     /// Function waiting for the form to be fully created before launching background tasks.
     /// </summary>
-    public void LaunchTasks()
+    public void LaunchTasks(object sender,EventArgs e)
     {
-        while (!IsHandleCreated) { Thread.Sleep(100); }
         Student.SocketToTeacher = Task.Run(() => Student.ConnectToTeacher(11111)).Result;
     }
 
@@ -84,12 +91,14 @@ public partial class Main : Window
     /// <param name="e"></param>
     private void ChangeProperty(object sender, ChangePropertyEventArgs e)
     {
-        Control control = FindControlRecursive(this, e.ControlName);
+        Type type = e.ControlType;
+        Control control = this.FindControl<type>(e.ControlName);
+        //Control control = FindControlRecursive(this, e.ControlName);
         if (control == null) { return; }
         PropertyInfo propInfo = control.GetType().GetProperty(e.PropertyName);
         if (propInfo.CanWrite)
         {
-            control.Invoke(new MethodInvoker(delegate { propInfo.SetValue(control, e.PropertyValue); }));
+            propInfo.SetValue(control, e.PropertyValue);
         }
     }
 
@@ -130,9 +139,9 @@ public partial class Main : Window
     public void NewTeacherIP(object sender, EventArgs e)
     {
         AskIp prompt = new();
-        prompt.ShowDialog();
+        prompt.Activate();
+        prompt.Show();
         prompt.Close();
-        prompt.Dispose();
         Student.IpToTeacher = IpForTheWeek.GetIp();
     }
 
@@ -210,7 +219,7 @@ public partial class Main : Window
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
-    public void OnClosing(object sender, FormClosedEventArgs e)
+    public void OnClosing(object sender, WindowClosingEventArgs e)
     {
         if (Student.SocketToTeacher == null) { return; }
         try
@@ -231,11 +240,11 @@ public partial class Main : Window
     {
         switch (WindowState)
         {
-            case FormWindowState.Minimized:
+            case WindowState.Minimized:
                 TrayIconStudent.Visible = true; Hide();
                 break;
-            case FormWindowState.Normal:
-            case FormWindowState.Maximized:
+            case WindowState.Normal:
+            case WindowState.Maximized:
                 TrayIconStudent.Visible = false;
                 break;
         }
@@ -249,7 +258,7 @@ public partial class Main : Window
     public void TrayIconStudentClick(object sender, EventArgs e)
     {
         Show();
-        WindowState = FormWindowState.Normal;
+        WindowState = WindowState.Normal;
     }
 
     #endregion

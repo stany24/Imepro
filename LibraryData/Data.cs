@@ -7,6 +7,7 @@ using System.Linq;
 using System.Management;
 using System.Net;
 using System.Net.Sockets;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.Json;
@@ -663,12 +664,14 @@ namespace LibraryData
     public class ChangePropertyEventArgs : EventArgs
     {
         public string ControlName { get; }
+        public Type ControlType { get; }
         public string PropertyName { get; }
         public object PropertyValue { get; }
 
-        public ChangePropertyEventArgs(string controlName, string propertyName, object propertyValue)
+        public ChangePropertyEventArgs(string controlName,Type controlType, string propertyName, object propertyValue)
         {
             ControlName = controlName;
+            ControlType = controlType;
             PropertyName = propertyName;
             PropertyValue = propertyValue;
         }
