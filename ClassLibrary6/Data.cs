@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using IronSoftware.Drawing;
 using System.Diagnostics;
-using System.Drawing;
-using System.Drawing.Imaging;
-using System.Linq;
 using System.Management;
 using System.Net;
 using System.Net.Sockets;
@@ -11,9 +7,9 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Drawing;
+using Point = IronSoftware.Drawing.Point;
 
 namespace LibraryData
 {
@@ -34,7 +30,7 @@ namespace LibraryData
         [JsonInclude]
         public Dictionary<int, string> Processes { get; set; }
         [JsonIgnore]
-        public Bitmap ScreenShot { get; set; }
+        public AnyBitmap ScreenShot { get; set; }
 
         #endregion
 
@@ -108,7 +104,7 @@ namespace LibraryData
             { "msedge",BrowserName.Edge } };
 
         private ReliableMulticastReceiver MulticastReceiver { get; set; }
-        private Rectangle OldRect = Rectangle.Empty;
+        private CropRectangle OldRect = System.Drawing.Rectangle.Empty;
         private StreamOptions options;
         private int screenToStream;
 
@@ -236,11 +232,11 @@ namespace LibraryData
         /// <summary>
         /// Function to get a screenshot of all screen in one image.
         /// </summary>
-        private Bitmap TakeAllScreenShot()
+        private AnyBitmap TakeAllScreenShot()
         {
             int TotalWidth = 0;
             int MaxHeight = 0;
-            List<Bitmap> images = new();
+            List<AnyBitmap> images = new();
             foreach (Screen screen in Screen.AllScreens)
             {
                 images.Add(TakeSreenShot(screen));
@@ -249,11 +245,11 @@ namespace LibraryData
             }
             if (MaxHeight > 0)
             {
-                Bitmap FullImage = new(TotalWidth, MaxHeight, PixelFormat.Format16bppRgb565);
+                AnyBitmap FullImage = new(TotalWidth, MaxHeight);
                 Graphics FullGraphics = Graphics.FromImage(FullImage);
 
                 int offsetLeft = 0;
-                foreach (Bitmap image in images)
+                foreach (AnyBitmap image in images)
                 {
                     FullGraphics.DrawImage(image, new Point(offsetLeft, 0));
                     offsetLeft += image.Width;
@@ -269,11 +265,11 @@ namespace LibraryData
         /// </summary>
         /// <param name="screen">The screen we want the screenshot.</param>
         /// <returns></returns>
-        private Bitmap TakeSreenShot(Screen screen)
+        private AnyBitmap TakeSreenShot(Screen screen)
         {
-            Bitmap Bitmap = new(screen.Bounds.Width, screen.Bounds.Height, PixelFormat.Format16bppRgb565);
-            Rectangle ScreenSize = screen.Bounds;
-            Graphics.FromImage(Bitmap).CopyFromScreen(ScreenSize.Left, ScreenSize.Top, 0, 0, ScreenSize.Size);
+            AnyBitmap Bitmap = new(screen.Bounds.Width, screen.Bounds.Height);
+            CropRectangle ScreenSize = screen.Bounds;
+            Graphics.FromImage(Bitmap).CopyFromScreen(ScreenSize.Left, ScreenSize.Top, 0, 0, new System.Drawing.Size(ScreenSize.Width,ScreenSize.Height));
             return Bitmap;
         }
 
@@ -306,11 +302,10 @@ namespace LibraryData
         /// <summary>
         /// Function to send the screenshot to the teacher.
         /// </summary>
-        private void SendImage(Bitmap image, Socket socket)
+        private void SendImage(AnyBitmap image, Socket socket)
         {
-            byte[] imagebytes;
-            ImageConverter converter = new();
-            imagebytes = (byte[])converter.ConvertTo(image, typeof(byte[]));
+            MemoryStream ms = image.ToStream();
+            byte[] imagebytes = ms.ToArray();
             socket.Send(imagebytes, 0, imagebytes.Length, SocketFlags.None);
         }
 
@@ -460,7 +455,7 @@ namespace LibraryData
         {
             isReceiving = false;
             mouseDisabled = false;
-            ChangePropertyEvent.Invoke(this, new ChangePropertyEventArgs("form",ControlType.Window, "FormBorderStyle", FormBorderStyle.Sizable));
+            ChangePropertyEvent.Invoke(this, new ChangePropertyEventArgs("form", ControlType.Window, "FormBorderStyle", FormBorderStyle.Sizable));
             ChangePropertyEvent.Invoke(this, new ChangePropertyEventArgs("pbxScreenShot", ControlType.Image, "Visible", false));
             gkh.Unhook();
         }
@@ -626,7 +621,7 @@ namespace LibraryData
         /// </summary>
         private void DisableMouse()
         {
-            Cursor.Clip = new Rectangle(0, 60, 1, 1);
+            Cursor.Clip = new CropRectangle(0, 60, 1, 1);
             Cursor.Hide();
             Application.AddMessageFilter(this);
             foreach (var process in Process.GetProcessesByName("Taskmgr"))
@@ -674,7 +669,7 @@ namespace LibraryData
         public string PropertyName { get; }
         public object PropertyValue { get; }
 
-        public ChangePropertyEventArgs(string controlName,ControlType controltype, string propertyName, object propertyValue)
+        public ChangePropertyEventArgs(string controlName, ControlType controltype, string propertyName, object propertyValue)
         {
             ControlName = controlName;
             ControlType = controltype;

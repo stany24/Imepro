@@ -74,8 +74,7 @@ public partial class Main : Window
     {
         MemoryStream ms = e.image.GetStream();
         ms.Position = 0;
-        Bitmap bitmap = new(ms);
-        pbxScreenShot.Source = bitmap;
+        pbxScreenShot.Source = new Bitmap(ms);
     }
 
     /// <summary>
@@ -174,11 +173,10 @@ public partial class Main : Window
     /// <param name="e"></param>
     public void HelpReceive(object ?sender, EventArgs e)
     {
-        string commande = CheckInterfaces();
         string path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads\\ActiverInterface.ps1");
         using (StreamWriter fichier = new(path))
         {
-            fichier.WriteLine(commande);
+            fichier.WriteLine(CheckInterfaces());
             fichier.Close();
         }
 
@@ -202,15 +200,10 @@ public partial class Main : Window
     /// <param name="e"></param>
     public void OnClosing(object ?sender, WindowClosingEventArgs e)
     {
+        TrayIconStudent.Dispose();
         if (Student.SocketToTeacher == null) { return; }
-        try
-        {
-            TrayIconStudent.Dispose();
-            Student.SocketToTeacher.Send(Encoding.ASCII.GetBytes("stop"));
-            Student.SocketToTeacher.Disconnect(false);
-            Student.SocketToTeacher = null;
-        }
-        catch {/* Should not happend*/}
+        Student.SocketToTeacher.Send(Encoding.ASCII.GetBytes("stop"));
+        Student.SocketToTeacher.Disconnect(false);
     }
 
     /// <summary>

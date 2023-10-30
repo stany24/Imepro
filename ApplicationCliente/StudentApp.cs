@@ -29,25 +29,16 @@ namespace ApplicationCliente
         {
             InitializeComponent();
             SplitterImageButtons.Panel1.Controls.SetChildIndex(pbxScreenShot, 0);
-            Student = new();
+            try{ Student = new(IpForTheWeek.GetIp());}
+            catch (Exception){
+                NewTeacherIP(new object(), new EventArgs());
+                Student = new(IpForTheWeek.GetIp());
+            }
             Student.ChangePropertyEvent += ChangeProperty;
             Student.NewMessageEvent += AddMessage;
             Student.NewConnexionMessageEvent += AddConnexionMessage;
             Student.NewImageEvent += DisplayImage;
-            try{Student.IpToTeacher = IpForTheWeek.GetIp();}
-            catch (Exception){NewTeacherIP(new object(), new EventArgs());}
-            Task.Run(LaunchTasks);
         }
-
-        /// <summary>
-        /// Function waiting for the form to be fully created before launching background tasks.
-        /// </summary>
-        public void LaunchTasks()
-        {
-            while (!IsHandleCreated) { Thread.Sleep(100); }
-            Student.SocketToTeacher = Task.Run(() => Student.ConnectToTeacher(11111)).Result;
-        }
-
         #endregion
 
         #region Event Handeling
@@ -138,7 +129,6 @@ namespace ApplicationCliente
             prompt.ShowDialog();
             prompt.Close();
             prompt.Dispose();
-            Student.IpToTeacher = IpForTheWeek.GetIp();
         }
 
         /// <summary>
