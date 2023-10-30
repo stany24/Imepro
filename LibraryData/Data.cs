@@ -7,7 +7,6 @@ using System.Linq;
 using System.Management;
 using System.Net;
 using System.Net.Sockets;
-using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.Json;
@@ -131,13 +130,21 @@ namespace LibraryData
 
         #region Constructor
 
-        public DataForStudent()
+        public DataForStudent(IPAddress teacherIp)
         {
+            IpToTeacher = teacherIp;
             AutorisedUrls = new();
             SeleniumProcessesID = new();
             GetDefaultProcesses();
             ComputerName = Environment.MachineName;
             UserName = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
+            Task.Run(InitializeSocket);
+        }
+
+        private void InitializeSocket()
+        {
+            SocketToTeacher = Task.Run(() => ConnectToTeacher(11111)).Result;
+            WaitForDemand();
         }
 
         #endregion
@@ -314,7 +321,7 @@ namespace LibraryData
         /// <summary>
         /// Function used to connect to the teacher application.
         /// </summary>
-        public Socket ConnectToTeacher(int port)
+        private Socket ConnectToTeacher(int port)
         {
             try
             {
@@ -343,7 +350,6 @@ namespace LibraryData
                         if (success)
                         {
                             sender.EndConnect(result);
-                            Task.Run(WaitForDemand);
                             NewConnexionMessageEvent.Invoke(this, new NewMessageEventArgs("Connected"));
                             return sender;
                         }

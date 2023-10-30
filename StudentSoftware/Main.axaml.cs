@@ -1,18 +1,17 @@
 using Avalonia.Controls;
-using System.Threading.Tasks;
 using System;
 using LibraryData;
 using System.Net.NetworkInformation;
 using System.Reflection;
 using System.Text;
+using Avalonia.Media.Imaging;
 using System.IO;
 using System.Net;
 using System.Linq;
 using System.Net.Sockets;
 using MsBox.Avalonia.Enums;
 using MsBox.Avalonia;
-using Avalonia.Interactivity;
-using IronSoftware.Drawing;
+using Avalonia.Threading;
 
 namespace StudentSoftware;
 
@@ -20,7 +19,8 @@ public partial class Main : Window
 {
     #region Variables
     readonly private TrayIcon TrayIconStudent;
-    readonly private DataForStudent Student;
+    private DataForStudent Student;
+    private AskIp WindowAskIp;
 
     #endregion
 
@@ -30,29 +30,35 @@ public partial class Main : Window
     {
         InitializeComponent();
         TrayIconStudent = new();
-        Student = new();
-        Initialized += LaunchTasks;
-        Closing += OnClosing;
-        Resized += StudentAppResized;
-
-        btnHelp.Click += HelpReceive;
-        btnWebView.Click += WebView2_Click;
-        btnChangeIp.Click +=NewTeacherIP;
-        btnResetStoredIp.Click +=ResetStoredIp;
-        Student.ChangePropertyEvent += ChangeProperty;
-        Student.NewMessageEvent += AddMessage;
-        Student.NewConnexionMessageEvent += AddConnexionMessage;
-        Student.NewImageEvent += DisplayImage;
-        try { Student.IpToTeacher = IpForTheWeek.GetIp(); }
-        catch (Exception) { NewTeacherIP(new object(), new EventArgs()); }
+        if (IpForTheWeek.GetIp() == null)
+        {
+            NewTeacherIP(true);
+        }
+        else
+        {
+            InitializeStudent();
+        }
+        InitializeEvents();
     }
 
-    /// <summary>
-    /// Function waiting for the form to be fully created before launching background tasks.
-    /// </summary>
-    public void LaunchTasks(object ?sender,EventArgs e)
+    private void InitializeStudent()
     {
-        Student.SocketToTeacher = Task.Run(() => Student.ConnectToTeacher(11111)).Result;
+        Student = new(IpForTheWeek.GetIp());
+        Student.NewConnexionMessageEvent += (sender,e) => Dispatcher.UIThread.Post(() => lbxInfo.Items.Add(e.Message));
+        Student.ChangePropertyEvent += ChangeProperty;
+        Student.NewMessageEvent += (sender,e) => lbxInfo.Items.Add(e.Message);
+        Student.NewImageEvent += DisplayImage;
+    }
+
+    private void InitializeEvents()
+    {
+        Closing += OnClosing;
+        Resized += StudentAppResized;
+        TrayIconStudent.Clicked += TrayIconStudentClick;
+        btnHelp.Click += HelpReceive;
+        btnWebView.Click += WebView2_Click;
+        btnChangeIp.Click +=(sender, e) => NewTeacherIP(false);
+        btnResetStoredIp.Click += (sender, e) => IpForTheWeek.Reset();
     }
 
     #endregion
@@ -66,30 +72,10 @@ public partial class Main : Window
     /// <param name="e"></param>
     private void DisplayImage(object ?sender, NewImageEventArgs e)
     {
-        using var ms = e.image.GetStream();
+        MemoryStream ms = e.image.GetStream();
         ms.Position = 0;
-        var bitmap = new Avalonia.Media.Imaging.Bitmap(ms);
+        Bitmap bitmap = new(ms);
         pbxScreenShot.Source = bitmap;
-    }
-
-    /// <summary>
-    /// Function that adds a message to the list of message
-    /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="e"></param>
-    private void AddMessage(object ?sender, NewMessageEventArgs e)
-    {
-        lbxInfo.Items.Add(e.Message);
-    }
-
-    /// <summary>
-    /// Function that adds a connexion message
-    /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="e"></param>
-    private void AddConnexionMessage(object ?sender, NewMessageEventArgs e)
-    {
-        lbxInfo.Items.Add(e.Message);
     }
 
     /// <summary>
@@ -99,13 +85,13 @@ public partial class Main : Window
     /// <param name="e"></param>
     private void ChangeProperty(object ?sender, ChangePropertyEventArgs e)
     {
-        Control control = null;
+        Control control;
         switch (e.ControlType)
         {
             case ControlType.Image: control = this.FindControl<Image>(e.ControlName);break;
             case ControlType.Window: control = this;break;
+            default:return;
         }
-        if (control == null) { return; }
         PropertyInfo propInfo = control.GetType().GetProperty(e.PropertyName);
         if (propInfo == null) { return; }
         if (propInfo.CanWrite)
@@ -123,14 +109,18 @@ public partial class Main : Window
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
-    public void NewTeacherIP(object ?sender, EventArgs e)
+    public void NewTeacherIP(bool isnew)
     {
-        AskIp prompt = new();
-        prompt.Activate();
-        prompt.Show();
-        prompt.Close();
-        Student.IpToTeacher = IpForTheWeek.GetIp();
+        WindowAskIp = new();
+        WindowAskIp.Activate();
+        WindowAskIp.Show();
+        WindowAskIp.Closed += (sender, e) => { Show(); };
+        if(isnew) {
+            InitializeStudent();
+        }
+        else { Student.IpToTeacher = IpForTheWeek.GetIp(); }
     }
+
 
     /// <summary>
     /// Function that verify the interfaces, if they are incorrect it returns a script.
@@ -177,11 +167,6 @@ public partial class Main : Window
         return true;
     }
 
-    private void ResetStoredIp(object ?sender,RoutedEventArgs e)
-    {
-        IpForTheWeek.Reset();
-    }
-
     /// <summary>
     /// Function to help the user configure its interfaces.
     /// </summary>
@@ -220,6 +205,7 @@ public partial class Main : Window
         if (Student.SocketToTeacher == null) { return; }
         try
         {
+            TrayIconStudent.Dispose();
             Student.SocketToTeacher.Send(Encoding.ASCII.GetBytes("stop"));
             Student.SocketToTeacher.Disconnect(false);
             Student.SocketToTeacher = null;
@@ -251,7 +237,7 @@ public partial class Main : Window
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
-    public void TrayIconStudentClick(object sender, EventArgs e)
+    public void TrayIconStudentClick(object ?sender, EventArgs e)
     {
         Show();
         WindowState = WindowState.Normal;
@@ -268,11 +254,11 @@ public partial class Main : Window
     /// <param name="e"></param>
     private void WebView2_Click(object ?sender, EventArgs e)
     {
-        Form form = new();
+        /*Form form = new();
         Browser browser = new();
         browser.NewTabEvent += new EventHandler<NewTabEventArgs>(AddWebview2Url);
         form.Controls.Add(browser);
-        form.Show();
+        form.Show();*/
     }
 
     /// <summary>
@@ -280,10 +266,10 @@ public partial class Main : Window
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
-    private void AddWebview2Url(object sender, NewTabEventArgs e)
+    /*private void AddWebview2Url(object sender, NewTabEventArgs e)
     {
         Student.Urls.AddUrl(e.Url, BrowserName.Webview2);
-    }
+    }*/
 
     #endregion
 }

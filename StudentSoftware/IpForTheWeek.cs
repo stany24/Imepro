@@ -37,7 +37,8 @@ namespace StudentSoftware
             Dictionary<string, string[]> Days = GetIpFromFile();
             int IsBeforeNoon = 0;
             if (DateTime.Now.TimeOfDay > new TimeSpan(12, 35, 0)) { IsBeforeNoon = 1; }
-            return IPAddress.Parse(Days[DateTime.Now.DayOfWeek.ToString()][IsBeforeNoon]);
+            try { return IPAddress.Parse(Days[DateTime.Now.DayOfWeek.ToString()][IsBeforeNoon]); }
+            catch { return null; }
         }
 
         public static void Reset()

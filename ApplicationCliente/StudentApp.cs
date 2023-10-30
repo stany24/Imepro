@@ -59,7 +59,7 @@ namespace ApplicationCliente
         /// <param name="e"></param>
         private void DisplayImage(object sender,NewImageEventArgs e)
         {
-            ScreenShot = e.image;
+            //ScreenShot = e.image;
         }
 
         /// <summary>

@@ -14,7 +14,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTestLibrary", "UnitTest
 		{3C15D5E3-049B-4B63-B3F8-668F9D3E6F9D} = {3C15D5E3-049B-4B63-B3F8-668F9D3E6F9D}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StudentSoftware", "StudentSoftware\StudentSoftware.csproj", "{9D9846DE-27E7-4551-A1E0-898161A5E18F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StudentSoftware", "StudentSoftware\StudentSoftware.csproj", "{9D9846DE-27E7-4551-A1E0-898161A5E18F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
