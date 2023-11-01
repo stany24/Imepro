@@ -4,7 +4,7 @@ using System.Text;
 using System.Windows.Forms;
 using System.Drawing;
 
-namespace LibraryData
+namespace LibraryData6
 {
     /// <summary>
     /// Class representing a UDP multicast message.

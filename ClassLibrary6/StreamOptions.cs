@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace LibraryData
+namespace LibraryData6
 {
     /// <summary>
     /// Class containing the options for the stream

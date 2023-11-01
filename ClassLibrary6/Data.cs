@@ -3,7 +3,6 @@ using System.Diagnostics;
 using System.Management;
 using System.Net;
 using System.Net.Sockets;
-using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -11,7 +10,7 @@ using System.Windows.Forms;
 using System.Drawing;
 using Point = IronSoftware.Drawing.Point;
 
-namespace LibraryData
+namespace LibraryData6
 {
     /// <summary>
     /// Class  that represent a basic student.
@@ -152,6 +151,7 @@ namespace LibraryData
         /// </summary>
         private void GetCurrentWebTabsName()
         {
+            /*
             [DllImport("user32.dll")]
             static extern int GetWindowTextLength(IntPtr hWnd);
 
@@ -181,6 +181,7 @@ namespace LibraryData
                     }
                 }
             }
+            */
         }
 
         /// <summary>
