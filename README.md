@@ -1,7 +1,7 @@
 ## Imepro
 
 ## Description
-The objectif is to give teachers a way to monitor and help there students.
+The objectif is to give teachers a way to monitor and help their students.
 
 ## Visuals
 Student application
