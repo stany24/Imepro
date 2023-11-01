@@ -1,6 +1,6 @@
 using Avalonia.Controls;
 using System;
-using LibraryData;
+using LibraryData6;
 using System.Net.NetworkInformation;
 using System.Reflection;
 using System.Text;
@@ -110,16 +110,19 @@ public partial class Main : Window
     /// <param name="e"></param>
     public void NewTeacherIP(bool isnew)
     {
-        WindowAskIp = new();
+        Hide();
+        WindowAskIp = new(!isnew);
         WindowAskIp.Activate();
         WindowAskIp.Show();
-        WindowAskIp.Closed += (sender, e) => { Show(); };
-        if(isnew) {
-            InitializeStudent();
-        }
-        else { Student.IpToTeacher = IpForTheWeek.GetIp(); }
+        WindowAskIp.Closed += (sender, e) =>{
+            Show();
+            if (isnew)
+            {
+                InitializeStudent();
+            }
+            else { Student.IpToTeacher = IpForTheWeek.GetIp(); }
+        };
     }
-
 
     /// <summary>
     /// Function that verify the interfaces, if they are incorrect it returns a script.
@@ -201,6 +204,7 @@ public partial class Main : Window
     public void OnClosing(object ?sender, WindowClosingEventArgs e)
     {
         TrayIconStudent.Dispose();
+        if (Student == null) { return; }
         if (Student.SocketToTeacher == null) { return; }
         Student.SocketToTeacher.Send(Encoding.ASCII.GetBytes("stop"));
         Student.SocketToTeacher.Disconnect(false);
@@ -211,12 +215,12 @@ public partial class Main : Window
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
-    public void StudentAppResized(object ?sender, EventArgs e)
+    public void StudentAppResized(object ?sender, WindowResizedEventArgs e)
     {
         switch (WindowState)
         {
             case WindowState.Minimized:
-                TrayIconStudent.IsVisible = true; Hide();
+                TrayIconStudent.IsVisible = true;
                 break;
             case WindowState.Normal:
             case WindowState.Maximized:
@@ -233,6 +237,7 @@ public partial class Main : Window
     public void TrayIconStudentClick(object ?sender, EventArgs e)
     {
         Show();
+        TrayIconStudent.IsVisible = false;
         WindowState = WindowState.Normal;
     }
 

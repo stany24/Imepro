@@ -306,7 +306,7 @@ namespace ApplicationTeacher
             }));
             TreeViewSelect.Invoke(new MethodInvoker(delegate
             {
-                TreeNode[] nodes = TreeViewDetails.Nodes.Find(Convert.ToString(student.ID), false);
+                TreeNode[] nodes = TreeViewSelect.Nodes.Find(Convert.ToString(student.ID), false);
                 if (nodes.Any()) { nodes[0].Remove(); }
             }));
         }

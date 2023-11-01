@@ -7,8 +7,10 @@ namespace StudentSoftware;
 public partial class AskIp : Window
 {
     private bool canClose = false;
-    public AskIp()
+    private readonly bool CanCloseWithoutIp;
+    public AskIp(bool canCloseWithoutIp)
     {
+        CanCloseWithoutIp = canCloseWithoutIp;
         InitializeComponent();
         btnConfirm.Click += Confirm;
         btnVerify.Click += Verify;
@@ -33,6 +35,7 @@ public partial class AskIp : Window
         if (tbxIp.Text == null) { return; }
         IpForTheWeek.SetIp(tbxIp.Text);
         canClose = true;
+        Close();
     }
 
     private void TextChanged(object ?sender, TextChangedEventArgs e)
@@ -43,6 +46,6 @@ public partial class AskIp : Window
 
     private void FormClosing(object ?sender,WindowClosingEventArgs e)
     {
-        if (!canClose) { e.Cancel = true; }
+        if (!canClose && !CanCloseWithoutIp) { e.Cancel = true; }
     }
 }
