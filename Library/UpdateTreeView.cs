@@ -1,8 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Collections.Specialized;
+﻿using System.Collections.Specialized;
 using System.Drawing;
-using System.Linq;
-using System.Windows.Forms;
+using Color = SixLabors.ImageSharp.Color;
 
 namespace LibraryData
 {
@@ -28,14 +26,12 @@ namespace LibraryData
 
                 if (filterEnabled)
                 {
-                    if (alertedProcesses.Contains(process))
+                    if (!alertedProcesses.Contains(process)) continue;
+                    current.BackColor = Color.Red;
+                    while (current.Parent != null)
                     {
+                        current = current.Parent;
                         current.BackColor = Color.Red;
-                        while (current.Parent != null)
-                        {
-                            current = current.Parent;
-                            current.BackColor = Color.Red;
-                        }
                     }
                 }
                 else
@@ -53,25 +49,22 @@ namespace LibraryData
         /// <param name="treeBrowser">The treeview you want to update.</param>
         public static void UpdateUrls(Dictionary<BrowserName, List<Url>> browsers, TreeNode nodeBrowser, TreeView treeBrowser)
         {
-            foreach (KeyValuePair<BrowserName, List<Url>> browser in browsers)
+            foreach (var browser in browsers.Where(browser => browser.Value.Count > 0))
             {
-                if (browser.Value.Count > 0)
+                TreeNode Browser;
+                if (nodeBrowser != null)
                 {
-                    TreeNode Browser;
-                    if (nodeBrowser != null)
-                    {
-                        if (!nodeBrowser.Nodes.Find(browser.Key.ToString(), false).Any()) { nodeBrowser.Nodes.Add(browser.Key.ToString(), browser.Key.ToString()); }
-                        Browser = nodeBrowser.Nodes.Find(browser.Key.ToString(), false)[0];
-                    }
-                    else
-                    {
-                        if (!treeBrowser.Nodes.Find(browser.Key.ToString(), false).Any()) { treeBrowser.Nodes.Add(browser.Key.ToString(), browser.Key.ToString()); }
-                        Browser = treeBrowser.Nodes.Find(browser.Key.ToString(), false)[0];
-                    }
-                    for (int i = Browser.Nodes.Count; i < browser.Value.Count; i++)
-                    {
-                        Browser.Nodes.Add(browser.Value[i].ToString());
-                    }
+                    if (!nodeBrowser.Nodes.Find(browser.Key.ToString(), false).Any()) { nodeBrowser.Nodes.Add(browser.Key.ToString(), browser.Key.ToString()); }
+                    Browser = nodeBrowser.Nodes.Find(browser.Key.ToString(), false)[0];
+                }
+                else
+                {
+                    if (!treeBrowser.Nodes.Find(browser.Key.ToString(), false).Any()) { treeBrowser.Nodes.Add(browser.Key.ToString(), browser.Key.ToString()); }
+                    Browser = treeBrowser.Nodes.Find(browser.Key.ToString(), false)[0];
+                }
+                for (int i = Browser.Nodes.Count; i < browser.Value.Count; i++)
+                {
+                    Browser.Nodes.Add(browser.Value[i].ToString());
                 }
             }
         }
@@ -79,24 +72,23 @@ namespace LibraryData
         /// <summary>
         /// Fonction to enable filters for urls
         /// </summary>
-        /// <param name="NodeBrowsers"></param>
-        public static void ApplyUrlFilter(TreeNode NodeBrowsers, StringCollection alertedUrls)
+        /// <param name="nodeBrowsers"></param>
+        /// <param name="alertedUrls"></param>
+        public static void ApplyUrlFilter(TreeNode nodeBrowsers, StringCollection alertedUrls)
         {
-            for (int i = 0; i < NodeBrowsers.Nodes.Count; i++)
+            for (int i = 0; i < nodeBrowsers.Nodes.Count; i++)
             {
-                for (int j = 0; j < NodeBrowsers.Nodes[i].Nodes.Count; j++)
+                for (int j = 0; j < nodeBrowsers.Nodes[i].Nodes.Count; j++)
                 {
-                    for (int k = 0; k < alertedUrls.Count; k++)
+                    foreach (string? t in alertedUrls)
                     {
-                        if (NodeBrowsers.Nodes[i].Nodes[j].Text.ToLower().Contains(alertedUrls[k]))
+                        if (!nodeBrowsers.Nodes[i].Nodes[j].Text.ToLower().Contains(t)) continue;
+                        TreeNode nodeUrl = nodeBrowsers.Nodes[i].Nodes[j];
+                        nodeUrl.BackColor = Color.Red;
+                        while (nodeUrl.Parent != null)
                         {
-                            TreeNode NodeUrl = NodeBrowsers.Nodes[i].Nodes[j];
-                            NodeUrl.BackColor = Color.Red;
-                            while (NodeUrl.Parent != null)
-                            {
-                                NodeUrl = NodeUrl.Parent;
-                                NodeUrl.BackColor = Color.Red;
-                            }
+                            nodeUrl = nodeUrl.Parent;
+                            nodeUrl.BackColor = Color.Red;
                         }
                     }
                 }

@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Drawing.Imaging;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Windows.Forms;
+﻿using System.Drawing;
+using IronSoftware.Drawing;
+using Point = IronSoftware.Drawing.Point;
 
 namespace LibraryData
 {
@@ -38,7 +33,7 @@ namespace LibraryData
         /// <param name="name">The computer name.</param>
         /// <param name="studentID">The student ID.</param>
         /// <param name="savepath">The save path for images.</param>
-        public Preview(Bitmap image, string name, int studentID, string savepath)
+        public Preview(AnyBitmap image, string name, int studentID, string savepath)
         {
             TimeSinceUpdate = 0;
             PbxImage = new();
@@ -88,7 +83,7 @@ namespace LibraryData
         /// <param name="e"></param>
         private void SaveScreenShot(object sender, EventArgs e)
         {
-            PbxImage.Image.Save(SavePath + "\\" + ComputerName + DateTime.Now.ToString("_yyyy-mm-dd_hh-mm-ss") + ".jpg", ImageFormat.Jpeg);
+            PbxImage.Image.Save(SavePath + "\\" + ComputerName + DateTime.Now.ToString("_yyyy-mm-dd_hh-mm-ss") + ".jpg", AnyBitmap.ImageFormat.Jpeg);
         }
 
         #endregion
@@ -137,11 +132,11 @@ namespace LibraryData
 
         #region Constructor
 
-        public PreviewDisplayer(int maxwidth)
+        public PreviewDisplayer(int maxWidth)
         {
             Zoom = 0.1;
-            CustomPreviewList = new();
-            MaxWidth = maxwidth;
+            CustomPreviewList = new List<Preview>();
+            MaxWidth = maxWidth;
             Task.Run(LaunchTimeUpdate);
         }
 
@@ -154,13 +149,13 @@ namespace LibraryData
         /// </summary>
         public void ChangeZoom()
         {
-            foreach (var (preview, NewHeight, NewWidth) in from Preview preview in CustomPreviewList
-                                                           let NewHeight = preview.PbxImage.Image.Height * Zoom
-                                                           let NewWidth = preview.PbxImage.Image.Width * Zoom
-                                                           select (preview, NewHeight, NewWidth))
+            foreach ((Preview? preview, double newHeight, double newWidth) in from Preview preview in CustomPreviewList
+                                                           let newHeight = preview.PbxImage.Image.Height * Zoom
+                                                           let newWidth = preview.PbxImage.Image.Width * Zoom
+                                                           select (preview, newHeight, newWidth))
             {
-                preview.PbxImage.Height = Convert.ToInt32(NewHeight);
-                preview.PbxImage.Width = Convert.ToInt32(NewWidth);
+                preview.PbxImage.Height = Convert.ToInt32(newHeight);
+                preview.PbxImage.Width = Convert.ToInt32(newWidth);
             }
 
             UpdateAllLocations(MaxWidth);
@@ -189,24 +184,24 @@ namespace LibraryData
         /// <summary>
         /// Function to place all previews at the right place.
         /// </summary>
-        public void UpdateAllLocations(int maxwidth)
+        public void UpdateAllLocations(int maxWidth)
         {
-            MaxWidth = maxwidth;
-            int OffsetTop = 0;
-            int OffsetRight = 0;
-            int MaxHeightInRow = 0;
+            MaxWidth = maxWidth;
+            int offsetTop = 0;
+            int offsetRight = 0;
+            int maxHeightInRow = 0;
             for (int i = 0; i < CustomPreviewList.Count; i++)
             {
-                if (OffsetRight + CustomPreviewList[i].Width > MaxWidth)
+                if (offsetRight + CustomPreviewList[i].Width > MaxWidth)
                 {
-                    OffsetTop += MaxHeightInRow;
-                    MaxHeightInRow = 0;
-                    OffsetRight = 0;
+                    offsetTop += maxHeightInRow;
+                    maxHeightInRow = 0;
+                    offsetRight = 0;
                 }
-                CustomPreviewList[i].Top = OffsetTop;
-                CustomPreviewList[i].Left = OffsetRight + Margin;
-                OffsetRight += CustomPreviewList[i].Width + Margin;
-                if (CustomPreviewList[i].Height > MaxHeightInRow) { MaxHeightInRow = CustomPreviewList[i].Height; }
+                CustomPreviewList[i].Top = offsetTop;
+                CustomPreviewList[i].Left = offsetRight + Margin;
+                offsetRight += CustomPreviewList[i].Width + Margin;
+                if (CustomPreviewList[i].Height > maxHeightInRow) { maxHeightInRow = CustomPreviewList[i].Height; }
             }
         }
 
@@ -214,18 +209,15 @@ namespace LibraryData
         /// Function to update the preview image.
         /// </summary>
         /// <param name="id">The student ID.</param>
-        /// <param name="computername">The computer name.</param>
+        /// <param name="computerName">The computer name.</param>
         /// <param name="image">The new image.</param>
-        public void UpdatePreview(int id, string computername, Bitmap image)
+        public void UpdatePreview(int id, string computerName, AnyBitmap image)
         {
-            foreach (Preview preview in CustomPreviewList)
+            foreach (Preview preview in CustomPreviewList.Where(preview => preview.StudentID == id && preview.GetComputerName() == computerName))
             {
-                if (preview.StudentID == id && preview.GetComputerName() == computername)
-                {
-                    preview.PbxImage.Image = image;
-                    preview.TimeSinceUpdate = 0;
-                    return;
-                }
+                preview.PbxImage.Image = image;
+                preview.TimeSinceUpdate = 0;
+                return;
             }
         }
 
@@ -247,7 +239,6 @@ namespace LibraryData
         /// Function to remove a preview of the panel.
         /// </summary>
         /// <param name="id">The student ID.</param>
-        /// <param name="computername">The computer name.</param>
         public void RemovePreview(int id)
         {
             foreach (Preview preview in CustomPreviewList)

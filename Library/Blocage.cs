@@ -52,7 +52,7 @@ namespace LibraryData
 
         public GlobalKeyboardHook()
         {
-            HookedKeys = new();
+            HookedKeys = new List<Keys>();
             hookProc = HookCallback;
             Hook();
         }
@@ -89,25 +89,20 @@ namespace LibraryData
 
         private int HookCallback(int code, int wParam, ref KeyboardHookStruct lParam)
         {
-            if (code >= 0)
+            if (code < 0) return CallNextHookEx(hHook, code, wParam, ref lParam);
+            Keys key = (Keys)lParam.VkCode;
+            if (!HookedKeys.Contains(key)) return CallNextHookEx(hHook, code, wParam, ref lParam);
+            KeyEventArgs kea = new(key);
+            switch (wParam)
             {
-                Keys key = (Keys)lParam.VkCode;
-                if (HookedKeys.Contains(key))
-                {
-                    KeyEventArgs kea = new(key);
-                    if ((wParam == WM_KEYDOWN || wParam == WM_SYSKEYDOWN) && (KeyDown != null))
-                    {
-                        KeyDown(this, kea);
-                    }
-                    else if ((wParam == WM_KEYUP || wParam == WM_SYSKEYUP) && (KeyUp != null))
-                    {
-                        KeyUp(this, kea);
-                    }
-                    if (kea.Handled)
-                        return 1;
-                }
+                case WM_KEYDOWN or WM_SYSKEYDOWN when (KeyDown != null):
+                    KeyDown(this, kea);
+                    break;
+                case WM_KEYUP or WM_SYSKEYUP when (KeyUp != null):
+                    KeyUp(this, kea);
+                    break;
             }
-            return CallNextHookEx(hHook, code, wParam, ref lParam);
+            return kea.Handled ? 1 : CallNextHookEx(hHook, code, wParam, ref lParam);
         }
 
         #endregion
@@ -132,8 +127,8 @@ namespace LibraryData
     {
         #region Constant
 
-        private const int SW_SHOWMINIMIZED = 2;
-        private const int SW_SHOW = 5;
+        private const int SwShowminimized = 2;
+        private const int SwShow = 5;
 
         #endregion
 
@@ -149,18 +144,15 @@ namespace LibraryData
         /// <summary>
         /// Function that minimize all unautorised applications
         /// </summary>
-        /// <param name="autorisedProcesses"></param>
-        public static void MinimizeUnAuthorised(List<string> autorisedProcesses)
+        /// <param name="authorisedProcesses"></param>
+        public static void MinimizeUnAuthorised(List<string> authorisedProcesses)
         {
             Process thisProcess = Process.GetCurrentProcess();
             List<Process> processes = Process.GetProcesses().ToList();
 
-            foreach (Process process in processes)
+            foreach (Process process in processes.Where(process => process.ProcessName != authorisedProcesses[0] && process.ProcessName != thisProcess.ProcessName))
             {
-                if (process.ProcessName != autorisedProcesses[0] && process.ProcessName != thisProcess.ProcessName)
-                {
-                    ShowWindow(process.MainWindowHandle, SW_SHOWMINIMIZED);
-                }
+                ShowWindow(process.MainWindowHandle, SwShowminimized);
             }
         }
         /// <summary>
@@ -171,7 +163,7 @@ namespace LibraryData
             List<Process> processes = Process.GetProcesses().ToList();
             foreach (Process process in processes)
             {
-                ShowWindow(process.MainWindowHandle, SW_SHOW);
+                ShowWindow(process.MainWindowHandle, SwShow);
             }
         }
 

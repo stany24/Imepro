@@ -1,21 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Drawing;
-using System.Drawing.Imaging;
-using System.Linq;
-using System.Management;
+﻿using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Windows.Forms;
+using IronSoftware.Drawing;
+using LibraryData;
+using Point = IronSoftware.Drawing.Point;
+using Rectangle = IronSoftware.Drawing.Rectangle;
 
-namespace LibraryData
+namespace Library
 {
     /// <summary>
     /// Class  that represent a basic student.
@@ -34,7 +29,7 @@ namespace LibraryData
         [JsonInclude]
         public Dictionary<int, string> Processes { get; set; }
         [JsonIgnore]
-        public Bitmap ScreenShot { get; set; }
+        public AnyBitmap ScreenShot { get; set; }
 
         #endregion
 
@@ -50,8 +45,8 @@ namespace LibraryData
 
         public Data()
         {
-            Urls = new();
-            Processes = new();
+            Urls = new History();
+            Processes = new Dictionary<int, string>();
         }
 
         #endregion
@@ -97,9 +92,9 @@ namespace LibraryData
     {
         #region Variables/Events
 
-        readonly private List<string> DefaultProcess = new();
-        readonly private GlobalKeyboardHook gkh = new();
-        readonly private Dictionary<string, BrowserName> browsersList = new() {
+        private readonly List<string> DefaultProcess = new();
+        private readonly GlobalKeyboardHook gkh = new();
+        private readonly Dictionary<string, BrowserName> browsersList = new() {
             { "chrome",BrowserName.Chrome },
             { "firefox", BrowserName.Firefox },
             { "iexplore",BrowserName.IExplorer },
@@ -123,8 +118,8 @@ namespace LibraryData
 
         public Socket SocketToTeacher { get; set; }
         public IPAddress IpToTeacher { get; set; }
-        public List<string> AutorisedUrls { get; set; }
-        public List<int> SeleniumProcessesID { get; set; }
+        public List<string> AuthorisedUrls { get; set; }
+        public List<int> SeleniumProcessesId { get; set; }
 
         #endregion
 
@@ -132,8 +127,8 @@ namespace LibraryData
 
         public DataForStudent()
         {
-            AutorisedUrls = new();
-            SeleniumProcessesID = new();
+            AuthorisedUrls = new List<string>();
+            SeleniumProcessesId = new List<int>();
             GetDefaultProcesses();
             ComputerName = Environment.MachineName;
             UserName = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
@@ -148,35 +143,35 @@ namespace LibraryData
         /// </summary>
         private void GetCurrentWebTabsName()
         {
-            [DllImport("user32.dll")]
-            static extern int GetWindowTextLength(IntPtr hWnd);
+            foreach (KeyValuePair<string, BrowserName> singleBrowser in browsersList)
+            {
+                Process[] process = Process.GetProcessesByName(singleBrowser.Key);
+                if (process.Length <= 0) continue;
+                foreach (Process instance in process)
+                {
+                    Process parent = GetParent(instance);
+                    if (parent != null && parent.ProcessName == singleBrowser.Key)
+                    { continue; }
+                    Process.GetProcessById(instance.Id);
+                    if (SeleniumProcessesId.Contains(instance.Id)) { continue; }
+                    IntPtr hWnd = instance.MainWindowHandle;
+
+                    StringBuilder text = new(GetWindowTextLength(hWnd) + 1);
+                    _ = GetWindowText(hWnd, text, text.Capacity);
+                    if (text.ToString() != "")
+                    {
+                        Urls.AddUrl(new Url(DateTime.Now, text.ToString()), singleBrowser.Value);
+                    }
+                }
+            }
+
+            return;
 
             [DllImport("user32.dll")]
             static extern int GetWindowText(IntPtr hWnd, StringBuilder lpString, int nMaxCount);
 
-            foreach (KeyValuePair<string, BrowserName> singleBrowser in browsersList)
-            {
-                Process[] process = Process.GetProcessesByName(singleBrowser.Key);
-                if (process.Length > 0)
-                {
-                    foreach (Process instance in process)
-                    {
-                        Process parent = GetParent(instance);
-                        if (parent != null && parent.ProcessName == singleBrowser.Key)
-                        { continue; }
-                        Process.GetProcessById(instance.Id);
-                        if (SeleniumProcessesID.Contains(instance.Id)) { continue; }
-                        IntPtr hWnd = instance.MainWindowHandle;
-
-                        StringBuilder text = new(GetWindowTextLength(hWnd) + 1);
-                        _ = GetWindowText(hWnd, text, text.Capacity);
-                        if (text.ToString() != "")
-                        {
-                            Urls.AddUrl(new Url(DateTime.Now, text.ToString()), singleBrowser.Value);
-                        }
-                    }
-                }
-            }
+            [DllImport("user32.dll")]
+            static extern int GetWindowTextLength(IntPtr hWnd);
         }
 
         /// <summary>
@@ -219,41 +214,39 @@ namespace LibraryData
         {
             Processes.Clear();
             List<Process> list = Process.GetProcesses().OrderBy(x => x.ProcessName).ToList();
-            foreach (Process process in list)
+            foreach (Process process in list.Where(process => !DefaultProcess.Contains(process.ProcessName)))
             {
-                if (!DefaultProcess.Contains(process.ProcessName)) { Processes.Add(process.Id, process.ProcessName); }
+                Processes.Add(process.Id, process.ProcessName);
             }
         }
 
         /// <summary>
         /// Function to get a screenshot of all screen in one image.
         /// </summary>
-        private Bitmap TakeAllScreenShot()
+        private AnyBitmap TakeAllScreenShot()
         {
-            int TotalWidth = 0;
-            int MaxHeight = 0;
-            List<Bitmap> images = new();
+            int totalWidth = 0;
+            int maxHeight = 0;
+            List<AnyBitmap> images = new();
             foreach (Screen screen in Screen.AllScreens)
             {
-                images.Add(TakeSreenShot(screen));
-                TotalWidth += screen.Bounds.Width;
-                if (screen.Bounds.Height > MaxHeight) { MaxHeight = screen.Bounds.Height; }
+                images.Add(TakeScreenShot(screen));
+                totalWidth += screen.Bounds.Width;
+                if (screen.Bounds.Height > maxHeight) { maxHeight = screen.Bounds.Height; }
             }
-            if (MaxHeight > 0)
-            {
-                Bitmap FullImage = new(TotalWidth, MaxHeight, PixelFormat.Format16bppRgb565);
-                Graphics FullGraphics = Graphics.FromImage(FullImage);
 
-                int offsetLeft = 0;
-                foreach (Bitmap image in images)
-                {
-                    FullGraphics.DrawImage(image, new Point(offsetLeft, 0));
-                    offsetLeft += image.Width;
-                }
-                FullGraphics.Dispose();
-                return FullImage;
+            if (maxHeight <= 0) return null;
+            AnyBitmap FullImage = new(totalWidth, maxHeight, PixelFormat.Format16bppRgb565);
+            Graphics FullGraphics = Graphics.FromImage(FullImage);
+
+            int offsetLeft = 0;
+            foreach (AnyBitmap image in images)
+            {
+                FullGraphics.DrawImage(image, new Point(offsetLeft, 0));
+                offsetLeft += image.Width;
             }
-            return null;
+            FullGraphics.Dispose();
+            return FullImage;
         }
 
         /// <summary>
@@ -261,12 +254,12 @@ namespace LibraryData
         /// </summary>
         /// <param name="screen">The screen we want the screenshot.</param>
         /// <returns></returns>
-        private Bitmap TakeSreenShot(Screen screen)
+        private AnyBitmap TakeScreenShot(Screen screen)
         {
-            Bitmap Bitmap = new(screen.Bounds.Width, screen.Bounds.Height, PixelFormat.Format16bppRgb565);
+            AnyBitmap AnyBitmap = new(screen.Bounds.Width, screen.Bounds.Height, PixelFormat.Format16bppRgb565);
             Rectangle ScreenSize = screen.Bounds;
-            Graphics.FromImage(Bitmap).CopyFromScreen(ScreenSize.Left, ScreenSize.Top, 0, 0, ScreenSize.Size);
-            return Bitmap;
+            Graphics.FromImage(AnyBitmap).CopyFromScreen(ScreenSize.Left, ScreenSize.Top, 0, 0, ScreenSize.Size);
+            return AnyBitmap;
         }
 
         #endregion
@@ -298,11 +291,10 @@ namespace LibraryData
         /// <summary>
         /// Function to send the screenshot to the teacher.
         /// </summary>
-        private void SendImage(Bitmap image, Socket socket)
+        private void SendImage(AnyBitmap image, Socket socket)
         {
-            byte[] imagebytes;
             ImageConverter converter = new();
-            imagebytes = (byte[])converter.ConvertTo(image, typeof(byte[]));
+            byte[] imagebytes = (byte[])converter.ConvertTo(image, typeof(byte[]));
             socket.Send(imagebytes, 0, imagebytes.Length, SocketFlags.None);
         }
 
@@ -317,7 +309,7 @@ namespace LibraryData
         {
             try
             {
-                int timeout = 2000;
+                const int timeout = 2000;
                 // Establish the remote endpoint for the socket. This example uses port 11111 on the local computer.
                 IPEndPoint localEndPoint = new(IpToTeacher, port);
 
@@ -328,15 +320,15 @@ namespace LibraryData
                     Socket sender = new(localEndPoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
 
                     // Si l'addresse du professeur a changé on adapte le socket
-                    if (localEndPoint.Address != IpToTeacher)
+                    if (localEndPoint.Address.Equals(IpToTeacher))
                     {
                         localEndPoint.Address = IpToTeacher;
-                        sender = new(localEndPoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
+                        sender = new Socket(localEndPoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
                     }
                     try
                     {
                         // Connect Socket to the remote endpoint using method Connect()
-                        var result = sender.BeginConnect(localEndPoint, null, null);
+                        IAsyncResult result = sender.BeginConnect(localEndPoint, null, null);
 
                         bool success = result.AsyncWaitHandle.WaitOne(timeout, true);
                         if (success)
@@ -419,7 +411,7 @@ namespace LibraryData
         /// Function to stop a process.
         /// </summary>
         /// <param name="id">the id of the process</param>
-        private void KillSelectedProcess(int id)
+        private static void KillSelectedProcess(int id)
         {
             Process.GetProcessById(id).Kill();
         }
@@ -464,10 +456,10 @@ namespace LibraryData
         private void SendStream()
         {
             isControled = true;
-            Socket SocketControl = ConnectToTeacher(11112);
+            Socket socketControl = ConnectToTeacher(11112);
             while (isControled)
             {
-                SendImage(TakeSreenShot(Screen.AllScreens[screenToStream]), SocketControl);
+                SendImage(TakeScreenShot(Screen.AllScreens[screenToStream]), socketControl);
             }
         }
 
@@ -476,10 +468,10 @@ namespace LibraryData
         /// </summary>
         private void ReceiveAuthorisedUrls()
         {
-            byte[] bytemessage = new byte[102400];
-            int nbData = SocketToTeacher.Receive(bytemessage);
-            Array.Resize(ref bytemessage, nbData);
-            AutorisedUrls = JsonSerializer.Deserialize<List<string>>(Encoding.Default.GetString(bytemessage));
+            byte[] byteMessage = new byte[102400];
+            int nbData = SocketToTeacher.Receive(byteMessage);
+            Array.Resize(ref byteMessage, nbData);
+            AuthorisedUrls = JsonSerializer.Deserialize<List<string>>(Encoding.Default.GetString(byteMessage));
         }
 
         /// <summary>
@@ -487,10 +479,10 @@ namespace LibraryData
         /// </summary>
         private void ReceiveMessage()
         {
-            byte[] bytemessage = new byte[1024];
-            int nbData = SocketToTeacher.Receive(bytemessage);
-            Array.Resize(ref bytemessage, nbData);
-            NewMessageEvent.Invoke(this, new NewMessageEventArgs(DateTime.Now.ToString("hh:mm ") + Encoding.Default.GetString(bytemessage)));
+            byte[] byteMessage = new byte[1024];
+            int nbData = SocketToTeacher.Receive(byteMessage);
+            Array.Resize(ref byteMessage, nbData);
+            NewMessageEvent.Invoke(this, new NewMessageEventArgs(DateTime.Now.ToString("hh:mm ") + Encoding.Default.GetString(byteMessage)));
         }
 
         #endregion
@@ -502,14 +494,14 @@ namespace LibraryData
         /// </summary>
         private void ReceiveMulticastStream()
         {
-            Task.Run(MinimizeUnAutorisedEverySecond);
-            Socket SocketMulticast = new(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+            Task.Run(MinimizeUnAuthorisedEverySecond);
+            Socket socketMulticast = new(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
             IPEndPoint ipep = new(IPAddress.Any, 45678);
-            SocketMulticast.Bind(ipep);
+            socketMulticast.Bind(ipep);
             IPAddress ip = IPAddress.Parse("232.1.2.3");
-            SocketMulticast.SetSocketOption(SocketOptionLevel.IP, SocketOptionName.AddMembership, new MulticastOption(ip, IPAddress.Any));
+            socketMulticast.SetSocketOption(SocketOptionLevel.IP, SocketOptionName.AddMembership, new MulticastOption(ip, IPAddress.Any));
 
-            MulticastReceiver = new ReliableMulticastReceiver(SocketMulticast);
+            MulticastReceiver = new ReliableMulticastReceiver(socketMulticast);
             MulticastReceiver.NewImageEvent += DisplayImage;
         }
 
@@ -589,7 +581,7 @@ namespace LibraryData
         /// <summary>
         /// Function to minimized unauthorised application every second.
         /// </summary>
-        private void MinimizeUnAutorisedEverySecond()
+        private void MinimizeUnAuthorisedEverySecond()
         {
             while (isReceiving)
             {
@@ -622,7 +614,7 @@ namespace LibraryData
             Cursor.Clip = new Rectangle(0, 60, 1, 1);
             Cursor.Hide();
             Application.AddMessageFilter(this);
-            foreach (var process in Process.GetProcessesByName("Taskmgr"))
+            foreach (Process process in Process.GetProcessesByName("Taskmgr"))
             {
                 process.Kill();
             }
@@ -641,8 +633,7 @@ namespace LibraryData
         public bool PreFilterMessage(ref Message m)
         {
             if (m.Msg == 0x201 || m.Msg == 0x202 || m.Msg == 0x203) return true;
-            if (m.Msg == 0x204 || m.Msg == 0x205 || m.Msg == 0x206) return true;
-            return false;
+            return m.Msg == 0x204 || m.Msg == 0x205 || m.Msg == 0x206;
         }
 
         #endregion

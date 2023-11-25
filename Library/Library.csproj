@@ -12,4 +12,8 @@
       </Compile>
     </ItemGroup>
 
+    <ItemGroup>
+      <PackageReference Include="IronSoftware.System.Drawing" Version="2023.12.1" />
+    </ItemGroup>
+
 </Project>

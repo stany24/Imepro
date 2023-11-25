@@ -1,15 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Drawing.Imaging;
-using System.IO;
-using System.Linq;
-using System.Net.Sockets;
+﻿using System.Net.Sockets;
 using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
+using IronSoftware.Drawing;
+using Rectangle = IronSoftware.Drawing.Rectangle;
 
-namespace LibraryData
+namespace Library
 {
     /// <summary>
     /// Class representing a UDP multicast message.
@@ -19,39 +13,39 @@ namespace LibraryData
         #region Variables
 
         public byte[] Data { get; }
-        readonly public int ImageNumber;
-        readonly public int PartNumber;
-        readonly public int TotalPartNumber;
-        private const string separator = "[";
+        public readonly int ImageNumber;
+        public readonly int PartNumber;
+        public readonly int TotalPartNumber;
+        private const string Separator = "[";
 
         #endregion
 
         #region Constructor
 
-        public ReliableMulticastMessage(string customstring)
+        public ReliableMulticastMessage(string customString)
         {
-            string[] split = customstring.Split(separator[0]);
+            string[] split = customString.Split(Separator[0]);
             ImageNumber = Convert.ToInt32(split[0]);
             PartNumber = Convert.ToInt32(split[1]);
             TotalPartNumber = Convert.ToInt32(split[2]);
-            int HeaderLength = 3 + split[0].Length + split[1].Length + split[2].Length;
-            Data = new byte[customstring.Length - HeaderLength];
-            Array.Copy(Encoding.Default.GetBytes(customstring), HeaderLength, Data, 0, customstring.Length - HeaderLength);
+            int headerLength = 3 + split[0].Length + split[1].Length + split[2].Length;
+            Data = new byte[customString.Length - headerLength];
+            Array.Copy(Encoding.Default.GetBytes(customString), headerLength, Data, 0, customString.Length - headerLength);
         }
 
-        public ReliableMulticastMessage(byte[] data, int imagenumber, int partnumber, int totalpartnumber)
+        public ReliableMulticastMessage(byte[] data, int imageNumber, int partnumber, int totalPartNumber)
         {
             Data = data;
-            ImageNumber = imagenumber;
+            ImageNumber = imageNumber;
             PartNumber = partnumber;
-            TotalPartNumber = totalpartnumber;
+            TotalPartNumber = totalPartNumber;
         }
 
         #endregion
 
         public string ToCustomString()
         {
-            return ImageNumber + separator + PartNumber + separator + TotalPartNumber + separator + Encoding.Default.GetString(Data);
+            return ImageNumber + Separator + PartNumber + Separator + TotalPartNumber + Separator + Encoding.Default.GetString(Data);
         }
     }
 
@@ -62,19 +56,19 @@ namespace LibraryData
     {
         #region Variables
 
-        private const int DATA_SIZE = 64000;
+        private const int DataSize = 64000;
         private int ScreenToShareId { get; set; }
         private int ImageNumber = 0;
-        readonly private Socket SocketToSend;
+        private readonly Socket SocketToSend;
         public bool Sending { get; set; }
 
         #endregion
 
         #region Constructor
 
-        public ReliableMulticastSender(Socket socket, int screentoshareid)
+        public ReliableMulticastSender(Socket socket, int screenToShareId)
         {
-            ScreenToShareId = screentoshareid;
+            ScreenToShareId = screenToShareId;
             SocketToSend = socket;
             Sending = true;
             Task.Run(SendImages);
@@ -88,18 +82,18 @@ namespace LibraryData
         {
             while (Sending)
             {
-                byte[] ImageBytes = TakeScreenshot();
-                int TotalImagePart = ImageBytes.Count() / DATA_SIZE + 1;
-                for (int i = 0; i * DATA_SIZE < ImageBytes.Count(); i++)
+                byte[] imageBytes = TakeScreenshot();
+                int totalImagePart = imageBytes.Length / DataSize + 1;
+                for (int i = 0; i * DataSize < imageBytes.Length; i++)
                 {
-                    byte[] part = new byte[DATA_SIZE];
-                    try { Array.Copy(ImageBytes, i * DATA_SIZE, part, 0, DATA_SIZE); }
+                    byte[] part = new byte[DataSize];
+                    try { Array.Copy(imageBytes, i * DataSize, part, 0, DataSize); }
                     catch
                     {
-                        Array.Copy(ImageBytes, i * DATA_SIZE, part, 0, ImageBytes.Length - i * DATA_SIZE);
-                        Array.Resize(ref part, ImageBytes.Length - i * DATA_SIZE);
+                        Array.Copy(imageBytes, i * DataSize, part, 0, imageBytes.Length - i * DataSize);
+                        Array.Resize(ref part, imageBytes.Length - i * DataSize);
                     }
-                    ReliableMulticastMessage message = new(part, ImageNumber, i, TotalImagePart);
+                    ReliableMulticastMessage message = new(part, ImageNumber, i, totalImagePart);
                     string custom = message.ToCustomString();
                     byte[] bytes = Encoding.Default.GetBytes(custom);
                     SocketToSend.Send(bytes);
@@ -112,7 +106,7 @@ namespace LibraryData
         public byte[] TakeScreenshot()
         {
             Screen screen = Screen.AllScreens[ScreenToShareId];
-            Bitmap bitmap = new(screen.Bounds.Width, screen.Bounds.Height, PixelFormat.Format16bppRgb565);
+            AnyBitmap bitmap = new(screen.Bounds.Width, screen.Bounds.Height, PixelFormat.Format16bppRgb565);
             Rectangle ScreenSize = screen.Bounds;
             Graphics.FromImage(bitmap).CopyFromScreen(ScreenSize.Left, ScreenSize.Top, 0, 0, ScreenSize.Size);
             ImageConverter converter = new();
@@ -130,8 +124,8 @@ namespace LibraryData
         #region Variables
 
         public event EventHandler<NewImageEventArgs> NewImageEvent;
-        readonly private List<ReliableImage> Images = new();
-        readonly Socket SocketToReceive;
+        private readonly List<ReliableImage> Images = new();
+        private readonly Socket SocketToReceive;
         public bool Receiving { get; set; }
 
         #endregion
@@ -163,13 +157,13 @@ namespace LibraryData
 
         private void AddMessageToImage(ReliableMulticastMessage message)
         {
-            foreach (ReliableImage image in Images)
+            foreach (ReliableImage image in Images.Where(image => image.ImageNumber == message.ImageNumber))
             {
-                if (image.ImageNumber == message.ImageNumber) { image.AddData(message.Data, message.PartNumber); return; }
+                image.AddData(message.Data, message.PartNumber); return;
             }
-            ReliableImage NewImage = new(message);
-            NewImage.ImageCompletedEvent += DisplayImage;
-            Images.Add(NewImage);
+            ReliableImage newImage = new(message);
+            newImage.ImageCompletedEvent += DisplayImage;
+            Images.Add(newImage);
         }
 
         private void DisplayImage(object sender, ImageCompletedEventArgs e)
@@ -191,8 +185,8 @@ namespace LibraryData
     {
         #region Variables
 
-        readonly private byte[][] ImageBytes;
-        readonly public int ImageNumber;
+        private readonly byte[][] ImageBytes;
+        public readonly int ImageNumber;
         public event EventHandler<ImageCompletedEventArgs> ImageCompletedEvent;
 
         #endregion
@@ -206,9 +200,9 @@ namespace LibraryData
             ImageNumber = message.ImageNumber;
         }
 
-        public void AddData(byte[] messagedata, int partnumber)
+        public void AddData(byte[] messageData, int partnumber)
         {
-            ImageBytes[partnumber] = messagedata;
+            ImageBytes[partnumber] = messageData;
             foreach (byte[] b in ImageBytes)
             {
                 if (b == null) { return; }
@@ -219,10 +213,10 @@ namespace LibraryData
         public void ImageCompleted()
         {
             byte[] imageData = ImageBytes.SelectMany(a => a).ToArray();
-            Bitmap bmp;
-            using (var ms = new MemoryStream(imageData))
+            AnyBitmap bmp;
+            using (MemoryStream ms = new MemoryStream(imageData))
             {
-                bmp = new Bitmap(ms);
+                bmp = new AnyBitmap(ms);
             }
             ImageCompletedEvent?.Invoke(this, new ImageCompletedEventArgs(bmp, ImageNumber));
         }
@@ -235,14 +229,14 @@ namespace LibraryData
     /// </summary>
     public class ImageCompletedEventArgs : EventArgs
     {
-        public ImageCompletedEventArgs(Bitmap competedimage, int imageId)
+        public ImageCompletedEventArgs(AnyBitmap competedImage, int imageId)
         {
-            CompletedImage = competedimage;
+            CompletedImage = competedImage;
             ImageId = imageId;
         }
 
         public int ImageId { get; set; }
-        public Bitmap CompletedImage { get; set; }
+        public AnyBitmap CompletedImage { get; set; }
     }
 
     /// <summary>
@@ -250,7 +244,7 @@ namespace LibraryData
     /// </summary>
     public class NewImageEventArgs : EventArgs
     {
-        public Bitmap image { get; }
-        public NewImageEventArgs(Bitmap newimage) { image = newimage; }
+        public AnyBitmap Image { get; }
+        public NewImageEventArgs(AnyBitmap newImage) { Image = newImage; }
     }
 }
