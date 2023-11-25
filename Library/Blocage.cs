@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
+﻿using System.Diagnostics;
 using System.Runtime.InteropServices;
-using System.Windows.Forms;
 
-namespace LibraryData
+namespace Library
 {
     /// <summary>
     /// Class to intercept the keyboard strokes to handle them.

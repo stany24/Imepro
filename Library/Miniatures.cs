@@ -1,8 +1,7 @@
-﻿using System.Drawing;
-using IronSoftware.Drawing;
+﻿using IronSoftware.Drawing;
 using Point = IronSoftware.Drawing.Point;
 
-namespace LibraryData
+namespace Library
 {
     /// <summary>
     /// Class for preview: a screenshot with the name of the student.

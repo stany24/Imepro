@@ -1,7 +1,7 @@
 ﻿using System.Net.Sockets;
 using System.Text;
 using IronSoftware.Drawing;
-using Rectangle = IronSoftware.Drawing.Rectangle;
+using ScreenCapture.NET;
 
 namespace Library
 {
@@ -58,9 +58,9 @@ namespace Library
 
         private const int DataSize = 64000;
         private int ScreenToShareId { get; set; }
-        private int ImageNumber = 0;
+        private int ImageNumber;
         private readonly Socket SocketToSend;
-        public bool Sending { get; set; }
+        private bool Sending { get; }
 
         #endregion
 
@@ -103,14 +103,30 @@ namespace Library
             }
         }
 
-        public byte[] TakeScreenshot()
+        private static byte[] TakeScreenshot()
         {
-            Screen screen = Screen.AllScreens[ScreenToShareId];
-            AnyBitmap bitmap = new(screen.Bounds.Width, screen.Bounds.Height, PixelFormat.Format16bppRgb565);
-            Rectangle ScreenSize = screen.Bounds;
-            Graphics.FromImage(bitmap).CopyFromScreen(ScreenSize.Left, ScreenSize.Top, 0, 0, ScreenSize.Size);
-            ImageConverter converter = new();
-            return (byte[])converter.ConvertTo(bitmap, typeof(byte[]));
+            // Create a screen-capture service
+            IScreenCaptureService screenCaptureService = new X11ScreenCaptureService();
+
+            // Get all available graphics cards
+            IEnumerable<GraphicsCard> graphicsCards = screenCaptureService.GetGraphicsCards();
+
+            // Get the displays from the graphics card(s) you are interested in
+            IEnumerable<Display> displays = screenCaptureService.GetDisplays(graphicsCards.First());
+
+            // Create a screen-capture for all screens you want to capture
+            IScreenCapture screenCapture = screenCaptureService.GetScreenCapture(displays.First());
+            
+            // Register the regions you want to capture from the screen
+            // Capture the whole screen
+            ICaptureZone fullscreen = screenCapture.RegisterCaptureZone(0, 0, screenCapture.Display.Width, screenCapture.Display.Height);
+            // Capture a 100x100 region at the top left and scale it down to 50x50
+            screenCapture.CaptureScreen();
+            using (fullscreen.Lock())
+            {
+                ReadOnlySpan<byte> rawData = fullscreen.RawBuffer;
+                return rawData.ToArray();
+            }
         }
 
         #endregion
@@ -123,10 +139,10 @@ namespace Library
     {
         #region Variables
 
-        public event EventHandler<NewImageEventArgs> NewImageEvent;
+        public event EventHandler<NewImageEventArgs>? NewImageEvent;
         private readonly List<ReliableImage> Images = new();
         private readonly Socket SocketToReceive;
-        public bool Receiving { get; set; }
+        private bool Receiving { get; set; }
 
         #endregion
 
@@ -143,7 +159,7 @@ namespace Library
 
         #region Image management
 
-        public void Receive()
+        private void Receive()
         {
             while (Receiving)
             {
@@ -166,9 +182,9 @@ namespace Library
             Images.Add(newImage);
         }
 
-        private void DisplayImage(object sender, ImageCompletedEventArgs e)
+        private void DisplayImage(object? sender, ImageCompletedEventArgs e)
         {
-            NewImageEvent.Invoke(sender,new NewImageEventArgs(e.CompletedImage));
+            NewImageEvent?.Invoke(sender, new NewImageEventArgs(e.CompletedImage));
             for (int i = 0; i < Images.Count; i++)
             {
                 if (Images[i].ImageNumber <= e.ImageId) { Images.Remove(Images[i]); }
@@ -187,7 +203,7 @@ namespace Library
 
         private readonly byte[][] ImageBytes;
         public readonly int ImageNumber;
-        public event EventHandler<ImageCompletedEventArgs> ImageCompletedEvent;
+        public event EventHandler<ImageCompletedEventArgs>? ImageCompletedEvent;
 
         #endregion
 
@@ -210,7 +226,7 @@ namespace Library
             ImageCompleted();
         }
 
-        public void ImageCompleted()
+        private void ImageCompleted()
         {
             byte[] imageData = ImageBytes.SelectMany(a => a).ToArray();
             AnyBitmap bmp;
@@ -235,8 +251,8 @@ namespace Library
             ImageId = imageId;
         }
 
-        public int ImageId { get; set; }
-        public AnyBitmap CompletedImage { get; set; }
+        public int ImageId { get; }
+        public AnyBitmap CompletedImage { get;}
     }
 
     /// <summary>

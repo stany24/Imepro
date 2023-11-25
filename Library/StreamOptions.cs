@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
 
-namespace LibraryData
+namespace Library
 {
     /// <summary>
     /// Class containing the options for the stream

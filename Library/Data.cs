@@ -6,7 +6,6 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using IronSoftware.Drawing;
-using LibraryData;
 using Point = IronSoftware.Drawing.Point;
 using Rectangle = IronSoftware.Drawing.Rectangle;
 
@@ -29,7 +28,7 @@ namespace Library
         [JsonInclude]
         public Dictionary<int, string> Processes { get; set; }
         [JsonIgnore]
-        public AnyBitmap ScreenShot { get; set; }
+        public AnyBitmap? ScreenShot { get; set; }
 
         #endregion
 

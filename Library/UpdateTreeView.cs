@@ -1,8 +1,7 @@
 ﻿using System.Collections.Specialized;
-using System.Drawing;
 using Color = SixLabors.ImageSharp.Color;
 
-namespace LibraryData
+namespace Library
 {
     public static class UpdateTreeView
     {
