@@ -20,7 +20,7 @@ namespace Library
         }
         public Command(CommandType type) { Type = type; Args = new List<string>(); }
 
-        public byte[] ToByteArray()
+        public IEnumerable<byte> ToByteArray()
         {
             return Encoding.Default.GetBytes(JsonSerializer.Serialize(this));
         }

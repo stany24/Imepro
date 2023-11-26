@@ -21,11 +21,11 @@ namespace Library
             public int DwExtraInfo { get; set; }
         }
 
-        private const int WH_KEYBOARD_LL = 13;
-        private const int WM_KEYDOWN = 0x100;
-        private const int WM_KEYUP = 0x101;
-        private const int WM_SYSKEYDOWN = 0x104;
-        private const int WM_SYSKEYUP = 0x105;
+        private const int WhKeyboardLl = 13;
+        private const int WmKeydown = 0x100;
+        private const int WmKeyup = 0x101;
+        private const int WmSystemKeydown = 0x104;
+        private const int WmSystemKeyup = 0x105;
 
         #endregion
 
@@ -33,7 +33,7 @@ namespace Library
 
         public List<Keys> HookedKeys { get; set; }
         private IntPtr hHook = IntPtr.Zero;
-        private static KeyboardHookProc hookProc;
+        private static KeyboardHookProc? _hookProc;
 
         #endregion
 
@@ -49,7 +49,7 @@ namespace Library
         public GlobalKeyboardHook()
         {
             HookedKeys = new List<Keys>();
-            hookProc = HookCallback;
+            _hookProc = HookCallback;
             Hook();
         }
 
@@ -68,7 +68,7 @@ namespace Library
         public void Hook()
         {
             IntPtr hInstance = LoadLibrary("User32");
-            hHook = SetWindowsHookEx(WH_KEYBOARD_LL, hookProc, hInstance, 0);
+            hHook = SetWindowsHookEx(WhKeyboardLl, _hookProc, hInstance, 0);
         }
 
         /// <summary>
@@ -91,10 +91,10 @@ namespace Library
             KeyEventArgs kea = new(key);
             switch (wParam)
             {
-                case WM_KEYDOWN or WM_SYSKEYDOWN when (KeyDown != null):
+                case WmKeydown or WmSystemKeydown when (KeyDown != null):
                     KeyDown(this, kea);
                     break;
-                case WM_KEYUP or WM_SYSKEYUP when (KeyUp != null):
+                case WmKeyup or WmSystemKeyup when (KeyUp != null):
                     KeyUp(this, kea);
                     break;
             }
@@ -106,13 +106,13 @@ namespace Library
         #region DLL Imports
 
         [DllImport("user32.dll")]
-        static extern IntPtr SetWindowsHookEx(int idHook, KeyboardHookProc callback, IntPtr hInstance, uint threadId);
+        private static extern IntPtr SetWindowsHookEx(int idHook, KeyboardHookProc? callback, IntPtr hInstance, uint threadId);
         [DllImport("user32.dll")]
-        static extern bool UnhookWindowsHookEx(IntPtr hInstance);
+        private static extern bool UnhookWindowsHookEx(IntPtr hInstance);
         [DllImport("user32.dll")]
-        static extern int CallNextHookEx(IntPtr idHook, int nCode, int wParam, ref KeyboardHookStruct lParam);
-        [DllImport("kernel32.dll")]
-        static extern IntPtr LoadLibrary(string lpFileName);
+        private static extern int CallNextHookEx(IntPtr idHook, int nCode, int wParam, ref KeyboardHookStruct lParam);
+        [DllImport("kernel32.dll", CharSet = CharSet.Unicode)]
+        private static extern IntPtr LoadLibrary(string lpFileName);
         #endregion
     }
 
@@ -123,7 +123,7 @@ namespace Library
     {
         #region Constant
 
-        private const int SwShowminimized = 2;
+        private const int SwShowMinimized = 2;
         private const int SwShow = 5;
 
         #endregion
@@ -131,7 +131,7 @@ namespace Library
         #region DLL Imports
 
         [DllImport("user32.dll")]
-        static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
+        private static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
 
         #endregion
 
@@ -148,7 +148,7 @@ namespace Library
 
             foreach (Process process in processes.Where(process => process.ProcessName != authorisedProcesses[0] && process.ProcessName != thisProcess.ProcessName))
             {
-                ShowWindow(process.MainWindowHandle, SwShowminimized);
+                ShowWindow(process.MainWindowHandle, SwShowMinimized);
             }
         }
         /// <summary>

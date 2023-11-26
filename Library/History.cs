@@ -26,10 +26,10 @@ namespace Library
 
         public History()
         {
-            AllBrowser = new();
+            AllBrowser = new Dictionary<BrowserName, List<Url>>();
             foreach (BrowserName name in Enum.GetValues(typeof(BrowserName)))
             {
-                AllBrowser.Add(name, new());
+                AllBrowser.Add(name, new List<Url>());
             }
         }
     }
@@ -52,9 +52,9 @@ namespace Library
     public class Url
     {
         [JsonInclude]
-        readonly public DateTime ScreenShotTime;
+        public readonly DateTime ScreenShotTime;
         [JsonInclude]
-        readonly public string Name;
+        public readonly string Name;
 
         public Url(DateTime screenShotTime, string name)
         {
