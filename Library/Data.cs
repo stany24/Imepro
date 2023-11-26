@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Drawing.Imaging;
 using System.Net;
 using System.Net.Sockets;
 using System.Runtime.InteropServices;
@@ -6,6 +7,8 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using IronSoftware.Drawing;
+using ScreenCapture.NET;
+using Color = IronSoftware.Drawing.Color;
 using Point = IronSoftware.Drawing.Point;
 using Rectangle = IronSoftware.Drawing.Rectangle;
 
@@ -229,36 +232,52 @@ namespace Library
             List<AnyBitmap> images = new();
             foreach (Screen screen in Screen.AllScreens)
             {
-                images.Add(TakeScreenShot(screen));
+                images.Add(TakeScreenShot());
                 totalWidth += screen.Bounds.Width;
                 if (screen.Bounds.Height > maxHeight) { maxHeight = screen.Bounds.Height; }
             }
 
             if (maxHeight <= 0) return null;
-            AnyBitmap FullImage = new(totalWidth, maxHeight, PixelFormat.Format16bppRgb565);
-            Graphics FullGraphics = Graphics.FromImage(FullImage);
+            AnyBitmap fullImage = new(totalWidth, maxHeight,Color.White);
+            Graphics fullGraphics = Graphics.FromImage(fullImage);
 
             int offsetLeft = 0;
             foreach (AnyBitmap image in images)
             {
-                FullGraphics.DrawImage(image, new Point(offsetLeft, 0));
+                fullGraphics.DrawImage(image, new Point(offsetLeft, 0));
                 offsetLeft += image.Width;
             }
-            FullGraphics.Dispose();
-            return FullImage;
+            fullGraphics.Dispose();
+            return fullImage;
         }
 
         /// <summary>
         /// Function to take a screenshot of the given screen.
         /// </summary>
-        /// <param name="screen">The screen we want the screenshot.</param>
         /// <returns></returns>
-        private AnyBitmap TakeScreenShot(Screen screen)
+        private static AnyBitmap TakeScreenShot()
         {
-            AnyBitmap anyBitmap = new(screen.Bounds.Width, screen.Bounds.Height, PixelFormat.Format16bppRgb565);
-            Rectangle screenSize = screen.Bounds;
-            Graphics.FromImage(anyBitmap).CopyFromScreen(screenSize.Left, screenSize.Top, 0, 0, screenSize.Size);
-            return anyBitmap;
+            // Create a screen-capture service
+            IScreenCaptureService screenCaptureService = new X11ScreenCaptureService();
+
+            // Get all available graphics cards
+            IEnumerable<GraphicsCard> graphicsCards = screenCaptureService.GetGraphicsCards();
+
+            // Get the displays from the graphics card(s) you are interested in
+            IEnumerable<Display> displays = screenCaptureService.GetDisplays(graphicsCards.First());
+
+            // Create a screen-capture for all screens you want to capture
+            IScreenCapture screenCapture = screenCaptureService.GetScreenCapture(displays.First());
+            
+            // Register the regions you want to capture from the screen
+            // Capture the whole screen
+            ICaptureZone fullscreen = screenCapture.RegisterCaptureZone(0, 0, screenCapture.Display.Width, screenCapture.Display.Height);
+            // Capture a 100x100 region at the top left and scale it down to 50x50
+            screenCapture.CaptureScreen();
+            using (fullscreen.Lock())
+            {
+                return new AnyBitmap(fullscreen.RawBuffer.ToArray());
+            }
         }
 
         #endregion
