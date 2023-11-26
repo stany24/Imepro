@@ -1,5 +1,7 @@
 ﻿using IronSoftware.Drawing;
 using Point = IronSoftware.Drawing.Point;
+using Avalonia.Controls;
+using Image = Avalonia.Controls.Image;
 
 namespace Library
 {
@@ -9,14 +11,14 @@ namespace Library
     public class Preview : UserControl
     {
         #region Variables
-
-        public int StudentID { get; set; }
-        internal PictureBox PbxImage { get; set; }
-        private readonly Label lblComputerInformations = new();
-        private readonly Button btnSaveScreenShot = new();
-        readonly int MarginBetweenText = 5;
+        
+        public int StudentId { get; set; }
+        internal Image PbxImage { get; set; }
+        private readonly Label lblComputerInformation;
+        private readonly Button btnSaveScreenShot;
+        private const int MarginBetweenText = 5;
         public int TimeSinceUpdate { get; set; }
-        readonly private string ComputerName;
+        private readonly string ComputerName;
         private readonly string SavePath;
 
         #endregion
@@ -30,18 +32,18 @@ namespace Library
         /// </summary>
         /// <param name="image">The screenshot of the student.</param>
         /// <param name="name">The computer name.</param>
-        /// <param name="studentID">The student ID.</param>
-        /// <param name="savepath">The save path for images.</param>
-        public Preview(AnyBitmap image, string name, int studentID, string savepath)
+        /// <param name="studentId">The student ID.</param>
+        /// <param name="savePath">The save path for images.</param>
+        public Preview(AnyBitmap image, string name, int studentId, string savePath)
         {
             TimeSinceUpdate = 0;
-            PbxImage = new();
-            Size = PbxImage.Size;
-            StudentID = studentID;
+            PbxImage = new Image();
+            Size = new Size((int)PbxImage.Source.Size.Width,(int)PbxImage.Source.Size.Height);
+            StudentId = studentId;
             ComputerName = name;
-            SavePath = savepath;
+            SavePath = savePath;
 
-            PbxImage = new PictureBox
+            PbxImage = new Image()
             {
                 Location = new Point(0, 0),
                 Image = image,
@@ -49,16 +51,16 @@ namespace Library
                 Size = new Size(400, 100),
             };
             PbxImage.SizeChanged += new EventHandler(UpdatePositionsRelativeToImage);
-            PbxImage.LocationChanged += new EventHandler(UpdatePositionsRelativeToImage);
+            PbxImage.chan LocationChanged += new EventHandler(UpdatePositionsRelativeToImage);
             Controls.Add(PbxImage);
 
-            lblComputerInformations = new Label
+            lblComputerInformation = new Label
             {
                 Location = new Point(140, 0),
                 Size = new Size(100, 20),
                 Text = ComputerName + " " + TimeSinceUpdate,
             };
-            Controls.Add(lblComputerInformations);
+            Controls.Add(lblComputerInformation);
 
             btnSaveScreenShot = new Button
             {
@@ -95,7 +97,7 @@ namespace Library
         public void UpdateTime()
         {
             TimeSinceUpdate++;
-            lblComputerInformations.Invoke(new MethodInvoker(delegate { lblComputerInformations.Text = ComputerName + " " + TimeSinceUpdate + "s"; }));
+            lblComputerInformation.Invoke(new MethodInvoker(delegate { lblComputerInformation.Text = ComputerName + " " + TimeSinceUpdate + "s"; }));
         }
 
         /// <summary>
@@ -105,11 +107,11 @@ namespace Library
         /// <param name="e"></param>
         private void UpdatePositionsRelativeToImage(object sender, EventArgs e)
         {
-            Size = new Size(PbxImage.Width, PbxImage.Height + 3 * MarginBetweenText + lblComputerInformations.Height);
+            Size = new Size(PbxImage.Width, PbxImage.Height + 3 * MarginBetweenText + lblComputerInformation.Height);
             btnSaveScreenShot.Left = PbxImage.Location.X + PbxImage.Width / 2 + MarginBetweenText / 2;
             btnSaveScreenShot.Top = PbxImage.Location.Y + PbxImage.Height + MarginBetweenText;
-            lblComputerInformations.Left = PbxImage.Location.X + PbxImage.Width / 2 - lblComputerInformations.Width - MarginBetweenText / 2;
-            lblComputerInformations.Top = btnSaveScreenShot.Location.Y + (btnSaveScreenShot.Height - lblComputerInformations.Height);
+            lblComputerInformation.Left = PbxImage.Location.X + PbxImage.Width / 2 - lblComputerInformation.Width - MarginBetweenText / 2;
+            lblComputerInformation.Top = btnSaveScreenShot.Location.Y + (btnSaveScreenShot.Height - lblComputerInformation.Height);
         }
 
         #endregion
@@ -124,7 +126,7 @@ namespace Library
 
         public List<Preview> CustomPreviewList { get; set; }
         private int MaxWidth;
-        private readonly int Margin = 10;
+        private const int Margin = 10;
         public double Zoom { get; set; }
 
         #endregion
@@ -189,18 +191,18 @@ namespace Library
             int offsetTop = 0;
             int offsetRight = 0;
             int maxHeightInRow = 0;
-            for (int i = 0; i < CustomPreviewList.Count; i++)
+            foreach (Preview preview in CustomPreviewList)
             {
-                if (offsetRight + CustomPreviewList[i].Width > MaxWidth)
+                if (offsetRight + preview.Width > MaxWidth)
                 {
                     offsetTop += maxHeightInRow;
                     maxHeightInRow = 0;
                     offsetRight = 0;
                 }
-                CustomPreviewList[i].Top = offsetTop;
-                CustomPreviewList[i].Left = offsetRight + Margin;
-                offsetRight += CustomPreviewList[i].Width + Margin;
-                if (CustomPreviewList[i].Height > maxHeightInRow) { maxHeightInRow = CustomPreviewList[i].Height; }
+                preview.Top = offsetTop;
+                preview.Left = offsetRight + Margin;
+                offsetRight += preview.Width + Margin;
+                if (preview.Height > maxHeightInRow) { maxHeightInRow = preview.Height; }
             }
         }
 
@@ -212,9 +214,9 @@ namespace Library
         /// <param name="image">The new image.</param>
         public void UpdatePreview(int id, string computerName, AnyBitmap image)
         {
-            foreach (Preview preview in CustomPreviewList.Where(preview => preview.StudentID == id && preview.GetComputerName() == computerName))
+            foreach (Preview preview in CustomPreviewList.Where(preview => preview.StudentId == id && preview.GetComputerName() == computerName))
             {
-                preview.PbxImage.Image = image;
+                preview.PbxImage.Source = image;
                 preview.TimeSinceUpdate = 0;
                 return;
             }
@@ -242,13 +244,11 @@ namespace Library
         {
             foreach (Preview preview in CustomPreviewList)
             {
-                if (preview.StudentID == id)
-                {
-                    CustomPreviewList.Remove(preview);
-                    preview.Dispose();
-                    UpdateAllLocations(MaxWidth);
-                    break;
-                }
+                if (preview.StudentId != id) continue;
+                CustomPreviewList.Remove(preview);
+                preview.Dispose();
+                UpdateAllLocations(MaxWidth);
+                break;
             }
         }
 

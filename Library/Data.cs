@@ -58,19 +58,19 @@ namespace Library
     {
         #region Variables
 
-        public Socket SocketToStudent { get; set; }
-        public Socket SocketControl { get; set; }
-        public int ID { get; set; }
+        public Socket? SocketToStudent { get; set; }
+        public Socket? SocketControl { get; set; }
+        public int Id { get; set; }
         public int NumberOfFailure { get; set; }
 
         #endregion
 
         #region Constructor
 
-        public DataForTeacher(Socket socket, int id)
+        public DataForTeacher(Socket? socket, int id)
         {
             SocketToStudent = socket;
-            ID = id;
+            Id = id;
         }
 
         public DataForTeacher(Data data)
@@ -101,22 +101,22 @@ namespace Library
             { "opera", BrowserName.Opera },
             { "msedge",BrowserName.Edge } };
 
-        private ReliableMulticastReceiver MulticastReceiver { get; set; }
+        private ReliableMulticastReceiver? MulticastReceiver { get; set; }
         private Rectangle OldRect = Rectangle.Empty;
-        private StreamOptions options;
+        private StreamOptions? options;
         private int screenToStream;
 
         private bool mouseDisabled = false;
         private bool isReceiving = false;
-        private bool isControled = false;
+        private bool isControlled;
 
-        public event EventHandler<NewMessageEventArgs> NewConnexionMessageEvent;
-        public event EventHandler<ChangePropertyEventArgs> ChangePropertyEvent;
-        public event EventHandler<NewMessageEventArgs> NewMessageEvent;
-        public event EventHandler<NewImageEventArgs> NewImageEvent;
+        public event EventHandler<NewMessageEventArgs>? NewConnexionMessageEvent;
+        public event EventHandler<ChangePropertyEventArgs>? ChangePropertyEvent;
+        public event EventHandler<NewMessageEventArgs>? NewMessageEvent;
+        public event EventHandler<NewImageEventArgs>? NewImageEvent;
 
-        public Socket SocketToTeacher { get; set; }
-        public IPAddress IpToTeacher { get; set; }
+        public Socket? SocketToTeacher { get; set; }
+        public IPAddress? IpToTeacher { get; set; }
         public List<string> AuthorisedUrls { get; set; }
         public List<int> SeleniumProcessesId { get; set; }
 
@@ -255,10 +255,10 @@ namespace Library
         /// <returns></returns>
         private AnyBitmap TakeScreenShot(Screen screen)
         {
-            AnyBitmap AnyBitmap = new(screen.Bounds.Width, screen.Bounds.Height, PixelFormat.Format16bppRgb565);
-            Rectangle ScreenSize = screen.Bounds;
-            Graphics.FromImage(AnyBitmap).CopyFromScreen(ScreenSize.Left, ScreenSize.Top, 0, 0, ScreenSize.Size);
-            return AnyBitmap;
+            AnyBitmap anyBitmap = new(screen.Bounds.Width, screen.Bounds.Height, PixelFormat.Format16bppRgb565);
+            Rectangle screenSize = screen.Bounds;
+            Graphics.FromImage(anyBitmap).CopyFromScreen(screenSize.Left, screenSize.Top, 0, 0, screenSize.Size);
+            return anyBitmap;
         }
 
         #endregion
@@ -274,8 +274,8 @@ namespace Library
             GetUserProcesses();
             //serialization
             string jsonString = JsonSerializer.Serialize(ToData(), new JsonSerializerOptions { IncludeFields = true, });
-            //envoi
-            SocketToTeacher.Send(Encoding.ASCII.GetBytes(jsonString), Encoding.ASCII.GetBytes(jsonString).Length, SocketFlags.None);
+            //sending
+            SocketToTeacher?.Send(Encoding.ASCII.GetBytes(jsonString), Encoding.ASCII.GetBytes(jsonString).Length, SocketFlags.None);
         }
 
         /// <summary>
@@ -290,11 +290,11 @@ namespace Library
         /// <summary>
         /// Function to send the screenshot to the teacher.
         /// </summary>
-        private void SendImage(AnyBitmap image, Socket socket)
+        private void SendImage(AnyBitmap image, Socket? socket)
         {
             ImageConverter converter = new();
-            byte[] imagebytes = (byte[])converter.ConvertTo(image, typeof(byte[]));
-            socket.Send(imagebytes, 0, imagebytes.Length, SocketFlags.None);
+            byte[] imageBytes = (byte[])converter.ConvertTo(image, typeof(byte[]));
+            socket?.Send(imageBytes, 0, imageBytes.Length, SocketFlags.None);
         }
 
         #endregion
@@ -304,7 +304,7 @@ namespace Library
         /// <summary>
         /// Function used to connect to the teacher application.
         /// </summary>
-        public Socket ConnectToTeacher(int port)
+        public Socket? ConnectToTeacher(int port)
         {
             try
             {
@@ -316,7 +316,7 @@ namespace Library
                 while (true)
                 {
                     // Creation TCP/IP Socket using Socket Class Constructor
-                    Socket sender = new(localEndPoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
+                    Socket? sender = new(localEndPoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
 
                     // Si l'addresse du professeur a changé on adapte le socket
                     if (localEndPoint.Address.Equals(IpToTeacher))
@@ -334,36 +334,36 @@ namespace Library
                         {
                             sender.EndConnect(result);
                             Task.Run(WaitForDemand);
-                            NewConnexionMessageEvent.Invoke(this, new NewMessageEventArgs("Connected"));
+                            NewConnexionMessageEvent?.Invoke(this, new NewMessageEventArgs("Connected"));
                             return sender;
                         }
                         else
                         {
                             sender.Close();
-                            NewConnexionMessageEvent.Invoke(this, new NewMessageEventArgs("Connexion failed to " + IpToTeacher + " Error: " + result));
+                            NewConnexionMessageEvent?.Invoke(this, new NewMessageEventArgs("Connexion failed to " + IpToTeacher + " Error: " + result));
                         }
                     }
                     // Manage of Socket's Exceptions
                     catch (ArgumentNullException ane)
                     {
-                        NewConnexionMessageEvent.Invoke(this, new NewMessageEventArgs("ArgumentNullException : " + ane.ToString()));
+                        NewConnexionMessageEvent?.Invoke(this, new NewMessageEventArgs("ArgumentNullException : " + ane.ToString()));
                         Thread.Sleep(1000);
                     }
                     catch (SocketException se)
                     {
-                        NewConnexionMessageEvent.Invoke(this, new NewMessageEventArgs("SocketException : " + se.ToString()));
+                        NewConnexionMessageEvent?.Invoke(this, new NewMessageEventArgs("SocketException : " + se.ToString()));
                         Thread.Sleep(1000);
                     }
                     catch (Exception e)
                     {
-                        NewConnexionMessageEvent.Invoke(this, new NewMessageEventArgs("Unexpected exception : " + e.ToString()));
+                        NewConnexionMessageEvent?.Invoke(this, new NewMessageEventArgs("Unexpected exception : " + e.ToString()));
                         Thread.Sleep(1000);
                     }
                 }
             }
             catch (Exception e)
             {
-                NewConnexionMessageEvent.Invoke(this, new NewMessageEventArgs(e.ToString()));
+                NewConnexionMessageEvent?.Invoke(this, new NewMessageEventArgs(e.ToString()));
                 Thread.Sleep(1000);
             }
             return null;
@@ -387,7 +387,7 @@ namespace Library
                 catch (SocketException) { return; }
                 Array.Resize(ref info, lenght);
                 Command command = JsonSerializer.Deserialize<Command>(Encoding.Default.GetString(info));
-                NewConnexionMessageEvent.Invoke(this, new NewMessageEventArgs(command.ToString()));
+                NewConnexionMessageEvent?.Invoke(this, new NewMessageEventArgs(command.ToString()));
                 switch (command.Type)
                 {
                     case CommandType.DemandData: SendData(); break;
@@ -398,8 +398,8 @@ namespace Library
                     case CommandType.StopReceiveMulticast: Stop(); break;
                     case CommandType.ReceiveMessage: ReceiveMessage(); break;
                     case CommandType.ReceiveAutorisedUrls: ReceiveAuthorisedUrls(); break;
-                    case CommandType.GiveControl: screenToStream = Convert.ToInt32(command.Args[1]); Task.Run(() => SendStream()); break;
-                    case CommandType.StopControl: isControled = false; break;
+                    case CommandType.GiveControl: screenToStream = Convert.ToInt32(command.Args[1]); Task.Run(SendStream); break;
+                    case CommandType.StopControl: isControlled = false; break;
                     case CommandType.DisconnectOfTeacher: Disconnect(); return;
                     case CommandType.StopApplication: ShutDown(); return;
                 }
@@ -420,9 +420,9 @@ namespace Library
         /// </summary>
         private void Disconnect()
         {
-            SocketToTeacher.Disconnect(false);
+            SocketToTeacher?.Disconnect(false);
             SocketToTeacher = null;
-            NewConnexionMessageEvent.Invoke(this, new NewMessageEventArgs("Le professeur a coupé la connexion"));
+            NewConnexionMessageEvent?.Invoke(this, new NewMessageEventArgs("Le professeur a coupé la connexion"));
             Thread.Sleep(1000);
             SocketToTeacher = Task.Run(() => ConnectToTeacher(11111)).Result;
         }
@@ -432,7 +432,7 @@ namespace Library
         /// </summary>
         private void ShutDown()
         {
-            SocketToTeacher.Disconnect(false);
+            SocketToTeacher?.Disconnect(false);
             SocketToTeacher = null;
             Application.Exit();
         }
@@ -444,8 +444,8 @@ namespace Library
         {
             isReceiving = false;
             mouseDisabled = false;
-            ChangePropertyEvent.Invoke(this, new ChangePropertyEventArgs("form", "FormBorderStyle", FormBorderStyle.Sizable));
-            ChangePropertyEvent.Invoke(this, new ChangePropertyEventArgs("pbxScreenShot", "Visible", false));
+            ChangePropertyEvent?.Invoke(this, new ChangePropertyEventArgs("form", "FormBorderStyle", FormBorderStyle.Sizable));
+            ChangePropertyEvent?.Invoke(this, new ChangePropertyEventArgs("pbxScreenShot", "Visible", false));
             gkh.Unhook();
         }
 
@@ -454,9 +454,9 @@ namespace Library
         /// </summary>
         private void SendStream()
         {
-            isControled = true;
-            Socket socketControl = ConnectToTeacher(11112);
-            while (isControled)
+            isControlled = true;
+            Socket? socketControl = ConnectToTeacher(11112);
+            while (isControlled)
             {
                 SendImage(TakeScreenShot(Screen.AllScreens[screenToStream]), socketControl);
             }
@@ -468,8 +468,12 @@ namespace Library
         private void ReceiveAuthorisedUrls()
         {
             byte[] byteMessage = new byte[102400];
-            int nbData = SocketToTeacher.Receive(byteMessage);
-            Array.Resize(ref byteMessage, nbData);
+            if (SocketToTeacher != null)
+            {
+                int nbData = SocketToTeacher.Receive(byteMessage);
+                Array.Resize(ref byteMessage, nbData);
+            }
+
             AuthorisedUrls = JsonSerializer.Deserialize<List<string>>(Encoding.Default.GetString(byteMessage));
         }
 
@@ -481,7 +485,7 @@ namespace Library
             byte[] byteMessage = new byte[1024];
             int nbData = SocketToTeacher.Receive(byteMessage);
             Array.Resize(ref byteMessage, nbData);
-            NewMessageEvent.Invoke(this, new NewMessageEventArgs(DateTime.Now.ToString("hh:mm ") + Encoding.Default.GetString(byteMessage)));
+            NewMessageEvent?.Invoke(this, new NewMessageEventArgs(DateTime.Now.ToString("hh:mm ") + Encoding.Default.GetString(byteMessage)));
         }
 
         #endregion
@@ -495,8 +499,8 @@ namespace Library
         {
             Task.Run(MinimizeUnAuthorisedEverySecond);
             Socket socketMulticast = new(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
-            IPEndPoint ipep = new(IPAddress.Any, 45678);
-            socketMulticast.Bind(ipep);
+            IPEndPoint ipEndPoint = new(IPAddress.Any, 45678);
+            socketMulticast.Bind(ipEndPoint);
             IPAddress ip = IPAddress.Parse("232.1.2.3");
             socketMulticast.SetSocketOption(SocketOptionLevel.IP, SocketOptionName.AddMembership, new MulticastOption(ip, IPAddress.Any));
 
@@ -509,9 +513,9 @@ namespace Library
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        public void DisplayImage(object sender, NewImageEventArgs e)
+        public void DisplayImage(object? sender, NewImageEventArgs e)
         {
-            NewImageEvent.Invoke(this, e);
+            NewImageEvent?.Invoke(this, e);
         }
 
         /// <summary>
@@ -523,26 +527,26 @@ namespace Library
             int size = SocketToTeacher.Receive(message);
             Array.Resize(ref message, size);
             options = JsonSerializer.Deserialize<StreamOptions>(Encoding.Default.GetString(message));
-            ChangePropertyEvent.Invoke(this, new ChangePropertyEventArgs("pbxScreenShot", "Visible", true));
+            ChangePropertyEvent?.Invoke(this, new ChangePropertyEventArgs("pbxScreenShot", "Visible", true));
 
             switch (options.GetPriority())
             {
                 case Priority.Fullscreen:
-                    ChangePropertyEvent.Invoke(this, new ChangePropertyEventArgs("form", "FormBorderStyle", FormBorderStyle.None));
-                    ChangePropertyEvent.Invoke(this, new ChangePropertyEventArgs("form", "WindowState", FormWindowState.Maximized));
+                    ChangePropertyEvent?.Invoke(this, new ChangePropertyEventArgs("form", "FormBorderStyle", FormBorderStyle.None));
+                    ChangePropertyEvent?.Invoke(this, new ChangePropertyEventArgs("form", "WindowState", FormWindowState.Maximized));
                     break;
                 case Priority.Blocking:
-                    ChangePropertyEvent.Invoke(this, new ChangePropertyEventArgs("form", "FormBorderStyle", FormBorderStyle.None));
-                    ChangePropertyEvent.Invoke(this, new ChangePropertyEventArgs("form", "WindowState", FormWindowState.Maximized));
-                    ChangePropertyEvent.Invoke(this, new ChangePropertyEventArgs("form", "TopMost", true));
+                    ChangePropertyEvent?.Invoke(this, new ChangePropertyEventArgs("form", "FormBorderStyle", FormBorderStyle.None));
+                    ChangePropertyEvent?.Invoke(this, new ChangePropertyEventArgs("form", "WindowState", FormWindowState.Maximized));
+                    ChangePropertyEvent?.Invoke(this, new ChangePropertyEventArgs("form", "TopMost", true));
                     mouseDisabled = true;
                     Task.Run(DisableMouseEverySecond);
                     DisableKeyboard();
                     break;
                 case Priority.Topmost:
-                    ChangePropertyEvent.Invoke(this, new ChangePropertyEventArgs("form", "FormBorderStyle", FormBorderStyle.None));
-                    ChangePropertyEvent.Invoke(this, new ChangePropertyEventArgs("form", "WindowState", FormWindowState.Maximized));
-                    ChangePropertyEvent.Invoke(this, new ChangePropertyEventArgs("form", "TopMost", true));
+                    ChangePropertyEvent?.Invoke(this, new ChangePropertyEventArgs("form", "FormBorderStyle", FormBorderStyle.None));
+                    ChangePropertyEvent?.Invoke(this, new ChangePropertyEventArgs("form", "WindowState", FormWindowState.Maximized));
+                    ChangePropertyEvent?.Invoke(this, new ChangePropertyEventArgs("form", "TopMost", true));
                     break;
                 case Priority.Widowed:
                     break;
@@ -584,7 +588,7 @@ namespace Library
         {
             while (isReceiving)
             {
-                WindowMinimize.MinimizeUnAuthorised(options.GetFocus());
+                WindowMinimize.MinimizeUnAuthorised(options?.GetFocus());
                 Thread.Sleep(3000);
             }
             WindowMinimize.ShowBack();
