@@ -3,7 +3,53 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-        x:Class="StudentApp.MainWindow"
+        x:Class="StudentApp.Main"
         Title="StudentApp">
-    Welcome to Avalonia!
+        <Grid Name="Grid"
+              ColumnDefinitions="*,10,Auto,10,Auto"
+              RowDefinitions="Auto,10,Auto,10,Auto,10,Auto,10,*"
+              ShowGridLines="True"
+              Margin="10">
+            <ListBox Name="LbxInfo"
+                     Grid.Row="0"
+                     Grid.Column="0"
+                     Grid.ColumnSpan="5"
+                     MinHeight="60"></ListBox>
+            <Image Name="PbxScreenShot" 
+                   Grid.Row="2"
+                   Grid.Column="0"
+                   Grid.RowSpan="7"></Image>
+            <Button Name="BtnHelp"
+                    Grid.Row="2"
+                    Grid.Column="2"
+                    HorizontalAlignment="Stretch"
+                    HorizontalContentAlignment="Center">Help</Button>
+            <Button Name="BtnChangeIp"
+                    Grid.Row="2"
+                    Grid.Column="4"
+                    HorizontalAlignment="Stretch"
+                    HorizontalContentAlignment="Center">Change ip</Button>
+            <Button Name="BtnResetAllIp"
+                    Grid.Row="4"
+                    Grid.Column="2"
+                    Grid.ColumnSpan="3"
+                    HorizontalAlignment="Stretch"
+                    HorizontalContentAlignment="Center">Reset all ip</Button>
+            <ListBox Name="LbxMessages"
+                     Grid.Row="8"
+                     Grid.Column="2"
+                     Grid.ColumnSpan="3"
+                     MinHeight="60"
+                     ></ListBox>
+            <Button Name="BtnFirefox"
+                        Grid.Row="6"
+                        Grid.Column="2"
+                        HorizontalAlignment="Stretch"
+                        HorizontalContentAlignment="Center">Firefox</Button>
+            <Button Name="BtnChrome"
+                        Grid.Row="6"
+                        Grid.Column="4"
+                        HorizontalAlignment="Stretch"
+                        HorizontalContentAlignment="Center">Chrome</Button>
+        </Grid>
 </Window>
