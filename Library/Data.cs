@@ -6,12 +6,8 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Avalonia;
 using IronSoftware.Drawing;
 using ScreenCapture.NET;
-using Color = IronSoftware.Drawing.Color;
-using Point = IronSoftware.Drawing.Point;
-using Rectangle = IronSoftware.Drawing.Rectangle;
 
 namespace Library
 {
@@ -273,7 +269,7 @@ namespace Library
         /// <summary>
         /// Function used to connect to the teacher application.
         /// </summary>
-        public Socket? ConnectToTeacher(int port)
+        private Socket? ConnectToTeacher(int port)
         {
             try
             {
@@ -315,17 +311,17 @@ namespace Library
                     // Manage of Socket's Exceptions
                     catch (ArgumentNullException ane)
                     {
-                        NewConnexionMessageEvent?.Invoke(this, new NewMessageEventArgs("ArgumentNullException : " + ane.ToString()));
+                        NewConnexionMessageEvent?.Invoke(this, new NewMessageEventArgs("ArgumentNullException : " + ane));
                         Thread.Sleep(1000);
                     }
                     catch (SocketException se)
                     {
-                        NewConnexionMessageEvent?.Invoke(this, new NewMessageEventArgs("SocketException : " + se.ToString()));
+                        NewConnexionMessageEvent?.Invoke(this, new NewMessageEventArgs("SocketException : " + se));
                         Thread.Sleep(1000);
                     }
                     catch (Exception e)
                     {
-                        NewConnexionMessageEvent?.Invoke(this, new NewMessageEventArgs("Unexpected exception : " + e.ToString()));
+                        NewConnexionMessageEvent?.Invoke(this, new NewMessageEventArgs("Unexpected exception : " + e));
                         Thread.Sleep(1000);
                     }
                 }
@@ -351,11 +347,12 @@ namespace Library
             while (true)
             {
                 byte[] info = new byte[128];
-                int lenght;
-                try { lenght = SocketToTeacher.Receive(info); }
+                int length;
+                try { length = SocketToTeacher.Receive(info); }
                 catch (SocketException) { return; }
-                Array.Resize(ref info, lenght);
-                Command command = JsonSerializer.Deserialize<Command>(Encoding.Default.GetString(info));
+                Array.Resize(ref info, length);
+                Command? command = JsonSerializer.Deserialize<Command>(Encoding.Default.GetString(info));
+                if(command ==null){continue;}
                 NewConnexionMessageEvent?.Invoke(this, new NewMessageEventArgs(command.ToString()));
                 switch (command.Type)
                 {
@@ -429,7 +426,7 @@ namespace Library
         }
 
         /// <summary>
-        /// Function to receive the autorised urls.
+        /// Function to receive the authorised urls.
         /// </summary>
         private void ReceiveAuthorisedUrls()
         {
@@ -440,7 +437,7 @@ namespace Library
                 Array.Resize(ref byteMessage, nbData);
             }
 
-            AuthorisedUrls = JsonSerializer.Deserialize<List<string>>(Encoding.Default.GetString(byteMessage));
+            AuthorisedUrls = JsonSerializer.Deserialize<List<string>>(Encoding.Default.GetString(byteMessage)) ?? new List<string>();
         }
 
         /// <summary>
@@ -478,7 +475,7 @@ namespace Library
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        public void DisplayImage(object? sender, NewImageEventArgs e)
+        private void DisplayImage(object? sender, NewImageEventArgs e)
         {
             NewImageEvent?.Invoke(this, e);
         }
