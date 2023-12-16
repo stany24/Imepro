@@ -1,11 +1,12 @@
 ﻿using System.Diagnostics;
-using System.Drawing.Imaging;
+using System.Drawing;
 using System.Net;
 using System.Net.Sockets;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Avalonia;
 using IronSoftware.Drawing;
 using ScreenCapture.NET;
 using Color = IronSoftware.Drawing.Color;
@@ -90,12 +91,11 @@ namespace Library
     /// <summary>
     /// Class containing all logic for the student application.
     /// </summary>
-    public class DataForStudent : Data, IMessageFilter
+    public class DataForStudent : Data
     {
         #region Variables/Events
 
         private readonly List<string> DefaultProcess = new();
-        private readonly GlobalKeyboardHook gkh = new();
         private readonly Dictionary<string, BrowserName> browsersList = new() {
             { "chrome",BrowserName.Chrome },
             { "firefox", BrowserName.Firefox },
@@ -105,7 +105,6 @@ namespace Library
             { "msedge",BrowserName.Edge } };
 
         private ReliableMulticastReceiver? MulticastReceiver { get; set; }
-        private Rectangle OldRect = Rectangle.Empty;
         private StreamOptions? options;
         private int screenToStream;
 
@@ -151,9 +150,6 @@ namespace Library
                 if (process.Length <= 0) continue;
                 foreach (Process instance in process)
                 {
-                    Process parent = GetParent(instance);
-                    if (parent != null && parent.ProcessName == singleBrowser.Key)
-                    { continue; }
                     Process.GetProcessById(instance.Id);
                     if (SeleniumProcessesId.Contains(instance.Id)) { continue; }
                     IntPtr hWnd = instance.MainWindowHandle;
@@ -174,31 +170,6 @@ namespace Library
 
             [DllImport("user32.dll")]
             static extern int GetWindowTextLength(IntPtr hWnd);
-        }
-
-        /// <summary>
-        /// Function to get the parent of a process.
-        /// </summary>
-        /// <param name="process">The process you want to parent.</param>
-        /// <returns>The parent of the given process.</returns>
-        public Process GetParent(Process process)
-        {
-            try
-            {
-                using var query = new ManagementObjectSearcher(
-                  "SELECT * " +
-                  "FROM Win32_Process " +
-                  "WHERE ProcessId=" + process.Id);
-                return query
-                  .Get()
-                  .OfType<ManagementObject>()
-                  .Select(p => Process.GetProcessById((int)(uint)p["ParentProcessId"]))
-                  .FirstOrDefault();
-            }
-            catch
-            {
-                return null;
-            }
         }
 
         /// <summary>
@@ -227,28 +198,7 @@ namespace Library
         /// </summary>
         private AnyBitmap TakeAllScreenShot()
         {
-            int totalWidth = 0;
-            int maxHeight = 0;
-            List<AnyBitmap> images = new();
-            foreach (Screen screen in Screen.AllScreens)
-            {
-                images.Add(TakeScreenShot());
-                totalWidth += screen.Bounds.Width;
-                if (screen.Bounds.Height > maxHeight) { maxHeight = screen.Bounds.Height; }
-            }
-
-            if (maxHeight <= 0) return null;
-            AnyBitmap fullImage = new(totalWidth, maxHeight,Color.White);
-            Graphics fullGraphics = Graphics.FromImage(fullImage);
-
-            int offsetLeft = 0;
-            foreach (AnyBitmap image in images)
-            {
-                fullGraphics.DrawImage(image, new Point(offsetLeft, 0));
-                offsetLeft += image.Width;
-            }
-            fullGraphics.Dispose();
-            return fullImage;
+            return TakeScreenShot();
         }
 
         /// <summary>
@@ -453,7 +403,6 @@ namespace Library
         {
             SocketToTeacher?.Disconnect(false);
             SocketToTeacher = null;
-            Application.Exit();
         }
 
         /// <summary>
@@ -463,9 +412,7 @@ namespace Library
         {
             isReceiving = false;
             mouseDisabled = false;
-            ChangePropertyEvent?.Invoke(this, new ChangePropertyEventArgs("form", "FormBorderStyle", FormBorderStyle.Sizable));
             ChangePropertyEvent?.Invoke(this, new ChangePropertyEventArgs("pbxScreenShot", "Visible", false));
-            gkh.Unhook();
         }
 
         /// <summary>
@@ -477,7 +424,7 @@ namespace Library
             Socket? socketControl = ConnectToTeacher(11112);
             while (isControlled)
             {
-                SendImage(TakeScreenShot(Screen.AllScreens[screenToStream]), socketControl);
+                SendImage(TakeScreenShot(), socketControl);
             }
         }
 
@@ -516,7 +463,6 @@ namespace Library
         /// </summary>
         private void ReceiveMulticastStream()
         {
-            Task.Run(MinimizeUnAuthorisedEverySecond);
             Socket socketMulticast = new(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
             IPEndPoint ipEndPoint = new(IPAddress.Any, 45678);
             socketMulticast.Bind(ipEndPoint);
@@ -551,111 +497,17 @@ namespace Library
             switch (options.GetPriority())
             {
                 case Priority.Fullscreen:
-                    ChangePropertyEvent?.Invoke(this, new ChangePropertyEventArgs("form", "FormBorderStyle", FormBorderStyle.None));
-                    ChangePropertyEvent?.Invoke(this, new ChangePropertyEventArgs("form", "WindowState", FormWindowState.Maximized));
                     break;
                 case Priority.Blocking:
-                    ChangePropertyEvent?.Invoke(this, new ChangePropertyEventArgs("form", "FormBorderStyle", FormBorderStyle.None));
-                    ChangePropertyEvent?.Invoke(this, new ChangePropertyEventArgs("form", "WindowState", FormWindowState.Maximized));
                     ChangePropertyEvent?.Invoke(this, new ChangePropertyEventArgs("form", "TopMost", true));
                     mouseDisabled = true;
-                    Task.Run(DisableMouseEverySecond);
-                    DisableKeyboard();
                     break;
                 case Priority.Topmost:
-                    ChangePropertyEvent?.Invoke(this, new ChangePropertyEventArgs("form", "FormBorderStyle", FormBorderStyle.None));
-                    ChangePropertyEvent?.Invoke(this, new ChangePropertyEventArgs("form", "WindowState", FormWindowState.Maximized));
                     ChangePropertyEvent?.Invoke(this, new ChangePropertyEventArgs("form", "TopMost", true));
                     break;
                 case Priority.Widowed:
                     break;
             }
-        }
-
-        #endregion
-
-        #region Blocking user
-
-        /// <summary>
-        /// Function to block all keyboard inputs.
-        /// </summary>
-        private void DisableKeyboard()
-        {
-            gkh.Hook();
-            foreach (Keys key in Enum.GetValues(typeof(Keys)))
-            {
-                gkh.HookedKeys.Add(key);
-            }
-            gkh.KeyDown += new KeyEventHandler(HandleKeyPress);
-            gkh.KeyUp += new KeyEventHandler(HandleKeyPress);
-        }
-
-        /// <summary>
-        /// Function to ignore pressed key.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void HandleKeyPress(object sender, KeyEventArgs e)
-        {
-            e.Handled = true;
-        }
-
-        /// <summary>
-        /// Function to minimized unauthorised application every second.
-        /// </summary>
-        private void MinimizeUnAuthorisedEverySecond()
-        {
-            while (isReceiving)
-            {
-                WindowMinimize.MinimizeUnAuthorised(options?.GetFocus());
-                Thread.Sleep(3000);
-            }
-            WindowMinimize.ShowBack();
-        }
-
-        /// <summary>
-        /// Function that disables the mouse every second.
-        /// </summary>
-        private void DisableMouseEverySecond()
-        {
-            OldRect = Cursor.Clip;
-            while (mouseDisabled)
-            {
-                DisableMouse();
-                Thread.Sleep(1000);
-            }
-            EnableMouse();
-        }
-
-
-        /// <summary>
-        /// Function to block the mouse.
-        /// </summary>
-        private void DisableMouse()
-        {
-            Cursor.Clip = new Rectangle(0, 60, 1, 1);
-            Cursor.Hide();
-            Application.AddMessageFilter(this);
-            foreach (Process process in Process.GetProcessesByName("Taskmgr"))
-            {
-                process.Kill();
-            }
-        }
-
-        /// <summary>
-        /// Function to enable the mouse.
-        /// </summary>
-        private void EnableMouse()
-        {
-            Cursor.Clip = OldRect;
-            Cursor.Show();
-            Application.RemoveMessageFilter(this);
-        }
-
-        public bool PreFilterMessage(ref Message m)
-        {
-            if (m.Msg == 0x201 || m.Msg == 0x202 || m.Msg == 0x203) return true;
-            return m.Msg == 0x204 || m.Msg == 0x205 || m.Msg == 0x206;
         }
 
         #endregion
