@@ -12,11 +12,14 @@ using Avalonia.Controls;
 using Avalonia.Threading;
 using IronSoftware.Drawing;
 using Library;
+using MsBox.Avalonia;
+using MsBox.Avalonia.Enums;
 
 namespace TeacherApp;
 
 public partial class MainWindow : Window
 {
+    private Parameter.Parameter parameter = new();
     readonly private PreviewDisplayer Displayer;
     readonly private List<DataForTeacher> AllStudents = new();
     readonly private List<DisplayStudent> AllStudentsDisplay = new();
@@ -46,10 +49,10 @@ public partial class MainWindow : Window
         switch (possiblesIp.Count)
         {
             case 0:
-                MessageBox.Show("Aucune addresse ip conforme n'a étée trouvée.\r\n" +
-                                "Vérifiez vos connexion aux réseaux.\r\n" +
-                                "L'application va ce fermer.", "Attention", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                Application.Exit();
+                MessageBoxManager.GetMessageBoxStandard("Attention", "Aucune addresse ip conforme n'a étée trouvée.\r\n" + 
+                                                                     "Vérifiez vos connexion aux réseaux.\r\n" +
+                                                                     "L'application va ce fermer.", ButtonEnum.YesNo);
+                Close();
                 break;
             case 1: ipAddr = possiblesIp[0]; break;
             default:
@@ -59,7 +62,7 @@ public partial class MainWindow : Window
                 prompt.Dispose();
                 break;
         }
-        lblIP.Text = "IP: " + ipAddr;
+        LblIp.Text = "IP: " + ipAddr;
     }
     
     private void AskingData()
@@ -99,8 +102,8 @@ public partial class MainWindow : Window
         for (int i = 0; i < AllStudents.Count; i++)
         {
             Socket socket = AllStudents[i].SocketToStudent;
-            socket.ReceiveTimeout = Properties.Settings.Default.DefaultTimeout;
-            socket.SendTimeout = Properties.Settings.Default.DefaultTimeout;
+            socket.ReceiveTimeout = (int)parameter.GetValue("Options","DefaultTimeout");
+            socket.SendTimeout = (int)parameter.GetValue("Options","DefaultTimeout");
             try
             {
                 socket.Send(new Command(CommandType.DemandData).ToByteArray() as byte[] ?? Array.Empty<byte>());
@@ -133,7 +136,7 @@ public partial class MainWindow : Window
             Socket socket = student.SocketToStudent;
             int id = student.Id;
             byte[] dataBuffer = new byte[100000];
-            socket.ReceiveTimeout = Properties.Settings.Default.DefaultTimeout;
+            socket.ReceiveTimeout = (int)parameter.GetValue("Options","DefaultTimeout");
             int nbData = socket.Receive(dataBuffer);
             Array.Resize(ref dataBuffer, nbData);
             Data? data = JsonSerializer.Deserialize<Data>(Encoding.Default.GetString(dataBuffer));
@@ -167,7 +170,7 @@ public partial class MainWindow : Window
         {
             Socket socket = student.SocketToStudent;
             byte[] imageBuffer = new byte[10485760];
-            socket.ReceiveTimeout = Properties.Settings.Default.DefaultTimeout;
+            socket.ReceiveTimeout = (int)parameter.GetValue("Options","DefaultTimeout");
             int nbData = socket.Receive(imageBuffer, 0, imageBuffer.Length, SocketFlags.None);
             Array.Resize(ref imageBuffer, nbData);
             student.ScreenShot = new AnyBitmap(new MemoryStream(imageBuffer));
@@ -250,8 +253,8 @@ public partial class MainWindow : Window
         isAsking = true;
         socket.Send(new Command(CommandType.ReceiveAutorisedUrls).ToByteArray() as byte[] ?? Array.Empty<byte>());
         //serialization
-        string jsonString = JsonSerializer.Serialize(Properties.Settings.Default.AutorisedWebsite);
-        //envoi
+        string jsonString = JsonSerializer.Serialize(parameter.GetList<string>("Options","AuthorisedWebsite"));
+        //sending
         Thread.Sleep(100);
         socket.Send(Encoding.ASCII.GetBytes(jsonString), Encoding.ASCII.GetBytes(jsonString).Length, SocketFlags.None);
         isAsking = false;

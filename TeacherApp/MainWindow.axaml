@@ -16,7 +16,12 @@
             Grid.Row="0"
             Grid.Column="0"
             ColumnDefinitions="Auto,10,Auto"
-            RowDefinitions="Auto,10,Auto"></Grid>
+            RowDefinitions="Auto,10,Auto">
+            <TextBlock
+                Name="LblIp"
+                Grid.Row="0"
+                Grid.Column="0"></TextBlock>
+        </Grid>
         <ListBox 
             Name="LbxRequests"
             Grid.Row="2"

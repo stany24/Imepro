@@ -11,18 +11,12 @@ public class Parameter
     public Parameter()
     {
         Sections.Add(
-            "Foods"
+            "Options"
             ,new SectionParameterComponent(
                 new Dictionary<string, ParameterComponent>
                 {
-                    {"PriceF",new DualParameterComponent(10,30,120,1,3,50)},
-                    {"Value",new DualParameterComponent(25,40,70,1,5,25)},
-                    {"FoodReductionTime",new SingleParameterComponent(1,4,60)},
-                    {"DrinkReduction",new SingleParameterComponent(1,4,20)},
-                    {"FoodReduction",new SingleParameterComponent(1,4,20)},
-                    {"MaxAttemptF",new SingleParameterComponent(1,10,25)},
-                    {"MinPriceNormalF",new SingleParameterComponent(1,20,100)},
-                    {"MinPriceExpensiveF",new SingleParameterComponent(1,6,100)}
+                    {"DefaultTimeout",new SingleParameterComponent(1,2,10)},
+                    {"AuthorisedWebsite",new ListParameterComponent<string>(new List<string>{"github.com"},new List<string>{"github.com"})},
                 }
             )
         );
