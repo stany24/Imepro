@@ -5,5 +5,22 @@
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="TeacherApp.MainWindow"
         Title="TeacherApp">
-    Welcome to Avalonia!
+    <Grid
+        Name="MainGrid"
+        ColumnDefinitions="Auto,10,Auto"
+        RowDefinitions="Auto,10,Auto"
+        Margin="10"
+        ShowGridLines="True">
+        <Grid 
+            Name="InfoGrid"
+            Grid.Row="0"
+            Grid.Column="0"
+            ColumnDefinitions="Auto,10,Auto"
+            RowDefinitions="Auto,10,Auto"></Grid>
+        <ListBox 
+            Name="LbxRequests"
+            Grid.Row="2"
+            Grid.Column="0"
+            Grid.ColumnSpan="3"></ListBox>
+    </Grid>
 </Window>
