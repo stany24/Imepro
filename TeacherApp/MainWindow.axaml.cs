@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
+using System.Runtime.InteropServices.ComTypes;
 using System.Text;
 using System.Text.Json;
 using System.Threading;
@@ -22,7 +23,7 @@ public partial class MainWindow : Window
     private Parameter.Parameter parameter = new();
     readonly private PreviewDisplayer Displayer;
     readonly private List<DataForTeacher> AllStudents = new();
-    readonly private List<DisplayStudent> AllStudentsDisplay = new();
+    readonly private List<StudentWindow> AllStudentsDisplay = new();
 
     private List<DataForTeacher> StudentToShareScreen = new();
     private Task ScreenSharer;
@@ -56,10 +57,10 @@ public partial class MainWindow : Window
                 break;
             case 1: ipAddr = possiblesIp[0]; break;
             default:
-                AskToChoseIp prompt = new(possiblesIp);
-                if (prompt.ShowDialog(this) == DialogResult.OK) { ipAddr = prompt.GetChoosenIp(); }
-                else { ipAddr = possiblesIp[0]; }
-                prompt.Dispose();
+                ChoseIpWindow prompt = new(possiblesIp);
+                prompt.Show();
+                IsEnabled = false;
+                prompt.Closing += (_, _) => ipAddr = prompt.GetChoosenIp();
                 break;
         }
         LblIp.Text = "IP: " + ipAddr;
@@ -197,22 +198,16 @@ public partial class MainWindow : Window
         Dispatcher.UIThread.InvokeAsync(() =>
         {
             LbxRequests.Items.Add(DateTime.Now.ToString("HH:mm:ss") + " L'élève " + student.UserName + " est déconnecté");
+            TreeViewItem[] nodes = TreeViewDetails.Items.;
+            if (nodes.Any()) { nodes[0].Remove(); }
+            TreeViewItem[] nodes = TreeViewDetails.Nodes.Find(Convert.ToString(student.Id), false);
+            if (nodes.Any()) { nodes[0].Remove(); }
         });
-        TreeViewDetails.Invoke(new MethodInvoker(delegate
-        {
-            TreeNode[] nodes = TreeViewDetails.Nodes.Find(Convert.ToString(student.Id), false);
-            if (nodes.Any()) { nodes[0].Remove(); }
-        }));
-        TreeViewSelect.Invoke(new MethodInvoker(delegate
-        {
-            TreeNode[] nodes = TreeViewDetails.Nodes.Find(Convert.ToString(student.Id), false);
-            if (nodes.Any()) { nodes[0].Remove(); }
-        }));
     }
 
     private void UpdateAllIndividualDisplay()
     {
-        foreach (DisplayStudent display in AllStudentsDisplay)
+        foreach (StudentWindow display in AllStudentsDisplay)
         {
             foreach (DataForTeacher student in AllStudents.Where(student => display.GetStudentId() == student.Id))
             {

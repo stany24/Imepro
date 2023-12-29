@@ -16,11 +16,21 @@
             Grid.Row="0"
             Grid.Column="0"
             ColumnDefinitions="Auto,10,Auto"
-            RowDefinitions="Auto,10,Auto">
+            RowDefinitions="Auto,10,Auto,10,Auto">
             <TextBlock
                 Name="LblIp"
                 Grid.Row="0"
                 Grid.Column="0"></TextBlock>
+            <TreeView
+                Name="TreeViewDetails"
+                Grid.Row="2"
+                Grid.Column="0"
+                Grid.ColumnSpan="3"></TreeView>
+            <TreeView
+                Name="TreeViewSelect"
+                Grid.Row="4"
+                Grid.Column="0"
+                Grid.ColumnSpan="3"></TreeView>
         </Grid>
         <ListBox 
             Name="LbxRequests"

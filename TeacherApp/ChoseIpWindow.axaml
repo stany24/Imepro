@@ -1,0 +1,22 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="TeacherApp.ChoseIpWindow"
+        Title="ChoseIpWindow">
+    <Grid
+        Name="Grid"
+        ColumnDefinitions="Auto"
+        RowDefinitions="Auto,10,Auto"
+        Margin="10">
+        <TextBlock
+            Name="LblChoseIp"
+            Grid.Column="0"
+            Grid.Row="0">Choisissez l'IP</TextBlock>
+        <ListBox
+            Name="LbxIps"
+            Grid.Column="0"
+            Grid.Row="2"></ListBox>
+    </Grid>
+</Window>
