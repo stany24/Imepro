@@ -14,6 +14,7 @@ using ClassLibrary6.ReliableMulticast;
 using MsBox.Avalonia;
 using MsBox.Avalonia.Enums;
 using StudentSoftware.Logic;
+using StudentSoftware.Models;
 
 namespace StudentSoftware.Views;
 
@@ -28,8 +29,9 @@ public partial class Main : Window
 
     #region Constructor
 
-    public Main()
+    public Main(MainViewModel model)
     {
+        DataContext = model;
         InitializeComponent();
         _trayIconStudent = new TrayIcon();
         if (IpForTheWeek.GetIp() == null)
@@ -46,9 +48,9 @@ public partial class Main : Window
     private void InitializeStudent()
     {
         _student = new DataForStudent(IpForTheWeek.GetIp());
-        _student.NewConnexionMessageEvent += (sender,e) => Dispatcher.UIThread.Post(() => lbxInfo.Items.Add(e.Message));
+        _student.NewConnexionMessageEvent += (sender,e) => Dispatcher.UIThread.Post(() => LbxInfo.Items.Add(e.Message));
         _student.ChangePropertyEvent += ChangeProperty;
-        _student.NewMessageEvent += (sender,e) => lbxInfo.Items.Add(e.Message);
+        _student.NewMessageEvent += (sender,e) => LbxInfo.Items.Add(e.Message);
         _student.NewImageEvent += DisplayImage;
     }
 
@@ -57,10 +59,10 @@ public partial class Main : Window
         Closing += OnClosing;
         Resized += StudentAppResized;
         _trayIconStudent.Clicked += TrayIconStudentClick;
-        btnHelp.Click += HelpReceive;
-        btnWebView.Click += WebView2_Click;
-        btnChangeIp.Click +=(_, _) => NewTeacherIp(false);
-        btnResetStoredIp.Click += (_, _) => IpForTheWeek.Reset();
+        BtnHelp.Click += HelpReceive;
+        BtnWebView.Click += WebView2_Click;
+        BtnChangeIp.Click +=(_, _) => NewTeacherIp(false);
+        BtnResetStoredIp.Click += (_, _) => IpForTheWeek.Reset();
     }
 
     #endregion
@@ -76,7 +78,7 @@ public partial class Main : Window
     {
         using MemoryStream memStream = new();
         e.Image.Write(memStream);
-        pbxScreenShot.Source = new Bitmap(memStream);
+        PbxScreenShot.Source = new Bitmap(memStream);
     }
 
     /// <summary>

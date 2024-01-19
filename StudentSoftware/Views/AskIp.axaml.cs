@@ -13,36 +13,36 @@ public partial class AskIp : Window
     {
         _canCloseWithoutIp = canCloseWithoutIp;
         InitializeComponent();
-        btnConfirm.Click += Confirm;
-        btnVerify.Click += Verify;
-        tbxIp.TextChanged += TextChanged;
+        BtnConfirm.Click += Confirm;
+        BtnVerify.Click += Verify;
+        TbxIp.TextChanged += TextChanged;
         Closing += FormClosing;
     }
 
     private void Verify(object ?sender,RoutedEventArgs e)
     {
-        if (tbxIp.Text == null) { return; }
+        if (TbxIp.Text == null) { return; }
         try
         {
-            IPAddress.Parse(tbxIp.Text);
-            btnConfirm.IsEnabled = true;
-            lblErreur.Text = "";
+            IPAddress.Parse(TbxIp.Text);
+            BtnConfirm.IsEnabled = true;
+            LblErreur.Text = "";
         }
-        catch { lblErreur.Text = "Veuillez entrer un adresse correcte"; }
+        catch { LblErreur.Text = "Veuillez entrer un adresse correcte"; }
     }
 
     private void Confirm(object? sender, RoutedEventArgs e)
     {
-        if (tbxIp.Text == null) { return; }
-        IpForTheWeek.SetIp(tbxIp.Text);
+        if (TbxIp.Text == null) { return; }
+        IpForTheWeek.SetIp(TbxIp.Text);
         _canClose = true;
         Close();
     }
 
     private void TextChanged(object ?sender, TextChangedEventArgs e)
     {
-        btnConfirm.IsEnabled = false;
-        lblErreur.Text = string.Empty;
+        BtnConfirm.IsEnabled = false;
+        LblErreur.Text = string.Empty;
     }
 
     private void FormClosing(object ?sender,WindowClosingEventArgs e)

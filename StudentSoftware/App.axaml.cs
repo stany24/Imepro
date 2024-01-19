@@ -1,6 +1,7 @@
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
+using StudentSoftware.Models;
 
 namespace StudentSoftware
 {
@@ -15,7 +16,7 @@ namespace StudentSoftware
         {
             if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             {
-                desktop.MainWindow = new Views.Main();
+                desktop.MainWindow = new Views.Main(new MainViewModel());
             }
 
             base.OnFrameworkInitializationCompleted();
