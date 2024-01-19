@@ -2,7 +2,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace LibraryData6
+namespace ClassLibrary6
 {
     public class Command
     {
@@ -31,20 +31,5 @@ namespace LibraryData6
             Args.ForEach(arg => str += " " + arg);
             return str;
         }
-    }
-    public enum CommandType
-    {
-        DemandData,
-        DemandImage,
-        KillProcess,
-        ReceiveMulticast,
-        ApplyMulticastSettings,
-        StopReceiveMulticast,
-        ReceiveMessage,
-        ReceiveAutorisedUrls,
-        GiveControl,
-        StopControl,
-        DisconnectOfTeacher,
-        StopApplication
     }
 }

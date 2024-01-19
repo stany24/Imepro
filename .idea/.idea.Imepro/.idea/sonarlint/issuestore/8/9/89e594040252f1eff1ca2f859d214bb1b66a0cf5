@@ -1,0 +1,9 @@
+
+zcsharpsquid:S1450"VRemove the field 'options' and declare it as a local variable in the relevant methods.(—ÆŠä8øÙıŠÒ1
+Lcsharpsquid:S1144"/Remove the unused private field 'browsersList'.(ÏàÜ‘
+Lcsharpsquid:S1144"*Remove the unused private field 'OldRect'.(ªõ„Êùÿÿÿÿ
+Ncsharpsquid:S1144"1Remove the unused private field 'screenToStream'.(¸ŒÑƒ
+ycsharpsquid:S4487 "WRemove this unread private field 'mouseDisabled' or refactor the code to use its value.(ÉĞÍ•ÿÿÿÿÿ
+wcsharpsquid:S4487!"URemove this unread private field 'isReceiving' or refactor the code to use its value.(®çÀÿÿÿÿÿ
+wcsharpsquid:S4487""URemove this unread private field 'isControled' or refactor the code to use its value.(Ä®“õùÿÿÿÿ
+;csharpsquid:S125N"Remove this commented out code.(©ÇÉ«

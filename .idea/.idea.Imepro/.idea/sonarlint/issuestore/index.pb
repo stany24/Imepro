@@ -178,3 +178,9 @@ b
 2ApplicationTeacher/ConfigurationWindow.Designer.cs,0\2\029fb2b43a355a85897dd124ceb76f786a9db4cf
 P
  ClassLibrary6/ScreenShotTaker.cs,e\a\eadf2b341bf1467fcf810b976c19b244e0044b76
+O
+ClassLibrary6/DataForStudent.cs,8\9\89e594040252f1eff1ca2f859d214bb1b66a0cf5
+_
+/ClassLibrary6/ReliableMulticastMessageSender.cs,f\f\ff7984056f05b6b9aa2bc69bfb81adc3311be28b
+a
+1ClassLibrary6/ReliableMulticastMessageReceiver.cs,0\b\0b574040f43ba7d5e0676adb7d7bfdd42d612d12

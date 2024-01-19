@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace LibraryData6
+namespace ClassLibrary6
 {
     /// <summary>
     /// Class containing the options for the stream
@@ -19,16 +19,5 @@ namespace LibraryData6
             Priority = priority;
             Focus = focus;
         }
-    }
-
-    /// <summary>
-    /// Class representing the priority of a stream on the student computer
-    /// </summary>
-    public enum Priority
-    {
-        Widowed,
-        Fullscreen,
-        Topmost,
-        Blocking
     }
 }

@@ -21,4 +21,31 @@
     </Reference>
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Update="DataForStudent.cs">
+      <DependentUpon>Data.cs</DependentUpon>
+    </Compile>
+    <Compile Update="DataForTeacher.cs">
+      <DependentUpon>Data.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Url.cs">
+      <DependentUpon>History.cs</DependentUpon>
+    </Compile>
+    <Compile Update="BrowserName.cs">
+      <DependentUpon>History.cs</DependentUpon>
+    </Compile>
+    <Compile Update="ReliableMulticastReceiver.cs">
+      <DependentUpon>ReliableMulticast.cs</DependentUpon>
+    </Compile>
+    <Compile Update="ReliableMulticastSender.cs">
+      <DependentUpon>ReliableMulticast.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Priority.cs">
+      <DependentUpon>StreamOptions.cs</DependentUpon>
+    </Compile>
+    <Compile Update="CommandType.cs">
+      <DependentUpon>Command.cs</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
 </Project>

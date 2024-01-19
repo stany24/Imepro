@@ -1,11 +1,7 @@
-﻿
-using System.Net.Sockets;
-using System.Text;
-using System.Drawing;
-using ClassLibrary6;
+﻿using System.Text;
 using ImageMagick;
 
-namespace LibraryData6
+namespace ClassLibrary6
 {
     /// <summary>
     /// Class representing a UDP multicast message.
@@ -49,126 +45,6 @@ namespace LibraryData6
         {
             return ImageNumber + separator + PartNumber + separator + TotalPartNumber + separator + Encoding.Default.GetString(Data);
         }
-    }
-
-    /// <summary>
-    /// Class used to send UDP multicast messages.
-    /// </summary>
-    public class ReliableMulticastSender
-    {
-        #region Variables
-
-        private const int DATA_SIZE = 64000;
-        private int ScreenToShareId { get; set; }
-        private int ImageNumber = 0;
-        readonly private Socket SocketToSend;
-        private readonly ScreenShotTaker _screenShotTaker = new();
-        public bool Sending { get; set; }
-
-        #endregion
-
-        #region Constructor
-
-        public ReliableMulticastSender(Socket socket, int screentoshareid)
-        {
-            ScreenToShareId = screentoshareid;
-            SocketToSend = socket;
-            Sending = true;
-            Task.Run(SendImages);
-        }
-
-        #endregion
-
-        #region Image management
-
-        private void SendImages()
-        {
-            while (Sending)
-            {
-                byte[] ImageBytes = _screenShotTaker.TakeScreenShot(ScreenToShareId).ToByteArray();
-                int TotalImagePart = ImageBytes.Count() / DATA_SIZE + 1;
-                for (int i = 0; i * DATA_SIZE < ImageBytes.Count(); i++)
-                {
-                    byte[] part = new byte[DATA_SIZE];
-                    try { Array.Copy(ImageBytes, i * DATA_SIZE, part, 0, DATA_SIZE); }
-                    catch
-                    {
-                        Array.Copy(ImageBytes, i * DATA_SIZE, part, 0, ImageBytes.Length - i * DATA_SIZE);
-                        Array.Resize(ref part, ImageBytes.Length - i * DATA_SIZE);
-                    }
-                    ReliableMulticastMessage message = new(part, ImageNumber, i, TotalImagePart);
-                    string custom = message.ToCustomString();
-                    byte[] bytes = Encoding.Default.GetBytes(custom);
-                    SocketToSend.Send(bytes);
-                }
-
-                ImageNumber++;
-            }
-        }
-
-        #endregion
-    }
-
-    /// <summary>
-    /// Class used to receive UDP multicast messages.
-    /// </summary>
-    public class ReliableMulticastReceiver
-    {
-        #region Variables
-
-        public event EventHandler<NewImageEventArgs> NewImageEvent;
-        readonly private List<ReliableImage> Images = new();
-        readonly Socket SocketToReceive;
-        public bool Receiving { get; set; }
-
-        #endregion
-
-        #region Constructor
-
-        public ReliableMulticastReceiver(Socket socket)
-        {
-            SocketToReceive = socket;
-            Receiving = true;
-            Task.Run(Receive);
-        }
-
-        #endregion
-
-        #region Image management
-
-        public void Receive()
-        {
-            while (Receiving)
-            {
-                byte[] message = new byte[65000];
-                int size = SocketToReceive.Receive(message);
-                Array.Resize(ref message, size);
-                ReliableMulticastMessage reliable = new(Encoding.Default.GetString(message));
-                AddMessageToImage(reliable);
-            }
-        }
-
-        private void AddMessageToImage(ReliableMulticastMessage message)
-        {
-            foreach (ReliableImage image in Images)
-            {
-                if (image.ImageNumber == message.ImageNumber) { image.AddData(message.Data, message.PartNumber); return; }
-            }
-            ReliableImage NewImage = new(message);
-            NewImage.ImageCompletedEvent += DisplayImage;
-            Images.Add(NewImage);
-        }
-
-        private void DisplayImage(object sender, ImageCompletedEventArgs e)
-        {
-            NewImageEvent.Invoke(sender, new NewImageEventArgs(e.CompletedImage));
-            for (int i = 0; i < Images.Count; i++)
-            {
-                if (Images[i].ImageNumber <= e.ImageId) { Images.Remove(Images[i]); }
-            }
-        }
-
-        #endregion
     }
 
     /// <summary>

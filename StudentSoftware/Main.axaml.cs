@@ -1,6 +1,5 @@
 using Avalonia.Controls;
 using Avalonia.Threading;
-using LibraryData6;
 using MsBox.Avalonia;
 using MsBox.Avalonia.Enums;
 using System;
@@ -12,6 +11,7 @@ using System.Net.Sockets;
 using System.Reflection;
 using System.Text;
 using Avalonia.Media.Imaging;
+using ClassLibrary6;
 using ImageMagick;
 
 namespace StudentSoftware;

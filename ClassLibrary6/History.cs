@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace LibraryData6
+namespace ClassLibrary6
 {
 
     /// <summary>
@@ -31,40 +31,6 @@ namespace LibraryData6
             {
                 AllBrowser.Add(name, new());
             }
-        }
-    }
-
-    public enum BrowserName
-    {
-        Firefox,
-        Opera,
-        Chrome,
-        Webview2,
-        Edge,
-        Safari,
-        IExplorer,
-    }
-
-    /// <summary>
-    /// Class representing an url.
-    /// </summary>
-    [Serializable]
-    public class Url
-    {
-        [JsonInclude]
-        readonly public DateTime ScreenShotTime;
-        [JsonInclude]
-        readonly public string Name;
-
-        public Url(DateTime screenShotTime, string name)
-        {
-            ScreenShotTime = screenShotTime;
-            Name = name;
-        }
-
-        public override string ToString()
-        {
-            return ScreenShotTime.ToString("HH:mm:ss") + " " + Name;
         }
     }
 }
