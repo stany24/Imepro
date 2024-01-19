@@ -1,7 +1,7 @@
 ﻿using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 
-namespace StudentSoftware.Models;
+namespace StudentSoftware.ViewModels;
 
 public class MainViewModel: ObservableObject
 {

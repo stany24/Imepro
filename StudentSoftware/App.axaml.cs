@@ -1,25 +1,25 @@
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
-using StudentSoftware.Models;
+using StudentSoftware.ViewModels;
+using StudentSoftware.Views;
 
-namespace StudentSoftware
+namespace StudentSoftware;
+
+public partial class App : Application
 {
-    public partial class App : Application
+    public override void Initialize()
     {
-        public override void Initialize()
+        AvaloniaXamlLoader.Load(this);
+    }
+
+    public override void OnFrameworkInitializationCompleted()
+    {
+        if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
-            AvaloniaXamlLoader.Load(this);
+            desktop.MainWindow = new Main(new MainViewModel());
         }
 
-        public override void OnFrameworkInitializationCompleted()
-        {
-            if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
-            {
-                desktop.MainWindow = new Views.Main(new MainViewModel());
-            }
-
-            base.OnFrameworkInitializationCompleted();
-        }
+        base.OnFrameworkInitializationCompleted();
     }
 }

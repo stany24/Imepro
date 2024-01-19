@@ -14,7 +14,7 @@ using ClassLibrary6.ReliableMulticast;
 using MsBox.Avalonia;
 using MsBox.Avalonia.Enums;
 using StudentSoftware.Logic;
-using StudentSoftware.Models;
+using StudentSoftware.ViewModels;
 
 namespace StudentSoftware.Views;
 

@@ -1,46 +1,33 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <OutputType>WinExe</OutputType>
-    <TargetFramework>net6.0-windows10.0.22000.0</TargetFramework>
-    <Nullable>enable</Nullable>
-    <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
-    <ApplicationManifest>app.manifest</ApplicationManifest>
-    <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
-    <SupportedOSPlatformVersion>10.0.17763.0</SupportedOSPlatformVersion>
-    <UseWindowsForms>False</UseWindowsForms>
-  </PropertyGroup>
+    <PropertyGroup>
+        <OutputType>WinExe</OutputType>
+        <TargetFramework>net6.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
+        <ApplicationManifest>app.manifest</ApplicationManifest>
+        <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <Folder Include="Models\"/>
+        <AvaloniaResource Include="Assets\**"/>
+    </ItemGroup>
 
 
-  <ItemGroup>
-    <PackageReference Include="Avalonia" Version="11.0.5">
-      <TreatAsUsed>true</TreatAsUsed>
-    </PackageReference>
-    <PackageReference Include="Avalonia.Desktop" Version="11.0.5" />
-    <PackageReference Include="Avalonia.Themes.Fluent" Version="11.0.5">
-      <TreatAsUsed>true</TreatAsUsed>
-    </PackageReference>
-    <PackageReference Include="Avalonia.Fonts.Inter" Version="11.0.5" />
-    <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
-    <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.0.5" />
-    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
-    <PackageReference Include="MessageBox.Avalonia" Version="3.1.5.1" />
-    <PackageReference Include="System.Text.Json" Version="7.0.3" />
-  </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="Avalonia" Version="11.0.7" />
+        <PackageReference Include="Avalonia.Desktop" Version="11.0.7" />
+        <PackageReference Include="Avalonia.Themes.Fluent" Version="11.0.7" />
+        <PackageReference Include="Avalonia.Fonts.Inter" Version="11.0.7" />
+        <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
+        <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.0.7" />
+        <PackageReference Include="Avalonia.ReactiveUI" Version="11.0.7" />
+        <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
+        <PackageReference Include="MessageBox.Avalonia" Version="3.1.5.1" />
+    </ItemGroup>
 
 
-  <ItemGroup>
-    <ProjectReference Include="..\ClassLibrary6\ClassLibrary6.csproj" />
-  </ItemGroup>
-
-
-  <ItemGroup>
-    <Compile Update="Views\AskIp.axaml.cs">
-      <DependentUpon>AskIp.axaml</DependentUpon>
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Update="Views\Main.axaml.cs">
-      <DependentUpon>Main.axaml</DependentUpon>
-      <SubType>Code</SubType>
-    </Compile>
-  </ItemGroup>
+    <ItemGroup>
+      <ProjectReference Include="..\ClassLibrary6\ClassLibrary6.csproj" />
+    </ItemGroup>
 </Project>
