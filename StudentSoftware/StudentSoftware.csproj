@@ -33,8 +33,13 @@
 
 
   <ItemGroup>
-    <Compile Update="Main.axaml.cs">
+    <Compile Update="Views\AskIp.axaml.cs">
+      <DependentUpon>AskIp.axaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Views\Main.axaml.cs">
       <DependentUpon>Main.axaml</DependentUpon>
+      <SubType>Code</SubType>
     </Compile>
   </ItemGroup>
 </Project>
