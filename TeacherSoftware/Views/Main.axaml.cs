@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -11,6 +13,8 @@ using Avalonia.Controls;
 using ClassLibrary6.Command;
 using ClassLibrary6.Data;
 using ClassLibrary6.ReliableMulticast;
+using ImageMagick;
+using MsBox.Avalonia;
 
 namespace TeacherSoftware.Views;
 
@@ -18,17 +22,17 @@ public partial class Main : Window
 {
     #region Variables
 
-    readonly private PreviewDisplayer Displayer;
-    readonly private List<DataForTeacher> AllStudents = new();
-    readonly private List<DisplayStudent> AllStudentsDisplay = new();
+    private readonly PreviewDisplayer _previewDisplay;
+    private readonly List<DataForTeacher> _allStudents = new();
+    private readonly List<DisplayStudent> _allStudentsDisplay = new();
 
-    private List<DataForTeacher> StudentToShareScreen = new();
-    private Task ScreenSharer;
-    private bool isSharing = false;
-    private bool isAsking = false;
-    private int NextId = 0;
-    private IPAddress ipAddr = null;
-    private ReliableMulticastSender MulticastSender;
+    private List<DataForTeacher> _studentToShareScreen = new();
+    private Task _screenSharer;
+    private bool _isSharing = false;
+    private bool _isAsking = false;
+    private int _nextId = 0;
+    private IPAddress _ipAddr = null;
+    private ReliableMulticastSender _multicastSender;
 
     #endregion
 
@@ -37,7 +41,7 @@ public partial class Main : Window
     public Main()
     {
         InitializeComponent();
-        Displayer = new(panelPreviews.Width);
+        _previewDisplay = new(panelPreviews.Width);
         FindIp();
         Task.Run(StartTasks);
     }
@@ -45,9 +49,8 @@ public partial class Main : Window
     /// <summary>
     /// Function that starts all tasks running in backgrouds.
     /// </summary>
-    public void StartTasks()
+    private void StartTasks()
     {
-        while (!IsHandleCreated) { Thread.Sleep(10); }
         Task.Run(AskingData);
         Task.Run(LogClients);
     }
@@ -55,33 +58,31 @@ public partial class Main : Window
     /// <summary>
     /// Function that find the teacher ip.
     /// </summary>
-    public void FindIp()
+    private void FindIp()
     {
-        // Establish the local endpointfor the socket.
+        // Establish the local endpoint for the socket.
         // Dns.GetHostName returns the name of the host running the application.
         IPHostEntry ipHost = Dns.GetHostEntry(Dns.GetHostName());
-        List<IPAddress> PossiblesIp = new();
-        foreach (IPAddress address in ipHost.AddressList)
-        {
-            if (address.AddressFamily == AddressFamily.InterNetwork) { PossiblesIp.Add(address); }
-        }
-        switch (PossiblesIp.Count)
+        List<IPAddress> possiblesIp = ipHost.AddressList.Where(address => address.AddressFamily == AddressFamily.InterNetwork).ToList();
+        switch (possiblesIp.Count)
         {
             case 0:
-                MessageBox.Show("Aucune addresse ip conforme n'a étée trouvée.\r\n" +
+                MessageBoxManager.GetMessageBoxStandard(
+                    "Attention",
+                    "Aucune addresse ip conforme n'a étée trouvée.\r\n" +
                     "Vérifiez vos connexion aux réseaux.\r\n" +
-                    "L'application va ce fermer.", "Attention", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    "L'application va ce fermer.");
                 Application.Exit();
                 break;
-            case 1: ipAddr = PossiblesIp[0]; break;
+            case 1: _ipAddr = possiblesIp[0]; break;
             default:
-                ChooseIp prompt = new(PossiblesIp);
-                if (prompt.ShowDialog(this) == DialogResult.OK) { ipAddr = prompt.GetChoosenIp(); }
-                else { ipAddr = PossiblesIp[0]; }
+                ChooseIp prompt = new(possiblesIp);
+                if (prompt.ShowDialog(this) == DialogResult.OK) { _ipAddr = prompt.GetChoosenIp(); }
+                else { _ipAddr = possiblesIp[0]; }
                 prompt.Dispose();
                 break;
         }
-        LblIp.Text = "IP: " + ipAddr.ToString();
+        LblIp.Text = "IP: " + _ipAddr.ToString();
     }
 
     #endregion
@@ -91,11 +92,10 @@ public partial class Main : Window
     /// <summary>
     /// Function that connect the students.
     /// </summary>
-    public void LogClients()
+    private void LogClients()
     {
-        while (!IsHandleCreated) { Thread.Sleep(100); }
-        IPEndPoint localEndPoint = new(ipAddr, 11111);
-        Socket listener = new(ipAddr.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
+        IPEndPoint localEndPoint = new(_ipAddr, 11111);
+        Socket listener = new(_ipAddr.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
         listener.Bind(localEndPoint);
         listener.Listen(-1);
         while (true)
@@ -103,12 +103,13 @@ public partial class Main : Window
             try
             {
                 Socket clientSocket = listener.Accept();
-                LbxRequests.Invoke(new MethodInvoker(delegate { LbxRequests.Items.Add(DateTime.Now.ToString("HH:mm:ss") + " Nouvelle connexion de: " + clientSocket.RemoteEndPoint); }));
-                AllStudents.Add(new DataForTeacher(clientSocket, NextId));
-                Task.Run(() => SendAutorisedUrl(clientSocket));
-                NextId++;
+                
+                LbxRequests.Items.Add(DateTime.Now.ToString("HH:mm:ss") + " Nouvelle connexion de: " + clientSocket.RemoteEndPoint);
+                _allStudents.Add(new DataForTeacher(clientSocket, _nextId));
+                Task.Run(() => SendAuthorisedUrl(clientSocket));
+                _nextId++;
             }
-            catch (Exception e) { LbxConnection.Invoke(new MethodInvoker(delegate { LbxConnection.Items.Add(e.ToString()); })); }
+            catch (Exception e) { LbxConnection.Items.Add(e.ToString()); }
         }
     }
 
@@ -116,17 +117,17 @@ public partial class Main : Window
     /// Function that sends the autorised urls to a student.
     /// </summary>
     /// <param name="socket"></param>
-    public void SendAutorisedUrl(Socket socket)
+    private void SendAuthorisedUrl(Socket socket)
     {
-        while (isAsking) { Thread.Sleep(100); }
-        isAsking = true;
+        while (_isAsking) { Thread.Sleep(100); }
+        _isAsking = true;
         socket.Send(new Command(CommandType.ReceiveAutorisedUrls).ToByteArray());
         //serialization
         string jsonString = JsonSerializer.Serialize(Properties.Settings.Default.AutorisedWebsite);
-        //envoi
+        //sending
         Thread.Sleep(100);
         socket.Send(Encoding.ASCII.GetBytes(jsonString), Encoding.ASCII.GetBytes(jsonString).Length, SocketFlags.None);
-        isAsking = false;
+        _isAsking = false;
     }
 
     #endregion
@@ -140,64 +141,64 @@ public partial class Main : Window
     {
         while (true)
         {
-            if (AllStudents.Count != 0)
+            if (_allStudents.Count != 0)
             {
-                while (isAsking) { Thread.Sleep(10); }
-                isAsking = true;
-                DateTime StartUpdate = DateTime.Now;
-                DateTime NextUpdate = DateTime.Now.AddSeconds(Properties.Settings.Default.TimeBetweenDemand);
-                List<DataForTeacher> ClientToRemove = new();
-                UpdateEleves(ClientToRemove);
-                foreach (DataForTeacher client in ClientToRemove)
+                while (_isAsking) { Thread.Sleep(10); }
+                _isAsking = true;
+                DateTime startUpdate = DateTime.Now;
+                DateTime nextUpdate = DateTime.Now.AddSeconds(Properties.Settings.Default.TimeBetweenDemand);
+                List<DataForTeacher> clientToRemove = new();
+                UpdateStudents(clientToRemove);
+                foreach (DataForTeacher client in clientToRemove)
                 {
                     RemoveStudent(client);
                 }
                 UpdateAllIndividualDisplay();
-                DateTime FinishedUpdate = DateTime.Now;
-                TimeSpan UpdateDuration = FinishedUpdate - StartUpdate;
-                TimeSpan CycleDuration = NextUpdate - StartUpdate;
-                if (CycleDuration > UpdateDuration)
-                {
-                    isAsking = false;
-                    LbxRequests.Invoke(new MethodInvoker(delegate { LbxRequests.Items.Add(DateTime.Now.ToString("HH:mm:ss") + " Attente du prochain cycle dans " + (CycleDuration - UpdateDuration) + " secondes"); }));
-                    Thread.Sleep(CycleDuration - UpdateDuration);
-                }
+                DateTime finishedUpdate = DateTime.Now;
+                TimeSpan updateDuration = finishedUpdate - startUpdate;
+                TimeSpan cycleDuration = nextUpdate - startUpdate;
+                if (cycleDuration <= updateDuration) continue;
+                _isAsking = false;
+                LbxRequests.Items.Add(DateTime.Now.ToString("HH:mm:ss") + " Attente du prochain cycle dans " + (cycleDuration - updateDuration) + " secondes");
+                Thread.Sleep(cycleDuration - updateDuration);
             }
             else { Thread.Sleep(100); }
         }
     }
 
     /// <summary>
-    /// Function that asks a studen for their data and screenshots.
+    /// Function that asks a student for their data and screenshots.
     /// </summary>
-    /// <param name="ClientToRemove"></param>
-    public void UpdateEleves(List<DataForTeacher> ClientToRemove)
+    /// <param name="clientToRemove"></param>
+    private void UpdateStudents(ICollection<DataForTeacher> clientToRemove)
     {
-        for (int i = 0; i < AllStudents.Count; i++)
+        for (int i = 0; i < _allStudents.Count; i++)
         {
-            Socket socket = AllStudents[i].SocketToStudent;
+            Socket socket = _allStudents[i].SocketToStudent;
             socket.ReceiveTimeout = Properties.Settings.Default.DefaultTimeout;
             socket.SendTimeout = Properties.Settings.Default.DefaultTimeout;
             try
             {
                 socket.Send(new Command(CommandType.DemandData).ToByteArray());
-                LbxRequests.Invoke(new MethodInvoker(delegate { LbxRequests.Items.Add(DateTime.Now.ToString("HH:mm:ss") + " Demande des données à " + AllStudents[i].UserName); }));
-                Task.Run(() => AllStudents[i] = ReceiveData(AllStudents[i])).Wait();
+                LbxRequests.Items.Add(DateTime.Now.ToString("HH:mm:ss") + " Demande des données à " + _allStudents[i].UserName);
+                int i1 = i;
+                Task.Run(() => _allStudents[i1] = ReceiveData(_allStudents[i1])).Wait();
                 socket.Send(new Command(CommandType.DemandImage).ToByteArray());
-                LbxRequests.Invoke(new MethodInvoker(delegate { LbxRequests.Items.Add(DateTime.Now.ToString("HH:mm:ss") + " Demande de l'image à " + AllStudents[i].UserName); }));
-                Task.Run(() => ReceiveImage(AllStudents[i])).Wait();
+                LbxRequests.Items.Add(DateTime.Now.ToString("HH:mm:ss") + " Demande de l'image à " + _allStudents[i].UserName);
+                int i2 = i;
+                Task.Run(() => ReceiveImage(_allStudents[i2])).Wait();
             }
             catch (SocketException)
             {
                 socket.Shutdown(SocketShutdown.Both);
                 socket.Close();
-                ClientToRemove.Add(AllStudents[i]);
+                clientToRemove.Add(_allStudents[i]);
             }
         }
     }
 
     /// <summary>
-    /// Fonction that is used to receive the student data.
+    /// Function that is used to receive the student data.
     /// </summary>
     /// <param name="student">The student that sent the data.</param>
     /// <returns></returns>
@@ -206,25 +207,25 @@ public partial class Main : Window
         try
         {
             Socket socket = student.SocketToStudent;
-            int id = student.ID;
+            int id = student.Id;
             byte[] dataBuffer = new byte[100000];
             socket.ReceiveTimeout = Properties.Settings.Default.DefaultTimeout;
             int nbData = socket.Receive(dataBuffer);
             Array.Resize(ref dataBuffer, nbData);
             Data data = JsonSerializer.Deserialize<Data>(Encoding.Default.GetString(dataBuffer));
-            student = new(data)
+            student = new DataForTeacher(data)
             {
                 SocketToStudent = socket,
-                ID = id
+                Id = id
             };
-            LbxRequests.Invoke(new MethodInvoker(delegate { LbxRequests.Items.Add(DateTime.Now.ToString("HH:mm:ss") + " Données recue de " + student.UserName); }));
+            LbxRequests.Items.Add(DateTime.Now.ToString("HH:mm:ss") + " Données recue de " + student.UserName);
             Task.Run(() => UpdateTreeViews(student));
             student.NumberOfFailure = 0;
             return student;
         }
         catch
         {
-            LbxRequests.Invoke(new MethodInvoker(delegate { LbxRequests.Items.Add(DateTime.Now.ToString("HH:mm:ss") + " " + student.UserName + "n'a pas envoyé de donnée"); }));
+            LbxRequests.Items.Add(DateTime.Now.ToString("HH:mm:ss") + " " + student.UserName + "n'a pas envoyé de donnée");
             student.NumberOfFailure++;
             return student;
         }
@@ -243,14 +244,14 @@ public partial class Main : Window
             socket.ReceiveTimeout = Properties.Settings.Default.DefaultTimeout;
             int nbData = socket.Receive(imageBuffer, 0, imageBuffer.Length, SocketFlags.None);
             Array.Resize(ref imageBuffer, nbData);
-            student.ScreenShot = new Bitmap(new MemoryStream(imageBuffer));
-            LbxRequests.Invoke(new MethodInvoker(delegate { LbxRequests.Items.Add(DateTime.Now.ToString("HH:mm:ss") + " Image recue de " + student.UserName); }));
+            student.ScreenShot = new MagickImage(new MemoryStream(imageBuffer));
+            LbxRequests.Items.Add(DateTime.Now.ToString("HH:mm:ss") + " Image recue de " + student.UserName);
             student.NumberOfFailure = 0;
-            Displayer.UpdatePreview(student.ID, student.ComputerName, student.ScreenShot);
+            _previewDisplay.UpdatePreview(student.Id, student.ComputerName, student.ScreenShot);
         }
         catch
         {
-            LbxRequests.Invoke(new MethodInvoker(delegate { LbxRequests.Items.Add(DateTime.Now.ToString("HH:mm:ss") + " " + student.UserName + "n'a pas envoyé d'image"); }));
+            LbxRequests.Items.Add(DateTime.Now.ToString("HH:mm:ss") + " " + student.UserName + "n'a pas envoyé d'image");
             student.NumberOfFailure++;
         }
     }
@@ -260,16 +261,16 @@ public partial class Main : Window
     #region TreeView update
 
     /// <summary>
-    /// Function that updates the treeviews.
+    /// Function that updates the tree-views.
     /// </summary>
     /// <param name="student">The student that is updated.</param>
-    public void UpdateTreeViews(DataForTeacher student)
+    private void UpdateTreeViews(DataForTeacher student)
     {
         TreeViewDetails.Invoke(new MethodInvoker(delegate
         {
             TreeNode nodeStudent;
-            try { nodeStudent = TreeViewDetails.Nodes.Find(Convert.ToString(student.ID), false)[0]; }
-            catch { nodeStudent = TreeViewDetails.Nodes.Add(Convert.ToString(student.ID), student.UserName + " : " + student.ComputerName); }
+            try { nodeStudent = TreeViewDetails.Nodes.Find(Convert.ToString(student.Id), false)[0]; }
+            catch { nodeStudent = TreeViewDetails.Nodes.Add(Convert.ToString(student.Id), student.UserName + " : " + student.ComputerName); }
             TreeNode nodeProcess;
             try { nodeProcess = nodeStudent.Nodes[0]; }
             catch { nodeProcess = nodeStudent.Nodes.Add("Processus:"); }
@@ -284,29 +285,29 @@ public partial class Main : Window
         TreeViewSelect.Invoke(new MethodInvoker(delegate
         {
             TreeNode nodeStudent;
-            try { nodeStudent = TreeViewSelect.Nodes.Find(Convert.ToString(student.ID), false)[0]; }
-            catch { nodeStudent = TreeViewSelect.Nodes.Add(Convert.ToString(student.ID), student.UserName + " : " + student.ComputerName); }
+            try { nodeStudent = TreeViewSelect.Nodes.Find(Convert.ToString(student.Id), false)[0]; }
+            catch { nodeStudent = TreeViewSelect.Nodes.Add(Convert.ToString(student.Id), student.UserName + " : " + student.ComputerName); }
         }));
     }
 
     #endregion
 
     /// <summary>
-    /// Function that applys the filters in the treeview.
+    /// Function that applys the filters in the tree-view.
     /// </summary>
     /// <param name="student">The student to remove.</param>
-    public void RemoveStudent(DataForTeacher student)
+    private void RemoveStudent(DataForTeacher student)
     {
-        AllStudents.Remove(student);
-        LbxRequests.Invoke(new MethodInvoker(delegate { LbxRequests.Items.Add(DateTime.Now.ToString("HH:mm:ss") + " L'élève " + student.UserName + " est déconnecté"); }));
+        _allStudents.Remove(student);
+        LbxRequests.Items.Add(DateTime.Now.ToString("HH:mm:ss") + " L'élève " + student.UserName + " est déconnecté");
         TreeViewDetails.Invoke(new MethodInvoker(delegate
         {
-            TreeNode[] nodes = TreeViewDetails.Nodes.Find(Convert.ToString(student.ID), false);
+            TreeNode[] nodes = TreeViewDetails.Nodes.Find(Convert.ToString(student.Id), false);
             if (nodes.Any()) { nodes[0].Remove(); }
         }));
         TreeViewSelect.Invoke(new MethodInvoker(delegate
         {
-            TreeNode[] nodes = TreeViewSelect.Nodes.Find(Convert.ToString(student.ID), false);
+            TreeNode[] nodes = TreeViewSelect.Nodes.Find(Convert.ToString(student.Id), false);
             if (nodes.Any()) { nodes[0].Remove(); }
         }));
     }
@@ -324,31 +325,31 @@ public partial class Main : Window
         if (e.Node.Checked)
         {
             DataForTeacher student = null;
-            foreach (DataForTeacher students in AllStudents)
+            foreach (DataForTeacher students in _allStudents)
             {
-                if (Convert.ToString(students.ID) == e.Node.Name) { student = students; }
+                if (Convert.ToString(students.Id) == e.Node.Name) { student = students; }
             }
             if (student == null) { return; }
-            foreach (Preview mini in Displayer.CustomPreviewList) { if (mini.GetComputerName() == student.ComputerName && mini.StudentID == student.ID) { return; } }
-            Preview preview = new(student.ScreenShot, student.ComputerName, student.ID, Properties.Settings.Default.PathToSaveFolder);
-            Displayer.AddPreview(preview);
+            foreach (Preview mini in _previewDisplay.CustomPreviewList) { if (mini.GetComputerName() == student.ComputerName && mini.StudentId == student.Id) { return; } }
+            Preview preview = new(student.ScreenShot, student.ComputerName, student.Id, Properties.Settings.Default.PathToSaveFolder);
+            _previewDisplay.AddPreview(preview);
             panelPreviews.Controls.Add(preview);
             panelPreviews.Controls.SetChildIndex(preview, 0);
         }
         else
         {
-            Displayer.RemovePreview(Convert.ToInt32(e.Node.Name));
+            _previewDisplay.RemovePreview(Convert.ToInt32(e.Node.Name));
         }
     }
 
     /// <summary>
-    /// Fonction that updates all previews when the panel is resized.
+    /// Function that updates all previews when the panel is resized.
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
     private void PanelPreviews_Resize(object sender, EventArgs e)
     {
-        Displayer.UpdateAllLocations(panelPreviews.Width);
+        _previewDisplay.UpdateAllLocations(panelPreviews.Width);
     }
 
     #endregion
@@ -358,19 +359,19 @@ public partial class Main : Window
     /// <summary>
     /// Function that take screenshots and share them in multicast.
     /// </summary>
-    public void RecordAndStreamScreen()
+    private void RecordAndStreamScreen()
     {
-        foreach (DataForTeacher student in StudentToShareScreen) { student.SocketToStudent.Send(new Command(CommandType.ReceiveMulticast).ToByteArray()); }
+        foreach (DataForTeacher student in _studentToShareScreen) { student.SocketToStudent.Send(new Command(CommandType.ReceiveMulticast).ToByteArray()); }
 
         Socket s = new(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
         IPAddress ip = IPAddress.Parse("232.1.2.3");
         s.SetSocketOption(SocketOptionLevel.IP, SocketOptionName.AddMembership, new MulticastOption(ip));
         s.SetSocketOption(SocketOptionLevel.IP, SocketOptionName.MulticastInterface, IPAddress.Parse("232.1.2.3").GetAddressBytes());
         s.SetSocketOption(SocketOptionLevel.IP, SocketOptionName.MulticastTimeToLive, 10);
-        IPEndPoint ipep = new(ip, 45678);
-        s.Connect(ipep);
+        IPEndPoint ipEndPoint = new(ip, 45678);
+        s.Connect(ipEndPoint);
         Thread.Sleep(1000);
-        MulticastSender = new ReliableMulticastSender(s, Properties.Settings.Default.ScreenToShareId);
+        _multicastSender = new ReliableMulticastSender(s, Properties.Settings.Default.ScreenToShareId);
     }
 
     /// <summary>
@@ -380,42 +381,44 @@ public partial class Main : Window
     /// <param name="e"></param>
     private void ShareScreen(object sender, EventArgs e)
     {
-        if (!isSharing)
+        if (!_isSharing)
         {
-            ChooseStreamOptions prompt = new(AllStudents);
+            ChooseStreamOptions prompt = new(_allStudents);
             if (prompt.ShowDialog(this) != DialogResult.OK) { return; }
-            StudentToShareScreen = prompt.GetStudentToShare();
-            if (StudentToShareScreen.Count == 0) { return; }
-            isSharing = true;
+            _studentToShareScreen = prompt.GetStudentToShare();
+            if (_studentToShareScreen.Count == 0) { return; }
+            _isSharing = true;
             SendStreamConfiguration();
-            ScreenSharer = Task.Run(RecordAndStreamScreen);
+            _screenSharer = Task.Run(RecordAndStreamScreen);
             BtnShare.Content = "Stop Sharing";
         }
         else
         {
-            isSharing = false;
-            MulticastSender.Sending = false;
-            for (int i = 0; i < StudentToShareScreen.Count; i++)
-            { StudentToShareScreen[i].SocketToStudent.Send(new Command(CommandType.StopReceiveMulticast).ToByteArray()); }
-            StudentToShareScreen = new();
+            _isSharing = false;
+            _multicastSender.Sending = false;
+            foreach (DataForTeacher student in _studentToShareScreen)
+            {
+                student.SocketToStudent.Send(new Command(CommandType.StopReceiveMulticast).ToByteArray());
+            }
+            _studentToShareScreen = new List<DataForTeacher>();
             BtnShare.Content = "Share screen";
-            ScreenSharer.Wait();
-            ScreenSharer.Dispose();
+            _screenSharer.Wait();
+            _screenSharer.Dispose();
         }
     }
 
     /// <summary>
-    /// Function that send the stream configuration to all relevent students.
+    /// Function that send the stream configuration to all relevant students.
     /// </summary>
     private void SendStreamConfiguration()
     {
         byte[] bytes = Encoding.Default.GetBytes(JsonSerializer.Serialize(Configuration.GetStreamOptions()));
-        foreach (DataForTeacher student in StudentToShareScreen)
+        foreach (DataForTeacher student in _studentToShareScreen)
         {
             student.SocketToStudent.Send(new Command(CommandType.ApplyMulticastSettings).ToByteArray());
         }
         Thread.Sleep(100);
-        foreach (DataForTeacher student in StudentToShareScreen)
+        foreach (DataForTeacher student in _studentToShareScreen)
         {
             student.SocketToStudent.Send(bytes);
         }
@@ -426,29 +429,29 @@ public partial class Main : Window
     #region Teacher actions
 
     /// <summary>
-    /// Function that shows the trayicon if the application is minimized.
+    /// Function that shows the tray-icon if the application is minimized.
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
     public void TeacherAppResized(object sender, EventArgs e)
     {
-        if (FormWindowState.Minimized == this.WindowState)
+        if (FormWindowState.Minimized == WindowState)
         {
             TrayIconTeacher.Visible = true;
-            this.Hide();
+            Hide();
         }
-        else if (FormWindowState.Normal == this.WindowState) { TrayIconTeacher.Visible = false; }
+        else if (FormWindowState.Normal == WindowState) { TrayIconTeacher.Visible = false; }
     }
 
     /// <summary>
-    /// Function that reopens the application when the trayicon is clicked.
+    /// Function that reopens the application when the tray-icon is clicked.
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
     public void TrayIconTeacherClick(object sender, EventArgs e)
     {
-        this.Show();
-        this.WindowState = FormWindowState.Normal;
+        Show();
+        WindowState = FormWindowState.Normal;
     }
 
     /// <summary>
@@ -458,9 +461,8 @@ public partial class Main : Window
     /// <param name="e"></param>
     public void OnClosing(object sender, FormClosedEventArgs e)
     {
-        for (int i = 0; i < AllStudents.Count; i++)
+        foreach (DataForTeacher student in _allStudents)
         {
-            DataForTeacher student = AllStudents[i];
             try
             {
                 student.SocketToStudent.Send(new Command(CommandType.StopReceiveMulticast).ToByteArray());
@@ -480,8 +482,8 @@ public partial class Main : Window
     /// <param name="e"></param>
     private void Slider_Scroll(object sender, EventArgs e)
     {
-        Displayer.Zoom = Slider.Value / 100.0;
-        Displayer.ChangeZoom();
+        _previewDisplay.Zoom = Slider.Value / 100.0;
+        _previewDisplay.ChangeZoom();
     }
 
     /// <summary>
@@ -492,9 +494,9 @@ public partial class Main : Window
     private void TreeViewDoubleClick(object sender, TreeNodeMouseClickEventArgs e)
     {
         if (e.Node == null) return;
-        foreach (DataForTeacher student in AllStudents)
+        foreach (DataForTeacher student in _allStudents.Where(student => student.Id == Convert.ToInt32(e.Node.Name)))
         {
-            if (student.ID == Convert.ToInt32(e.Node.Name)) { OpenPrivateDisplay(student); return; }
+            OpenPrivateDisplay(student); return;
         }
     }
 
@@ -505,16 +507,13 @@ public partial class Main : Window
     /// <summary>
     /// Fonction that updates all individual displays.
     /// </summary>
-    public void UpdateAllIndividualDisplay()
+    private void UpdateAllIndividualDisplay()
     {
-        foreach (DisplayStudent display in AllStudentsDisplay)
+        foreach (DisplayStudent display in _allStudentsDisplay)
         {
-            foreach (DataForTeacher student in AllStudents)
+            foreach (DataForTeacher student in _allStudents.Where(student => display.GetStudentId() == student.Id))
             {
-                if (display.GetStudentId() == student.ID)
-                {
-                    display.UpdateAffichage(student);
-                }
+                display.UpdateAffichage(student);
             }
         }
     }
@@ -523,14 +522,14 @@ public partial class Main : Window
     /// Function that creates a new individual display.
     /// </summary>
     /// <param name="student">The student for which you want a private display.</param>
-    public void OpenPrivateDisplay(DataForTeacher student)
+    private void OpenPrivateDisplay(DataForTeacher student)
     {
-        foreach (DisplayStudent display in AllStudentsDisplay)
+        if (_allStudentsDisplay.Any(display => display.GetStudentId() == student.Id))
         {
-            if (display.GetStudentId() == student.ID) { return; }
+            return;
         }
-        DisplayStudent newDisplay = new(ipAddr);
-        AllStudentsDisplay.Add(newDisplay);
+        DisplayStudent newDisplay = new(_ipAddr);
+        _allStudentsDisplay.Add(newDisplay);
         newDisplay.UpdateAffichage(student);
         newDisplay.FormClosing += new FormClosingEventHandler(RemovePrivateDisplay);
         newDisplay.Show();
@@ -541,10 +540,10 @@ public partial class Main : Window
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
-    public void RemovePrivateDisplay(object sender, FormClosingEventArgs e)
+    private void RemovePrivateDisplay(object sender, FormClosingEventArgs e)
     {
         DisplayStudent closingDisplay = (DisplayStudent)sender;
-        AllStudentsDisplay.Remove(closingDisplay);
+        _allStudentsDisplay.Remove(closingDisplay);
     }
 
     #endregion
@@ -552,7 +551,7 @@ public partial class Main : Window
     #region Filter
 
     /// <summary>
-    /// Function that enable or disable the filters in the treeviews.
+    /// Function that enable or disable the filters in the tree-views.
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
@@ -561,15 +560,15 @@ public partial class Main : Window
         Configuration.SetFilterEnabled(!Configuration.GetFilterEnabled());
         if (Configuration.GetFilterEnabled())
         {
-            btnFilter.Text = "Désactiver";
-            foreach (DataForTeacher student in AllStudents)
+            BtnFilter.Text = "Désactiver";
+            foreach (DataForTeacher student in _allStudents)
             {
                 UpdateTreeViews(student);
             }
         }
         else
         {
-            btnFilter.Text = "Activer";
+            BtnFilter.Text = "Activer";
             foreach (TreeNode node in TreeViewDetails.Nodes)
             {
                 RemoveFilter(node);
@@ -581,12 +580,12 @@ public partial class Main : Window
     /// Function that removes the background color in all nodes.
     /// </summary>
     /// <param name="node"></param>
-    void RemoveFilter(TreeNode node)
+    private void RemoveFilter(TreeNode node)
     {
         node.BackColor = Color.White;
-        foreach (TreeNode subnode in node.Nodes)
+        foreach (TreeNode subNode in node.Nodes)
         {
-            RemoveFilter(subnode);
+            RemoveFilter(subNode);
         }
     }
 
@@ -614,7 +613,7 @@ public partial class Main : Window
     }
 
     /// <summary>
-    /// Function that opens all treenode in the treeviews.
+    /// Function that opens all tree-node in the tree-views.
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>

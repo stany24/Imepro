@@ -24,6 +24,12 @@
             Name="LbxConnection"></ListBox>
         <Button
             Name="BtnShare"></Button>
+        <TreeView
+            Name="TreeViewSelect"></TreeView>
+        <Button
+            Name="BtnFilter"></Button>
+        <TreeView
+            Name="TreeViewDetails"></TreeView>
     </Grid>
 
 </Window>

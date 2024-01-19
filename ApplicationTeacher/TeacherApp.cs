@@ -47,7 +47,6 @@ namespace ApplicationTeacher
         /// </summary>
         public void StartTasks()
         {
-            while (!IsHandleCreated) { Thread.Sleep(10); }
             Task.Run(AskingData);
             Task.Run(LogClients);
         }
