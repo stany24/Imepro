@@ -1,0 +1,3 @@
+
+ucsharpsquid:S3776"RRefactor this method to reduce its Cognitive Complexity from 19 to the 15 allowed.(®›«ïûÿÿÿÿ
+|csharpsquid:S1450u"ZRemove the field 'isControled' and declare it as a local variable in the relevant methods.(Ä®“õùÿÿÿÿ

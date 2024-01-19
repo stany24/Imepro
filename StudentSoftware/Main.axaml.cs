@@ -1,17 +1,18 @@
 using Avalonia.Controls;
-using System;
+using Avalonia.Threading;
 using LibraryData6;
+using MsBox.Avalonia;
+using MsBox.Avalonia.Enums;
+using System;
+using System.IO;
+using System.Linq;
+using System.Net;
 using System.Net.NetworkInformation;
+using System.Net.Sockets;
 using System.Reflection;
 using System.Text;
 using Avalonia.Media.Imaging;
-using System.IO;
-using System.Net;
-using System.Linq;
-using System.Net.Sockets;
-using MsBox.Avalonia.Enums;
-using MsBox.Avalonia;
-using Avalonia.Threading;
+using ImageMagick;
 
 namespace StudentSoftware;
 
@@ -72,9 +73,9 @@ public partial class Main : Window
     /// <param name="e"></param>
     private void DisplayImage(object ?sender, NewImageEventArgs e)
     {
-        MemoryStream ms = e.image.GetStream();
-        ms.Position = 0;
-        pbxScreenShot.Source = new Bitmap(ms);
+        using MemoryStream memStream = new();
+        e.image.Write(memStream);
+        pbxScreenShot.Source = new Bitmap(memStream);
     }
 
     /// <summary>

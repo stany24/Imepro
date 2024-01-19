@@ -19,28 +19,21 @@ namespace LibraryData
         /// <param name="ignoredProcesses">List of ignored processes.</param>
         public static void UpdateProcess(Dictionary<int, string> processes, TreeNode nodeProcess, TreeView treeProcess, bool filterEnabled, StringCollection alertedProcesses, StringCollection ignoredProcesses)
         {
-
             foreach (string process in processes.Select(process => process.Value))
             {
+                if (ignoredProcesses.Contains(process)) { continue; }
                 TreeNode current;
                 if (nodeProcess != null) { current = nodeProcess.Nodes.Add(process); }
                 else { current = treeProcess.Nodes.Add(process); }
-
-                if (filterEnabled)
+                
+                if (filterEnabled && alertedProcesses.Contains(process))
                 {
-                    if (alertedProcesses.Contains(process))
+                    current.BackColor = Color.Red;
+                    while (current.Parent != null)
                     {
+                        current = current.Parent;
                         current.BackColor = Color.Red;
-                        while (current.Parent != null)
-                        {
-                            current = current.Parent;
-                            current.BackColor = Color.Red;
-                        }
                     }
-                }
-                else
-                {
-                    if (ignoredProcesses.Contains(process)) { current.BackColor = Color.Yellow; }
                 }
             }
         }
@@ -55,23 +48,21 @@ namespace LibraryData
         {
             foreach (KeyValuePair<BrowserName, List<Url>> browser in browsers)
             {
-                if (browser.Value.Count > 0)
+             if (browser.Value.Count <= 0) {continue; }
+                TreeNode Browser;
+                if (nodeBrowser != null)
                 {
-                    TreeNode Browser;
-                    if (nodeBrowser != null)
-                    {
-                        if (!nodeBrowser.Nodes.Find(browser.Key.ToString(), false).Any()) { nodeBrowser.Nodes.Add(browser.Key.ToString(), browser.Key.ToString()); }
-                        Browser = nodeBrowser.Nodes.Find(browser.Key.ToString(), false)[0];
-                    }
-                    else
-                    {
-                        if (!treeBrowser.Nodes.Find(browser.Key.ToString(), false).Any()) { treeBrowser.Nodes.Add(browser.Key.ToString(), browser.Key.ToString()); }
-                        Browser = treeBrowser.Nodes.Find(browser.Key.ToString(), false)[0];
-                    }
-                    for (int i = Browser.Nodes.Count; i < browser.Value.Count; i++)
-                    {
-                        Browser.Nodes.Add(browser.Value[i].ToString());
-                    }
+                    if (!nodeBrowser.Nodes.Find(browser.Key.ToString(), false).Any()) { nodeBrowser.Nodes.Add(browser.Key.ToString(), browser.Key.ToString()); }
+                    Browser = nodeBrowser.Nodes.Find(browser.Key.ToString(), false)[0];
+                }
+                else
+                {
+                    if (!treeBrowser.Nodes.Find(browser.Key.ToString(), false).Any()) { treeBrowser.Nodes.Add(browser.Key.ToString(), browser.Key.ToString()); }
+                    Browser = treeBrowser.Nodes.Find(browser.Key.ToString(), false)[0];
+                }
+                for (int i = Browser.Nodes.Count; i < browser.Value.Count; i++)
+                {
+                    Browser.Nodes.Add(browser.Value[i].ToString());
                 }
             }
         }

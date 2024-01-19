@@ -1,8 +1,9 @@
-﻿using IronSoftware.Drawing;
+﻿
 using System.Net.Sockets;
 using System.Text;
-using System.Windows.Forms;
 using System.Drawing;
+using ClassLibrary6;
+using ImageMagick;
 
 namespace LibraryData6
 {
@@ -61,6 +62,7 @@ namespace LibraryData6
         private int ScreenToShareId { get; set; }
         private int ImageNumber = 0;
         readonly private Socket SocketToSend;
+        private readonly ScreenShotTaker _screenShotTaker = new();
         public bool Sending { get; set; }
 
         #endregion
@@ -83,7 +85,7 @@ namespace LibraryData6
         {
             while (Sending)
             {
-                byte[] ImageBytes = TakeScreenshot();
+                byte[] ImageBytes = _screenShotTaker.TakeScreenShot(ScreenToShareId).ToByteArray();
                 int TotalImagePart = ImageBytes.Count() / DATA_SIZE + 1;
                 for (int i = 0; i * DATA_SIZE < ImageBytes.Count(); i++)
                 {
@@ -102,15 +104,6 @@ namespace LibraryData6
 
                 ImageNumber++;
             }
-        }
-
-        public byte[] TakeScreenshot()
-        {
-            Screen screen = Screen.AllScreens[ScreenToShareId];
-            CropRectangle ScreenSize = screen.Bounds;
-            AnyBitmap bitmap = new(ScreenSize.Width, ScreenSize.Height);
-            Graphics.FromImage(bitmap).CopyFromScreen(ScreenSize.Left, ScreenSize.Top, 0, 0, new System.Drawing.Size(ScreenSize.Width,ScreenSize.Height));
-            return bitmap.ExportBytes();
         }
 
         #endregion
@@ -213,11 +206,7 @@ namespace LibraryData6
         public void ImageCompleted()
         {
             byte[] imageData = ImageBytes.SelectMany(a => a).ToArray();
-            AnyBitmap bmp;
-            using (var ms = new MemoryStream(imageData))
-            {
-                bmp = new AnyBitmap(ms);
-            }
+            MagickImage bmp = new MagickImage(imageData);
             ImageCompletedEvent?.Invoke(this, new ImageCompletedEventArgs(bmp, ImageNumber));
         }
 
@@ -229,14 +218,14 @@ namespace LibraryData6
     /// </summary>
     public class ImageCompletedEventArgs : EventArgs
     {
-        public ImageCompletedEventArgs(AnyBitmap competedimage, int imageId)
+        public ImageCompletedEventArgs(MagickImage competedimage, int imageId)
         {
             CompletedImage = competedimage;
             ImageId = imageId;
         }
 
         public int ImageId { get; set; }
-        public AnyBitmap CompletedImage { get; set; }
+        public MagickImage CompletedImage { get; set; }
     }
 
     /// <summary>
@@ -244,7 +233,7 @@ namespace LibraryData6
     /// </summary>
     public class NewImageEventArgs : EventArgs
     {
-        public AnyBitmap image { get; }
-        public NewImageEventArgs(AnyBitmap newimage) { image = newimage; }
+        public MagickImage image { get; }
+        public NewImageEventArgs(MagickImage newimage) { image = newimage; }
     }
 }

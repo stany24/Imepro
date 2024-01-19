@@ -1,14 +1,12 @@
-﻿using IronSoftware.Drawing;
-using System.Diagnostics;
-using System.Management;
+﻿using System.Diagnostics;
+using System.Drawing;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using System.Windows.Forms;
-using System.Drawing;
-using Point = IronSoftware.Drawing.Point;
+using ClassLibrary6;
+using ImageMagick;
 
 namespace LibraryData6
 {
@@ -29,7 +27,7 @@ namespace LibraryData6
         [JsonInclude]
         public Dictionary<int, string> Processes { get; set; }
         [JsonIgnore]
-        public AnyBitmap ScreenShot { get; set; }
+        public MagickImage ScreenShot { get; set; }
 
         #endregion
 
@@ -88,12 +86,10 @@ namespace LibraryData6
     /// <summary>
     /// Class containing all logic for the student application.
     /// </summary>
-    public class DataForStudent : Data, IMessageFilter
+    public class DataForStudent : Data
     {
         #region Variables/Events
-
         readonly private List<string> DefaultProcess = new();
-        readonly private GlobalKeyboardHook gkh = new();
         readonly private Dictionary<string, BrowserName> browsersList = new() {
             { "chrome",BrowserName.Chrome },
             { "firefox", BrowserName.Firefox },
@@ -102,8 +98,9 @@ namespace LibraryData6
             { "opera", BrowserName.Opera },
             { "msedge",BrowserName.Edge } };
 
+        private readonly ScreenShotTaker _screenShotTaker = new();
         private ReliableMulticastReceiver MulticastReceiver { get; set; }
-        private CropRectangle OldRect = System.Drawing.Rectangle.Empty;
+        private Rectangle OldRect = Rectangle.Empty;
         private StreamOptions options;
         private int screenToStream;
 
@@ -185,31 +182,6 @@ namespace LibraryData6
         }
 
         /// <summary>
-        /// Function to get the parent of a process.
-        /// </summary>
-        /// <param name="process">The process you want to parent.</param>
-        /// <returns>The parent of the given process.</returns>
-        public Process GetParent(Process process)
-        {
-            try
-            {
-                using var query = new ManagementObjectSearcher(
-                  "SELECT * " +
-                  "FROM Win32_Process " +
-                  "WHERE ProcessId=" + process.Id);
-                return query
-                  .Get()
-                  .OfType<ManagementObject>()
-                  .Select(p => Process.GetProcessById((int)(uint)p["ParentProcessId"]))
-                  .FirstOrDefault();
-            }
-            catch
-            {
-                return null;
-            }
-        }
-
-        /// <summary>
         /// Function to get the default processes when launching the application.
         /// </summary>
         private void GetDefaultProcesses()
@@ -228,50 +200,6 @@ namespace LibraryData6
             {
                 if (!DefaultProcess.Contains(process.ProcessName)) { Processes.Add(process.Id, process.ProcessName); }
             }
-        }
-
-        /// <summary>
-        /// Function to get a screenshot of all screen in one image.
-        /// </summary>
-        private AnyBitmap TakeAllScreenShot()
-        {
-            int TotalWidth = 0;
-            int MaxHeight = 0;
-            List<AnyBitmap> images = new();
-            foreach (Screen screen in Screen.AllScreens)
-            {
-                images.Add(TakeSreenShot(screen));
-                TotalWidth += screen.Bounds.Width;
-                if (screen.Bounds.Height > MaxHeight) { MaxHeight = screen.Bounds.Height; }
-            }
-            if (MaxHeight > 0)
-            {
-                AnyBitmap FullImage = new(TotalWidth, MaxHeight);
-                Graphics FullGraphics = Graphics.FromImage(FullImage);
-
-                int offsetLeft = 0;
-                foreach (AnyBitmap image in images)
-                {
-                    FullGraphics.DrawImage(image, new Point(offsetLeft, 0));
-                    offsetLeft += image.Width;
-                }
-                FullGraphics.Dispose();
-                return FullImage;
-            }
-            return null;
-        }
-
-        /// <summary>
-        /// Function to take a screenshot of the given screen.
-        /// </summary>
-        /// <param name="screen">The screen we want the screenshot.</param>
-        /// <returns></returns>
-        private AnyBitmap TakeSreenShot(Screen screen)
-        {
-            AnyBitmap Bitmap = new(screen.Bounds.Width, screen.Bounds.Height);
-            CropRectangle ScreenSize = screen.Bounds;
-            Graphics.FromImage(Bitmap).CopyFromScreen(ScreenSize.Left, ScreenSize.Top, 0, 0, new System.Drawing.Size(ScreenSize.Width,ScreenSize.Height));
-            return Bitmap;
         }
 
         #endregion
@@ -303,11 +231,10 @@ namespace LibraryData6
         /// <summary>
         /// Function to send the screenshot to the teacher.
         /// </summary>
-        private void SendImage(AnyBitmap image, Socket socket)
+        private void SendImage(MagickImage image, Socket socket)
         {
-            MemoryStream ms = image.ToStream();
-            byte[] imagebytes = ms.ToArray();
-            socket.Send(imagebytes, 0, imagebytes.Length, SocketFlags.None);
+            byte[] imageBytes = image.ToByteArray();
+            socket.Send(imageBytes, 0, imageBytes.Length, SocketFlags.None);
         }
 
         #endregion
@@ -403,14 +330,13 @@ namespace LibraryData6
                 switch (command.Type)
                 {
                     case CommandType.DemandData: SendData(); break;
-                    case CommandType.DemandImage: SendImage(TakeAllScreenShot(), SocketToTeacher); break;
+                    case CommandType.DemandImage: SendImage(_screenShotTaker.TakeAllScreenShot(), SocketToTeacher); break;
                     case CommandType.KillProcess: KillSelectedProcess(Convert.ToInt32(command.Args[1])); break;
                     case CommandType.ReceiveMulticast: Task.Run(ReceiveMulticastStream); break;
                     case CommandType.ApplyMulticastSettings: ApplyMulticastSettings(); break;
                     case CommandType.StopReceiveMulticast: Stop(); break;
                     case CommandType.ReceiveMessage: ReceiveMessage(); break;
                     case CommandType.ReceiveAutorisedUrls: ReceiveAuthorisedUrls(); break;
-                    case CommandType.GiveControl: screenToStream = Convert.ToInt32(command.Args[1]); Task.Run(() => SendStream()); break;
                     case CommandType.StopControl: isControled = false; break;
                     case CommandType.DisconnectOfTeacher: Disconnect(); return;
                     case CommandType.StopApplication: ShutDown(); return;
@@ -446,7 +372,6 @@ namespace LibraryData6
         {
             SocketToTeacher.Disconnect(false);
             SocketToTeacher = null;
-            Application.Exit();
         }
 
         /// <summary>
@@ -456,22 +381,7 @@ namespace LibraryData6
         {
             isReceiving = false;
             mouseDisabled = false;
-            ChangePropertyEvent.Invoke(this, new ChangePropertyEventArgs("form", ControlType.Window, "FormBorderStyle", FormBorderStyle.Sizable));
             ChangePropertyEvent.Invoke(this, new ChangePropertyEventArgs("pbxScreenShot", ControlType.Image, "Visible", false));
-            gkh.Unhook();
-        }
-
-        /// <summary>
-        /// Function to send the stream to the teacher.
-        /// </summary>
-        private void SendStream()
-        {
-            isControled = true;
-            Socket SocketControl = ConnectToTeacher(11112);
-            while (isControled)
-            {
-                SendImage(TakeSreenShot(Screen.AllScreens[screenToStream]), SocketControl);
-            }
         }
 
         /// <summary>
@@ -505,7 +415,6 @@ namespace LibraryData6
         /// </summary>
         private void ReceiveMulticastStream()
         {
-            Task.Run(MinimizeUnAutorisedEverySecond);
             Socket SocketMulticast = new(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
             IPEndPoint ipep = new(IPAddress.Any, 45678);
             SocketMulticast.Bind(ipep);
@@ -540,112 +449,17 @@ namespace LibraryData6
             switch (options.GetPriority())
             {
                 case Priority.Fullscreen:
-                    ChangePropertyEvent.Invoke(this, new ChangePropertyEventArgs("form", ControlType.Window, "FormBorderStyle", FormBorderStyle.None));
-                    ChangePropertyEvent.Invoke(this, new ChangePropertyEventArgs("form", ControlType.Window, "WindowState", FormWindowState.Maximized));
                     break;
                 case Priority.Blocking:
-                    ChangePropertyEvent.Invoke(this, new ChangePropertyEventArgs("form", ControlType.Window, "FormBorderStyle", FormBorderStyle.None));
-                    ChangePropertyEvent.Invoke(this, new ChangePropertyEventArgs("form", ControlType.Window, "WindowState", FormWindowState.Maximized));
                     ChangePropertyEvent.Invoke(this, new ChangePropertyEventArgs("form", ControlType.Window, "TopMost", true));
                     mouseDisabled = true;
-                    Task.Run(DisableMouseEverySecond);
-                    DisableKeyboard();
                     break;
                 case Priority.Topmost:
-                    ChangePropertyEvent.Invoke(this, new ChangePropertyEventArgs("form", ControlType.Window, "FormBorderStyle", FormBorderStyle.None));
-                    ChangePropertyEvent.Invoke(this, new ChangePropertyEventArgs("form", ControlType.Window, "WindowState", FormWindowState.Maximized));
                     ChangePropertyEvent.Invoke(this, new ChangePropertyEventArgs("form", ControlType.Window, "TopMost", true));
                     break;
                 case Priority.Widowed:
                     break;
             }
-        }
-
-        #endregion
-
-        #region Blocking user
-
-        /// <summary>
-        /// Function to block all keyboard inputs.
-        /// </summary>
-        private void DisableKeyboard()
-        {
-            gkh.Hook();
-            foreach (Keys key in Enum.GetValues(typeof(Keys)))
-            {
-                gkh.HookedKeys.Add(key);
-            }
-            gkh.KeyDown += new KeyEventHandler(HandleKeyPress);
-            gkh.KeyUp += new KeyEventHandler(HandleKeyPress);
-        }
-
-        /// <summary>
-        /// Function to ignore pressed key.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void HandleKeyPress(object sender, KeyEventArgs e)
-        {
-            e.Handled = true;
-        }
-
-        /// <summary>
-        /// Function to minimized unauthorised application every second.
-        /// </summary>
-        private void MinimizeUnAutorisedEverySecond()
-        {
-            while (isReceiving)
-            {
-                WindowMinimize.MinimizeUnAuthorised(options.GetFocus());
-                Thread.Sleep(3000);
-            }
-            WindowMinimize.ShowBack();
-        }
-
-        /// <summary>
-        /// Function that disables the mouse every second.
-        /// </summary>
-        private void DisableMouseEverySecond()
-        {
-            OldRect = Cursor.Clip;
-            while (mouseDisabled)
-            {
-                DisableMouse();
-                Thread.Sleep(1000);
-            }
-            EnableMouse();
-        }
-
-
-        /// <summary>
-        /// Function to block the mouse.
-        /// </summary>
-        private void DisableMouse()
-        {
-            Cursor.Clip = new CropRectangle(0, 60, 1, 1);
-            Cursor.Hide();
-            Application.AddMessageFilter(this);
-            foreach (var process in Process.GetProcessesByName("Taskmgr"))
-            {
-                process.Kill();
-            }
-        }
-
-        /// <summary>
-        /// Function to enable the mouse.
-        /// </summary>
-        private void EnableMouse()
-        {
-            Cursor.Clip = OldRect;
-            Cursor.Show();
-            Application.RemoveMessageFilter(this);
-        }
-
-        public bool PreFilterMessage(ref Message m)
-        {
-            if (m.Msg == 0x201 || m.Msg == 0x202 || m.Msg == 0x203) return true;
-            if (m.Msg == 0x204 || m.Msg == 0x205 || m.Msg == 0x206) return true;
-            return false;
         }
 
         #endregion
