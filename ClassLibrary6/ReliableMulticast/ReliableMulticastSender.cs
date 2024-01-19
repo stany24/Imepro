@@ -6,7 +6,7 @@ namespace ClassLibrary6.ReliableMulticast;
 /// <summary>
 /// Class used to send UDP multicast messages.
 /// </summary>
-public class ReliableMulticastMessageSender
+public class ReliableMulticastSender
 {
     #region Variables
 
@@ -21,7 +21,7 @@ public class ReliableMulticastMessageSender
 
     #region Constructor
 
-    public ReliableMulticastMessageSender(Socket socket, int screenToShareId)
+    public ReliableMulticastSender(Socket socket, int screenToShareId)
     {
         ScreenToShareId = screenToShareId;
         _socketToSend = socket;

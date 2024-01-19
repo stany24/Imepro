@@ -6,7 +6,7 @@ namespace ClassLibrary6.ReliableMulticast;
 /// <summary>
 /// Class used to receive UDP multicast messages.
 /// </summary>
-public class ReliableMulticastMessageReceiver
+public class ReliableMulticastReceiver
 {
     #region Variables
 
@@ -19,7 +19,7 @@ public class ReliableMulticastMessageReceiver
 
     #region Constructor
 
-    public ReliableMulticastMessageReceiver(Socket socket)
+    public ReliableMulticastReceiver(Socket socket)
     {
         _socketToReceive = socket;
         Receiving = true;

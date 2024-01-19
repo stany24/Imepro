@@ -28,7 +28,7 @@ public class DataForStudent : Data
         { "msedge",BrowserName.Edge } };
 
     private readonly ScreenShotTaker.ScreenShotTaker _screenShotTaker = new();
-    private ReliableMulticastMessageReceiver MulticastReceiver { get; set; }
+    private ReliableMulticastReceiver MulticastReceiver { get; set; }
     private Rectangle OldRect = Rectangle.Empty;
     private StreamOptions.StreamOptions _options;
     private int _screenToStream;
@@ -350,7 +350,7 @@ public class DataForStudent : Data
         IPAddress ip = IPAddress.Parse("232.1.2.3");
         socketMulticast.SetSocketOption(SocketOptionLevel.IP, SocketOptionName.AddMembership, new MulticastOption(ip, IPAddress.Any));
 
-        MulticastReceiver = new ReliableMulticastMessageReceiver(socketMulticast);
+        MulticastReceiver = new ReliableMulticastReceiver(socketMulticast);
         MulticastReceiver.NewImageEvent += DisplayImage;
     }
 
