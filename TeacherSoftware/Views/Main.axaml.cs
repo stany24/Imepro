@@ -15,6 +15,7 @@ using ClassLibrary6.Data;
 using ClassLibrary6.ReliableMulticast;
 using ImageMagick;
 using MsBox.Avalonia;
+using TeacherSoftware.ViewModels;
 
 namespace TeacherSoftware.Views;
 
@@ -266,6 +267,9 @@ public partial class Main : Window
     /// <param name="student">The student that is updated.</param>
     private void UpdateTreeViews(DataForTeacher student)
     {
+        if(DataContext is not MainViewModel model){return;}
+        model.UpdateProcesses(student.Id,student.Processes);
+        model.UpdateBrowsers(student.Id,student.Urls);
         TreeViewDetails.Invoke(new MethodInvoker(delegate
         {
             TreeNode nodeStudent;
@@ -298,18 +302,8 @@ public partial class Main : Window
     /// <param name="student">The student to remove.</param>
     private void RemoveStudent(DataForTeacher student)
     {
-        _allStudents.Remove(student);
-        LbxRequests.Items.Add(DateTime.Now.ToString("HH:mm:ss") + " L'élève " + student.UserName + " est déconnecté");
-        TreeViewDetails.Invoke(new MethodInvoker(delegate
-        {
-            TreeNode[] nodes = TreeViewDetails.Nodes.Find(Convert.ToString(student.Id), false);
-            if (nodes.Any()) { nodes[0].Remove(); }
-        }));
-        TreeViewSelect.Invoke(new MethodInvoker(delegate
-        {
-            TreeNode[] nodes = TreeViewSelect.Nodes.Find(Convert.ToString(student.Id), false);
-            if (nodes.Any()) { nodes[0].Remove(); }
-        }));
+        if(DataContext is not MainViewModel model) {return;}
+        model.RemoveStudent(student.Id);
     }
 
     #region Previews

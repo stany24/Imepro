@@ -19,7 +19,7 @@ public partial class App : Application
         {
             desktop.MainWindow = new Main
             {
-                DataContext = new MainWindowViewModel(),
+                DataContext = new MainViewModel(),
             };
         }
 
