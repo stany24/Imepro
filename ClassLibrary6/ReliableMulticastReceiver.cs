@@ -11,8 +11,8 @@ public class ReliableMulticastMessageReceiver
     #region Variables
 
     public event EventHandler<NewImageEventArgs> NewImageEvent;
-    readonly private List<ReliableImage> Images = new();
-    readonly Socket SocketToReceive;
+    private readonly List<ReliableImage> _images = new();
+    readonly Socket _socketToReceive;
     public bool Receiving { get; set; }
 
     #endregion
@@ -21,7 +21,7 @@ public class ReliableMulticastMessageReceiver
 
     public ReliableMulticastMessageReceiver(Socket socket)
     {
-        SocketToReceive = socket;
+        _socketToReceive = socket;
         Receiving = true;
         Task.Run(Receive);
     }
@@ -35,7 +35,7 @@ public class ReliableMulticastMessageReceiver
         while (Receiving)
         {
             byte[] message = new byte[65000];
-            int size = SocketToReceive.Receive(message);
+            int size = _socketToReceive.Receive(message);
             Array.Resize(ref message, size);
             ReliableMulticastMessage reliable = new(Encoding.Default.GetString(message));
             AddMessageToImage(reliable);
@@ -44,21 +44,21 @@ public class ReliableMulticastMessageReceiver
 
     private void AddMessageToImage(ReliableMulticastMessage message)
     {
-        foreach (ReliableImage image in Images)
+        foreach (ReliableImage image in _images.Where(image => image.ImageNumber == message.ImageNumber))
         {
-            if (image.ImageNumber == message.ImageNumber) { image.AddData(message.Data, message.PartNumber); return; }
+            image.AddData(message.Data, message.PartNumber); return;
         }
-        ReliableImage NewImage = new(message);
-        NewImage.ImageCompletedEvent += DisplayImage;
-        Images.Add(NewImage);
+        ReliableImage newImage = new(message);
+        newImage.ImageCompletedEvent += DisplayImage;
+        _images.Add(newImage);
     }
 
     private void DisplayImage(object sender, ImageCompletedEventArgs e)
     {
         NewImageEvent.Invoke(sender, new NewImageEventArgs(e.CompletedImage));
-        for (int i = 0; i < Images.Count; i++)
+        for (int i = 0; i < _images.Count; i++)
         {
-            if (Images[i].ImageNumber <= e.ImageId) { Images.Remove(Images[i]); }
+            if (_images[i].ImageNumber <= e.ImageId) { _images.Remove(_images[i]); }
         }
     }
 

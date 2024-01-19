@@ -11,7 +11,7 @@ public class DataForTeacher : Data
 
     public Socket SocketToStudent { get; set; }
     public Socket SocketControl { get; set; }
-    public int ID { get; set; }
+    public int Id { get; set; }
     public int NumberOfFailure { get; set; }
 
     #endregion
@@ -21,7 +21,7 @@ public class DataForTeacher : Data
     public DataForTeacher(Socket socket, int id)
     {
         SocketToStudent = socket;
-        ID = id;
+        Id = id;
     }
 
     public DataForTeacher(Data data)

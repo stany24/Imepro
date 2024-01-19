@@ -184,3 +184,19 @@ _
 /ClassLibrary6/ReliableMulticastMessageSender.cs,f\f\ff7984056f05b6b9aa2bc69bfb81adc3311be28b
 a
 1ClassLibrary6/ReliableMulticastMessageReceiver.cs,0\b\0b574040f43ba7d5e0676adb7d7bfdd42d612d12
+O
+ClassLibrary6/DataForTeacher.cs,e\c\ec6ba8ed9b25b11f0f5d2c7159a9c9f303662bb6
+L
+ClassLibrary6/BrowserName.cs,0\8\084a3a1fbf048e04307946914724699eccbe8b34
+D
+ClassLibrary6/Url.cs,4\8\4879c55bad149595d064bfa42b964ef442e42182
+R
+"ClassLibrary6/NewImageEventArgs.cs,f\9\f92091c30f20b86decc68010a6371d8346264dac
+X
+(ClassLibrary6/ImageCompletedEventArgs.cs,f\c\fc47e5548e8ec707ac8581a751d321902a88ed15
+X
+(ClassLibrary6/ReliableMulticastSender.cs,2\2\22190db34022068d54367b281f4ba32c6df765d6
+Z
+*ClassLibrary6/ReliableMulticastReceiver.cs,d\d\ddc373894d7e2a60f23a4bd7aac0e7f8b9352ed1
+I
+ClassLibrary6/Priority.cs,2\1\2170337b90a4b6d276fb6f894366ad0edd605f79

@@ -36,8 +36,8 @@ namespace ClassLibrary6
 
         public Data()
         {
-            Urls = new();
-            Processes = new();
+            Urls = new History();
+            Processes = new Dictionary<int, string>();
         }
 
         #endregion
@@ -62,10 +62,10 @@ namespace ClassLibrary6
         public string PropertyName { get; }
         public object PropertyValue { get; }
 
-        public ChangePropertyEventArgs(string controlName, ControlType controltype, string propertyName, object propertyValue)
+        public ChangePropertyEventArgs(string controlName, ControlType controlType, string propertyName, object propertyValue)
         {
             ControlName = controlName;
-            ControlType = controltype;
+            ControlType = controlType;
             PropertyName = propertyName;
             PropertyValue = propertyValue;
         }

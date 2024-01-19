@@ -9,9 +9,9 @@ namespace ClassLibrary6;
 public class Url
 {
     [JsonInclude]
-    readonly public DateTime ScreenShotTime;
+    public readonly DateTime ScreenShotTime;
     [JsonInclude]
-    readonly public string Name;
+    public readonly string Name;
 
     public Url(DateTime screenShotTime, string name)
     {

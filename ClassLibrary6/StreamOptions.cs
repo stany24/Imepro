@@ -9,9 +9,9 @@ namespace ClassLibrary6
     public class StreamOptions
     {
         [JsonInclude]
-        readonly public Priority Priority;
+        public readonly Priority Priority;
         [JsonInclude]
-        readonly public List<string> Focus;
+        public readonly List<string> Focus;
         public Priority GetPriority() { return Priority; }
         public List<string> GetFocus() { return Focus; }
         public StreamOptions(Priority priority, List<string> focus)

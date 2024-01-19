@@ -46,6 +46,15 @@
     <Compile Update="CommandType.cs">
       <DependentUpon>Command.cs</DependentUpon>
     </Compile>
+    <Compile Update="ReliableImage.cs">
+      <DependentUpon>ReliableMulticast.cs</DependentUpon>
+    </Compile>
+    <Compile Update="ImageCompletedEventArgs.cs">
+      <DependentUpon>ReliableMulticast.cs</DependentUpon>
+    </Compile>
+    <Compile Update="NewImageEventArgs.cs">
+      <DependentUpon>ReliableMulticast.cs</DependentUpon>
+    </Compile>
   </ItemGroup>
 
 </Project>

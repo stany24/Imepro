@@ -12,22 +12,21 @@ namespace ClassLibrary6
         public List<string> Args { get; set; }
 
         [JsonConstructor]
-        public Command(CommandType type, List<string> args)
+        public Command(CommandType type, List<string>? args)
         {
             Type = type;
-            if (args != null) { Args = args; }
-            else { Args = new List<string>(); }
+            Args = args ?? new List<string>();
         }
         public Command(CommandType type) { Type = type; Args = new List<string>(); }
 
-        public byte[] ToByteArray()
+        public IEnumerable<byte> ToByteArray()
         {
             return Encoding.Default.GetBytes(JsonSerializer.Serialize(this));
         }
         public override string ToString()
         {
             if (Args.Count == 0) { return Type.ToString(); }
-            string str = Type.ToString() + "  Args:";
+            string str = Type + "  Args:";
             Args.ForEach(arg => str += " " + arg);
             return str;
         }

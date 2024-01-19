@@ -26,10 +26,10 @@ namespace ClassLibrary6
 
         public History()
         {
-            AllBrowser = new();
+            AllBrowser = new Dictionary<BrowserName, List<Url>>();
             foreach (BrowserName name in Enum.GetValues(typeof(BrowserName)))
             {
-                AllBrowser.Add(name, new());
+                AllBrowser.Add(name, new List<Url>());
             }
         }
     }

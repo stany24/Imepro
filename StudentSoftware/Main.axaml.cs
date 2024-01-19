@@ -74,7 +74,7 @@ public partial class Main : Window
     private void DisplayImage(object ?sender, NewImageEventArgs e)
     {
         using MemoryStream memStream = new();
-        e.image.Write(memStream);
+        e.Image.Write(memStream);
         pbxScreenShot.Source = new Bitmap(memStream);
     }
 

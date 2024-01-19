@@ -14,8 +14,8 @@ namespace ClassLibrary6;
 public class DataForStudent : Data
 {
     #region Variables/Events
-    readonly private List<string> DefaultProcess = new();
-    readonly private Dictionary<string, BrowserName> browsersList = new() {
+    private readonly List<string> _defaultProcess = new();
+    private readonly Dictionary<string, BrowserName> browsersList = new() {
         { "chrome",BrowserName.Chrome },
         { "firefox", BrowserName.Firefox },
         { "iexplore",BrowserName.IExplorer },
@@ -26,8 +26,8 @@ public class DataForStudent : Data
     private readonly ScreenShotTaker _screenShotTaker = new();
     private ReliableMulticastMessageReceiver MulticastReceiver { get; set; }
     private Rectangle OldRect = Rectangle.Empty;
-    private StreamOptions options;
-    private int screenToStream;
+    private StreamOptions _options;
+    private int _screenToStream;
 
     private bool mouseDisabled = false;
     private bool isReceiving = false;
@@ -38,10 +38,10 @@ public class DataForStudent : Data
     public event EventHandler<NewMessageEventArgs> NewMessageEvent;
     public event EventHandler<NewImageEventArgs> NewImageEvent;
 
-    public Socket SocketToTeacher { get; set; }
+    public Socket SocketToTeacher { get; private set; }
     public IPAddress IpToTeacher { get; set; }
-    public List<string> AutorisedUrls { get; set; }
-    public List<int> SeleniumProcessesID { get; set; }
+    public List<string> AuthorisedUrls { get; set; }
+    public List<int> SeleniumProcessesId { get; set; }
 
     #endregion
 
@@ -50,8 +50,8 @@ public class DataForStudent : Data
     public DataForStudent(IPAddress teacherIp)
     {
         IpToTeacher = teacherIp;
-        AutorisedUrls = new();
-        SeleniumProcessesID = new();
+        AuthorisedUrls = new();
+        SeleniumProcessesId = new();
         GetDefaultProcesses();
         ComputerName = Environment.MachineName;
         UserName = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
@@ -111,7 +111,7 @@ public class DataForStudent : Data
     /// </summary>
     private void GetDefaultProcesses()
     {
-        foreach (Process process in Process.GetProcesses().OrderBy(x => x.ProcessName)) { DefaultProcess.Add(process.ProcessName); }
+        foreach (Process process in Process.GetProcesses().OrderBy(x => x.ProcessName)) { _defaultProcess.Add(process.ProcessName); }
     }
 
     /// <summary>
@@ -121,9 +121,9 @@ public class DataForStudent : Data
     {
         Processes.Clear();
         List<Process> list = Process.GetProcesses().OrderBy(x => x.ProcessName).ToList();
-        foreach (Process process in list)
+        foreach (Process process in list.Where(process => !_defaultProcess.Contains(process.ProcessName)))
         {
-            if (!DefaultProcess.Contains(process.ProcessName)) { Processes.Add(process.Id, process.ProcessName); }
+            Processes.Add(process.Id, process.ProcessName);
         }
     }
 
@@ -140,7 +140,7 @@ public class DataForStudent : Data
         GetUserProcesses();
         //serialization
         string jsonString = JsonSerializer.Serialize(ToData(), new JsonSerializerOptions { IncludeFields = true, });
-        //envoi
+        //sending
         SocketToTeacher.Send(Encoding.ASCII.GetBytes(jsonString), Encoding.ASCII.GetBytes(jsonString).Length, SocketFlags.None);
     }
 
@@ -156,7 +156,7 @@ public class DataForStudent : Data
     /// <summary>
     /// Function to send the screenshot to the teacher.
     /// </summary>
-    private void SendImage(MagickImage image, Socket socket)
+    private static void SendImage(IMagickImage image, Socket socket)
     {
         byte[] imageBytes = image.ToByteArray();
         socket.Send(imageBytes, 0, imageBytes.Length, SocketFlags.None);
@@ -173,7 +173,7 @@ public class DataForStudent : Data
     {
         try
         {
-            int timeout = 2000;
+            const int timeout = 2000;
             // Establish the remote endpoint for the socket. This example uses port 11111 on the local computer.
             IPEndPoint localEndPoint = new(IpToTeacher, port);
 
@@ -183,16 +183,16 @@ public class DataForStudent : Data
                 // Creation TCP/IP Socket using Socket Class Constructor
                 Socket sender = new(localEndPoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
 
-                // Si l'addresse du professeur a changé on adapte le socket
-                if (localEndPoint.Address != IpToTeacher)
+                //If the teacher ip changed we adapt the socket
+                if (localEndPoint.Address.Equals(IpToTeacher))
                 {
                     localEndPoint.Address = IpToTeacher;
-                    sender = new(localEndPoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
+                    sender = new Socket(localEndPoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
                 }
                 try
                 {
                     // Connect Socket to the remote endpoint using method Connect()
-                    var result = sender.BeginConnect(localEndPoint, null, null);
+                    IAsyncResult result = sender.BeginConnect(localEndPoint, null, null);
 
                     bool success = result.AsyncWaitHandle.WaitOne(timeout, true);
                     if (success)
@@ -210,17 +210,17 @@ public class DataForStudent : Data
                 // Manage of Socket's Exceptions
                 catch (ArgumentNullException ane)
                 {
-                    NewConnexionMessageEvent.Invoke(this, new NewMessageEventArgs("ArgumentNullException : " + ane.ToString()));
+                    NewConnexionMessageEvent.Invoke(this, new NewMessageEventArgs("ArgumentNullException : " + ane));
                     Thread.Sleep(1000);
                 }
                 catch (SocketException se)
                 {
-                    NewConnexionMessageEvent.Invoke(this, new NewMessageEventArgs("SocketException : " + se.ToString()));
+                    NewConnexionMessageEvent.Invoke(this, new NewMessageEventArgs("SocketException : " + se));
                     Thread.Sleep(1000);
                 }
                 catch (Exception e)
                 {
-                    NewConnexionMessageEvent.Invoke(this, new NewMessageEventArgs("Unexpected exception : " + e.ToString()));
+                    NewConnexionMessageEvent.Invoke(this, new NewMessageEventArgs("Unexpected exception : " + e));
                     Thread.Sleep(1000);
                 }
             }
@@ -246,10 +246,10 @@ public class DataForStudent : Data
         while (true)
         {
             byte[] info = new byte[128];
-            int lenght;
-            try { lenght = SocketToTeacher.Receive(info); }
+            int length;
+            try { length = SocketToTeacher.Receive(info); }
             catch (SocketException) { return; }
-            Array.Resize(ref info, lenght);
+            Array.Resize(ref info, length);
             Command command = JsonSerializer.Deserialize<Command>(Encoding.Default.GetString(info));
             NewConnexionMessageEvent.Invoke(this, new NewMessageEventArgs(command.ToString()));
             switch (command.Type)
@@ -273,7 +273,7 @@ public class DataForStudent : Data
     /// Function to stop a process.
     /// </summary>
     /// <param name="id">the id of the process</param>
-    private void KillSelectedProcess(int id)
+    private static void KillSelectedProcess(int id)
     {
         Process.GetProcessById(id).Kill();
     }
@@ -314,10 +314,10 @@ public class DataForStudent : Data
     /// </summary>
     private void ReceiveAuthorisedUrls()
     {
-        byte[] bytemessage = new byte[102400];
-        int nbData = SocketToTeacher.Receive(bytemessage);
-        Array.Resize(ref bytemessage, nbData);
-        AutorisedUrls = JsonSerializer.Deserialize<List<string>>(Encoding.Default.GetString(bytemessage));
+        byte[] byteMessage = new byte[102400];
+        int nbData = SocketToTeacher.Receive(byteMessage);
+        Array.Resize(ref byteMessage, nbData);
+        AuthorisedUrls = JsonSerializer.Deserialize<List<string>>(Encoding.Default.GetString(byteMessage));
     }
 
     /// <summary>
@@ -325,10 +325,10 @@ public class DataForStudent : Data
     /// </summary>
     private void ReceiveMessage()
     {
-        byte[] bytemessage = new byte[1024];
-        int nbData = SocketToTeacher.Receive(bytemessage);
-        Array.Resize(ref bytemessage, nbData);
-        NewMessageEvent.Invoke(this, new NewMessageEventArgs(DateTime.Now.ToString("hh:mm ") + Encoding.Default.GetString(bytemessage)));
+        byte[] byteMessage = new byte[1024];
+        int nbData = SocketToTeacher.Receive(byteMessage);
+        Array.Resize(ref byteMessage, nbData);
+        NewMessageEvent.Invoke(this, new NewMessageEventArgs(DateTime.Now.ToString("hh:mm ") + Encoding.Default.GetString(byteMessage)));
     }
 
     #endregion
@@ -340,13 +340,13 @@ public class DataForStudent : Data
     /// </summary>
     private void ReceiveMulticastStream()
     {
-        Socket SocketMulticast = new(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
-        IPEndPoint ipep = new(IPAddress.Any, 45678);
-        SocketMulticast.Bind(ipep);
+        using Socket socketMulticast = new(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+        IPEndPoint ipEndPoint = new(IPAddress.Any, 45678);
+        socketMulticast.Bind(ipEndPoint);
         IPAddress ip = IPAddress.Parse("232.1.2.3");
-        SocketMulticast.SetSocketOption(SocketOptionLevel.IP, SocketOptionName.AddMembership, new MulticastOption(ip, IPAddress.Any));
+        socketMulticast.SetSocketOption(SocketOptionLevel.IP, SocketOptionName.AddMembership, new MulticastOption(ip, IPAddress.Any));
 
-        MulticastReceiver = new ReliableMulticastMessageReceiver(SocketMulticast);
+        MulticastReceiver = new ReliableMulticastMessageReceiver(socketMulticast);
         MulticastReceiver.NewImageEvent += DisplayImage;
     }
 
@@ -355,7 +355,7 @@ public class DataForStudent : Data
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
-    public void DisplayImage(object sender, NewImageEventArgs e)
+    private void DisplayImage(object? sender, NewImageEventArgs e)
     {
         NewImageEvent.Invoke(this, e);
     }
@@ -368,10 +368,10 @@ public class DataForStudent : Data
         byte[] message = new byte[128];
         int size = SocketToTeacher.Receive(message);
         Array.Resize(ref message, size);
-        options = JsonSerializer.Deserialize<StreamOptions>(Encoding.Default.GetString(message));
+        _options = JsonSerializer.Deserialize<StreamOptions>(Encoding.Default.GetString(message));
         ChangePropertyEvent.Invoke(this, new ChangePropertyEventArgs("pbxScreenShot", ControlType.Image, "Visible", true));
 
-        switch (options.GetPriority())
+        switch (_options.GetPriority())
         {
             case Priority.Fullscreen:
                 break;
