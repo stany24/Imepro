@@ -9,12 +9,14 @@ using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using Avalonia;
 using Avalonia.Controls;
 using ClassLibrary6.Command;
 using ClassLibrary6.Data;
 using ClassLibrary6.ReliableMulticast;
 using ImageMagick;
 using MsBox.Avalonia;
+using TeacherSoftware.Logic;
 using TeacherSoftware.ViewModels;
 
 namespace TeacherSoftware.Views;
@@ -22,17 +24,15 @@ namespace TeacherSoftware.Views;
 public partial class Main : Window
 {
     #region Variables
-
-    private readonly PreviewDisplayer _previewDisplay;
     private readonly List<DataForTeacher> _allStudents = new();
     private readonly List<DisplayStudent> _allStudentsDisplay = new();
 
     private List<DataForTeacher> _studentToShareScreen = new();
     private Task _screenSharer;
-    private bool _isSharing = false;
-    private bool _isAsking = false;
-    private int _nextId = 0;
-    private IPAddress _ipAddr = null;
+    private bool _isSharing;
+    private bool _isAsking;
+    private int _nextId;
+    private IPAddress _ipAddr;
     private ReliableMulticastSender _multicastSender;
 
     #endregion
@@ -42,13 +42,12 @@ public partial class Main : Window
     public Main()
     {
         InitializeComponent();
-        _previewDisplay = new(panelPreviews.Width);
         FindIp();
         Task.Run(StartTasks);
     }
 
     /// <summary>
-    /// Function that starts all tasks running in backgrouds.
+    /// Function that starts all tasks running in backgrounds.
     /// </summary>
     private void StartTasks()
     {
@@ -248,7 +247,7 @@ public partial class Main : Window
             student.ScreenShot = new MagickImage(new MemoryStream(imageBuffer));
             LbxRequests.Items.Add(DateTime.Now.ToString("HH:mm:ss") + " Image recue de " + student.UserName);
             student.NumberOfFailure = 0;
-            _previewDisplay.UpdatePreview(student.Id, student.ComputerName, student.ScreenShot);
+            PreviewDisplay.AddOrUpdatePreview(student.Id, student.ComputerName, student.ScreenShot);
         }
         catch
         {
@@ -270,28 +269,6 @@ public partial class Main : Window
         if(DataContext is not MainViewModel model){return;}
         model.UpdateProcesses(student.Id,student.Processes);
         model.UpdateBrowsers(student.Id,student.Urls);
-        TreeViewDetails.Invoke(new MethodInvoker(delegate
-        {
-            TreeNode nodeStudent;
-            try { nodeStudent = TreeViewDetails.Nodes.Find(Convert.ToString(student.Id), false)[0]; }
-            catch { nodeStudent = TreeViewDetails.Nodes.Add(Convert.ToString(student.Id), student.UserName + " : " + student.ComputerName); }
-            TreeNode nodeProcess;
-            try { nodeProcess = nodeStudent.Nodes[0]; }
-            catch { nodeProcess = nodeStudent.Nodes.Add("Processus:"); }
-            TreeNode nodeNavigateurs;
-            try { nodeNavigateurs = nodeStudent.Nodes[1]; }
-            catch { nodeNavigateurs = nodeStudent.Nodes.Add("Navigateurs:"); }
-            nodeProcess.Nodes.Clear();
-            UpdateTreeView.UpdateProcess(student.Processes, nodeProcess, null, Configuration.GetFilterEnabled(), Properties.Settings.Default.AlertedProcesses, Properties.Settings.Default.IgnoredProcesses);
-            UpdateTreeView.UpdateUrls(student.Urls.AllBrowser, nodeNavigateurs, null);
-            UpdateTreeView.ApplyUrlFilter(nodeNavigateurs, Properties.Settings.Default.AlertedUrls);
-        }));
-        TreeViewSelect.Invoke(new MethodInvoker(delegate
-        {
-            TreeNode nodeStudent;
-            try { nodeStudent = TreeViewSelect.Nodes.Find(Convert.ToString(student.Id), false)[0]; }
-            catch { nodeStudent = TreeViewSelect.Nodes.Add(Convert.ToString(student.Id), student.UserName + " : " + student.ComputerName); }
-        }));
     }
 
     #endregion
@@ -327,8 +304,8 @@ public partial class Main : Window
             foreach (Preview mini in _previewDisplay.CustomPreviewList) { if (mini.GetComputerName() == student.ComputerName && mini.StudentId == student.Id) { return; } }
             Preview preview = new(student.ScreenShot, student.ComputerName, student.Id, Properties.Settings.Default.PathToSaveFolder);
             _previewDisplay.AddPreview(preview);
-            panelPreviews.Controls.Add(preview);
-            panelPreviews.Controls.SetChildIndex(preview, 0);
+            GridPreview.Controls.Add(preview);
+            GridPreview.Controls.SetChildIndex(preview, 0);
         }
         else
         {
@@ -343,7 +320,7 @@ public partial class Main : Window
     /// <param name="e"></param>
     private void PanelPreviews_Resize(object sender, EventArgs e)
     {
-        _previewDisplay.UpdateAllLocations(panelPreviews.Width);
+        _previewDisplay.UpdateAllLocations(GridPreview.Width);
     }
 
     #endregion
@@ -429,12 +406,17 @@ public partial class Main : Window
     /// <param name="e"></param>
     public void TeacherAppResized(object sender, EventArgs e)
     {
-        if (FormWindowState.Minimized == WindowState)
+        if(DataContext is not MainViewModel model){return;}
+        switch (WindowState)
         {
-            TrayIconTeacher.Visible = true;
-            Hide();
+            case WindowState.Minimized:
+                model.TrayIconVisible = true;
+                Hide();
+                break;
+            default:
+                model.TrayIconVisible = false;
+                break;
         }
-        else if (FormWindowState.Normal == WindowState) { TrayIconTeacher.Visible = false; }
     }
 
     /// <summary>
@@ -465,8 +447,6 @@ public partial class Main : Window
             catch {/*Student has already closed the application.*/ }
             student.SocketToStudent.Dispose();
         }
-        TrayIconTeacher.Visible = false;
-        TrayIconTeacher.Dispose();
     }
 
     /// <summary>

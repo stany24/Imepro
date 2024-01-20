@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using ClassLibrary6.History;
 
 namespace TeacherSoftware.Logic.Nodes;
@@ -18,18 +19,18 @@ public class StudentNode
         Checked = false;
     }
 
-    public void NewUrl(BrowserName name, Url url)
+    public void UpdateBrowsers(History history)
     {
         Browser ??= new List<BrowserNode>();
-        
-        BrowserNode? browser = Browser.Find(browserNode => browserNode.Name == name);
-        if (browser != null)
+        foreach (KeyValuePair<BrowserName, List<Url>> keyValuePair in history.AllBrowser)
         {
-            browser.AddUrl(url);
-        }
-        else
-        {
-            Browser.Add(new BrowserNode(name,url));
+            BrowserNode? browser = Browser.Find(browser => browser.Name == keyValuePair.Key);
+            if(browser == null){Browser.Add(new BrowserNode(keyValuePair.Key,keyValuePair.Value[0]));}
+            browser = Browser[^1];
+            for (int i = browser.Urls.Count; i < keyValuePair.Value.Count; i++)
+            {
+                browser.Urls.Add(new UrlNode(keyValuePair.Value[i]));
+            }
         }
     }
 

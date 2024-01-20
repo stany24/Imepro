@@ -3,6 +3,7 @@
         xmlns:vm="using:TeacherSoftware.ViewModels"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:logic="clr-namespace:TeacherSoftware.Logic"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="TeacherSoftware.Views.Main"
         x:DataType="vm:MainViewModel"
@@ -30,6 +31,21 @@
             Name="BtnFilter"></Button>
         <TreeView
             Name="TreeViewDetails"></TreeView>
+        <Slider
+            Name="Slider"></Slider>
+        <Grid
+            Name="GridPreview"></Grid>
+        <logic:PreviewDisplay
+            Name="PreviewDisplay"></logic:PreviewDisplay>
+        <TrayIcon.Icons>
+            <TrayIcons>
+                <TrayIcon
+                    IsVisible="{Binding TrayIconVisible}"
+                    Icon="/Assets/avalonia-logo.ico" 
+                    ToolTipText="Avalonia Tray Icon">
+                </TrayIcon>
+            </TrayIcons>
+        </TrayIcon.Icons>
     </Grid>
 
 </Window>

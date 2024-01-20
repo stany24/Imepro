@@ -8,6 +8,7 @@ namespace TeacherSoftware.ViewModels;
 public class MainViewModel : ViewModelBase
 {
     public ObservableCollection<StudentNode> Nodes{ get; }
+    public bool TrayIconVisible { get; set; } = false;
 
     public void RemoveStudent(int id)
     {
@@ -34,7 +35,8 @@ public class MainViewModel : ViewModelBase
         foreach (StudentNode node in Nodes)
         {
             if (node.Id != id) continue;
-            node
+            
+            node.UpdateBrowsers(history);
         }
     }
 }
