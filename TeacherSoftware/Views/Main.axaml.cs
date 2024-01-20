@@ -19,6 +19,7 @@ using MsBox.Avalonia;
 using ReactiveUI;
 using TeacherSoftware.Logic;
 using TeacherSoftware.ViewModels;
+// ReSharper disable StringLiteralTypo
 
 namespace TeacherSoftware.Views;
 
@@ -27,6 +28,7 @@ public partial class Main : ReactiveWindow<MainViewModel>
     #region Variables
     private readonly List<DataForTeacher> _allStudents = new();
     private readonly List<DisplayStudent> _allStudentsDisplay = new();
+    private readonly Properties _properties = new();
 
     private List<DataForTeacher> _studentToShareScreen = new();
     private Task _screenSharer;
@@ -81,9 +83,7 @@ public partial class Main : ReactiveWindow<MainViewModel>
             case 0:
                 MessageBoxManager.GetMessageBoxStandard(
                     "Attention",
-                    "Aucune addresse ip conforme n'a étée trouvée.\r\n" +
-                    "Vérifiez vos connexion aux réseaux.\r\n" +
-                    "L'application va ce fermer.");
+                    "Aucune addresse ip conforme n'a étée trouvée. Vérifiez vos connexion aux réseaux. L'application va ce fermer.");
                 Close();
                 break;
             case 1: _ipAddr = possiblesIp[0]; break;
@@ -92,7 +92,7 @@ public partial class Main : ReactiveWindow<MainViewModel>
                 model.OpenChooseIpCommand.Execute(null);
                 break;
         }
-        LblIp.Text = "IP: " + _ipAddr.ToString();
+        LblIp.Text = "IP: " + _ipAddr;
     }
 
     #endregion
@@ -124,7 +124,7 @@ public partial class Main : ReactiveWindow<MainViewModel>
     }
 
     /// <summary>
-    /// Function that sends the autorised urls to a student.
+    /// Function that sends the authorised urls to a student.
     /// </summary>
     /// <param name="socket"></param>
     private void SendAuthorisedUrl(Socket socket)
@@ -133,7 +133,7 @@ public partial class Main : ReactiveWindow<MainViewModel>
         _isAsking = true;
         socket.Send(new Command(CommandType.ReceiveAutorisedUrls).ToByteArray());
         //serialization
-        string jsonString = JsonSerializer.Serialize(Properties.Settings.Default.AutorisedWebsite);
+        string jsonString = JsonSerializer.Serialize(_properties.AutorisedWebsites);
         //sending
         Thread.Sleep(100);
         socket.Send(Encoding.ASCII.GetBytes(jsonString), Encoding.ASCII.GetBytes(jsonString).Length, SocketFlags.None);
@@ -156,7 +156,7 @@ public partial class Main : ReactiveWindow<MainViewModel>
                 while (_isAsking) { Thread.Sleep(10); }
                 _isAsking = true;
                 DateTime startUpdate = DateTime.Now;
-                DateTime nextUpdate = DateTime.Now.AddSeconds(Properties.Settings.Default.TimeBetweenDemand);
+                DateTime nextUpdate = DateTime.Now.AddSeconds(_properties.TimeBetweenDemand);
                 List<DataForTeacher> clientToRemove = new();
                 UpdateStudents(clientToRemove);
                 foreach (DataForTeacher client in clientToRemove)
@@ -185,8 +185,8 @@ public partial class Main : ReactiveWindow<MainViewModel>
         for (int i = 0; i < _allStudents.Count; i++)
         {
             Socket socket = _allStudents[i].SocketToStudent;
-            socket.ReceiveTimeout = Properties.Settings.Default.DefaultTimeout;
-            socket.SendTimeout = Properties.Settings.Default.DefaultTimeout;
+            socket.ReceiveTimeout = _properties.DefaultTimeout;
+            socket.SendTimeout = _properties.DefaultTimeout;
             try
             {
                 socket.Send(new Command(CommandType.DemandData).ToByteArray());
@@ -219,10 +219,11 @@ public partial class Main : ReactiveWindow<MainViewModel>
             Socket socket = student.SocketToStudent;
             int id = student.Id;
             byte[] dataBuffer = new byte[100000];
-            socket.ReceiveTimeout = Properties.Settings.Default.DefaultTimeout;
+            socket.ReceiveTimeout = _properties.DefaultTimeout;
             int nbData = socket.Receive(dataBuffer);
             Array.Resize(ref dataBuffer, nbData);
-            Data data = JsonSerializer.Deserialize<Data>(Encoding.Default.GetString(dataBuffer));
+            Data? data = JsonSerializer.Deserialize<Data>(Encoding.Default.GetString(dataBuffer));
+            if (data == null) { return student;}
             student = new DataForTeacher(data)
             {
                 SocketToStudent = socket,
@@ -251,7 +252,7 @@ public partial class Main : ReactiveWindow<MainViewModel>
         {
             Socket socket = student.SocketToStudent;
             byte[] imageBuffer = new byte[10485760];
-            socket.ReceiveTimeout = Properties.Settings.Default.DefaultTimeout;
+            socket.ReceiveTimeout = _properties.DefaultTimeout;
             int nbData = socket.Receive(imageBuffer, 0, imageBuffer.Length, SocketFlags.None);
             Array.Resize(ref imageBuffer, nbData);
             student.ScreenShot = new MagickImage(new MemoryStream(imageBuffer));
@@ -284,7 +285,7 @@ public partial class Main : ReactiveWindow<MainViewModel>
     #endregion
 
     /// <summary>
-    /// Function that applys the filters in the tree-view.
+    /// Function that apply the filters in the tree-view.
     /// </summary>
     /// <param name="student">The student to remove.</param>
     private void RemoveStudent(DataForTeacher student)
@@ -298,39 +299,36 @@ public partial class Main : ReactiveWindow<MainViewModel>
     /// <summary>
     /// Function that creates or remove the screenshots when a checkbox is clicked.
     /// </summary>
-    /// <param name="sender"></param>
     /// <param name="e"></param>
-    private void TreeNodeChecked(object sender, TreeViewEventArgs e)
+    private void TreeNodeChecked(TreeViewEventArgs e)
     {
         if (e.Node == null) { return; }
         if (e.Node.Checked)
         {
-            DataForTeacher student = null;
-            foreach (DataForTeacher students in _allStudents)
+            DataForTeacher? student = null;
+            foreach (DataForTeacher students in _allStudents.Where(students => Convert.ToString(students.Id) == e.Node.Name))
             {
-                if (Convert.ToString(students.Id) == e.Node.Name) { student = students; }
+                student = students;
             }
             if (student == null) { return; }
-            foreach (Preview mini in _previewDisplay.CustomPreviewList) { if (mini.GetComputerName() == student.ComputerName && mini.StudentId == student.Id) { return; } }
-            Preview preview = new(student.ScreenShot, student.ComputerName, student.Id, Properties.Settings.Default.PathToSaveFolder);
-            _previewDisplay.AddPreview(preview);
+            foreach (Preview mini in PreviewDisplay.CustomPreviewList) { if (mini.GetComputerName() == student.ComputerName && mini.StudentId == student.Id) { return; } }
+            Preview preview = new(student.ScreenShot, student.ComputerName, student.Id, _properties.PathToSaveFolder);
+            PreviewDisplay.AddPreview(preview);
             GridPreview.Controls.Add(preview);
             GridPreview.Controls.SetChildIndex(preview, 0);
         }
         else
         {
-            _previewDisplay.RemovePreview(Convert.ToInt32(e.Node.Name));
+            PreviewDisplay.RemovePreview(Convert.ToInt32(e.Node.Name));
         }
     }
 
     /// <summary>
     /// Function that updates all previews when the panel is resized.
     /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="e"></param>
-    private void PanelPreviews_Resize(object sender, EventArgs e)
+    private void PanelPreviews_Resize()
     {
-        _previewDisplay.UpdateAllLocations(GridPreview.Width);
+        PreviewDisplay.UpdateAllLocations(GridPreview.Width);
     }
 
     #endregion
@@ -352,15 +350,13 @@ public partial class Main : ReactiveWindow<MainViewModel>
         IPEndPoint ipEndPoint = new(ip, 45678);
         s.Connect(ipEndPoint);
         Thread.Sleep(1000);
-        _multicastSender = new ReliableMulticastSender(s, Properties.Settings.Default.ScreenToShareId);
+        _multicastSender = new ReliableMulticastSender(s, _properties.ScreenToShareId);
     }
 
     /// <summary>
     /// Function starts or stops the stream.
     /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="e"></param>
-    private void ShareScreen(object sender, EventArgs e)
+    private void ShareScreen()
     {
         if (!_isSharing)
         {
@@ -393,7 +389,7 @@ public partial class Main : ReactiveWindow<MainViewModel>
     /// </summary>
     private void SendStreamConfiguration()
     {
-        byte[] bytes = Encoding.Default.GetBytes(JsonSerializer.Serialize(Configuration.GetStreamOptions()));
+        byte[] bytes = Encoding.Default.GetBytes(JsonSerializer.Serialize(_properties.GetStreamOptions()));
         foreach (DataForTeacher student in _studentToShareScreen)
         {
             student.SocketToStudent.Send(new Command(CommandType.ApplyMulticastSettings).ToByteArray());
@@ -412,9 +408,7 @@ public partial class Main : ReactiveWindow<MainViewModel>
     /// <summary>
     /// Function that shows the tray-icon if the application is minimized.
     /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="e"></param>
-    public void TeacherAppResized(object sender, EventArgs e)
+    public void TeacherAppResized()
     {
         if(DataContext is not MainViewModel model){return;}
         switch (WindowState)
@@ -432,9 +426,7 @@ public partial class Main : ReactiveWindow<MainViewModel>
     /// <summary>
     /// Function that reopens the application when the tray-icon is clicked.
     /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="e"></param>
-    public void TrayIconTeacherClick(object sender, EventArgs e)
+    public void TrayIconTeacherClick()
     {
         Show();
         WindowState = WindowState.Normal;
@@ -443,9 +435,7 @@ public partial class Main : ReactiveWindow<MainViewModel>
     /// <summary>
     /// Function that signal to the student the closure of the teacher application.
     /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="e"></param>
-    public void OnClosing(object sender, FormClosedEventArgs e)
+    public void OnClosing()
     {
         foreach (DataForTeacher student in _allStudents)
         {
@@ -462,20 +452,16 @@ public partial class Main : ReactiveWindow<MainViewModel>
     /// <summary>
     /// Function that resizes the screenshot when the slider is moved.
     /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="e"></param>
-    private void Slider_Scroll(object sender, EventArgs e)
+    private void Slider_Scroll()
     {
-        _previewDisplay.Zoom = Slider.Value / 100.0;
-        _previewDisplay.ChangeZoom();
+        PreviewDisplay.Zoom = Slider.Value / 100.0;
+        PreviewDisplay.ChangeZoom();
     }
 
     /// <summary>
     /// Function that verifies the node click before opening a new display.
     /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="e"></param>
-    private void TreeViewDoubleClick(object sender, TreeNodeMouseClickEventArgs e)
+    private void TreeViewDoubleClick(TreeNodeMouseClickEventArgs e)
     {
         if (e.Node == null) return;
         foreach (DataForTeacher student in _allStudents.Where(student => student.Id == Convert.ToInt32(e.Node.Name)))
@@ -523,8 +509,7 @@ public partial class Main : ReactiveWindow<MainViewModel>
     /// Function that removes the individual display when it is closed.
     /// </summary>
     /// <param name="sender"></param>
-    /// <param name="e"></param>
-    private void RemovePrivateDisplay(object sender, FormClosingEventArgs e)
+    private void RemovePrivateDisplay(object sender)
     {
         DisplayStudent closingDisplay = (DisplayStudent)sender;
         _allStudentsDisplay.Remove(closingDisplay);
@@ -537,14 +522,12 @@ public partial class Main : ReactiveWindow<MainViewModel>
     /// <summary>
     /// Function that enable or disable the filters in the tree-views.
     /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="e"></param>
-    private void ButtonFilter_Click(object sender, EventArgs e)
+    private void ButtonFilter_Click()
     {
-        Configuration.SetFilterEnabled(!Configuration.GetFilterEnabled());
-        if (Configuration.GetFilterEnabled())
+        _properties.SetFilterEnabled(!_properties.GetFilterEnabled());
+        if (_properties.GetFilterEnabled())
         {
-            BtnFilter.Text = "Désactiver";
+            BtnFilter.Content= "Désactiver";
             foreach (DataForTeacher student in _allStudents)
             {
                 UpdateTreeViews(student);
@@ -552,7 +535,7 @@ public partial class Main : ReactiveWindow<MainViewModel>
         }
         else
         {
-            BtnFilter.Text = "Activer";
+            BtnFilter.Content= "Activer";
             foreach (TreeNode node in TreeViewDetails.Nodes)
             {
                 RemoveFilter(node);
@@ -578,11 +561,9 @@ public partial class Main : ReactiveWindow<MainViewModel>
     #region TreeView display
 
     /// <summary>
-    /// Function that closes all treenode in the treeviews.
+    /// Function that closes all tree-node in the tree-views.
     /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="e"></param>
-    private void HideTreeView_Click(object sender, EventArgs e)
+    private void HideTreeView_Click()
     {
         TreeNodeCollection nodes = TreeViewDetails.Nodes;
         foreach (TreeNode node in nodes)
@@ -599,9 +580,7 @@ public partial class Main : ReactiveWindow<MainViewModel>
     /// <summary>
     /// Function that opens all tree-node in the tree-views.
     /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="e"></param>
-    private void ShowTreeView_Click(object sender, EventArgs e)
+    private void ShowTreeView_Click()
     {
         TreeNodeCollection nodes = TreeViewDetails.Nodes;
         foreach (TreeNode node in nodes)
@@ -620,9 +599,7 @@ public partial class Main : ReactiveWindow<MainViewModel>
     /// <summary>
     /// Function that open the configuration window.
     /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="e"></param>
-    private void OpenConfigWindow_Click(object sender, EventArgs e)
+    private void OpenConfigWindow_Click()
     {
         ConfigurationWindow configWindow = new();
         configWindow.Show();
