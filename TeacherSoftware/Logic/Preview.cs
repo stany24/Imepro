@@ -1,5 +1,4 @@
 using System;
-using System.Diagnostics;
 using System.IO;
 using Avalonia.Controls;
 using Avalonia.Media;

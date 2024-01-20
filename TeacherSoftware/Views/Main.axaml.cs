@@ -72,7 +72,7 @@ public partial class Main : Window
                     "Aucune addresse ip conforme n'a étée trouvée.\r\n" +
                     "Vérifiez vos connexion aux réseaux.\r\n" +
                     "L'application va ce fermer.");
-                Application.Exit();
+                Close();
                 break;
             case 1: _ipAddr = possiblesIp[0]; break;
             default:
