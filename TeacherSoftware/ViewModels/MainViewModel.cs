@@ -1,6 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Reactive.Linq;
+using System.Windows.Input;
 using ClassLibrary6.History;
+using ReactiveUI;
 using TeacherSoftware.Logic.Nodes;
 
 namespace TeacherSoftware.ViewModels;
@@ -9,6 +12,23 @@ public class MainViewModel : ViewModelBase
 {
     public ObservableCollection<StudentNode> Nodes{ get; }
     public bool TrayIconVisible { get; set; } = false;
+    
+    public MainViewModel()
+    {
+        ShowDialog = new Interaction<ChooseIpViewModel, ChooseIpReturnViewModel?>();
+
+        OpenChooseIpCommand = ReactiveCommand.CreateFromTask(async () =>
+        {
+            ChooseIpViewModel store = new();
+
+            ChooseIpReturnViewModel? result = await ShowDialog.Handle(store);
+        });
+    }
+
+    public ICommand OpenChooseIpCommand { get; }
+
+    public Interaction<ChooseIpViewModel, ChooseIpReturnViewModel?> ShowDialog { get; }
+    
 
     public void RemoveStudent(int id)
     {

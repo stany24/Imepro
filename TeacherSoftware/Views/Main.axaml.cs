@@ -9,19 +9,20 @@ using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using Avalonia;
 using Avalonia.Controls;
+using Avalonia.ReactiveUI;
 using ClassLibrary6.Command;
 using ClassLibrary6.Data;
 using ClassLibrary6.ReliableMulticast;
 using ImageMagick;
 using MsBox.Avalonia;
+using ReactiveUI;
 using TeacherSoftware.Logic;
 using TeacherSoftware.ViewModels;
 
 namespace TeacherSoftware.Views;
 
-public partial class Main : Window
+public partial class Main : ReactiveWindow<MainViewModel>
 {
     #region Variables
     private readonly List<DataForTeacher> _allStudents = new();
@@ -42,8 +43,19 @@ public partial class Main : Window
     public Main()
     {
         InitializeComponent();
+        this.WhenActivated(action => action(ViewModel!.ShowDialog.RegisterHandler(ShowChooseIpDialog)));
         FindIp();
         Task.Run(StartTasks);
+    }
+    
+    private async Task ShowChooseIpDialog(InteractionContext<ChooseIpViewModel, ChooseIpReturnViewModel?> interaction)
+    {
+        ChooseIp dialog = new()
+        {
+            DataContext = interaction.Input
+        };
+        ChooseIpReturnViewModel? result = await dialog.ShowDialog<ChooseIpReturnViewModel?>(this);
+        interaction.SetOutput(result);
     }
 
     /// <summary>
@@ -76,10 +88,8 @@ public partial class Main : Window
                 break;
             case 1: _ipAddr = possiblesIp[0]; break;
             default:
-                ChooseIp prompt = new(possiblesIp);
-                if (prompt.ShowDialog(this) == DialogResult.OK) { _ipAddr = prompt.GetChoosenIp(); }
-                else { _ipAddr = possiblesIp[0]; }
-                prompt.Dispose();
+                if(DataContext is not MainViewModel model){return;}
+                model.OpenChooseIpCommand.Execute(null);
                 break;
         }
         LblIp.Text = "IP: " + _ipAddr.ToString();
@@ -427,7 +437,7 @@ public partial class Main : Window
     public void TrayIconTeacherClick(object sender, EventArgs e)
     {
         Show();
-        WindowState = FormWindowState.Normal;
+        WindowState = WindowState.Normal;
     }
 
     /// <summary>
@@ -479,7 +489,7 @@ public partial class Main : Window
     #region Individual display
 
     /// <summary>
-    /// Fonction that updates all individual displays.
+    /// Function that updates all individual displays.
     /// </summary>
     private void UpdateAllIndividualDisplay()
     {
