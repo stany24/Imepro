@@ -19,6 +19,7 @@ using ImageMagick;
 using MsBox.Avalonia;
 using ReactiveUI;
 using TeacherSoftware.Logic;
+using TeacherSoftware.Logic.Nodes;
 using TeacherSoftware.ViewModels;
 // ReSharper disable StringLiteralTypo
 
@@ -50,7 +51,7 @@ public partial class Main : ReactiveWindow<MainViewModel>
         this.WhenActivated(action => action(ViewModel!.ShowDialog.RegisterHandler(ShowChooseIpDialog)));
         FindIp();
         Task.Run(StartTasks);
-        Slider.ValueChanged += (_,e) => Slider_Scroll(e);
+        Slider.ValueChanged += (_,e) => PreviewDisplay.Zoom = (int)e.NewValue;
         BtnFilter.Click += (_,_) => ButtonFilter_Click();
         BtnShare.Click += (_,_) => ShareScreen();
         BtnHideTreeView.Click += (_, _) => HideTreeView();
@@ -332,14 +333,6 @@ public partial class Main : ReactiveWindow<MainViewModel>
         }
     }
 
-    /// <summary>
-    /// Function that updates all previews when the panel is resized.
-    /// </summary>
-    private void PanelPreviews_Resize()
-    {
-        PreviewDisplay.UpdateAllLocations(GridPreview.Width);
-    }
-
     #endregion
 
     #region Stream
@@ -460,15 +453,6 @@ public partial class Main : ReactiveWindow<MainViewModel>
     }
 
     /// <summary>
-    /// Function that resizes the screenshot when the slider is moved.
-    /// </summary>
-    private void Slider_Scroll(RangeBaseValueChangedEventArgs rangeBaseValueChangedEventArgs)
-    {
-        PreviewDisplay.Zoom = (int)rangeBaseValueChangedEventArgs.NewValue;
-        PreviewDisplay.ChangeZoom();
-    }
-
-    /// <summary>
     /// Function that verifies the node click before opening a new display.
     /// </summary>
     private void TreeViewDoubleClick(TreeNodeMouseClickEventArgs e)
@@ -493,7 +477,7 @@ public partial class Main : ReactiveWindow<MainViewModel>
         {
             foreach (DataForTeacher student in _allStudents.Where(student => display.GetStudentId() == student.Id))
             {
-                display.UpdateAffichage(student);
+                display.UpdateDisplay(student);
             }
         }
     }
@@ -508,10 +492,10 @@ public partial class Main : ReactiveWindow<MainViewModel>
         {
             return;
         }
-        DisplayStudent newDisplay = new(_ipAddr);
+        DisplayStudent newDisplay = new(student.Id);
         _allStudentsDisplay.Add(newDisplay);
-        newDisplay.UpdateAffichage(student);
-        newDisplay.FormClosing += new FormClosingEventHandler(RemovePrivateDisplay);
+        newDisplay.UpdateDisplay(student);
+        newDisplay.Closing += (sender,_) =>RemovePrivateDisplay(sender);
         newDisplay.Show();
     }
 
@@ -519,8 +503,9 @@ public partial class Main : ReactiveWindow<MainViewModel>
     /// Function that removes the individual display when it is closed.
     /// </summary>
     /// <param name="sender"></param>
-    private void RemovePrivateDisplay(object sender)
+    private void RemovePrivateDisplay(object? sender)
     {
+        if(sender == null){return;}
         DisplayStudent closingDisplay = (DisplayStudent)sender;
         _allStudentsDisplay.Remove(closingDisplay);
     }
@@ -534,36 +519,14 @@ public partial class Main : ReactiveWindow<MainViewModel>
     /// </summary>
     private void ButtonFilter_Click()
     {
-        _properties.SetFilterEnabled(!_properties.GetFilterEnabled());
-        if (_properties.GetFilterEnabled())
+        _properties.FilterEnabled = !_properties.FilterEnabled;
+        foreach (StudentNode? studentNode in TreeViewStudents.Items.Cast<StudentNode>())
         {
-            BtnFilter.Content= "Désactiver";
-            foreach (DataForTeacher student in _allStudents)
-            {
-                UpdateTreeViews(student);
-            }
-        }
-        else
-        {
-            BtnFilter.Content= "Activer";
-            foreach (TreeNode node in TreeViewDetails.Nodes)
-            {
-                RemoveFilter(node);
-            }
-        }
-    }
+            if(studentNode == null){return;}
 
-    /// <summary>
-    /// Function that removes the background color in all nodes.
-    /// </summary>
-    /// <param name="node"></param>
-    private void RemoveFilter(TreeNode node)
-    {
-        node.BackColor = Color.White;
-        foreach (TreeNode subNode in node.Nodes)
-        {
-            RemoveFilter(subNode);
+            studentNode.ApplyFilter(_properties.FilterEnabled);
         }
+        BtnFilter.Content = _properties.FilterEnabled ? "Désactiver" : "Activer";
     }
 
     #endregion

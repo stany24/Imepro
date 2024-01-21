@@ -22,9 +22,13 @@ public class PreviewDisplay:RelativePanel
                 > 100 => 100,
                 _ => value
             };
-            UpdateZoom();
+            UpdatePreviewLocationAndSize();
         }
-        
+    }
+
+    public PreviewDisplay()
+    {
+        SizeChanged += (_,_) => UpdatePreviewLocationAndSize();
     }
 
     public void AddOrUpdatePreview(int id,string name,MagickImage image)
@@ -50,7 +54,7 @@ public class PreviewDisplay:RelativePanel
         _previews.Remove(preview);
     }
 
-    private void UpdateZoom()
+    private void UpdatePreviewLocationAndSize()
     {
         
     }

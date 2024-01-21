@@ -34,6 +34,11 @@ public class StudentNode
         }
     }
 
+    public void ApplyFilter(bool enabled)
+    {
+        
+    }
+
     public void UpdateProcesses(Dictionary<int, string> processes)
     {
         Processes ??= new ProcessesNode();
