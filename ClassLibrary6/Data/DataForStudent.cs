@@ -375,7 +375,7 @@ public class DataForStudent : Data
         _options = JsonSerializer.Deserialize<StreamOptions.StreamOptions>(Encoding.Default.GetString(message));
         ChangePropertyEvent.Invoke(this, new ChangePropertyEventArgs("pbxScreenShot", ControlType.Image, "Visible", true));
 
-        switch (_options.GetPriority())
+        switch (_options.Priority)
         {
             case Priority.Fullscreen:
                 break;

@@ -29,6 +29,7 @@ public partial class Main : ReactiveWindow<MainViewModel>
     private readonly List<DataForTeacher> _allStudents = new();
     private readonly List<DisplayStudent> _allStudentsDisplay = new();
     private readonly Properties _properties = new();
+    private bool _running = true;
 
     private List<DataForTeacher> _studentToShareScreen = new();
     private Task _screenSharer;
@@ -108,7 +109,7 @@ public partial class Main : ReactiveWindow<MainViewModel>
         Socket listener = new(_ipAddr.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
         listener.Bind(localEndPoint);
         listener.Listen(-1);
-        while (true)
+        while (_running)
         {
             try
             {
@@ -149,7 +150,7 @@ public partial class Main : ReactiveWindow<MainViewModel>
     /// </summary>
     private void AskingData()
     {
-        while (true)
+        while (_running)
         {
             if (_allStudents.Count != 0)
             {
@@ -389,7 +390,7 @@ public partial class Main : ReactiveWindow<MainViewModel>
     /// </summary>
     private void SendStreamConfiguration()
     {
-        byte[] bytes = Encoding.Default.GetBytes(JsonSerializer.Serialize(_properties.GetStreamOptions()));
+        byte[] bytes = Encoding.Default.GetBytes(JsonSerializer.Serialize(_properties.Options));
         foreach (DataForTeacher student in _studentToShareScreen)
         {
             student.SocketToStudent.Send(new Command(CommandType.ApplyMulticastSettings).ToByteArray());
@@ -437,6 +438,7 @@ public partial class Main : ReactiveWindow<MainViewModel>
     /// </summary>
     public void OnClosing()
     {
+        _running = false;
         foreach (DataForTeacher student in _allStudents)
         {
             try
