@@ -12,7 +12,7 @@ public class ProcessesNode
         //removing old processes
         for (int i = 0; i < Processes.Count; i++)
         {
-            bool exists = processes.Keys.Contains<>(Processes[i]);
+            bool exists = processes.ContainsKey(Processes[i].Id);
             if (exists) continue;
             Processes.RemoveAt(i);
             i--;

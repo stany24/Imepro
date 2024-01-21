@@ -59,15 +59,6 @@
             Grid.RowSpan="3">
             
         </logic:PreviewDisplay>
-        <TrayIcon.Icons>
-            <TrayIcons>
-                <TrayIcon
-                    IsVisible="{Binding TrayIconVisible}"
-                    Icon="/Assets/avalonia-logo.ico" 
-                    ToolTipText="Avalonia Tray Icon">
-                </TrayIcon>
-            </TrayIcons>
-        </TrayIcon.Icons>
     </Grid>
 
 </Window>

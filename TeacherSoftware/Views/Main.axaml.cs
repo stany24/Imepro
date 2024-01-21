@@ -45,8 +45,9 @@ public partial class Main : ReactiveWindow<MainViewModel>
 
     #region At start
 
-    public Main()
+    public Main(MainViewModel model)
     {
+        DataContext = model;
         InitializeComponent();
         this.WhenActivated(action => action(ViewModel!.ShowDialog.RegisterHandler(ShowChooseIpDialog)));
         FindIp();
@@ -54,8 +55,8 @@ public partial class Main : ReactiveWindow<MainViewModel>
         Slider.ValueChanged += (_,e) => PreviewDisplay.Zoom = (int)e.NewValue;
         BtnFilter.Click += (_,_) => ButtonFilter_Click();
         BtnShare.Click += (_,_) => ShareScreen();
-        BtnHideTreeView.Click += (_, _) => HideTreeView();
-        BtnShowTreeView.Click += (_, _) => ShowTreeView();
+        BtnHideTreeView.Click += (_, _) => CloseAllTreeViewNodes();
+        BtnShowTreeView.Click += (_, _) => OpenAllTreeViewNodes();
         BtnOpenConfiguration.Click += (_, _) => OpenConfiguration();
         Closing += (_, _) => OnClosing();
     }
@@ -309,28 +310,8 @@ public partial class Main : ReactiveWindow<MainViewModel>
     /// <summary>
     /// Function that creates or remove the screenshots when a checkbox is clicked.
     /// </summary>
-    /// <param name="e"></param>
-    private void TreeNodeChecked(TreeViewEventArgs e)
-    {
-        if (e.Node == null) { return; }
-        if (e.Node.Checked)
-        {
-            DataForTeacher? student = null;
-            foreach (DataForTeacher students in _allStudents.Where(students => Convert.ToString(students.Id) == e.Node.Name))
-            {
-                student = students;
-            }
-            if (student == null) { return; }
-            foreach (Preview mini in PreviewDisplay.CustomPreviewList) { if (mini.GetComputerName() == student.ComputerName && mini.StudentId == student.Id) { return; } }
-            Preview preview = new(student.ScreenShot, student.ComputerName, student.Id, _properties.PathToSaveFolder);
-            PreviewDisplay.AddPreview(preview);
-            GridPreview.Controls.Add(preview);
-            GridPreview.Controls.SetChildIndex(preview, 0);
-        }
-        else
-        {
-            PreviewDisplay.RemovePreview(Convert.ToInt32(e.Node.Name));
-        }
+    private void ShowHidePreview()
+    { 
     }
 
     #endregion
@@ -363,8 +344,7 @@ public partial class Main : ReactiveWindow<MainViewModel>
         if (!_isSharing)
         {
             ChooseStreamOptions prompt = new(_allStudents);
-            if (prompt.ShowDialog(this) != DialogResult.OK) { return; }
-            _studentToShareScreen = prompt.GetStudentToShare();
+            prompt.Show();
             if (_studentToShareScreen.Count == 0) { return; }
             _isSharing = true;
             SendStreamConfiguration();
@@ -455,13 +435,8 @@ public partial class Main : ReactiveWindow<MainViewModel>
     /// <summary>
     /// Function that verifies the node click before opening a new display.
     /// </summary>
-    private void TreeViewDoubleClick(TreeNodeMouseClickEventArgs e)
+    private void OpenPrivateDisplay()
     {
-        if (e.Node == null) return;
-        foreach (DataForTeacher student in _allStudents.Where(student => student.Id == Convert.ToInt32(e.Node.Name)))
-        {
-            OpenPrivateDisplay(student); return;
-        }
     }
 
     #endregion
@@ -536,35 +511,17 @@ public partial class Main : ReactiveWindow<MainViewModel>
     /// <summary>
     /// Function that closes all tree-node in the tree-views.
     /// </summary>
-    private void HideTreeView()
+    private void CloseAllTreeViewNodes()
     {
-        TreeNodeCollection nodes = TreeViewDetails.Nodes;
-        foreach (TreeNode node in nodes)
-        {
-            node.Collapse(false);
-        }
-        nodes = TreeViewSelect.Nodes;
-        foreach (TreeNode node in nodes)
-        {
-            node.Collapse(false);
-        }
+        
     }
 
     /// <summary>
     /// Function that opens all tree-node in the tree-views.
     /// </summary>
-    private void ShowTreeView()
+    private void OpenAllTreeViewNodes()
     {
-        TreeNodeCollection nodes = TreeViewDetails.Nodes;
-        foreach (TreeNode node in nodes)
-        {
-            node.ExpandAll();
-        }
-        nodes = TreeViewSelect.Nodes;
-        foreach (TreeNode node in nodes)
-        {
-            node.ExpandAll();
-        }
+        
     }
 
     #endregion

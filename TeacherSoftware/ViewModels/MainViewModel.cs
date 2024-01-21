@@ -20,7 +20,6 @@ public class MainViewModel : ViewModelBase
         OpenChooseIpCommand = ReactiveCommand.CreateFromTask(async () =>
         {
             ChooseIpViewModel store = new();
-
             ChooseIpReturnViewModel? result = await ShowDialog.Handle(store);
         });
     }
