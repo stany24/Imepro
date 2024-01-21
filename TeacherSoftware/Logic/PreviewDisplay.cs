@@ -9,6 +9,23 @@ namespace TeacherSoftware.Logic;
 public class PreviewDisplay:RelativePanel
 {
     private readonly List<Preview> _previews = new();
+    private int _zoom;
+
+    public int Zoom
+    {
+        get => _zoom;
+        set
+        {
+            _zoom = value switch
+            {
+                < 0 => 0,
+                > 100 => 100,
+                _ => value
+            };
+            UpdateZoom();
+        }
+        
+    }
 
     public void AddOrUpdatePreview(int id,string name,MagickImage image)
     {
@@ -31,5 +48,10 @@ public class PreviewDisplay:RelativePanel
         Preview? preview = _previews.Find(prev => prev.Id == id);
         if(preview == null){return;}
         _previews.Remove(preview);
+    }
+
+    private void UpdateZoom()
+    {
+        
     }
 }

@@ -16,27 +16,49 @@
         <vm:MainViewModel/>
     </Design.DataContext>
 
-    <Grid>
-        <TextBlock
-            Name="LblIp"></TextBlock>
-        <ListBox
-            Name="LbxRequests"></ListBox>
-        <ListBox
-            Name="LbxConnection"></ListBox>
-        <Button
-            Name="BtnShare"></Button>
-        <TreeView
-            Name="TreeViewSelect"></TreeView>
-        <Button
-            Name="BtnFilter"></Button>
-        <TreeView
-            Name="TreeViewDetails"></TreeView>
-        <Slider
-            Name="Slider"></Slider>
+    <Grid
+        Name="MainGrid"
+        Margin="5"
+        RowDefinitions="Auto,5,*,5,Auto"
+        ColumnDefinitions="Auto,5,*">
         <Grid
-            Name="GridPreview"></Grid>
+            Name="SubGrid"
+            Grid.Column="0"
+            Grid.Row="0">
+            <TextBlock
+                Name="LblIp"></TextBlock>
+            <Button
+                Name="BtnShare"></Button>
+            <Button
+                Name="BtnFilter"></Button>
+            <Button
+                Name="BtnShowTreeView"></Button>
+            <Button
+                Name="BtnHideTreeView"></Button>
+            <Button
+                Name="BtnOpenConfiguration"></Button>
+            <Slider
+                Name="Slider"
+                Minimum="1"
+                Maximum="100"
+                Value="30"></Slider>
+        </Grid>
+        <ListBox
+            Name="LbxInfo"
+            Grid.Column="0"
+            Grid.Row="4"
+            Grid.ColumnSpan="3"></ListBox>
+        <TreeView
+            Name="TreeViewStudents"
+            Grid.Column="0"
+            Grid.Row="2"></TreeView>
         <logic:PreviewDisplay
-            Name="PreviewDisplay"></logic:PreviewDisplay>
+            Name="PreviewDisplay"
+            Grid.Column="2"
+            Grid.Row="0"
+            Grid.RowSpan="3">
+            
+        </logic:PreviewDisplay>
         <TrayIcon.Icons>
             <TrayIcons>
                 <TrayIcon

@@ -10,6 +10,7 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
 using Avalonia.ReactiveUI;
 using ClassLibrary6.Command;
 using ClassLibrary6.Data;
@@ -49,6 +50,13 @@ public partial class Main : ReactiveWindow<MainViewModel>
         this.WhenActivated(action => action(ViewModel!.ShowDialog.RegisterHandler(ShowChooseIpDialog)));
         FindIp();
         Task.Run(StartTasks);
+        Slider.ValueChanged += (_,e) => Slider_Scroll(e);
+        BtnFilter.Click += (_,_) => ButtonFilter_Click();
+        BtnShare.Click += (_,_) => ShareScreen();
+        BtnHideTreeView.Click += (_, _) => HideTreeView();
+        BtnShowTreeView.Click += (_, _) => ShowTreeView();
+        BtnOpenConfiguration.Click += (_, _) => OpenConfiguration();
+        Closing += (_, _) => OnClosing();
     }
     
     private async Task ShowChooseIpDialog(InteractionContext<ChooseIpViewModel, ChooseIpReturnViewModel?> interaction)
@@ -115,12 +123,12 @@ public partial class Main : ReactiveWindow<MainViewModel>
             {
                 Socket clientSocket = listener.Accept();
                 
-                LbxRequests.Items.Add(DateTime.Now.ToString("HH:mm:ss") + " Nouvelle connexion de: " + clientSocket.RemoteEndPoint);
+                LbxInfo.Items.Add(DateTime.Now.ToString("HH:mm:ss") + " Nouvelle connexion de: " + clientSocket.RemoteEndPoint);
                 _allStudents.Add(new DataForTeacher(clientSocket, _nextId));
                 Task.Run(() => SendAuthorisedUrl(clientSocket));
                 _nextId++;
             }
-            catch (Exception e) { LbxConnection.Items.Add(e.ToString()); }
+            catch (Exception e) { LbxInfo.Items.Add(e.ToString()); }
         }
     }
 
@@ -170,7 +178,7 @@ public partial class Main : ReactiveWindow<MainViewModel>
                 TimeSpan cycleDuration = nextUpdate - startUpdate;
                 if (cycleDuration <= updateDuration) continue;
                 _isAsking = false;
-                LbxRequests.Items.Add(DateTime.Now.ToString("HH:mm:ss") + " Attente du prochain cycle dans " + (cycleDuration - updateDuration) + " secondes");
+                LbxInfo.Items.Add(DateTime.Now.ToString("HH:mm:ss") + " Attente du prochain cycle dans " + (cycleDuration - updateDuration) + " secondes");
                 Thread.Sleep(cycleDuration - updateDuration);
             }
             else { Thread.Sleep(100); }
@@ -191,11 +199,11 @@ public partial class Main : ReactiveWindow<MainViewModel>
             try
             {
                 socket.Send(new Command(CommandType.DemandData).ToByteArray());
-                LbxRequests.Items.Add(DateTime.Now.ToString("HH:mm:ss") + " Demande des données à " + _allStudents[i].UserName);
+                LbxInfo.Items.Add(DateTime.Now.ToString("HH:mm:ss") + " Demande des données à " + _allStudents[i].UserName);
                 int i1 = i;
                 Task.Run(() => _allStudents[i1] = ReceiveData(_allStudents[i1])).Wait();
                 socket.Send(new Command(CommandType.DemandImage).ToByteArray());
-                LbxRequests.Items.Add(DateTime.Now.ToString("HH:mm:ss") + " Demande de l'image à " + _allStudents[i].UserName);
+                LbxInfo.Items.Add(DateTime.Now.ToString("HH:mm:ss") + " Demande de l'image à " + _allStudents[i].UserName);
                 int i2 = i;
                 Task.Run(() => ReceiveImage(_allStudents[i2])).Wait();
             }
@@ -230,14 +238,14 @@ public partial class Main : ReactiveWindow<MainViewModel>
                 SocketToStudent = socket,
                 Id = id
             };
-            LbxRequests.Items.Add(DateTime.Now.ToString("HH:mm:ss") + " Données recue de " + student.UserName);
+            LbxInfo.Items.Add(DateTime.Now.ToString("HH:mm:ss") + " Données recue de " + student.UserName);
             Task.Run(() => UpdateTreeViews(student));
             student.NumberOfFailure = 0;
             return student;
         }
         catch
         {
-            LbxRequests.Items.Add(DateTime.Now.ToString("HH:mm:ss") + " " + student.UserName + "n'a pas envoyé de donnée");
+            LbxInfo.Items.Add(DateTime.Now.ToString("HH:mm:ss") + " " + student.UserName + "n'a pas envoyé de donnée");
             student.NumberOfFailure++;
             return student;
         }
@@ -257,13 +265,13 @@ public partial class Main : ReactiveWindow<MainViewModel>
             int nbData = socket.Receive(imageBuffer, 0, imageBuffer.Length, SocketFlags.None);
             Array.Resize(ref imageBuffer, nbData);
             student.ScreenShot = new MagickImage(new MemoryStream(imageBuffer));
-            LbxRequests.Items.Add(DateTime.Now.ToString("HH:mm:ss") + " Image recue de " + student.UserName);
+            LbxInfo.Items.Add(DateTime.Now.ToString("HH:mm:ss") + " Image recue de " + student.UserName);
             student.NumberOfFailure = 0;
             PreviewDisplay.AddOrUpdatePreview(student.Id, student.ComputerName, student.ScreenShot);
         }
         catch
         {
-            LbxRequests.Items.Add(DateTime.Now.ToString("HH:mm:ss") + " " + student.UserName + "n'a pas envoyé d'image");
+            LbxInfo.Items.Add(DateTime.Now.ToString("HH:mm:ss") + " " + student.UserName + "n'a pas envoyé d'image");
             student.NumberOfFailure++;
         }
     }
@@ -436,27 +444,27 @@ public partial class Main : ReactiveWindow<MainViewModel>
     /// <summary>
     /// Function that signal to the student the closure of the teacher application.
     /// </summary>
-    public void OnClosing()
+    private void OnClosing()
     {
         _running = false;
-        foreach (DataForTeacher student in _allStudents)
+        foreach (Socket studentSocket in _allStudents.Select(student => student.SocketToStudent))
         {
             try
             {
-                student.SocketToStudent.Send(new Command(CommandType.StopReceiveMulticast).ToByteArray());
-                student.SocketToStudent.Send(new Command(CommandType.DisconnectOfTeacher).ToByteArray());
+                studentSocket.Send(new Command(CommandType.StopReceiveMulticast).ToByteArray());
+                studentSocket.Send(new Command(CommandType.DisconnectOfTeacher).ToByteArray());
             }
             catch {/*Student has already closed the application.*/ }
-            student.SocketToStudent.Dispose();
+            studentSocket.Dispose();
         }
     }
 
     /// <summary>
     /// Function that resizes the screenshot when the slider is moved.
     /// </summary>
-    private void Slider_Scroll()
+    private void Slider_Scroll(RangeBaseValueChangedEventArgs rangeBaseValueChangedEventArgs)
     {
-        PreviewDisplay.Zoom = Slider.Value / 100.0;
+        PreviewDisplay.Zoom = (int)rangeBaseValueChangedEventArgs.NewValue;
         PreviewDisplay.ChangeZoom();
     }
 
@@ -565,7 +573,7 @@ public partial class Main : ReactiveWindow<MainViewModel>
     /// <summary>
     /// Function that closes all tree-node in the tree-views.
     /// </summary>
-    private void HideTreeView_Click()
+    private void HideTreeView()
     {
         TreeNodeCollection nodes = TreeViewDetails.Nodes;
         foreach (TreeNode node in nodes)
@@ -582,7 +590,7 @@ public partial class Main : ReactiveWindow<MainViewModel>
     /// <summary>
     /// Function that opens all tree-node in the tree-views.
     /// </summary>
-    private void ShowTreeView_Click()
+    private void ShowTreeView()
     {
         TreeNodeCollection nodes = TreeViewDetails.Nodes;
         foreach (TreeNode node in nodes)
@@ -601,9 +609,9 @@ public partial class Main : ReactiveWindow<MainViewModel>
     /// <summary>
     /// Function that open the configuration window.
     /// </summary>
-    private void OpenConfigWindow_Click()
+    private void OpenConfiguration()
     {
-        ConfigurationWindow configWindow = new();
+        Configuration configWindow = new();
         configWindow.Show();
     }
 }
