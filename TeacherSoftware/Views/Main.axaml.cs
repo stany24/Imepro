@@ -16,7 +16,6 @@ using ClassLibrary6.ReliableMulticast;
 using ImageMagick;
 using MsBox.Avalonia;
 using TeacherSoftware.Logic;
-using TeacherSoftware.Logic.Nodes;
 using TeacherSoftware.ViewModels;
 // ReSharper disable StringLiteralTypo
 
@@ -25,7 +24,7 @@ namespace TeacherSoftware.Views;
 public partial class Main : Window
 {
     #region Variables
-    private readonly List<DataForTeacher> _allStudents = new();
+    
     private readonly List<DisplayStudent> _allStudentsDisplay = new();
     private readonly Properties _properties = new();
     private bool _running = true;
@@ -59,6 +58,20 @@ public partial class Main : Window
         BtnShowTreeView.Click += (_, _) => OpenAllTreeViewNodes();
         BtnOpenConfiguration.Click += (_, _) => OpenConfiguration();
         Closing += (_, _) => OnClosing();
+    }
+
+    private MainViewModel GetModel()
+    {
+        Dispatcher.UIThread.Post(() =>
+        {
+            if (DataContext is MainViewModel model)
+            {
+                return;
+            }
+
+            DataContext = new MainViewModel();
+        });
+        return DataContext as MainViewModel;
     }
 
     private void ChooseIpWindowClosing()
@@ -129,12 +142,11 @@ public partial class Main : Window
             {
                 Socket clientSocket = listener.Accept();
                 Dispatcher.UIThread.Post(() => LbxInfo.Items.Add(DateTime.Now.ToString("HH:mm:ss") + " Nouvelle connexion de: " + clientSocket.RemoteEndPoint));
-                _allStudents.Add(new DataForTeacher(clientSocket, _nextId));
                 Dispatcher.UIThread.Post(() =>
                 {
                     if (DataContext is MainViewModel model)
                     {
-                        model.NewStudent(_nextId);
+                        model.Students.Add(new DataForTeacher(clientSocket, _nextId));
                     }
                 });
                 Task.Run(() => SendAuthorisedUrl(clientSocket));
@@ -170,9 +182,10 @@ public partial class Main : Window
     /// </summary>
     private void AskingData()
     {
+        if (DataContext is not MainViewModel model){return;}
         while (_running)
         {
-            if (_allStudents.Count != 0)
+            if (model.Students.Count != 0)
             {
                 while (_isAsking) { Thread.Sleep(10); }
                 _isAsking = true;
@@ -182,7 +195,7 @@ public partial class Main : Window
                 UpdateStudents(clientToRemove);
                 foreach (DataForTeacher client in clientToRemove)
                 {
-                    RemoveStudent(client);
+                    model.Students.Remove(client);
                 }
                 UpdateAllIndividualDisplay();
                 DateTime finishedUpdate = DateTime.Now;
@@ -203,27 +216,28 @@ public partial class Main : Window
     /// <param name="clientToRemove"></param>
     private void UpdateStudents(ICollection<DataForTeacher> clientToRemove)
     {
-        for (int i = 0; i < _allStudents.Count; i++)
+        if (DataContext is not MainViewModel model){return;}
+        for (int i = 0; i < model.Students.Count; i++)
         {
-            Socket socket = _allStudents[i].SocketToStudent;
+            Socket socket = model.Students[i].SocketToStudent;
             socket.ReceiveTimeout = _properties.DefaultTimeout;
             socket.SendTimeout = _properties.DefaultTimeout;
             try
             {
                 socket.Send(new Command(CommandType.DemandData).ToByteArray());
-                LbxInfo.Items.Add(DateTime.Now.ToString("HH:mm:ss") + " Demande des données à " + _allStudents[i].UserName);
+                LbxInfo.Items.Add(DateTime.Now.ToString("HH:mm:ss") + " Demande des données à " + model.Students[i].UserName);
                 int i1 = i;
-                Task.Run(() => _allStudents[i1] = ReceiveData(_allStudents[i1])).Wait();
+                Task.Run(() => model.Students[i1] = ReceiveData(model.Students[i1])).Wait();
                 socket.Send(new Command(CommandType.DemandImage).ToByteArray());
-                LbxInfo.Items.Add(DateTime.Now.ToString("HH:mm:ss") + " Demande de l'image à " + _allStudents[i].UserName);
+                LbxInfo.Items.Add(DateTime.Now.ToString("HH:mm:ss") + " Demande de l'image à " + model.Students[i].UserName);
                 int i2 = i;
-                Task.Run(() => ReceiveImage(_allStudents[i2])).Wait();
+                Task.Run(() => ReceiveImage(model.Students[i2])).Wait();
             }
             catch (SocketException)
             {
                 socket.Shutdown(SocketShutdown.Both);
                 socket.Close();
-                clientToRemove.Add(_allStudents[i]);
+                clientToRemove.Add(model.Students[i]);
             }
         }
     }
@@ -251,7 +265,6 @@ public partial class Main : Window
                 Id = id
             };
             LbxInfo.Items.Add(DateTime.Now.ToString("HH:mm:ss") + " Données recue de " + student.UserName);
-            Task.Run(() => UpdateTreeViews(student));
             student.NumberOfFailure = 0;
             return student;
         }
@@ -290,34 +303,6 @@ public partial class Main : Window
 
     #endregion
 
-    #region TreeView update
-
-    /// <summary>
-    /// Function that updates the tree-views.
-    /// </summary>
-    /// <param name="student">The student that is updated.</param>
-    private void UpdateTreeViews(DataForTeacher student)
-    {
-        Dispatcher.UIThread.Post(() =>
-        {
-            if(DataContext is not MainViewModel model){return;}
-            model.UpdateProcesses(student.Id,student.Processes);
-            model.UpdateBrowsers(student.Id, student.Urls);
-        });
-    }
-
-    #endregion
-
-    /// <summary>
-    /// Function that apply the filters in the tree-view.
-    /// </summary>
-    /// <param name="student">The student to remove.</param>
-    private void RemoveStudent(DataForTeacher student)
-    {
-        if(DataContext is not MainViewModel model) {return;}
-        model.RemoveStudent(student.Id);
-    }
-
     #region Previews
 
     /// <summary>
@@ -354,9 +339,10 @@ public partial class Main : Window
     /// </summary>
     private void ShareScreen()
     {
+        if(DataContext is not MainViewModel model){return;}
         if (!_isSharing)
         {
-            ChooseStreamOptions prompt = new(_allStudents);
+            ChooseStreamOptions prompt = new(model.Students);
             prompt.Show();
             if (_studentToShareScreen.Count == 0) { return; }
             _isSharing = true;
@@ -433,7 +419,8 @@ public partial class Main : Window
     private void OnClosing()
     {
         _running = false;
-        foreach (Socket studentSocket in _allStudents.Select(student => student.SocketToStudent))
+        if(DataContext is not MainViewModel model){return;}
+        foreach (Socket studentSocket in model.Students.Select(student => student.SocketToStudent))
         {
             try
             {
@@ -461,9 +448,10 @@ public partial class Main : Window
     /// </summary>
     private void UpdateAllIndividualDisplay()
     {
+        if(DataContext is not MainViewModel model){return;}
         foreach (DisplayStudent display in _allStudentsDisplay)
         {
-            foreach (DataForTeacher student in _allStudents.Where(student => display.GetStudentId() == student.Id))
+            foreach (DataForTeacher student in model.Students.Where(student => display.GetStudentId() == student.Id))
             {
                 display.UpdateDisplay(student);
             }
@@ -508,12 +496,10 @@ public partial class Main : Window
     private void ButtonFilter_Click()
     {
         _properties.FilterEnabled = !_properties.FilterEnabled;
-        foreach (StudentNode? studentNode in TreeViewStudents.Items.Cast<StudentNode>())
-        {
-            if(studentNode == null){return;}
-
-            studentNode.ApplyFilter(_properties.FilterEnabled);
-        }
+        
+        
+        
+        
         BtnFilter.Content = _properties.FilterEnabled ? "Désactiver" : "Activer";
     }
 
