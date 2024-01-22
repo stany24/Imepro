@@ -162,7 +162,6 @@ public class DataForStudent : Data
     /// </summary>
     private static void SendImage(IMagickImage image, Socket socket)
     {
-        image.Format = MagickFormat.Rgb;
         byte[] imageBytes = image.ToByteArray();
         socket.Send(imageBytes, 0, imageBytes.Length, SocketFlags.None);
     }
