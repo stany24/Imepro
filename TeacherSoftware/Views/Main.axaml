@@ -1,6 +1,7 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="using:TeacherSoftware.ViewModels"
+        xmlns:nodes="using:TeacherSoftware.Logic.Nodes"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:logic="clr-namespace:TeacherSoftware.Logic"
@@ -61,7 +62,33 @@
         <TreeView
             Name="TreeViewStudents"
             Grid.Column="0"
-            Grid.Row="2"></TreeView>
+            Grid.Row="2"
+            ItemsSource="{Binding Nodes}">
+            <TreeView.ItemTemplate>
+                <DataTemplate>
+                    <TreeView>
+                        <TextBlock Text="{Binding Name}"/>
+                        <CheckBox IsChecked="{Binding Checked}"/>
+                        <TextBlock Text="Processes"></TextBlock>
+                        <TreeView ItemsSource="{Binding Processes}">
+                            <TreeView.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Name}" />
+                                </DataTemplate>
+                            </TreeView.ItemTemplate>
+                        </TreeView>
+                        <TextBlock Text="History"></TextBlock>
+                        <TreeView ItemsSource="{Binding Browser}">
+                            <TreeView.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Name}" />
+                                </DataTemplate>
+                            </TreeView.ItemTemplate>
+                        </TreeView>
+                    </TreeView>
+                </DataTemplate>
+            </TreeView.ItemTemplate>
+        </TreeView>
         <logic:PreviewDisplay
             Name="PreviewDisplay"
             Grid.Column="2"

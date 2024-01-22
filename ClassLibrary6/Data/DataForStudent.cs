@@ -255,7 +255,8 @@ public class DataForStudent : Data
             try { length = SocketToTeacher.Receive(info); }
             catch (SocketException) { return; }
             Array.Resize(ref info, length);
-            Command.Command command = JsonSerializer.Deserialize<Command.Command>(Encoding.Default.GetString(info));
+            string json = Encoding.Default.GetString(info);
+            Command.Command command = JsonSerializer.Deserialize<Command.Command>(json);
             NewConnexionMessageEvent.Invoke(this, new NewMessageEventArgs(command.ToString()));
             switch (command.Type)
             {

@@ -9,8 +9,8 @@ public class StudentNode
     public int Id { get; set; }
     public string Name{ get; set; }
     public bool Checked { get; set; }
-    public ProcessesNode? Processes{ get; set; }
-    public List<BrowserNode>? Browser{ get; set; }
+    public List<ProcessNode>? Processes { get; set; } = new();
+    public List<BrowserNode>? Browser{ get; set; } = new();
 
     public StudentNode(int id)
     {
@@ -37,10 +37,21 @@ public class StudentNode
     {
         
     }
-
+    
     public void UpdateProcesses(Dictionary<int, string> processes)
     {
-        Processes ??= new ProcessesNode();
-        Processes.UpdateProcesses(processes);
+        //removing old processes
+        for (int i = 0; i < Processes.Count; i++)
+        {
+            bool exists = processes.ContainsKey(Processes[i].Id);
+            if (exists) continue;
+            Processes.RemoveAt(i);
+            i--;
+        }
+        //adding new processes
+        foreach (KeyValuePair<int, string> keyValuePair in from keyValuePair in processes let proc = Processes.Find(proc => proc.Id == keyValuePair.Key) where proc == null select keyValuePair)
+        {
+            Processes.Add(new ProcessNode(keyValuePair.Key,keyValuePair.Value));
+        }
     }
 }
