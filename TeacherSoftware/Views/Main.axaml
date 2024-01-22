@@ -56,7 +56,8 @@
             Name="LbxInfo"
             Grid.Column="0"
             Grid.Row="4"
-            Grid.ColumnSpan="3"></ListBox>
+            Grid.ColumnSpan="3"
+            MinHeight="200"></ListBox>
         <TreeView
             Name="TreeViewStudents"
             Grid.Column="0"

@@ -12,10 +12,9 @@ public class StudentNode
     public ProcessesNode? Processes{ get; set; }
     public List<BrowserNode>? Browser{ get; set; }
 
-    public StudentNode(int id,string name)
+    public StudentNode(int id)
     {
         Id = id;
-        Name = name;
         Checked = false;
     }
 

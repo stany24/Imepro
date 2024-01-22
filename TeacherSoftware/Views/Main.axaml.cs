@@ -9,6 +9,7 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Avalonia.Controls;
+using Avalonia.Threading;
 using ClassLibrary6.Command;
 using ClassLibrary6.Data;
 using ClassLibrary6.ReliableMulticast;
@@ -127,13 +128,19 @@ public partial class Main : Window
             try
             {
                 Socket clientSocket = listener.Accept();
-                
-                LbxInfo.Items.Add(DateTime.Now.ToString("HH:mm:ss") + " Nouvelle connexion de: " + clientSocket.RemoteEndPoint);
+                Dispatcher.UIThread.Post(() => LbxInfo.Items.Add(DateTime.Now.ToString("HH:mm:ss") + " Nouvelle connexion de: " + clientSocket.RemoteEndPoint));
                 _allStudents.Add(new DataForTeacher(clientSocket, _nextId));
+                Dispatcher.UIThread.Post(() =>
+                {
+                    if (DataContext is MainViewModel model)
+                    {
+                        model.NewStudent(_nextId);
+                    }
+                });
                 Task.Run(() => SendAuthorisedUrl(clientSocket));
                 _nextId++;
             }
-            catch (Exception e) { LbxInfo.Items.Add(e.ToString()); }
+            catch (Exception e) { Dispatcher.UIThread.Post(() => LbxInfo.Items.Add(e.ToString())); }
         }
     }
 
@@ -183,7 +190,7 @@ public partial class Main : Window
                 TimeSpan cycleDuration = nextUpdate - startUpdate;
                 if (cycleDuration <= updateDuration) continue;
                 _isAsking = false;
-                LbxInfo.Items.Add(DateTime.Now.ToString("HH:mm:ss") + " Attente du prochain cycle dans " + (cycleDuration - updateDuration) + " secondes");
+                Dispatcher.UIThread.Post(() => LbxInfo.Items.Add(DateTime.Now.ToString("HH:mm:ss") + " Attente du prochain cycle dans " + (cycleDuration - updateDuration) + " secondes"));
                 Thread.Sleep(cycleDuration - updateDuration);
             }
             else { Thread.Sleep(100); }
@@ -291,9 +298,12 @@ public partial class Main : Window
     /// <param name="student">The student that is updated.</param>
     private void UpdateTreeViews(DataForTeacher student)
     {
-        if(DataContext is not MainViewModel model){return;}
-        model.UpdateProcesses(student.Id,student.Processes);
-        model.UpdateBrowsers(student.Id,student.Urls);
+        Dispatcher.UIThread.Post(() =>
+        {
+            if(DataContext is not MainViewModel model){return;}
+            model.UpdateProcesses(student.Id,student.Processes);
+            model.UpdateBrowsers(student.Id, student.Urls);
+        });
     }
 
     #endregion

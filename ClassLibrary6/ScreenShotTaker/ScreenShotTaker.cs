@@ -9,7 +9,15 @@ public class ScreenShotTaker
     private readonly List<ICaptureZone> _iCaptureZones = new();
     public ScreenShotTaker()
     {
-        IScreenCaptureService screenCaptureService = new X11ScreenCaptureService();
+        IScreenCaptureService screenCaptureService;
+        if (Environment.OSVersion.Platform == PlatformID.Win32NT)
+        {
+            screenCaptureService = new DX11ScreenCaptureService();
+        }
+        else
+        {
+            screenCaptureService = new X11ScreenCaptureService();
+        }
         
         IEnumerable<GraphicsCard> graphicsCards = screenCaptureService.GetGraphicsCards();
         
@@ -34,7 +42,15 @@ public class ScreenShotTaker
         {
             using (captureZone.Lock())
             {
-                images.Add(new MagickImage(captureZone.RawBuffer));
+                MagickImage imageMagick = new(MagickColors.White, captureZone.Width,captureZone.Height);
+                for (int i = 0; i < captureZone.Width; i++)
+                {
+                    for (int j = 0; j < captureZone.Height; j++)
+                    {
+                        imageMagick.GetPixels().SetPixel(i,j,new byte[]{captureZone.Image[i, j].R,captureZone.Image[i, j].G,captureZone.Image[i, j].B});
+                    }
+                }
+                images.Add(imageMagick);
             }
         }
         
