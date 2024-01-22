@@ -117,7 +117,7 @@ public partial class Main : Window
         _windowAskIp = new AskIp(!isNew);
         _windowAskIp.Activate();
         _windowAskIp.Show();
-        _windowAskIp.Closed += (sender, e) =>{
+        _windowAskIp.Closed += (_, _) =>{
             Show();
             if (isNew)
             {
@@ -183,8 +183,8 @@ public partial class Main : Window
 
         MessageBoxManager.GetMessageBoxStandard(
             "Attention",
-            "Vos interfaces réseau ne sont pas configurés correctement.\r\n" +
-            "1) Lancez une fenêtre windows powershell en administrateur.\r\n" +
+            "Vos interfaces rï¿½seau ne sont pas configurï¿½s correctement.\r\n" +
+            "1) Lancez une fenï¿½tre windows powershell en administrateur.\r\n" +
             "2) Copiez tout le contenu du fichier " + path + ".\r\n" +
             "3) Collez le tout dans le terminal et executez.\r\n",
             ButtonEnum.YesNo);

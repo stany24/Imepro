@@ -54,11 +54,11 @@ public class DataForStudent : Data
     public DataForStudent(IPAddress teacherIp)
     {
         IpToTeacher = teacherIp;
-        AuthorisedUrls = new();
-        SeleniumProcessesId = new();
+        AuthorisedUrls = new List<string>();
+        SeleniumProcessesId = new List<int>();
         GetDefaultProcesses();
         ComputerName = Environment.MachineName;
-        UserName = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
+        UserName = Environment.UserName;
         Task.Run(InitializeSocket);
     }
 
