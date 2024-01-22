@@ -4,6 +4,21 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="TeacherSoftware.Views.ChooseIp"
-        Title="ChooseIp">
-    Welcome to Avalonia!
+        Title="ChooseIp"
+        SizeToContent="WidthAndHeight">
+    <Grid
+        RowDefinitions="Auto,5,Auto"
+        ColumnDefinitions="Auto"
+        Margin="10">
+        <ListBox
+            Name="LbxIp"
+            Grid.Row="0"
+            Grid.Column="0"></ListBox>
+        <Button
+            Name="BtnConfirm"
+            Grid.Row="2"
+            Grid.Column="0"
+            HorizontalAlignment="Stretch"
+            HorizontalContentAlignment="Center">Confirmer</Button>
+    </Grid>
 </Window>

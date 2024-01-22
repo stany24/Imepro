@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -10,14 +9,11 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Avalonia.Controls;
-using Avalonia.Controls.Primitives;
-using Avalonia.ReactiveUI;
 using ClassLibrary6.Command;
 using ClassLibrary6.Data;
 using ClassLibrary6.ReliableMulticast;
 using ImageMagick;
 using MsBox.Avalonia;
-using ReactiveUI;
 using TeacherSoftware.Logic;
 using TeacherSoftware.Logic.Nodes;
 using TeacherSoftware.ViewModels;
@@ -25,7 +21,7 @@ using TeacherSoftware.ViewModels;
 
 namespace TeacherSoftware.Views;
 
-public partial class Main : ReactiveWindow<MainViewModel>
+public partial class Main : Window
 {
     #region Variables
     private readonly List<DataForTeacher> _allStudents = new();
@@ -41,6 +37,8 @@ public partial class Main : ReactiveWindow<MainViewModel>
     private IPAddress _ipAddr;
     private ReliableMulticastSender _multicastSender;
 
+    private ChooseIp _chooseIpWindow;
+
     #endregion
 
     #region At start
@@ -49,9 +47,10 @@ public partial class Main : ReactiveWindow<MainViewModel>
     {
         DataContext = model;
         InitializeComponent();
-        this.WhenActivated(action => action(ViewModel!.ShowDialog.RegisterHandler(ShowChooseIpDialog)));
-        FindIp();
-        Task.Run(StartTasks);
+        if (FindIp())
+        {
+            Task.Run(StartTasks);
+        }
         Slider.ValueChanged += (_,e) => PreviewDisplay.Zoom = (int)e.NewValue;
         BtnFilter.Click += (_,_) => ButtonFilter_Click();
         BtnShare.Click += (_,_) => ShareScreen();
@@ -60,15 +59,14 @@ public partial class Main : ReactiveWindow<MainViewModel>
         BtnOpenConfiguration.Click += (_, _) => OpenConfiguration();
         Closing += (_, _) => OnClosing();
     }
-    
-    private async Task ShowChooseIpDialog(InteractionContext<ChooseIpViewModel, ChooseIpReturnViewModel?> interaction)
+
+    private void ChooseIpWindowClosing()
     {
-        ChooseIp dialog = new()
-        {
-            DataContext = interaction.Input
-        };
-        ChooseIpReturnViewModel? result = await dialog.ShowDialog<ChooseIpReturnViewModel?>(this);
-        interaction.SetOutput(result);
+        Show();
+        IsEnabled = true;
+        _ipAddr = _chooseIpWindow.GetChoosenIp();
+        LblIp.Text = "IP: " + _ipAddr;
+        Task.Run(StartTasks);
     }
 
     /// <summary>
@@ -83,7 +81,7 @@ public partial class Main : ReactiveWindow<MainViewModel>
     /// <summary>
     /// Function that find the teacher ip.
     /// </summary>
-    private void FindIp()
+    private bool FindIp()
     {
         // Establish the local endpoint for the socket.
         // Dns.GetHostName returns the name of the host running the application.
@@ -96,14 +94,19 @@ public partial class Main : ReactiveWindow<MainViewModel>
                     "Attention",
                     "Aucune addresse ip conforme n'a étée trouvée. Vérifiez vos connexion aux réseaux. L'application va ce fermer.");
                 Close();
-                break;
-            case 1: _ipAddr = possiblesIp[0]; break;
+                return false;
+            case 1:
+                _ipAddr = possiblesIp[0];
+                LblIp.Text = "IP: " + _ipAddr;
+                return true;
             default:
-                if(DataContext is not MainViewModel model){return;}
-                model.OpenChooseIpCommand.Execute(null);
-                break;
+                _chooseIpWindow = new ChooseIp(possiblesIp);
+                _chooseIpWindow.Show();
+                _chooseIpWindow.Closing += (_,_) => ChooseIpWindowClosing();
+                Hide();
+                IsEnabled = false;
+                return false;
         }
-        LblIp.Text = "IP: " + _ipAddr;
     }
 
     #endregion

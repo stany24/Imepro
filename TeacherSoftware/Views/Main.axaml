@@ -10,12 +10,6 @@
         Icon="/Assets/avalonia-logo.ico"
         Title="TeacherSoftware">
 
-    <Design.DataContext>
-        <!-- This only sets the DataContext for the previewer in an IDE,
-             to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
-        <vm:MainViewModel/>
-    </Design.DataContext>
-
     <Grid
         Name="MainGrid"
         Margin="5"
@@ -24,19 +18,34 @@
         <Grid
             Name="SubGrid"
             Grid.Column="0"
-            Grid.Row="0">
+            Grid.Row="0"
+            RowDefinitions="Auto,5,Auto,5,Auto"
+            ColumnDefinitions="Auto,5,Auto">
             <TextBlock
-                Name="LblIp"></TextBlock>
+                Name="LblIp"
+                Grid.Row="0"
+                Grid.Column="0">IP:</TextBlock>
             <Button
-                Name="BtnShare"></Button>
+                Name="BtnShare"
+                Grid.Row="0"
+                Grid.Column="2">Share</Button>
             <Button
-                Name="BtnFilter"></Button>
+                Name="BtnFilter"
+                Grid.Row="0"
+                Grid.Column="2">Filtrer</Button>
             <Button
-                Name="BtnShowTreeView"></Button>
+                Name="BtnShowTreeView"
+                Grid.Row="2"
+                Grid.Column="0">Ouvrir</Button>
             <Button
-                Name="BtnHideTreeView"></Button>
+                Name="BtnHideTreeView"
+                Grid.Row="2"
+                Grid.Column="2">Fermer</Button>
             <Button
-                Name="BtnOpenConfiguration"></Button>
+                Name="BtnOpenConfiguration"
+                Grid.Row="4"
+                Grid.Column="0"
+                Grid.ColumnSpan="3">Configurations</Button>
             <Slider
                 Name="Slider"
                 Minimum="1"
