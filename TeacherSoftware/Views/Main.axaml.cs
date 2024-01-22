@@ -92,6 +92,11 @@ public partial class Main : Window
         Task.Run(LogClients);
     }
 
+    private void Log(string message)
+    {
+        Dispatcher.UIThread.Post(() => LbxInfo.Items.Add(DateTime.Now.ToString("HH:mm:ss: ") + message));
+    }
+
     /// <summary>
     /// Function that find the teacher ip.
     /// </summary>
@@ -141,7 +146,8 @@ public partial class Main : Window
             try
             {
                 Socket clientSocket = listener.Accept();
-                Dispatcher.UIThread.Post(() => LbxInfo.Items.Add(DateTime.Now.ToString("HH:mm:ss") + " Nouvelle connexion de: " + clientSocket.RemoteEndPoint));
+
+                Log(" Nouvelle connexion de: " + clientSocket.RemoteEndPoint);
                 Dispatcher.UIThread.Post(() =>
                 {
                     if (DataContext is MainViewModel model)
@@ -203,7 +209,7 @@ public partial class Main : Window
                 TimeSpan cycleDuration = nextUpdate - startUpdate;
                 if (cycleDuration <= updateDuration) continue;
                 _isAsking = false;
-                Dispatcher.UIThread.Post(() => LbxInfo.Items.Add(DateTime.Now.ToString("HH:mm:ss") + " Attente du prochain cycle dans " + (cycleDuration - updateDuration) + " secondes"));
+                Log("Attente du prochain cycle dans " + (cycleDuration - updateDuration) + " secondes");
                 Thread.Sleep(cycleDuration - updateDuration);
             }
             else { Thread.Sleep(100); }
@@ -225,11 +231,11 @@ public partial class Main : Window
             try
             {
                 socket.Send(new Command(CommandType.DemandData).ToByteArray());
-                LbxInfo.Items.Add(DateTime.Now.ToString("HH:mm:ss") + " Demande des données à " + model.Students[i].UserName);
+                Log("Demande des données à " + model.Students[i].UserName);
                 int i1 = i;
                 Task.Run(() => model.Students[i1] = ReceiveData(model.Students[i1])).Wait();
                 socket.Send(new Command(CommandType.DemandImage).ToByteArray());
-                LbxInfo.Items.Add(DateTime.Now.ToString("HH:mm:ss") + " Demande de l'image à " + model.Students[i].UserName);
+                Log("Demande de l'image à " + model.Students[i].UserName);
                 int i2 = i;
                 Task.Run(() => ReceiveImage(model.Students[i2])).Wait();
             }
@@ -264,13 +270,13 @@ public partial class Main : Window
                 SocketToStudent = socket,
                 Id = id
             };
-            LbxInfo.Items.Add(DateTime.Now.ToString("HH:mm:ss") + " Données recue de " + student.UserName);
+            Log("Données recue de " + student.UserName);
             student.NumberOfFailure = 0;
             return student;
         }
         catch
         {
-            LbxInfo.Items.Add(DateTime.Now.ToString("HH:mm:ss") + " " + student.UserName + "n'a pas envoyé de donnée");
+            Log(student.UserName + " n'a pas envoyé de donnée");
             student.NumberOfFailure++;
             return student;
         }
@@ -285,18 +291,20 @@ public partial class Main : Window
         try
         {
             Socket socket = student.SocketToStudent;
-            byte[] imageBuffer = new byte[10485760];
+            byte[] receivedBuffer = new byte[10485760];
             socket.ReceiveTimeout = _properties.DefaultTimeout;
-            int nbData = socket.Receive(imageBuffer, 0, imageBuffer.Length, SocketFlags.None);
-            Array.Resize(ref imageBuffer, nbData);
-            student.ScreenShot = new MagickImage(new MemoryStream(imageBuffer));
-            LbxInfo.Items.Add(DateTime.Now.ToString("HH:mm:ss") + " Image recue de " + student.UserName);
+            int nbData = socket.Receive(receivedBuffer, 0, receivedBuffer.Length, SocketFlags.None);
+            byte[] imageBuffer = new byte[nbData];
+            Array.Copy(receivedBuffer,imageBuffer,nbData);
+            student.ScreenShot = new MagickImage(imageBuffer);
+            Log("Image recue de " + student.UserName);
             student.NumberOfFailure = 0;
             PreviewDisplay.AddOrUpdatePreview(student.Id, student.ComputerName, student.ScreenShot);
         }
-        catch
+        catch(Exception e)
         {
-            LbxInfo.Items.Add(DateTime.Now.ToString("HH:mm:ss") + " " + student.UserName + "n'a pas envoyé d'image");
+            Log(e.ToString());
+            Log(student.UserName + "n'a pas envoyé d'image");
             student.NumberOfFailure++;
         }
     }

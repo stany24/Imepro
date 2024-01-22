@@ -53,8 +53,10 @@ public class ScreenShotTaker
                 images.Add(imageMagick);
             }
         }
-        
-        return (MagickImage)images.Mosaic();
+
+        MagickImage final = (MagickImage)images.Mosaic();
+        final.Format = MagickFormat.Rgb;
+        return final;
     }
 
     public MagickImage TakeScreenShot(int screenId)
