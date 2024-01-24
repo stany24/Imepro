@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
@@ -16,6 +15,7 @@ using ClassLibrary6.ReliableMulticast;
 using ImageMagick;
 using MsBox.Avalonia;
 using TeacherSoftware.Logic;
+using TeacherSoftware.Logic.MessageManager;
 using TeacherSoftware.ViewModels;
 // ReSharper disable StringLiteralTypo
 
@@ -27,6 +27,7 @@ public partial class Main : Window
     
     private readonly List<DisplayStudent> _allStudentsDisplay = new();
     private readonly Properties _properties = new();
+    private readonly MessageManager _messageManager = new();
     private bool _running = true;
 
     private List<DataForTeacher> _studentToShareScreen = new();
@@ -58,20 +59,6 @@ public partial class Main : Window
         BtnShowTreeView.Click += (_, _) => OpenAllTreeViewNodes();
         BtnOpenConfiguration.Click += (_, _) => OpenConfiguration();
         Closing += (_, _) => OnClosing();
-    }
-
-    private MainViewModel GetModel()
-    {
-        Dispatcher.UIThread.Post(() =>
-        {
-            if (DataContext is MainViewModel model)
-            {
-                return;
-            }
-
-            DataContext = new MainViewModel();
-        });
-        return DataContext as MainViewModel;
     }
 
     private void ChooseIpWindowClosing()
@@ -150,33 +137,17 @@ public partial class Main : Window
                 Log(" Nouvelle connexion de: " + clientSocket.RemoteEndPoint);
                 Dispatcher.UIThread.Post(() =>
                 {
-                    if (DataContext is MainViewModel model)
-                    {
-                        model.Students.Add(new DataForTeacher(clientSocket, _nextId));
-                    }
+                    if (DataContext is not MainViewModel model) return;
+                    DataForTeacher student = new(clientSocket, _nextId);
+                    string content = JsonSerializer.Serialize(_properties.AutorisedWebsites);
+                    _messageManager.NewMessage(new Message(content,CommandType.ReceiveAutorisedUrls,student.SocketToStudent,student.Id));
+                    student.SocketToStudent.Send(new Command(CommandType.ReceiveAutorisedUrls).ToByteArray());
+                    model.Students.Add(student);
                 });
-                Task.Run(() => SendAuthorisedUrl(clientSocket));
                 _nextId++;
             }
             catch (Exception e) { Dispatcher.UIThread.Post(() => LbxInfo.Items.Add(e.ToString())); }
         }
-    }
-
-    /// <summary>
-    /// Function that sends the authorised urls to a student.
-    /// </summary>
-    /// <param name="socket"></param>
-    private void SendAuthorisedUrl(Socket socket)
-    {
-        while (_isAsking) { Thread.Sleep(100); }
-        _isAsking = true;
-        socket.Send(new Command(CommandType.ReceiveAutorisedUrls).ToByteArray());
-        //serialization
-        string jsonString = JsonSerializer.Serialize(_properties.AutorisedWebsites);
-        //sending
-        Thread.Sleep(100);
-        socket.Send(Encoding.ASCII.GetBytes(jsonString), Encoding.ASCII.GetBytes(jsonString).Length, SocketFlags.None);
-        _isAsking = false;
     }
 
     #endregion
@@ -223,28 +194,11 @@ public partial class Main : Window
     private void UpdateStudents(ICollection<DataForTeacher> clientToRemove)
     {
         if (DataContext is not MainViewModel model){return;}
-        for (int i = 0; i < model.Students.Count; i++)
+
+        foreach (DataForTeacher student in model.Students)
         {
-            Socket socket = model.Students[i].SocketToStudent;
-            socket.ReceiveTimeout = _properties.DefaultTimeout;
-            socket.SendTimeout = _properties.DefaultTimeout;
-            try
-            {
-                socket.Send(new Command(CommandType.DemandData).ToByteArray());
-                Log("Demande des données à " + model.Students[i].UserName);
-                int i1 = i;
-                Task.Run(() => model.Students[i1] = ReceiveData(model.Students[i1])).Wait();
-                socket.Send(new Command(CommandType.DemandImage).ToByteArray());
-                Log("Demande de l'image à " + model.Students[i].UserName);
-                int i2 = i;
-                Task.Run(() => ReceiveImage(model.Students[i2])).Wait();
-            }
-            catch (SocketException)
-            {
-                socket.Shutdown(SocketShutdown.Both);
-                socket.Close();
-                clientToRemove.Add(model.Students[i]);
-            }
+            _messageManager.NewMessage(new Message("",CommandType.DemandData,student.SocketToStudent,student.Id));
+            _messageManager.NewMessage(new Message("",CommandType.DemandImage,student.SocketToStudent,student.Id));
         }
     }
 
