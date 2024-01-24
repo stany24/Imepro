@@ -12,8 +12,8 @@ public class MessageManager
 {
     private byte[] receivedBytes = new byte[10000];
     private bool _running;
-    private List<Message> _messages;
-    public EventHandler<MessageReceived>? MessageReceived;
+    private List<Message> _messages = new();
+    public EventHandler<MessageReceivedEventArgs>? MessageReceived;
     public EventHandler<EventArgs>? MessageFailed;
 
     public MessageManager()
@@ -41,7 +41,8 @@ public class MessageManager
                 int messageSize = message.TargetSocket.Receive(receivedBytes);
                 byte[] messageBytes = new byte[messageSize];
                 Array.Copy(receivedBytes,messageBytes,messageSize);
-                MessageReceived?.Invoke(null,new MessageReceived(message.StudentId,Encoding.Default.GetString(messageBytes)));
+                MessageReceived?.Invoke(null,new MessageReceivedEventArgs(message.StudentId,Encoding.Default.GetString(messageBytes)));
+                _messages.Remove(message);
             }
             else
             {

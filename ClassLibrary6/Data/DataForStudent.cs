@@ -9,6 +9,7 @@ using ClassLibrary6.History;
 using ClassLibrary6.ReliableMulticast;
 using ClassLibrary6.StreamOptions;
 using ImageMagick;
+using StudentSoftware.Logic;
 
 namespace ClassLibrary6.Data;
 
@@ -255,18 +256,18 @@ public class DataForStudent : Data
             catch (SocketException) { return; }
             Array.Resize(ref info, length);
             string json = Encoding.Default.GetString(info);
-            Command.Command command = JsonSerializer.Deserialize<Command.Command>(json);
-            NewConnexionMessageEvent.Invoke(this, new NewMessageEventArgs(command.ToString()));
-            switch (command.Type)
+            Message message = JsonSerializer.Deserialize<Message>(json);
+            NewConnexionMessageEvent.Invoke(this, new NewMessageEventArgs(message.type.ToString()));
+            switch (message.type)
             {
                 case CommandType.DemandData: SendData(); break;
                 case CommandType.DemandImage: SendImage(_screenShotTaker.TakeAllScreenShot(), SocketToTeacher); break;
-                case CommandType.KillProcess: KillSelectedProcess(Convert.ToInt32(command.Args[1])); break;
+                case CommandType.KillProcess: KillSelectedProcess(Convert.ToInt32(message.content)); break;
                 case CommandType.ReceiveMulticast: Task.Run(ReceiveMulticastStream); break;
                 case CommandType.ApplyMulticastSettings: ApplyMulticastSettings(); break;
                 case CommandType.StopReceiveMulticast: Stop(); break;
                 case CommandType.ReceiveMessage: ReceiveMessage(); break;
-                case CommandType.ReceiveAutorisedUrls: ReceiveAuthorisedUrls(); break;
+                case CommandType.ReceiveAutorisedUrls: ReceiveAuthorisedUrls(message.content); break;
                 case CommandType.StopControl: isControled = false; break;
                 case CommandType.DisconnectOfTeacher: Disconnect(); return;
                 case CommandType.StopApplication: ShutDown(); return;
@@ -317,12 +318,9 @@ public class DataForStudent : Data
     /// <summary>
     /// Function to receive the autorised urls.
     /// </summary>
-    private void ReceiveAuthorisedUrls()
+    private void ReceiveAuthorisedUrls(string urls)
     {
-        byte[] byteMessage = new byte[102400];
-        int nbData = SocketToTeacher.Receive(byteMessage);
-        Array.Resize(ref byteMessage, nbData);
-        AuthorisedUrls = JsonSerializer.Deserialize<List<string>>(Encoding.Default.GetString(byteMessage));
+        AuthorisedUrls = JsonSerializer.Deserialize<List<string>>(urls);
     }
 
     /// <summary>
