@@ -48,7 +48,7 @@ public partial class Main : Window
     private void InitializeStudent()
     {
         _student = new DataForStudent(IpForTheWeek.GetIp());
-        _student.NewConnexionMessageEvent += (sender,e) => Dispatcher.UIThread.Post(() => LbxInfo.Items.Add(e.Message));
+        _student.NewConnexionMessageEvent += (_,e) => Dispatcher.UIThread.Post(() => LbxInfo.Items.Add(e.Message));
         _student.ChangePropertyEvent += ChangeProperty;
         _student.NewMessageEvent += (sender,e) => LbxInfo.Items.Add(e.Message);
         _student.NewImageEvent += DisplayImage;

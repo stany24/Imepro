@@ -55,19 +55,37 @@ public partial class Main : Window
         Slider.ValueChanged += (_,e) => PreviewDisplay.Zoom = (int)e.NewValue;
         BtnFilter.Click += (_,_) => ButtonFilter_Click();
         BtnShare.Click += (_,_) => ShareScreen();
-        BtnHideTreeView.Click += (_, _) => CloseAllTreeViewNodes();
-        BtnShowTreeView.Click += (_, _) => OpenAllTreeViewNodes();
+        BtnHideTreeView.Click += (_, _) => ApplyVisibilityToAllNodes(false);
+        BtnShowTreeView.Click += (_, _) => ApplyVisibilityToAllNodes(true);
         BtnOpenConfiguration.Click += (_, _) => OpenConfiguration();
         Closing += (_, _) => OnClosing();
         _messageManager.MessageReceived += HandleReceivedMessage;
     }
 
-    private void HandleReceivedMessage(object? sender, MessageReceived message)
+    private void HandleReceivedMessage(object? sender, MessageReceivedEventArgs message)
     {
         switch (message.type)
         {
             
         }
+    }
+
+    private MainViewModel GetModel()
+    {
+        try
+        {
+            if (DataContext is MainViewModel model)
+            {
+                return model;
+            }
+        }
+        catch { }
+        return Dispatcher.UIThread.InvokeAsync(() =>
+        {
+            if (DataContext is MainViewModel model){return model;}
+            DataContext = new MainViewModel();
+            return DataContext as MainViewModel;
+        }).Result ?? new MainViewModel();
     }
 
     private void ChooseIpWindowClosing()
@@ -146,16 +164,14 @@ public partial class Main : Window
                 Log(" Nouvelle connexion de: " + clientSocket.RemoteEndPoint);
                 Dispatcher.UIThread.Post(() =>
                 {
-                    if (DataContext is not MainViewModel model) return;
                     DataForTeacher student = new(clientSocket, _nextId);
                     string content = JsonSerializer.Serialize(_properties.AutorisedWebsites);
                     _messageManager.NewMessage(new Message(content,CommandType.ReceiveAutorisedUrls,student.SocketToStudent,student.Id));
-                    student.SocketToStudent.Send(new Command(CommandType.ReceiveAutorisedUrls).ToByteArray());
-                    model.Students.Add(student);
+                    GetModel().Students.Add(student);
                 });
                 _nextId++;
             }
-            catch (Exception e) { Dispatcher.UIThread.Post(() => LbxInfo.Items.Add(e.ToString())); }
+            catch (Exception e) { Log(e.ToString()); }
         }
     }
 
@@ -168,10 +184,9 @@ public partial class Main : Window
     /// </summary>
     private void AskingData()
     {
-        if (DataContext is not MainViewModel model){return;}
         while (_running)
         {
-            if (model.Students.Count != 0)
+            if (GetModel().Students.Count != 0)
             {
                 while (_isAsking) { Thread.Sleep(10); }
                 _isAsking = true;
@@ -181,7 +196,7 @@ public partial class Main : Window
                 UpdateStudents(clientToRemove);
                 foreach (DataForTeacher client in clientToRemove)
                 {
-                    model.Students.Remove(client);
+                    GetModel().Students.Remove(client);
                 }
                 UpdateAllIndividualDisplay();
                 DateTime finishedUpdate = DateTime.Now;
@@ -202,9 +217,7 @@ public partial class Main : Window
     /// <param name="clientToRemove"></param>
     private void UpdateStudents(ICollection<DataForTeacher> clientToRemove)
     {
-        if (DataContext is not MainViewModel model){return;}
-
-        foreach (DataForTeacher student in model.Students)
+        foreach (DataForTeacher student in GetModel().Students)
         {
             _messageManager.NewMessage(new Message("",CommandType.DemandData,student.SocketToStudent,student.Id));
             _messageManager.NewMessage(new Message("",CommandType.DemandImage,student.SocketToStudent,student.Id));
@@ -292,7 +305,13 @@ public partial class Main : Window
     /// </summary>
     private void RecordAndStreamScreen()
     {
-        foreach (DataForTeacher student in _studentToShareScreen) { student.SocketToStudent.Send(new Command(CommandType.ReceiveMulticast).ToByteArray()); }
+        foreach (DataForTeacher student in _studentToShareScreen)
+        {
+            _messageManager.NewMessage(new Message("",CommandType.ReceiveMulticast,student.SocketToStudent,student.Id)
+            {
+                MessagePriority = MessagePriority.High
+            });
+        }
 
         Socket s = new(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
         IPAddress ip = IPAddress.Parse("232.1.2.3");
@@ -310,10 +329,9 @@ public partial class Main : Window
     /// </summary>
     private void ShareScreen()
     {
-        if(DataContext is not MainViewModel model){return;}
         if (!_isSharing)
         {
-            ChooseStreamOptions prompt = new(model.Students);
+            ChooseStreamOptions prompt = new(GetModel().Students);
             prompt.Show();
             if (_studentToShareScreen.Count == 0) { return; }
             _isSharing = true;
@@ -327,7 +345,7 @@ public partial class Main : Window
             _multicastSender.Sending = false;
             foreach (DataForTeacher student in _studentToShareScreen)
             {
-                student.SocketToStudent.Send(new Command(CommandType.StopReceiveMulticast).ToByteArray());
+                _messageManager.NewMessage(new Message("",CommandType.StopReceiveMulticast,student.SocketToStudent,student.Id));
             }
             _studentToShareScreen = new List<DataForTeacher>();
             BtnShare.Content = "Share screen";
@@ -341,15 +359,9 @@ public partial class Main : Window
     /// </summary>
     private void SendStreamConfiguration()
     {
-        byte[] bytes = Encoding.Default.GetBytes(JsonSerializer.Serialize(_properties.Options));
         foreach (DataForTeacher student in _studentToShareScreen)
         {
-            student.SocketToStudent.Send(new Command(CommandType.ApplyMulticastSettings).ToByteArray());
-        }
-        Thread.Sleep(100);
-        foreach (DataForTeacher student in _studentToShareScreen)
-        {
-            student.SocketToStudent.Send(bytes);
+            _messageManager.NewMessage(new Message(JsonSerializer.Serialize(_properties.Options),CommandType.ApplyMulticastSettings,student.SocketToStudent,student.Id));
         }
     }
 
@@ -362,15 +374,14 @@ public partial class Main : Window
     /// </summary>
     public void TeacherAppResized()
     {
-        if(DataContext is not MainViewModel model){return;}
         switch (WindowState)
         {
             case WindowState.Minimized:
-                model.TrayIconVisible = true;
+                GetModel().TrayIconVisible = true;
                 Hide();
                 break;
             default:
-                model.TrayIconVisible = false;
+                GetModel().TrayIconVisible = false;
                 break;
         }
     }
@@ -390,8 +401,7 @@ public partial class Main : Window
     private void OnClosing()
     {
         _running = false;
-        if(DataContext is not MainViewModel model){return;}
-        foreach (Socket studentSocket in model.Students.Select(student => student.SocketToStudent))
+        foreach (Socket studentSocket in GetModel().Students.Select(student => student.SocketToStudent))
         {
             try
             {
@@ -419,10 +429,9 @@ public partial class Main : Window
     /// </summary>
     private void UpdateAllIndividualDisplay()
     {
-        if(DataContext is not MainViewModel model){return;}
         foreach (DisplayStudent display in _allStudentsDisplay)
         {
-            foreach (DataForTeacher student in model.Students.Where(student => display.GetStudentId() == student.Id))
+            foreach (DataForTeacher student in  GetModel().Students.Where(student => display.GetStudentId() == student.Id))
             {
                 display.UpdateDisplay(student);
             }
@@ -435,7 +444,7 @@ public partial class Main : Window
     /// <param name="student">The student for which you want a private display.</param>
     private void OpenPrivateDisplay(DataForTeacher student)
     {
-        if (_allStudentsDisplay.Any(display => display.GetStudentId() == student.Id))
+        if (_allStudentsDisplay.Exists(display => display.GetStudentId() == student.Id))
         {
             return;
         }
@@ -478,20 +487,15 @@ public partial class Main : Window
 
     #region TreeView display
 
-    /// <summary>
-    /// Function that closes all tree-node in the tree-views.
-    /// </summary>
-    private void CloseAllTreeViewNodes()
+    private void ApplyVisibilityToAllNodes(bool expanded)
     {
-        
-    }
-
-    /// <summary>
-    /// Function that opens all tree-node in the tree-views.
-    /// </summary>
-    private void OpenAllTreeViewNodes()
-    {
-        
+        foreach (object? item in TreeViewStudents.Items)
+        {
+            if(item == null){continue;}
+            TreeViewItem? treeViewItem = (TreeViewItem)TreeViewStudents.TreeContainerFromItem(item);
+            if(treeViewItem == null){continue;}
+            treeViewItem.IsExpanded  = expanded;
+        }
     }
 
     #endregion
