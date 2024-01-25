@@ -59,6 +59,15 @@ public partial class Main : Window
         BtnShowTreeView.Click += (_, _) => OpenAllTreeViewNodes();
         BtnOpenConfiguration.Click += (_, _) => OpenConfiguration();
         Closing += (_, _) => OnClosing();
+        _messageManager.MessageReceived += HandleReceivedMessage;
+    }
+
+    private void HandleReceivedMessage(object? sender, MessageReceived message)
+    {
+        switch (message.type)
+        {
+            
+        }
     }
 
     private void ChooseIpWindowClosing()

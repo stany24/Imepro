@@ -41,7 +41,7 @@ public class MessageManager
                 int messageSize = message.TargetSocket.Receive(receivedBytes);
                 byte[] messageBytes = new byte[messageSize];
                 Array.Copy(receivedBytes,messageBytes,messageSize);
-                MessageReceived?.Invoke(null,new MessageReceived(message.StudentId,Encoding.Default.GetString(messageBytes)));
+                MessageReceived?.Invoke(null,new MessageReceived(message.StudentId,message.Type,Encoding.Default.GetString(messageBytes)));
             }
             else
             {
