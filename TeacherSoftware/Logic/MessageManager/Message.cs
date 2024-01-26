@@ -24,4 +24,9 @@ public class Message
         TargetSocket = studentSocket;
         StudentId = studentId;
     }
+
+    private string Add()
+    {
+        return Content + StudentId;
+    }
 }

@@ -64,9 +64,33 @@ public partial class Main : Window
 
     private void HandleReceivedMessage(object? sender, MessageReceivedEventArgs message)
     {
+        DataForTeacher? student = GetModel().Students.Find(student => student.Id == message.StudentId);
         switch (message.type)
         {
-            
+            case CommandType.DemandData:
+                try
+                {
+                    student.ScreenShot = new MagickImage(Encoding.Default.GetBytes(message.Message));
+                    Log("Image recue de " + student.UserName);
+                    PreviewDisplay.AddOrUpdatePreview(student.Id, student.ComputerName, student.ScreenShot);
+                }
+                catch
+                {
+                    Log("Message from "+student.UserName+" received but image data was corrupted");
+                }
+                break;
+            case CommandType.DemandImage:
+                Data? data = JsonSerializer.Deserialize<Data>(message.Message);
+                if (data == null)
+                {
+                    Log("Message from "+student.UserName+" received but no data received");
+                    return;
+                }
+                student.Urls = data.Urls;
+                student.Processes = data.Processes;
+                break;
+            default: Log("Received an unwanted response");
+                break;
         }
     }
 
@@ -221,40 +245,6 @@ public partial class Main : Window
         {
             _messageManager.NewMessage(new Message("",CommandType.DemandData,student.SocketToStudent,student.Id));
             _messageManager.NewMessage(new Message("",CommandType.DemandImage,student.SocketToStudent,student.Id));
-        }
-    }
-
-    /// <summary>
-    /// Function that is used to receive the student data.
-    /// </summary>
-    /// <param name="student">The student that sent the data.</param>
-    /// <returns></returns>
-    private DataForTeacher ReceiveData(DataForTeacher student)
-    {
-        try
-        {
-            Socket socket = student.SocketToStudent;
-            int id = student.Id;
-            byte[] dataBuffer = new byte[100000];
-            socket.ReceiveTimeout = _properties.DefaultTimeout;
-            int nbData = socket.Receive(dataBuffer);
-            Array.Resize(ref dataBuffer, nbData);
-            Data? data = JsonSerializer.Deserialize<Data>(Encoding.Default.GetString(dataBuffer));
-            if (data == null) { return student;}
-            student = new DataForTeacher(data)
-            {
-                SocketToStudent = socket,
-                Id = id
-            };
-            Log("Données recue de " + student.UserName);
-            student.NumberOfFailure = 0;
-            return student;
-        }
-        catch
-        {
-            Log(student.UserName + " n'a pas envoyé de donnée");
-            student.NumberOfFailure++;
-            return student;
         }
     }
 

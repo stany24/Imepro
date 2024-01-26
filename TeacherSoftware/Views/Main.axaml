@@ -58,14 +58,34 @@
             Grid.Row="4"
             Grid.ColumnSpan="3"
             MinHeight="200"></ListBox>
-        <TreeView
+        <TreeView 
             Name="TreeViewStudents"
             Grid.Column="0"
             Grid.Row="2"
             ItemsSource="{Binding Students}">
             <TreeView.ItemTemplate>
                 <DataTemplate>
-                    <TextBox Text="{Binding UserName}"></TextBox>
+                    <StackPanel Orientation="Vertical">
+                        <TextBlock Text="{Binding UserName}" />
+                        <TreeViewItem Header="Processes">
+                            <ItemsControl ItemsSource="{Binding Processes.Values}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding}" />
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </TreeViewItem>
+                        <TreeViewItem Header="Browsers">
+                            <ItemsControl ItemsSource="{Binding Urls.AllBrowser.Keys}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding }" />
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </TreeViewItem>
+                    </StackPanel>
                 </DataTemplate>
             </TreeView.ItemTemplate>
         </TreeView>

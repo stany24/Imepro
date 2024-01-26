@@ -19,15 +19,16 @@ public class MessageManager
     public MessageManager()
     {
         _running = true;
-        Task.Run(Run);
+        Task.Run(Sender);
     }
 
     public void NewMessage(Message message)
     {
+        message.CreatedTime = DateTime.Now;
         _messages.Add(message);
     }
 
-    private void Run()
+    private void Sender()
     {
         while (_running)
         {
@@ -41,6 +42,7 @@ public class MessageManager
                 int messageSize = message.TargetSocket.Receive(receivedBytes);
                 byte[] messageBytes = new byte[messageSize];
                 Array.Copy(receivedBytes,messageBytes,messageSize);
+                Console.WriteLine(Encoding.Default.GetString(messageBytes));
                 MessageReceived?.Invoke(null,new MessageReceivedEventArgs(message.StudentId,message.Type,Encoding.Default.GetString(messageBytes)));
                 _messages.Remove(message);
             }
