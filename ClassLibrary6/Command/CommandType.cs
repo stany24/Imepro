@@ -13,5 +13,7 @@ public enum CommandType
     GiveControl,
     StopControl,
     DisconnectOfTeacher,
-    StopApplication
+    StopApplication,
+    Ok,
+    Error
 }

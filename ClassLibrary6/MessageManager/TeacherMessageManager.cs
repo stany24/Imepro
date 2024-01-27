@@ -1,25 +1,27 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Text;
 using System.Text.Json;
-using System.Threading;
-using System.Threading.Tasks;
+using ClassLibrary6.Command;
+using TeacherSoftware.Logic.MessageManager;
 
-namespace TeacherSoftware.Logic.MessageManager;
+namespace ClassLibrary6.MessageManager;
 
-public class MessageManager
+public class TeacherMessageManager
 {
-    private byte[] receivedBytes = new byte[10000];
+    private readonly byte[] _receivedBytes = new byte[10000];
     private bool _running;
-    private List<Message> _messages = new();
+    private readonly List<Message> _messages = new();
     public EventHandler<MessageReceivedEventArgs>? MessageReceived;
     public EventHandler<EventArgs>? MessageFailed;
 
-    public MessageManager()
+    public TeacherMessageManager()
     {
         _running = true;
         Task.Run(Sender);
+    }
+
+    ~TeacherMessageManager()
+    {
+        _running = false;
     }
 
     public void NewMessage(Message message)
@@ -39,12 +41,20 @@ public class MessageManager
 
                 string serialized = JsonSerializer.Serialize(message);
                 message.TargetSocket.Send(Encoding.Default.GetBytes(serialized));
-                int messageSize = message.TargetSocket.Receive(receivedBytes);
-                byte[] messageBytes = new byte[messageSize];
-                Array.Copy(receivedBytes,messageBytes,messageSize);
-                Console.WriteLine(Encoding.Default.GetString(messageBytes));
-                MessageReceived?.Invoke(null,new MessageReceivedEventArgs(message.StudentId,message.Type,Encoding.Default.GetString(messageBytes)));
-                _messages.Remove(message);
+                try
+                {
+                    int messageSize = message.TargetSocket.Receive(_receivedBytes);
+                    byte[] messageBytes = new byte[messageSize];
+                    Array.Copy(_receivedBytes,messageBytes,messageSize);
+                    Console.WriteLine(Encoding.Default.GetString(messageBytes));
+                    MessageReceived?.Invoke(null,new MessageReceivedEventArgs(message.StudentId,message.Type,Encoding.Default.GetString(messageBytes)));
+                    _messages.Remove(message);
+                }
+                catch
+                {
+                    MessageReceived?.Invoke(null,new MessageReceivedEventArgs(message.StudentId,CommandType.Error,""));
+                }
+                
             }
             else
             {

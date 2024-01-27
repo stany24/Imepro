@@ -7,10 +7,10 @@ public class MessageReceivedEventArgs:EventArgs
 {
     public string Message;
     public CommandType type;
-    public int StudentId;
+    public int? StudentId;
 
 
-    public MessageReceivedEventArgs(int studentId,CommandType type,string message)
+    public MessageReceivedEventArgs(int? studentId,CommandType type,string message)
     {
         StudentId = studentId;
         Message = message;

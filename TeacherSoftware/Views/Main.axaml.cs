@@ -11,6 +11,7 @@ using Avalonia.Controls;
 using Avalonia.Threading;
 using ClassLibrary6.Command;
 using ClassLibrary6.Data;
+using ClassLibrary6.MessageManager;
 using ClassLibrary6.ReliableMulticast;
 using ImageMagick;
 using MsBox.Avalonia;
@@ -27,7 +28,7 @@ public partial class Main : Window
     
     private readonly List<DisplayStudent> _allStudentsDisplay = new();
     private readonly Properties _properties = new();
-    private readonly MessageManager _messageManager = new();
+    private readonly TeacherMessageManager _teacherMessageManager = new();
     private bool _running = true;
 
     private List<DataForTeacher> _studentToShareScreen = new();
@@ -59,12 +60,16 @@ public partial class Main : Window
         BtnShowTreeView.Click += (_, _) => ApplyVisibilityToAllNodes(true);
         BtnOpenConfiguration.Click += (_, _) => OpenConfiguration();
         Closing += (_, _) => OnClosing();
-        _messageManager.MessageReceived += HandleReceivedMessage;
+        _teacherMessageManager.MessageReceived += HandleReceivedMessage;
     }
 
     private void HandleReceivedMessage(object? sender, MessageReceivedEventArgs message)
     {
         DataForTeacher? student = GetModel().Students.Find(student => student.Id == message.StudentId);
+        if(student == null){
+            Log("Received message from unlogged student");
+            return;
+        }
         switch (message.type)
         {
             case CommandType.DemandData:
@@ -88,6 +93,13 @@ public partial class Main : Window
                 }
                 student.Urls = data.Urls;
                 student.Processes = data.Processes;
+                Log("Données recue de " + student.UserName);
+                break;
+            case CommandType.Ok:
+                Log("Message from "+student.UserName+" received but no data received");
+                break;
+            case CommandType.Error:
+                Log("Pas de réponse de "+student.UserName);
                 break;
             default: Log("Received an unwanted response");
                 break;
@@ -160,7 +172,7 @@ public partial class Main : Window
                 _chooseIpWindow = new ChooseIp(possiblesIp);
                 _chooseIpWindow.Show();
                 _chooseIpWindow.Closing += (_,_) => ChooseIpWindowClosing();
-                Hide();
+                Dispatcher.UIThread.Post(Hide);
                 IsEnabled = false;
                 return false;
         }
@@ -190,7 +202,7 @@ public partial class Main : Window
                 {
                     DataForTeacher student = new(clientSocket, _nextId);
                     string content = JsonSerializer.Serialize(_properties.AutorisedWebsites);
-                    _messageManager.NewMessage(new Message(content,CommandType.ReceiveAutorisedUrls,student.SocketToStudent,student.Id));
+                    _teacherMessageManager.NewMessage(new Message(content,CommandType.ReceiveAutorisedUrls,student.SocketToStudent,student.Id));
                     GetModel().Students.Add(student);
                 });
                 _nextId++;
@@ -243,8 +255,8 @@ public partial class Main : Window
     {
         foreach (DataForTeacher student in GetModel().Students)
         {
-            _messageManager.NewMessage(new Message("",CommandType.DemandData,student.SocketToStudent,student.Id));
-            _messageManager.NewMessage(new Message("",CommandType.DemandImage,student.SocketToStudent,student.Id));
+            _teacherMessageManager.NewMessage(new Message("",CommandType.DemandData,student.SocketToStudent,student.Id));
+            _teacherMessageManager.NewMessage(new Message("",CommandType.DemandImage,student.SocketToStudent,student.Id));
         }
     }
 
@@ -276,18 +288,7 @@ public partial class Main : Window
     }
 
     #endregion
-
-    #region Previews
-
-    /// <summary>
-    /// Function that creates or remove the screenshots when a checkbox is clicked.
-    /// </summary>
-    private void ShowHidePreview()
-    { 
-    }
-
-    #endregion
-
+    
     #region Stream
 
     /// <summary>
@@ -297,7 +298,7 @@ public partial class Main : Window
     {
         foreach (DataForTeacher student in _studentToShareScreen)
         {
-            _messageManager.NewMessage(new Message("",CommandType.ReceiveMulticast,student.SocketToStudent,student.Id)
+            _teacherMessageManager.NewMessage(new Message("",CommandType.ReceiveMulticast,student.SocketToStudent,student.Id)
             {
                 MessagePriority = MessagePriority.High
             });
@@ -335,7 +336,7 @@ public partial class Main : Window
             _multicastSender.Sending = false;
             foreach (DataForTeacher student in _studentToShareScreen)
             {
-                _messageManager.NewMessage(new Message("",CommandType.StopReceiveMulticast,student.SocketToStudent,student.Id));
+                _teacherMessageManager.NewMessage(new Message("",CommandType.StopReceiveMulticast,student.SocketToStudent,student.Id));
             }
             _studentToShareScreen = new List<DataForTeacher>();
             BtnShare.Content = "Share screen";
@@ -351,7 +352,7 @@ public partial class Main : Window
     {
         foreach (DataForTeacher student in _studentToShareScreen)
         {
-            _messageManager.NewMessage(new Message(JsonSerializer.Serialize(_properties.Options),CommandType.ApplyMulticastSettings,student.SocketToStudent,student.Id));
+            _teacherMessageManager.NewMessage(new Message(JsonSerializer.Serialize(_properties.Options),CommandType.ApplyMulticastSettings,student.SocketToStudent,student.Id));
         }
     }
 
@@ -368,7 +369,7 @@ public partial class Main : Window
         {
             case WindowState.Minimized:
                 GetModel().TrayIconVisible = true;
-                Hide();
+                Dispatcher.UIThread.Post(Hide);
                 break;
             default:
                 GetModel().TrayIconVisible = false;

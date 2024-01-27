@@ -1,9 +1,9 @@
-﻿using System;
-using System.Net.Sockets;
+﻿using System.Net.Sockets;
 using System.Text.Json.Serialization;
 using ClassLibrary6.Command;
+using TeacherSoftware.Logic.MessageManager;
 
-namespace TeacherSoftware.Logic.MessageManager;
+namespace ClassLibrary6.MessageManager;
 
 public class Message
 {
@@ -23,10 +23,5 @@ public class Message
         Type = type;
         TargetSocket = studentSocket;
         StudentId = studentId;
-    }
-
-    private string Add()
-    {
-        return Content + StudentId;
     }
 }

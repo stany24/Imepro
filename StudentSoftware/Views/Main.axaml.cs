@@ -10,6 +10,7 @@ using Avalonia.Controls;
 using Avalonia.Media.Imaging;
 using Avalonia.Threading;
 using ClassLibrary6.Data;
+using ClassLibrary6.MessageManager;
 using ClassLibrary6.ReliableMulticast;
 using MsBox.Avalonia;
 using MsBox.Avalonia.Enums;
@@ -24,6 +25,7 @@ public partial class Main : Window
     private readonly TrayIcon _trayIconStudent;
     private DataForStudent _student;
     private AskIp _windowAskIp;
+    private StudentMessageManager _messageManager;
 
     #endregion
 
@@ -50,7 +52,7 @@ public partial class Main : Window
         _student = new DataForStudent(IpForTheWeek.GetIp());
         _student.NewConnexionMessageEvent += (_,e) => Dispatcher.UIThread.Post(() => LbxInfo.Items.Add(e.Message));
         _student.ChangePropertyEvent += ChangeProperty;
-        _student.NewMessageEvent += (sender,e) => LbxInfo.Items.Add(e.Message);
+        _student.NewMessageEvent += (_,e) => LbxInfo.Items.Add(e.Message);
         _student.NewImageEvent += DisplayImage;
     }
 
