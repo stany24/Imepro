@@ -2,10 +2,9 @@ using Avalonia.Controls;
 
 namespace TeacherSoftware.Views;
 
-public partial class Main : Window
+public partial class ConfigurationWindow : Window
 {
-
-    public Main()
+    public ConfigurationWindow()
     {
         InitializeComponent();
     }

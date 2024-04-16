@@ -1,15 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Net;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 
 namespace TeacherSoftware.Views;
 
-public partial class ChooseIp : Window
+public partial class ChooseIpWindow : Window
 {
     private IPAddress _ipAddress;
-    public ChooseIp(List<IPAddress> addresses)
+    public ChooseIpWindow(List<IPAddress> addresses)
     {
         InitializeComponent();
         foreach (IPAddress ipAddress in addresses)

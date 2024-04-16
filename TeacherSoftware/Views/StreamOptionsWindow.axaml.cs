@@ -4,9 +4,9 @@ using ClassLibrary6.Data;
 
 namespace TeacherSoftware.Views;
 
-public partial class ChooseStreamOptions : Window
+public partial class StreamOptionsWindow : Window
 {
-    public ChooseStreamOptions(List<DataForTeacher> students)
+    public StreamOptionsWindow()
     {
         InitializeComponent();
     }

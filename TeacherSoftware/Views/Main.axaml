@@ -7,6 +7,8 @@
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="TeacherSoftware.Views.Main"
         x:DataType="vm:MainViewModel"
+        IsVisible="{Binding IsVisible}"
+        IsEnabled="{Binding IsEnabled}"
         Icon="/Assets/avalonia-logo.ico"
         Title="TeacherSoftware">
 
@@ -19,44 +21,61 @@
             Name="SubGrid"
             Grid.Column="0"
             Grid.Row="0"
-            RowDefinitions="Auto,5,Auto,5,Auto"
+            RowDefinitions="Auto,5,Auto,5,Auto,5,Auto"
             ColumnDefinitions="Auto,5,Auto">
             <TextBlock
                 Name="LblIp"
                 Grid.Row="0"
-                Grid.Column="0">IP:</TextBlock>
+                Grid.Column="0"
+                Text="{Binding LblIpText}"></TextBlock>
             <Button
                 Name="BtnShare"
-                Grid.Row="0"
-                Grid.Column="2">Share</Button>
+                Grid.Row="2"
+                Grid.Column="0"
+                Command="{Binding OpenStreamOptionsWindow}"
+                HorizontalAlignment="Stretch"
+                HorizontalContentAlignment="Center"
+                Content="{Binding BtnShareContent}"></Button>
             <Button
                 Name="BtnFilter"
-                Grid.Row="0"
-                Grid.Column="2">Filtrer</Button>
+                Grid.Row="2"
+                Grid.Column="2"
+                HorizontalAlignment="Stretch"
+                HorizontalContentAlignment="Center"
+                Content="{Binding BtnFilterContent}"></Button>
             <Button
                 Name="BtnShowTreeView"
-                Grid.Row="2"
-                Grid.Column="0">Ouvrir</Button>
-            <Button
-                Name="BtnHideTreeView"
-                Grid.Row="2"
-                Grid.Column="2">Fermer</Button>
-            <Button
-                Name="BtnOpenConfiguration"
                 Grid.Row="4"
                 Grid.Column="0"
-                Grid.ColumnSpan="3">Configurations</Button>
+                HorizontalAlignment="Stretch"
+                HorizontalContentAlignment="Center">Ouvrir</Button>
+            <Button
+                Name="BtnHideTreeView"
+                Grid.Row="4"
+                Grid.Column="2"
+                HorizontalAlignment="Stretch"
+                HorizontalContentAlignment="Center">Fermer</Button>
+            <Button
+                Name="BtnOpenConfiguration"
+                Grid.Row="6"
+                Grid.Column="0"
+                Grid.ColumnSpan="3"
+                Command="{Binding OpenConfigurationWindow}"
+                HorizontalAlignment="Stretch"
+                HorizontalContentAlignment="Center">Configurations</Button>
             <Slider
                 Name="Slider"
+                HorizontalAlignment="Stretch"
                 Minimum="1"
                 Maximum="100"
-                Value="30"></Slider>
+                Value="{Binding SliderZoomValue}"></Slider>
         </Grid>
         <ListBox
             Name="LbxInfo"
             Grid.Column="0"
             Grid.Row="4"
             Grid.ColumnSpan="3"
+            ItemsSource="{Binding AllInfos}"
             MinHeight="200"></ListBox>
         <TreeView 
             Name="TreeViewStudents"
@@ -71,7 +90,7 @@
                             <ItemsControl ItemsSource="{Binding Processes.Values}">
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
-                                        <TextBlock Text="{Binding}" />
+                                        <TextBlock Text="Test" />
                                     </DataTemplate>
                                 </ItemsControl.ItemTemplate>
                             </ItemsControl>
@@ -80,7 +99,7 @@
                             <ItemsControl ItemsSource="{Binding Urls.AllBrowser.Keys}">
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
-                                        <TextBlock Text="{Binding }" />
+                                        <TextBlock Text="Test" />
                                     </DataTemplate>
                                 </ItemsControl.ItemTemplate>
                             </ItemsControl>
@@ -91,6 +110,8 @@
         </TreeView>
         <logic:PreviewDisplay
             Name="PreviewDisplay"
+            Zoom="{Binding SliderZoomValue}"
+            Previews="{Binding Previews}"
             Grid.Column="2"
             Grid.Row="0"
             Grid.RowSpan="3">

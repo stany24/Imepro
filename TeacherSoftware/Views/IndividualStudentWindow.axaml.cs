@@ -1,14 +1,12 @@
-﻿using Avalonia;
-using Avalonia.Controls;
-using Avalonia.Markup.Xaml;
+﻿using Avalonia.Controls;
 using ClassLibrary6.Data;
 
 namespace TeacherSoftware.Views;
 
-public partial class DisplayStudent : Window
+public partial class IndividualStudentWindow : Window
 {
     private int _id;
-    public DisplayStudent(int id)
+    public IndividualStudentWindow(int id)
     {
         _id = id;
         InitializeComponent();

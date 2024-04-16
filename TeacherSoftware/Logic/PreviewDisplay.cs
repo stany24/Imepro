@@ -1,5 +1,7 @@
-using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
+using System.Linq;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Media.Imaging;
 using ImageMagick;
@@ -8,9 +10,13 @@ namespace TeacherSoftware.Logic;
 
 public class PreviewDisplay:RelativePanel
 {
-    private readonly List<Preview> _previews = new();
+    public static readonly StyledProperty<ObservableCollection<Preview>> PreviewsProperty = 
+        AvaloniaProperty.Register<PreviewDisplay, ObservableCollection<Preview>>(nameof(Previews), defaultValue: new ObservableCollection<Preview>());
+    public ObservableCollection<Preview> Previews { get; set; } = new();
+    
+    public static readonly StyledProperty<int> ZoomProperty = 
+        AvaloniaProperty.Register<PreviewDisplay, int>(nameof(Zoom), defaultValue: 100);
     private int _zoom;
-
     public int Zoom
     {
         get => _zoom;
@@ -29,11 +35,12 @@ public class PreviewDisplay:RelativePanel
     public PreviewDisplay()
     {
         SizeChanged += (_,_) => UpdatePreviewLocationAndSize();
+        Previews.CollectionChanged += (_,_) => UpdatePreviewLocationAndSize();
     }
 
     public void AddOrUpdatePreview(int id,string name,MagickImage image)
     {
-        Preview? preview = _previews.Find(prev => prev.Id == id);
+        Preview? preview = Previews.ToList().Find(prev => prev.Id == id);
         using MemoryStream memStream = new();
         image.Write(memStream);
         Bitmap bitmap = new(memStream);
@@ -43,15 +50,15 @@ public class PreviewDisplay:RelativePanel
         }
         else
         {
-            _previews.Add(new Preview(id,name,bitmap));
+            Previews.Add(new Preview(id,name,bitmap));
         }
     }
     
     public void RemovePreview(int id)
     {
-        Preview? preview = _previews.Find(prev => prev.Id == id);
+        Preview? preview = Previews.ToList().Find(prev => prev.Id == id);
         if(preview == null){return;}
-        _previews.Remove(preview);
+        Previews.Remove(preview);
     }
 
     private void UpdatePreviewLocationAndSize()
