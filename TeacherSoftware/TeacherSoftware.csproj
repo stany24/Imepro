@@ -21,11 +21,19 @@
         <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
         <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.1.1" />
         <PackageReference Include="Avalonia.ReactiveUI" Version="11.1.1" />
+        <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
         <PackageReference Include="MessageBox.Avalonia" Version="3.1.6" />
     </ItemGroup>
 
 
     <ItemGroup>
       <ProjectReference Include="..\ClassLibrary6\ClassLibrary6.csproj" />
+    </ItemGroup>
+
+
+    <ItemGroup>
+      <Reference Include="CommunityToolkit.Mvvm">
+        <HintPath>..\..\..\..\..\home\stan\.nuget\packages\communitytoolkit.mvvm\8.2.2\lib\net6.0\CommunityToolkit.Mvvm.dll</HintPath>
+      </Reference>
     </ItemGroup>
 </Project>

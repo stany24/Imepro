@@ -10,8 +10,9 @@ public class Url
 {
     [JsonInclude]
     public readonly DateTime ScreenShotTime;
+
     [JsonInclude]
-    public readonly string Name;
+    public string Name { get; set; }
 
     public Url(DateTime screenShotTime, string name)
     {
