@@ -1,11 +1,9 @@
 using ClassLibrary6.Command;
 
-namespace StudentSoftware.Logic;
+namespace ClassLibrary6.Data;
 
-public class Message
+public class Message(CommandType type, string content)
 {
-    public string content;
-    public CommandType type;
-    
-    public Message(){}
+    public string Content { get; init; } = content;
+    public CommandType Type { get; init; } = type;
 }

@@ -2,12 +2,15 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using Avalonia.Controls;
+using Avalonia.Media.Imaging;
 using ClassLibrary6.Command;
 using ClassLibrary6.Data;
 using ClassLibrary6.History;
@@ -35,7 +38,7 @@ public partial class MainViewModel : ViewModelBase
     [ObservableProperty] private List<string> _requests = [];
     [ObservableProperty] private List<string> _connections = [];
     
-    private IPAddress ipAddr = null;
+    private IPAddress ipAddr;
     private int NextId;
     private bool isAsking;
     
@@ -51,12 +54,33 @@ public partial class MainViewModel : ViewModelBase
         };
         MainWindow.Closing+=(_,_) => Closing();
         MainWindow.Show();
-        LblIpText = "IP: 192.168.1.1";
-        History history = new();
-        history.AddUrl(new Url(DateTime.Now, "youtube.com"),BrowserName.Firefox);
-        Students.Add(new DataForTeacher(new Data("stan","computer",history,new Dictionary<int, string>(){{367,"rider"}})));
+        FindIp();
         Task.Run(AskStudentsForData);
         Task.Run(LogClients);
+        FindIp();
+    }
+
+    private void FindIp()
+    {
+        // Establish the local endpointfor the socket.
+        // Dns.GetHostName returns the name of the host running the application.
+        IPHostEntry ipHost = Dns.GetHostEntry(Dns.GetHostName());
+        List<IPAddress> possiblesIp = ipHost.AddressList.Where(address => address.AddressFamily == AddressFamily.InterNetwork).ToList();
+        possiblesIp.RemoveAll(x => x.Equals(IPAddress.Parse("127.0.1.1")));
+        switch (possiblesIp.Count)
+        {
+            case 0:
+                Console.WriteLine("No IP address found"); // TODO : add message box and close app
+                break;
+            case 1: 
+                ipAddr = possiblesIp[0];
+                Console.WriteLine("IP address found: " + ipAddr);
+                break;
+            default:
+                Console.WriteLine("Multiple IP address found"); // TODO : add window to choose the right one
+                break;
+        }
+        LblIpText = "IP: " + ipAddr;
     }
 
     private void LogClients()
@@ -85,7 +109,8 @@ public partial class MainViewModel : ViewModelBase
         isAsking = true;
         socket.Send(new Command(CommandType.ReceiveAutorisedUrls).ToByteArray());
         //serialization
-        string jsonString = JsonSerializer.Serialize(new List<string>{"youtube.com","github.com"}); //TODO : add to settings
+        string content = JsonSerializer.Serialize(new List<string> { "youtube.com", "github.com" });//TODO : add to settings
+        string jsonString = JsonSerializer.Serialize(new Message(CommandType.ReceiveAutorisedUrls, content));
         //envoi
         Thread.Sleep(100);
         socket.Send(Encoding.ASCII.GetBytes(jsonString), Encoding.ASCII.GetBytes(jsonString).Length, SocketFlags.None);
@@ -177,7 +202,6 @@ public partial class MainViewModel : ViewModelBase
                 Id = id
             };
             Requests.Add(DateTime.Now.ToString("HH:mm:ss") + " Données recue de " + student.UserName);
-            Task.Run(() => UpdateTreeViews(student));
             student.NumberOfFailure = 0;
             return student;
         }
@@ -201,7 +225,7 @@ public partial class MainViewModel : ViewModelBase
             student.ScreenShot = new MagickImage(new MemoryStream(imageBuffer));
             Requests.Add(DateTime.Now.ToString("HH:mm:ss") + " Image recue de " + student.UserName);
             student.NumberOfFailure = 0;
-            Displayer.UpdatePreview(student.Id, student.ComputerName, student.ScreenShot);
+            Previews.Add(new Preview(student.Id, student.ComputerName, new Bitmap(new MemoryStream(imageBuffer))));
         }
         catch
         {
@@ -214,16 +238,6 @@ public partial class MainViewModel : ViewModelBase
     {
         Students.Remove(student);
         Requests.Add(DateTime.Now.ToString("HH:mm:ss") + " L'élève " + student.UserName + " est déconnecté");
-        TreeViewDetails.Invoke(new MethodInvoker(delegate
-        {
-            TreeNode[] nodes = TreeViewDetails.Nodes.Find(Convert.ToString(student.ID), false);
-            if (nodes.Any()) { nodes[0].Remove(); }
-        }));
-        TreeViewSelect.Invoke(new MethodInvoker(delegate
-        {
-            TreeNode[] nodes = TreeViewSelect.Nodes.Find(Convert.ToString(student.ID), false);
-            if (nodes.Any()) { nodes[0].Remove(); }
-        }));
     }
 
     private void Closing()
