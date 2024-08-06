@@ -1,7 +1,4 @@
-﻿using System;
-using System.Windows.Forms;
-
-namespace ApplicationTeacher
+﻿namespace ApplicationTeacher
 {
     internal static class Program
     {

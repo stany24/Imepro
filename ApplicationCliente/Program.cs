@@ -1,7 +1,4 @@
-﻿using System;
-using System.Windows.Forms;
-
-namespace ApplicationCliente
+﻿namespace ApplicationCliente
 {
     internal static class Program
     {

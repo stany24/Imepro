@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net;
-using System.Windows.Forms;
-
-namespace ApplicationTeacher
+﻿namespace ApplicationTeacher
 {
     public partial class AskToChoseIp : Form
     {

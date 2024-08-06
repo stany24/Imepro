@@ -202,7 +202,7 @@ public class DataForStudent : Data
                     bool success = result.AsyncWaitHandle.WaitOne(timeout, true);
                     if (success)
                     {
-                        sender.EndConnect(result);
+                        //sender.EndConnect(result);
                         NewConnexionMessageEvent.Invoke(this, new NewMessageEventArgs("Connected"));
                         return sender;
                     }
@@ -254,6 +254,7 @@ public class DataForStudent : Data
             int length;
             try { length = SocketToTeacher.Receive(info); }
             catch (SocketException) { return; }
+            if(length == 0) { return; }
             Array.Resize(ref info, length);
             string json = Encoding.Default.GetString(info);
             Message message = JsonSerializer.Deserialize<Message>(json);

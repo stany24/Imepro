@@ -1,13 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Drawing.Imaging;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-
-namespace LibraryData
+﻿namespace LibraryData
 {
     /// <summary>
     /// Class for preview: a screenshot with the name of the student.

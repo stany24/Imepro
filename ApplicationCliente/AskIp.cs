@@ -1,8 +1,4 @@
-﻿using System;
-using System.Net;
-using System.Windows.Forms;
-
-namespace ApplicationCliente
+﻿namespace ApplicationCliente
 {
     public partial class AskIp : Form
     {
