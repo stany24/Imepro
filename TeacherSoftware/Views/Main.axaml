@@ -1,0 +1,116 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:TeacherSoftware.ViewModels"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:logic="clr-namespace:TeacherSoftware.Logic"
+        xmlns:data="clr-namespace:ClassLibrary6.Data;assembly=ClassLibrary6"
+        xmlns:diagnostics="clr-namespace:System.Diagnostics;assembly=System.Diagnostics.Process"
+        xmlns:history="clr-namespace:ClassLibrary6.History;assembly=ClassLibrary6"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="TeacherSoftware.Views.Main"
+        x:DataType="vm:MainViewModel"
+        IsVisible="{Binding IsVisible}"
+        IsEnabled="{Binding IsEnabled}"
+        Icon="/Assets/avalonia-logo.ico"
+        Title="TeacherSoftware">
+
+    <Grid
+        Name="MainGrid"
+        Margin="5"
+        RowDefinitions="Auto,5,*,5,Auto"
+        ColumnDefinitions="Auto,5,*">
+        <Grid
+            Name="SubGrid"
+            Grid.Column="0"
+            Grid.Row="0"
+            RowDefinitions="Auto,5,Auto,5,Auto,5,Auto"
+            ColumnDefinitions="Auto,5,Auto">
+            <TextBlock
+                Name="LblIp"
+                Grid.Row="0"
+                Grid.Column="0"
+                Text="{Binding LblIpText}"></TextBlock>
+            <Button
+                Name="BtnShare"
+                Grid.Row="2"
+                Grid.Column="0"
+                Command="{Binding OpenStreamOptionsWindow}"
+                HorizontalAlignment="Stretch"
+                HorizontalContentAlignment="Center"
+                Content="{Binding BtnShareContent}"></Button>
+            <Button
+                Name="BtnFilter"
+                Grid.Row="2"
+                Grid.Column="2"
+                HorizontalAlignment="Stretch"
+                HorizontalContentAlignment="Center"
+                Content="{Binding BtnFilterContent}"></Button>
+            <Button
+                Name="BtnShowTreeView"
+                Grid.Row="4"
+                Grid.Column="0"
+                HorizontalAlignment="Stretch"
+                HorizontalContentAlignment="Center">Ouvrir</Button>
+            <Button
+                Name="BtnHideTreeView"
+                Grid.Row="4"
+                Grid.Column="2"
+                HorizontalAlignment="Stretch"
+                HorizontalContentAlignment="Center">Fermer</Button>
+            <Button
+                Name="BtnOpenConfiguration"
+                Grid.Row="6"
+                Grid.Column="0"
+                Grid.ColumnSpan="3"
+                Command="{Binding OpenConfigurationWindow}"
+                HorizontalAlignment="Stretch"
+                HorizontalContentAlignment="Center">Configurations</Button>
+            <Slider
+                Name="Slider"
+                HorizontalAlignment="Stretch"
+                Minimum="1"
+                Maximum="100"
+                Value="{Binding SliderZoomValue}"></Slider>
+        </Grid>
+        <ListBox
+            Name="LbxInfo"
+            Grid.Column="0"
+            Grid.Row="4"
+            Grid.ColumnSpan="3"
+            ItemsSource="{Binding AllInfos}"
+            MinHeight="200"></ListBox>
+        <TreeView 
+            Name="TreeViewStudents"
+            Grid.Column="0"
+            Grid.Row="2"
+            ItemsSource="{Binding Students}">
+            <TreeView.ItemTemplate>
+                <TreeDataTemplate DataType="data:DataForTeacher">
+                    <TreeViewItem Header="{Binding UserName}">
+                        <TreeViewItem Header="{Binding ComputerName}" />
+                        <TreeViewItem Header="Processes" ItemsSource="{Binding Processes}">
+                            <TreeViewItem.ItemTemplate>
+                                <TreeDataTemplate DataType="diagnostics:Process">
+                                    <TreeViewItem Header="{Binding ProcessName}" />
+                                </TreeDataTemplate>
+                            </TreeViewItem.ItemTemplate>
+                        </TreeViewItem>
+                        <TreeViewItem Header="Browsers">
+                            
+                        </TreeViewItem>
+                    </TreeViewItem>
+                </TreeDataTemplate>
+            </TreeView.ItemTemplate>
+        </TreeView>
+        <logic:PreviewDisplay
+            Name="PreviewDisplay"
+            Zoom="{Binding SliderZoomValue}"
+            Previews="{Binding Previews}"
+            Grid.Column="2"
+            Grid.Row="0"
+            Grid.RowSpan="3">
+        </logic:PreviewDisplay>
+    </Grid>
+
+</Window>

@@ -130,13 +130,21 @@ namespace LibraryData
 
         #region Constructor
 
-        public DataForStudent()
+        public DataForStudent(IPAddress teacherIp)
         {
+            IpToTeacher = teacherIp;
             AutorisedUrls = new();
             SeleniumProcessesID = new();
             GetDefaultProcesses();
             ComputerName = Environment.MachineName;
             UserName = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
+            Task.Run(InitializeSocket);
+        }
+
+        private void InitializeSocket()
+        {
+            SocketToTeacher = ConnectToTeacher(11111);
+            WaitForDemand();
         }
 
         #endregion
@@ -313,7 +321,7 @@ namespace LibraryData
         /// <summary>
         /// Function used to connect to the teacher application.
         /// </summary>
-        public Socket ConnectToTeacher(int port)
+        private Socket ConnectToTeacher(int port)
         {
             try
             {
@@ -342,7 +350,6 @@ namespace LibraryData
                         if (success)
                         {
                             sender.EndConnect(result);
-                            Task.Run(WaitForDemand);
                             NewConnexionMessageEvent.Invoke(this, new NewMessageEventArgs("Connected"));
                             return sender;
                         }
@@ -453,8 +460,8 @@ namespace LibraryData
         {
             isReceiving = false;
             mouseDisabled = false;
-            ChangePropertyEvent.Invoke(this, new ChangePropertyEventArgs("form", "FormBorderStyle", FormBorderStyle.Sizable));
-            ChangePropertyEvent.Invoke(this, new ChangePropertyEventArgs("pbxScreenShot", "Visible", false));
+            ChangePropertyEvent.Invoke(this, new ChangePropertyEventArgs("form",ControlType.Window, "FormBorderStyle", FormBorderStyle.Sizable));
+            ChangePropertyEvent.Invoke(this, new ChangePropertyEventArgs("pbxScreenShot", ControlType.Image, "Visible", false));
             gkh.Unhook();
         }
 
@@ -532,26 +539,26 @@ namespace LibraryData
             int size = SocketToTeacher.Receive(message);
             Array.Resize(ref message, size);
             options = JsonSerializer.Deserialize<StreamOptions>(Encoding.Default.GetString(message));
-            ChangePropertyEvent.Invoke(this, new ChangePropertyEventArgs("pbxScreenShot", "Visible", true));
+            ChangePropertyEvent.Invoke(this, new ChangePropertyEventArgs("pbxScreenShot", ControlType.Image, "Visible", true));
 
             switch (options.GetPriority())
             {
                 case Priority.Fullscreen:
-                    ChangePropertyEvent.Invoke(this, new ChangePropertyEventArgs("form", "FormBorderStyle", FormBorderStyle.None));
-                    ChangePropertyEvent.Invoke(this, new ChangePropertyEventArgs("form", "WindowState", FormWindowState.Maximized));
+                    ChangePropertyEvent.Invoke(this, new ChangePropertyEventArgs("form", ControlType.Window, "FormBorderStyle", FormBorderStyle.None));
+                    ChangePropertyEvent.Invoke(this, new ChangePropertyEventArgs("form", ControlType.Window, "WindowState", FormWindowState.Maximized));
                     break;
                 case Priority.Blocking:
-                    ChangePropertyEvent.Invoke(this, new ChangePropertyEventArgs("form", "FormBorderStyle", FormBorderStyle.None));
-                    ChangePropertyEvent.Invoke(this, new ChangePropertyEventArgs("form", "WindowState", FormWindowState.Maximized));
-                    ChangePropertyEvent.Invoke(this, new ChangePropertyEventArgs("form", "TopMost", true));
+                    ChangePropertyEvent.Invoke(this, new ChangePropertyEventArgs("form", ControlType.Window, "FormBorderStyle", FormBorderStyle.None));
+                    ChangePropertyEvent.Invoke(this, new ChangePropertyEventArgs("form", ControlType.Window, "WindowState", FormWindowState.Maximized));
+                    ChangePropertyEvent.Invoke(this, new ChangePropertyEventArgs("form", ControlType.Window, "TopMost", true));
                     mouseDisabled = true;
                     Task.Run(DisableMouseEverySecond);
                     DisableKeyboard();
                     break;
                 case Priority.Topmost:
-                    ChangePropertyEvent.Invoke(this, new ChangePropertyEventArgs("form", "FormBorderStyle", FormBorderStyle.None));
-                    ChangePropertyEvent.Invoke(this, new ChangePropertyEventArgs("form", "WindowState", FormWindowState.Maximized));
-                    ChangePropertyEvent.Invoke(this, new ChangePropertyEventArgs("form", "TopMost", true));
+                    ChangePropertyEvent.Invoke(this, new ChangePropertyEventArgs("form", ControlType.Window, "FormBorderStyle", FormBorderStyle.None));
+                    ChangePropertyEvent.Invoke(this, new ChangePropertyEventArgs("form", ControlType.Window, "WindowState", FormWindowState.Maximized));
+                    ChangePropertyEvent.Invoke(this, new ChangePropertyEventArgs("form", ControlType.Window, "TopMost", true));
                     break;
                 case Priority.Widowed:
                     break;
@@ -663,14 +670,22 @@ namespace LibraryData
     public class ChangePropertyEventArgs : EventArgs
     {
         public string ControlName { get; }
+        public ControlType ControlType { get; }
         public string PropertyName { get; }
         public object PropertyValue { get; }
 
-        public ChangePropertyEventArgs(string controlName, string propertyName, object propertyValue)
+        public ChangePropertyEventArgs(string controlName,ControlType controltype, string propertyName, object propertyValue)
         {
             ControlName = controlName;
+            ControlType = controltype;
             PropertyName = propertyName;
             PropertyValue = propertyValue;
         }
+    }
+
+    public enum ControlType
+    {
+        Image,
+        Window
     }
 }

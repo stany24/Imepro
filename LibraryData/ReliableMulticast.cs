@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Net.Sockets;
@@ -112,11 +111,14 @@ namespace LibraryData
         public byte[] TakeScreenshot()
         {
             Screen screen = Screen.AllScreens[ScreenToShareId];
-            Bitmap bitmap = new(screen.Bounds.Width, screen.Bounds.Height, PixelFormat.Format16bppRgb565);
             Rectangle ScreenSize = screen.Bounds;
+            Bitmap bitmap = new(ScreenSize.Width, ScreenSize.Height);
             Graphics.FromImage(bitmap).CopyFromScreen(ScreenSize.Left, ScreenSize.Top, 0, 0, ScreenSize.Size);
             ImageConverter converter = new();
-            return (byte[])converter.ConvertTo(bitmap, typeof(byte[]));
+            MemoryStream ms = new();
+            bitmap.Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg);
+            Bitmap anybitmap = new(ms);
+            return (byte[])converter.ConvertTo(anybitmap, typeof(byte[]));
         }
 
         #endregion

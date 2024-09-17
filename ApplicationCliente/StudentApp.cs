@@ -1,5 +1,5 @@
-﻿using LibraryData;
-using System;
+﻿using System;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -7,9 +7,8 @@ using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.Reflection;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Forms;
+using LibraryData;
 
 namespace ApplicationCliente
 {
@@ -19,6 +18,7 @@ namespace ApplicationCliente
         #region Variables
 
         readonly DataForStudent Student;
+        private Bitmap ScreenShot;
 
         #endregion
 
@@ -27,25 +27,16 @@ namespace ApplicationCliente
         {
             InitializeComponent();
             SplitterImageButtons.Panel1.Controls.SetChildIndex(pbxScreenShot, 0);
-            Student = new();
+            try{ Student = new(IpForTheWeek.GetIp());}
+            catch (Exception){
+                NewTeacherIP(new object(), new EventArgs());
+                Student = new(IpForTheWeek.GetIp());
+            }
             Student.ChangePropertyEvent += ChangeProperty;
             Student.NewMessageEvent += AddMessage;
             Student.NewConnexionMessageEvent += AddConnexionMessage;
             Student.NewImageEvent += DisplayImage;
-            try{Student.IpToTeacher = IpForTheWeek.GetIp();}
-            catch (Exception){NewTeacherIP(new object(), new EventArgs());}
-            Task.Run(LaunchTasks);
         }
-
-        /// <summary>
-        /// Function waiting for the form to be fully created before launching background tasks.
-        /// </summary>
-        public void LaunchTasks()
-        {
-            while (!IsHandleCreated) { Thread.Sleep(100); }
-            Student.SocketToTeacher = Task.Run(() => Student.ConnectToTeacher(11111)).Result;
-        }
-
         #endregion
 
         #region Event Handeling
@@ -57,7 +48,7 @@ namespace ApplicationCliente
         /// <param name="e"></param>
         private void DisplayImage(object sender,NewImageEventArgs e)
         {
-            pbxScreenShot.Image = e.image;
+            //ScreenShot = e.image;
         }
 
         /// <summary>
@@ -136,7 +127,6 @@ namespace ApplicationCliente
             prompt.ShowDialog();
             prompt.Close();
             prompt.Dispose();
-            Student.IpToTeacher = IpForTheWeek.GetIp();
         }
 
         /// <summary>
