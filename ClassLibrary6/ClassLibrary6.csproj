@@ -14,6 +14,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Reference Include="Avalonia.Base">
+      <HintPath>..\StudentSoftware\bin\Debug\net6.0\Avalonia.Base.dll</HintPath>
+    </Reference>
     <Reference Include="System.Management">
       <HintPath>..\..\..\..\..\..\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.7.2\System.Management.dll</HintPath>
     </Reference>

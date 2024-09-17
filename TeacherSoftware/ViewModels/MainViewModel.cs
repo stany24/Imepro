@@ -24,7 +24,7 @@ public partial class MainViewModel : ViewModelBase
     [ObservableProperty] private List<Preview> _previews = new();
     [ObservableProperty] private List<string> _allInfos = new();
     
-    public ObservableCollection<DataForTeacher> Students { get; set; } = new();
+    public ObservableCollection<DataForTeacher> Students { get; } = new();
 
     [ObservableProperty] private int _sliderZoomValue = 50;
 
@@ -39,7 +39,8 @@ public partial class MainViewModel : ViewModelBase
         LblIpText = "IP: 192.168.1.1";
         History history = new();
         history.AddUrl(new Url(DateTime.Now, "youtube.com"),BrowserName.Firefox);
-        Students.Add(new DataForTeacher(new Data("stan","computer",history,new Dictionary<int, string>(){{367,"rider"}})));
+        Students.Add(new DataForTeacher(new Data("stan","computer",history,new Dictionary<int, string>{{367,"rider"}})));
+        Console.WriteLine(Students[0]);
     }
 
     private void Closing()

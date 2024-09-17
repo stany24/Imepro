@@ -38,10 +38,10 @@ public class DataForStudent : Data
     private bool isReceiving = false;
     private bool isControled = false;
 
-    public event EventHandler<NewMessageEventArgs> NewConnexionMessageEvent;
-    public event EventHandler<ChangePropertyEventArgs> ChangePropertyEvent;
-    public event EventHandler<NewMessageEventArgs> NewMessageEvent;
-    public event EventHandler<NewImageEventArgs> NewImageEvent;
+    public event EventHandler<NewMessageEventArgs>? NewConnexionMessageEvent;
+    public event EventHandler<ChangePropertyEventArgs>? ChangePropertyEvent;
+    public event EventHandler<NewMessageEventArgs>? NewMessageEvent;
+    public event EventHandler<NewImageEventArgs>? NewImageEvent;
 
     public Socket SocketToTeacher { get; private set; }
     public IPAddress IpToTeacher { get; set; }

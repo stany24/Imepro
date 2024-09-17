@@ -55,6 +55,7 @@ public class ScreenShotTaker
         }
 
         MagickImage final = (MagickImage)images.Mosaic();
+        
         final.Format = MagickFormat.Rgb;
         return final;
     }

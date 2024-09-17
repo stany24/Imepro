@@ -1,4 +1,5 @@
 ﻿using System.Text.Json.Serialization;
+using Avalonia.Collections;
 
 namespace ClassLibrary6.History
 {
@@ -9,8 +10,7 @@ namespace ClassLibrary6.History
     [Serializable]
     public class History
     {
-        [JsonInclude]
-        public Dictionary<BrowserName, List<Url>> AllBrowser { get; set; }
+        [JsonInclude] public AvaloniaDictionary<BrowserName, List<Url>> AllBrowser { get; set; } = new();
 
         /// <summary>
         /// Function to add a new url.
@@ -26,7 +26,6 @@ namespace ClassLibrary6.History
 
         public History()
         {
-            AllBrowser = new Dictionary<BrowserName, List<Url>>();
             foreach (BrowserName name in Enum.GetValues(typeof(BrowserName)))
             {
                 AllBrowser.Add(name, new List<Url>());
