@@ -117,7 +117,7 @@ namespace LibraryData
             ImageConverter converter = new();
             MemoryStream ms = new();
             bitmap.Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg);
-            AnyBitmap anybitmap = new(ms);
+            Bitmap anybitmap = new(ms);
             return (byte[])converter.ConvertTo(anybitmap, typeof(byte[]));
         }
 
@@ -221,10 +221,10 @@ namespace LibraryData
         public void ImageCompleted()
         {
             byte[] imageData = ImageBytes.SelectMany(a => a).ToArray();
-            AnyBitmap bmp;
+            Bitmap bmp;
             using (var ms = new MemoryStream(imageData))
             {
-                bmp = new AnyBitmap(ms);
+                bmp = new Bitmap(ms);
             }
             ImageCompletedEvent?.Invoke(this, new ImageCompletedEventArgs(bmp, ImageNumber));
         }
@@ -237,14 +237,14 @@ namespace LibraryData
     /// </summary>
     public class ImageCompletedEventArgs : EventArgs
     {
-        public ImageCompletedEventArgs(AnyBitmap competedimage, int imageId)
+        public ImageCompletedEventArgs(Bitmap competedimage, int imageId)
         {
             CompletedImage = competedimage;
             ImageId = imageId;
         }
 
         public int ImageId { get; set; }
-        public AnyBitmap CompletedImage { get; set; }
+        public Bitmap CompletedImage { get; set; }
     }
 
     /// <summary>
@@ -252,7 +252,7 @@ namespace LibraryData
     /// </summary>
     public class NewImageEventArgs : EventArgs
     {
-        public AnyBitmap image { get; }
-        public NewImageEventArgs(AnyBitmap newimage) { image = newimage; }
+        public Bitmap image { get; }
+        public NewImageEventArgs(Bitmap newimage) { image = newimage; }
     }
 }

@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using Avalonia.Controls;
-using ClassLibrary6.Data;
+﻿using Avalonia.Controls;
 
 namespace TeacherSoftware.Views;
 

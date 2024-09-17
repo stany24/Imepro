@@ -1,5 +1,4 @@
-﻿using LibraryData;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
@@ -7,6 +6,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using LibraryData;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
@@ -531,7 +531,7 @@ namespace ApplicationTeacher
             DisplayStudent newDisplay = new(ipAddr);
             AllStudentsDisplay.Add(newDisplay);
             newDisplay.UpdateAffichage(student);
-            newDisplay.FormClosing += new FormClosingEventHandler(RemovePrivateDisplay);
+            //newDisplay += new FormClosingEventHandler(RemovePrivateDisplay);
             newDisplay.Show();
         }
 

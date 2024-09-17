@@ -9,7 +9,6 @@ using ClassLibrary6.History;
 using ClassLibrary6.ReliableMulticast;
 using ClassLibrary6.StreamOptions;
 using ImageMagick;
-using StudentSoftware.Logic;
 
 namespace ClassLibrary6.Data;
 
@@ -19,7 +18,7 @@ namespace ClassLibrary6.Data;
 public class DataForStudent : Data
 {
     #region Variables/Events
-    private readonly List<string> _defaultProcess = new();
+    private readonly List<string> _defaultProcess = [];
     private readonly Dictionary<string, BrowserName> browsersList = new() {
         { "chrome",BrowserName.Chrome },
         { "firefox", BrowserName.Firefox },
@@ -34,9 +33,9 @@ public class DataForStudent : Data
     private StreamOptions.StreamOptions _options;
     private int _screenToStream;
 
-    private bool mouseDisabled = false;
-    private bool isReceiving = false;
-    private bool isControled = false;
+    private bool mouseDisabled;
+    private bool isReceiving;
+    private bool isControled;
 
     public event EventHandler<NewMessageEventArgs>? NewConnexionMessageEvent;
     public event EventHandler<ChangePropertyEventArgs>? ChangePropertyEvent;
@@ -202,7 +201,7 @@ public class DataForStudent : Data
                     bool success = result.AsyncWaitHandle.WaitOne(timeout, true);
                     if (success)
                     {
-                        sender.EndConnect(result);
+                        //sender.EndConnect(result);
                         NewConnexionMessageEvent.Invoke(this, new NewMessageEventArgs("Connected"));
                         return sender;
                     }
@@ -254,20 +253,26 @@ public class DataForStudent : Data
             int length;
             try { length = SocketToTeacher.Receive(info); }
             catch (SocketException) { return; }
+            if(length == 0) { return; }
             Array.Resize(ref info, length);
             string json = Encoding.Default.GetString(info);
-            Message message = JsonSerializer.Deserialize<Message>(json);
-            NewConnexionMessageEvent.Invoke(this, new NewMessageEventArgs(message.type.ToString()));
-            switch (message.type)
+            Message? message = JsonSerializer.Deserialize<Message>(json);
+            if (message == null)
+            {
+                NewMessageEvent.Invoke(this,new NewMessageEventArgs("Received a corrupted message from teacher"));
+                return;
+            }
+            NewConnexionMessageEvent.Invoke(this, new NewMessageEventArgs(message.Type.ToString()));
+            switch (message.Type)
             {
                 case CommandType.DemandData: SendData(); break;
                 case CommandType.DemandImage: SendImage(_screenShotTaker.TakeAllScreenShot(), SocketToTeacher); break;
-                case CommandType.KillProcess: KillSelectedProcess(Convert.ToInt32(message.content)); break;
+                case CommandType.KillProcess: KillSelectedProcess(Convert.ToInt32(message.Content)); break;
                 case CommandType.ReceiveMulticast: Task.Run(ReceiveMulticastStream); break;
                 case CommandType.ApplyMulticastSettings: ApplyMulticastSettings(); break;
                 case CommandType.StopReceiveMulticast: Stop(); break;
                 case CommandType.ReceiveMessage: ReceiveMessage(); break;
-                case CommandType.ReceiveAutorisedUrls: ReceiveAuthorisedUrls(message.content); break;
+                case CommandType.ReceiveAutorisedUrls: ReceiveAuthorisedUrls(message.Content); break;
                 case CommandType.StopControl: isControled = false; break;
                 case CommandType.DisconnectOfTeacher: Disconnect(); return;
                 case CommandType.StopApplication: ShutDown(); return;

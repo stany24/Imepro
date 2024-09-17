@@ -42,7 +42,7 @@ public class ScreenShotTaker
         {
             using (captureZone.Lock())
             {
-                MagickImage imageMagick = new(MagickColors.White, captureZone.Width,captureZone.Height);
+                MagickImage imageMagick = new(MagickColors.White, (uint)captureZone.Width,(uint)captureZone.Height);
                 for (int i = 0; i < captureZone.Width; i++)
                 {
                     for (int j = 0; j < captureZone.Height; j++)
@@ -65,7 +65,7 @@ public class ScreenShotTaker
         ICaptureZone captureZone = _iCaptureZones[screenId];
         using (captureZone.Lock())
         {
-            return new MagickImage(captureZone.RawBuffer);
+            return new MagickImage(captureZone.RawBuffer.ToArray());
         }
     }
 }

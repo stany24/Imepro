@@ -1,5 +1,4 @@
-﻿using LibraryData;
-using System;
+﻿using System;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -9,6 +8,7 @@ using System.Net.Sockets;
 using System.Reflection;
 using System.Text;
 using System.Windows.Forms;
+using LibraryData;
 
 namespace ApplicationCliente
 {
