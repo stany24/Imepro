@@ -22,14 +22,14 @@ For specific usage of the application you can see the wiki.
 For the moment the only support is to make an issue.
 
 ## Roadmap
-For the future update you can see the issues with the tag "enhancement ".
+No intensions to continue. And I would restart the project instead of continuing.
 
 ## Contributing
-You can always help me if you want. I just want you to add documentation to your code for everyone to understand it.
+You can always fork if you want but not recommended.
 
 ## Authors and acknowledgment
 My school CPNE-TI for making me start the project.
 My teacher for helping me when I needed.
 
 ## Project status
-The project is still running.
+The project has ended.
